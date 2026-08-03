@@ -2,33 +2,34 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
     <title>Experiencia MS3 - Visor Inmersivo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
-        body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; }
+        body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; touch-action: none; }
         #webgl-container, #ms3-environment { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
         #webgl-container { z-index: 2; cursor: pointer; }
-        #ms3-environment { z-index: 1; opacity: 0; pointer-events: none; transition: opacity 1.5s ease; background: radial-gradient(circle, #1e1b4b 0%, #000 100%); }
-        #instruction { position: absolute; bottom: 30px; width: 100%; text-align: center; color: #fff; z-index: 3; font-size: 1.2rem; pointer-events: none; transition: opacity 0.5s; padding: 0 20px; }
+        #ms3-environment { z-index: 1; opacity: 0; transition: opacity 1.5s ease; background: radial-gradient(circle, #4c1d95 0%, #000 100%); }
+        #instruction { position: absolute; bottom: 50px; width: 100%; text-align: center; color: #fff; z-index: 10; font-size: 1rem; pointer-events: none; transition: opacity 0.5s; padding: 0 20px; box-sizing: border-box; text-shadow: 0 0 10px #fff; }
         
         #vr-btn {
-            position: absolute; top: 20px; right: 20px; z-index: 10;
-            padding: 12px 24px; background: transparent; color: #0ff;
-            border: 2px solid #0ff; border-radius: 8px; font-weight: bold;
+            position: absolute; top: 20px; right: 20px; z-index: 20;
+            padding: 12px 24px; background: rgba(0, 0, 0, 0.6); color: #0ff;
+            border: 2px solid #0ff; border-radius: 12px; font-weight: bold;
             text-transform: uppercase; letter-spacing: 2px;
-            box-shadow: 0 0 10px #0ff, inset 0 0 10px #0ff;
-            cursor: pointer; transition: all 0.3s;
+            box-shadow: 0 0 15px #0ff, inset 0 0 5px #0ff;
+            cursor: pointer; transition: all 0.3s; backdrop-filter: blur(5px);
+            font-size: 0.8rem;
         }
-        #vr-btn:hover { background: #0ff; color: #000; box-shadow: 0 0 20px #0ff; }
+        #vr-btn:active { transform: scale(0.95); box-shadow: 0 0 25px #0ff; }
     </style>
 </head>
 <body>
 
     <button id="vr-btn" style="display: none;">Ver en VR</button>
-    <div id="instruction">Toca la pantalla para activar la experiencia inmersiva</div>
+    <div id="instruction">Toca la pantalla para entrar</div>
     <div id="webgl-container"></div>
     <div id="ms3-environment"></div>
 
@@ -36,15 +37,15 @@
         const container = document.getElementById('webgl-container');
         const envContainer = document.getElementById('ms3-environment');
         const vrBtn = document.getElementById('vr-btn');
-        let isSystemActive = false;
-        let isVRMode = false;
+        let isSystemActive = false, isVRMode = false;
         let internalScene, internalCamera, internalRenderer, stars;
         let targetQuaternion = new THREE.Quaternion();
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, logarithmicDepthBuffer: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
 
         const planet = new THREE.Mesh(new THREE.IcosahedronGeometry(2, 2), new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true }));
@@ -56,25 +57,21 @@
             internalCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             internalRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             internalRenderer.setSize(window.innerWidth, window.innerHeight);
-            internalRenderer.setClearColor(0x000000, 0); 
+            internalRenderer.setPixelRatio(window.devicePixelRatio);
             envContainer.appendChild(internalRenderer.domElement);
 
             const starGeometry = new THREE.BufferGeometry();
-            const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
             const starPositions = new Float32Array(3000);
-            for(let i=0; i<3000; i++) starPositions[i] = (Math.random() - 0.5) * 100;
+            for(let i=0; i<3000; i++) starPositions[i] = (Math.random() - 0.5) * 200;
             starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-            stars = new THREE.Points(starGeometry, starMaterial);
+            stars = new THREE.Points(starGeometry, new THREE.PointsMaterial({ color: 0xffffff, size: 0.2 }));
             internalScene.add(stars);
 
-            const screenGeometry = new THREE.PlaneGeometry(2, 1.5);
-            const material = new THREE.MeshBasicMaterial({ color: 0x0ff, wireframe: true });
-            for(let y = -1; y <= 1; y++) {
-                for(let x = -2; x <= 2; x++) {
-                    const screen = new THREE.Mesh(screenGeometry, material);
-                    screen.position.set(x * 2.2, y * 1.7, -5);
-                    internalScene.add(screen);
-                }
+            const mat = new THREE.MeshBasicMaterial({ color: 0x0ff, wireframe: true });
+            for(let i = 0; i < 20; i++) {
+                const screen = new THREE.Mesh(new THREE.PlaneGeometry(2, 1.5), mat);
+                screen.position.set((Math.random()-0.5)*20, (Math.random()-0.5)*10, -10 + (Math.random()-0.5)*10);
+                internalScene.add(screen);
             }
             vrBtn.style.display = 'block';
         }
@@ -83,8 +80,7 @@
             const alpha = event.alpha ? THREE.MathUtils.degToRad(event.alpha) : 0;
             const beta = event.beta ? THREE.MathUtils.degToRad(event.beta) : 0;
             const gamma = event.gamma ? THREE.MathUtils.degToRad(event.gamma) : 0;
-            const Euler = new THREE.Euler(beta, alpha, -gamma, 'YXZ');
-            targetQuaternion.setFromEuler(Euler);
+            targetQuaternion.setFromEuler(new THREE.Euler(beta, alpha, -gamma, 'YXZ'));
         }
 
         function animate() {
@@ -93,57 +89,51 @@
                 planet.rotation.y += 0.005;
                 renderer.render(scene, camera);
             } else {
-                if(stars) stars.rotation.y += 0.0005;
                 internalCamera.quaternion.slerp(targetQuaternion, 0.1);
-                
                 if (isVRMode) {
-                    renderVR();
+                    const w = window.innerWidth, h = window.innerHeight;
+                    internalRenderer.setScissorTest(true);
+                    
+                    internalRenderer.setViewport(0, 0, w/2, h);
+                    internalRenderer.setScissor(0, 0, w/2, h);
+                    internalRenderer.render(internalScene, internalCamera);
+                    
+                    internalRenderer.setViewport(w/2, 0, w/2, h);
+                    internalRenderer.setScissor(w/2, 0, w/2, h);
+                    internalRenderer.render(internalScene, internalCamera);
+                    
+                    internalRenderer.setScissorTest(false);
                 } else {
-                    internalRenderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
                     internalRenderer.render(internalScene, internalCamera);
                 }
             }
         }
-
-        function renderVR() {
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            
-            // Render Left
-            internalRenderer.setViewport(0, 0, width / 2, height);
-            internalRenderer.setScissor(0, 0, width / 2, height);
-            internalRenderer.setScissorTest(true);
-            internalRenderer.render(internalScene, internalCamera);
-            
-            // Render Right
-            internalRenderer.setViewport(width / 2, 0, width / 2, height);
-            internalRenderer.setScissor(width / 2, 0, width / 2, height);
-            internalRenderer.render(internalScene, internalCamera);
-            internalRenderer.setScissorTest(false);
-        }
-
         animate();
 
         async function startExperience() {
             if (isSystemActive) return;
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                const response = await DeviceOrientationEvent.requestPermission();
+                if (response !== 'granted') return;
+            }
             window.addEventListener('deviceorientation', handleOrientation, true);
             document.getElementById('instruction').style.opacity = '0';
             gsap.to(camera.position, { z: 0.5, duration: 2, onComplete: () => {
                 initInternalSystem();
                 envContainer.style.opacity = '1';
                 envContainer.style.pointerEvents = 'auto';
-                container.style.opacity = '0';
                 isSystemActive = true;
             }});
         }
 
-        vrBtn.addEventListener('click', () => {
+        vrBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             isVRMode = !isVRMode;
-            vrBtn.innerText = isVRMode ? "Salir de VR" : "Ver en VR";
+            vrBtn.innerText = isVRMode ? "Salir VR" : "Ver en VR";
         });
 
-        window.addEventListener('click', startExperience);
-        window.addEventListener('touchend', startExperience);
+        window.addEventListener('touchstart', startExperience, { once: true });
+        window.addEventListener('click', startExperience, { once: true });
     </script>
 </body>
 </html>
