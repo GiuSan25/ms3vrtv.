@@ -3,292 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Experiencia Inmersiva MS3 - Mobile & VR</title>
+    <title>Experiencia MS3 - Visor Inmersivo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Importante: Añadimos DeviceOrientationControls para un movimiento fluido -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/DeviceOrientationControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background-color: #000;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            width: 100vw;
-            height: 100vh;
-            touch-action: none;
-        }
-
-        #webgl-container {
-            width: 100vw;
-            height: 100vh;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 2;
-            cursor: pointer;
-        }
-
-        #instruction {
-            position: absolute;
-            bottom: 50px;
-            width: 100%;
-            text-align: center;
-            color: #00ffff;
-            z-index: 5;
-            font-size: 1.1rem;
-            padding: 0 20px;
-            box-sizing: border-box;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
-            letter-spacing: 1px;
-            pointer-events: none;
-            transition: opacity 0.5s ease;
-        }
-
-        /* Botón para habilitar sensores en iPhone (iOS) */
-        #ios-permission-btn {
-            position: absolute;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
-            background: rgba(0, 255, 255, 0.2);
-            color: #00ffff;
-            border: 1px solid #00ffff;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            z-index: 10;
-            display: none;
-            cursor: pointer;
-        }
-
-        /* Botón inferior para activar VR o Modo Pantalla Completa móvil */
-        #vr-button {
-            position: absolute;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #ff007f, #7f00ff);
-            color: #fff;
-            border: 2px solid #ff77ff;
-            border-radius: 30px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 10;
-            box-shadow: 0 0 20px rgba(255, 0, 127, 0.6);
-            display: none;
-        }
+        body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; }
+        #webgl-container, #ms3-environment { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
+        #webgl-container { z-index: 2; cursor: pointer; }
+        #ms3-environment { z-index: 1; opacity: 0; pointer-events: none; transition: opacity 1.5s ease; background: linear-gradient(135deg, #4c1d95, #be185d); }
+        #instruction { position: absolute; bottom: 30px; width: 100%; text-align: center; color: #fff; z-index: 3; font-size: 1.2rem; pointer-events: none; transition: opacity 0.5s; padding: 0 20px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-    <div id="instruction">Toca el mundo para entrar al sistema MS3</div>
-    <button id="ios-permission-btn">Activar Movimiento (iOS)</button>
+    <div id="instruction">Toca la pantalla para activar la experiencia inmersiva</div>
     <div id="webgl-container"></div>
-    <button id="vr-button">Ver con gafas VR</button>
-
-    <!-- Importar librerías de Three.js y complementos de control móvil -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/DeviceOrientationControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/vr/VRButton.js"></script>
+    <div id="ms3-environment"></div>
 
     <script>
-        let scene, camera, renderer, planet, worldGroup, insideGroup;
-        let controls;
-        let isInside = false;
-
         const container = document.getElementById('webgl-container');
-        const instruction = document.getElementById('instruction');
-        const vrButtonElement = document.getElementById('vr-button');
-        const iosBtn = document.getElementById('ios-permission-btn');
+        const envContainer = document.getElementById('ms3-environment');
+        let isSystemActive = false;
+        let internalScene, internalCamera, internalRenderer, stars, controls;
 
-        function init() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        // Entry Scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        const planet = new THREE.Mesh(new THREE.IcosahedronGeometry(2, 2), new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true }));
+        scene.add(planet);
+        camera.position.z = 5;
+
+        function initInternalSystem() {
+            internalScene = new THREE.Scene();
+            internalCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            internalRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            internalRenderer.setSize(window.innerWidth, window.innerHeight);
+            internalRenderer.setClearColor(0x000000, 0); 
+            envContainer.appendChild(internalRenderer.domElement);
+
+            // Inicializar controles de giroscopio
+            controls = new THREE.DeviceOrientationControls(internalCamera);
+
+            // Create Stars
+            const starGeometry = new THREE.BufferGeometry();
+            const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
+            const starPositions = new Float32Array(1000 * 3);
+            for(let i=0; i<3000; i++) starPositions[i] = (Math.random() - 0.5) * 100;
+            starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+            stars = new THREE.Points(starGeometry, starMaterial);
+            internalScene.add(stars);
+
+            // Create Static TV-wall screens
+            const screenGeometry = new THREE.PlaneGeometry(2, 1.5);
+            const material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, side: THREE.DoubleSide });
             
-            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Optimización de rendimiento para móviles
-            renderer.xr.enabled = true;
-            container.appendChild(renderer.domElement);
-
-            // --- GRUPO 1: MUNDO INICIAL ---
-            worldGroup = new THREE.Group();
-            scene.add(worldGroup);
-
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-            scene.add(ambientLight);
-
-            const geometry = new THREE.SphereGeometry(2, 32, 32);
-            const material = new THREE.MeshBasicMaterial({ 
-                color: 0x00ffff, 
-                wireframe: true,
-                transparent: true,
-                opacity: 0.8
-            });
-            planet = new THREE.Mesh(geometry, material);
-            worldGroup.add(planet);
-
-            camera.position.z = 5;
-
-            // --- GRUPO 2: ENTORNO INTERIOR ---
-            insideGroup = new THREE.Group();
-            insideGroup.visible = false;
-            scene.add(insideGroup);
-
-            createStarryBackground();
-
-            const platformGeo = new THREE.CylinderGeometry(3, 3.2, 0.3, 32);
-            const platformMat = new THREE.MeshBasicMaterial({ color: 0x110522, wireframe: true });
-            const platform = new THREE.Mesh(platformGeo, platformMat);
-            platform.position.y = -1.5;
-            insideGroup.add(platform);
-
-            createSurroundingScreens();
-
-            // Evento táctil y de clic para entrar al mundo
-            window.addEventListener('pointerdown', onWorldClick);
-
-            // Configurar controles de orientación móvil (Giroscopio)
-            controls = new THREE.DeviceOrientationControls(camera);
-
-            // Botón de VR nativo de Three.js
-            document.body.appendChild(VRButton.createButton(renderer));
-
-            // Manejo de permisos para iOS (iPhone / iPad)
-            iosBtn.addEventListener('click', () => {
-                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    DeviceOrientationEvent.requestPermission().then(response => {
-                        if (response === 'granted') {
-                            window.addEventListener('deviceorientation', (e) => controls.update(), true);
-                            iosBtn.style.display = 'none';
-                        }
-                    }).catch(console.error);
-                } else {
-                    window.addEventListener('deviceorientation', (e) => controls.update(), true);
-                    iosBtn.style.display = 'none';
+            for(let y = -1; y <= 1; y++) {
+                for(let x = -2; x <= 2; x++) {
+                    const screen = new THREE.Mesh(screenGeometry, material);
+                    screen.position.set(x * 2.2, y * 1.7, -5);
+                    internalScene.add(screen);
                 }
-            });
-
-            vrButtonElement.addEventListener('click', () => {
-                if (renderer.xr.isPresenting) {
-                    renderer.xr.getSession().end();
-                } else {
-                    if (navigator.xr) {
-                        navigator.xr.requestSession('immersive-vr').then((session) => {
-                            renderer.xr.setSession(session);
-                        }).catch(() => {
-                            alert("Modo VR no disponible en este navegador móvil.");
-                        });
-                    } else {
-                        alert("Tu navegador móvil no soporta WebXR.");
-                    }
-                }
-            });
-
-            animate();
-        }
-
-        // Cielo estrellado degradé rosa/violeta optimizado
-        function createStarryBackground() {
-            const skyGeo = new THREE.SphereGeometry(50, 32, 32);
-            const canvas = document.createElement('canvas');
-            canvas.width = 512;
-            canvas.height = 512;
-            const ctx = canvas.getContext('2d');
-            
-            const gradient = ctx.createLinearGradient(0, 0, 0, 512);
-            gradient.addColorStop(0, '#020005');  
-            gradient.addColorStop(0.5, '#150525'); 
-            gradient.addColorStop(1, '#2c0030');  
-            
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, 512, 512);
-
-            ctx.fillStyle = '#ffffff';
-            for (let i = 0; i < 200; i++) {
-                const x = Math.random() * 512;
-                const y = Math.random() * 512;
-                ctx.beginPath();
-                ctx.arc(x, y, Math.random() * 1.5, 0, Math.PI * 2);
-                ctx.fill();
             }
-
-            const skyTexture = new THREE.CanvasTexture(canvas);
-            const skyMat = new THREE.MeshBasicMaterial({ map: skyTexture, side: THREE.BackSide });
-            const skyMesh = new THREE.Mesh(skyGeo, skyMat);
-            insideGroup.add(skyMesh);
-        }
-
-        // Pantallas flotantes circulares
-        function createSurroundingScreens() {
-            const textureLoader = new THREE.TextureLoader();
-            textureLoader.load('watermarked_img_12879850403898477142.png', (texture) => {
-                const numScreens = 10; // Reducido ligeramente para mayor fluidez en móviles
-                const radius = 7;
-
-                for (let i = 0; i < numScreens; i++) {
-                    const angle = (i / numScreens) * Math.PI * 2;
-                    const x = Math.cos(angle) * radius;
-                    const z = Math.sin(angle) * radius;
-
-                    const screenGeo = new THREE.PlaneGeometry(3.2, 1.8);
-                    const screenMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
-                    const screen = new THREE.Mesh(screenGeo, screenMat);
-
-                    screen.position.set(x, 1, z);
-                    screen.lookAt(0, 1, 0);
-                    insideGroup.add(screen);
-                }
-            });
-        }
-
-        // Transición optimizada para touch/click
-        function onWorldClick(event) {
-            if (isInside) return;
-            isInside = true;
-
-            instruction.style.opacity = '0';
-
-            // Comprobar si es dispositivo iOS para mostrar el botón de activar sensores
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                iosBtn.style.display = 'block';
-            }
-
-            gsap.to(camera.position, {
-                z: 0.1,
-                duration: 1.2,
-                ease: "power2.inOut",
-                onComplete: () => {
-                    worldGroup.visible = false;
-                    insideGroup.visible = true;
-                    camera.position.set(0, 0, 0);
-                    
-                    vrButtonElement.style.display = 'block';
-                    window.removeEventListener('pointerdown', onWorldClick);
-                }
-            });
         }
 
         function animate() {
-            renderer.setAnimationLoop(() => {
-                if (!isInside) {
-                    planet.rotation.y += 0.005;
-                } else {
-                    // Actualizar el giroscopio del celular si está activo
-                    if (controls) controls.update();
-                }
+            requestAnimationFrame(animate);
+            if (!isSystemActive) {
+                planet.rotation.y += 0.005;
                 renderer.render(scene, camera);
+            } else {
+                if(stars) stars.rotation.y += 0.0005;
+                if(controls) controls.update(); // Actualizar la orientación del giroscopio en cada fotograma
+                internalRenderer.render(internalScene, internalCamera);
+            }
+        }
+        animate();
+
+        // Función para activar permisos y la transición
+        async function startExperience() {
+            if (isSystemActive) return;
+
+            // Solicitar permisos de giroscopio en iOS (13+) de forma segura
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                try {
+                    const permissionState = await DeviceOrientationEvent.requestPermission();
+                    if (permissionState !== 'granted') {
+                        alert('Se requiere permiso para usar el giroscopio.');
+                        return;
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            document.getElementById('instruction').style.opacity = '0';
+            
+            gsap.to(camera.position, { 
+                z: 0.5, 
+                duration: 2, 
+                ease: "power2.inOut", 
+                onComplete: () => {
+                    initInternalSystem();
+                    envContainer.style.opacity = '1';
+                    envContainer.style.pointerEvents = 'auto';
+                    container.style.opacity = '0';
+                    isSystemActive = true;
+                }
             });
         }
+
+        window.addEventListener('click', startExperience);
+        window.addEventListener('touchend', startExperience);
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
+            if (internalCamera && internalRenderer) {
+                internalCamera.aspect = window.innerWidth / window.innerHeight;
+                internalCamera.updateProjectionMatrix();
+                internalRenderer.setSize(window.innerWidth, window.innerHeight);
+            }
         });
-
-        init();
     </script>
 </body>
 </html>
