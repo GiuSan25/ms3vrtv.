@@ -11,12 +11,23 @@
         body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; }
         #webgl-container, #ms3-environment { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
         #webgl-container { z-index: 2; cursor: pointer; }
-        #ms3-environment { z-index: 1; opacity: 0; pointer-events: none; transition: opacity 1.5s ease; background: linear-gradient(135deg, #4c1d95, #be185d); }
-        #instruction { position: absolute; bottom: 30px; width: 100%; text-align: center; color: #fff; z-index: 3; font-size: 1.2rem; pointer-events: none; transition: opacity 0.5s; padding: 0 20px; box-sizing: border-box; }
+        #ms3-environment { z-index: 1; opacity: 0; pointer-events: none; transition: opacity 1.5s ease; background: radial-gradient(circle, #1e1b4b 0%, #000 100%); }
+        #instruction { position: absolute; bottom: 30px; width: 100%; text-align: center; color: #fff; z-index: 3; font-size: 1.2rem; pointer-events: none; transition: opacity 0.5s; padding: 0 20px; }
+        
+        #vr-btn {
+            position: absolute; top: 20px; right: 20px; z-index: 10;
+            padding: 12px 24px; background: transparent; color: #0ff;
+            border: 2px solid #0ff; border-radius: 8px; font-weight: bold;
+            text-transform: uppercase; letter-spacing: 2px;
+            box-shadow: 0 0 10px #0ff, inset 0 0 10px #0ff;
+            cursor: pointer; transition: all 0.3s;
+        }
+        #vr-btn:hover { background: #0ff; color: #000; box-shadow: 0 0 20px #0ff; }
     </style>
 </head>
 <body>
 
+    <button id="vr-btn" style="display: none;">Ver en VR</button>
     <div id="instruction">Toca la pantalla para activar la experiencia inmersiva</div>
     <div id="webgl-container"></div>
     <div id="ms3-environment"></div>
@@ -24,14 +35,12 @@
     <script>
         const container = document.getElementById('webgl-container');
         const envContainer = document.getElementById('ms3-environment');
+        const vrBtn = document.getElementById('vr-btn');
         let isSystemActive = false;
+        let isVRMode = false;
         let internalScene, internalCamera, internalRenderer, stars;
-        
-        // Variables para almacenar la orientación del dispositivo
-        let deviceQuaternion = new THREE.Quaternion();
         let targetQuaternion = new THREE.Quaternion();
 
-        // Entry Scene (Planeta inicial)
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -50,19 +59,16 @@
             internalRenderer.setClearColor(0x000000, 0); 
             envContainer.appendChild(internalRenderer.domElement);
 
-            // Create Stars
             const starGeometry = new THREE.BufferGeometry();
             const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
-            const starPositions = new Float32Array(1000 * 3);
+            const starPositions = new Float32Array(3000);
             for(let i=0; i<3000; i++) starPositions[i] = (Math.random() - 0.5) * 100;
             starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
             stars = new THREE.Points(starGeometry, starMaterial);
             internalScene.add(stars);
 
-            // Create Static TV-wall screens
             const screenGeometry = new THREE.PlaneGeometry(2, 1.5);
-            const material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, side: THREE.DoubleSide });
-            
+            const material = new THREE.MeshBasicMaterial({ color: 0x0ff, wireframe: true });
             for(let y = -1; y <= 1; y++) {
                 for(let x = -2; x <= 2; x++) {
                     const screen = new THREE.Mesh(screenGeometry, material);
@@ -70,37 +76,15 @@
                     internalScene.add(screen);
                 }
             }
+            vrBtn.style.display = 'block';
         }
 
-        // Capturador Universal de Orientación (Android e iOS)
         function handleOrientation(event) {
-            const alpha = event.alpha ? THREE.MathUtils.degToRad(event.alpha) : 0; // Z
-            const beta = event.beta ? THREE.MathUtils.degToRad(event.beta) : 0;   // X
-            const gamma = event.gamma ? THREE.MathUtils.degToRad(event.gamma) : 0; // Y
-
-            const zee = new THREE.Vector3(0, 0, 1);
-            const cameraQuaternion = new THREE.Quaternion();
-            const Euler = new THREE.Euler();
-            const baseOrientation = new THREE.Quaternion();
-
-            // Convertir datos del sensor a orientaciones 3D compatibles con Three.js
-            Euler.set(beta, alpha, -gamma, 'YXZ');
-            cameraQuaternion.setFromEuler(Euler);
-            
-            // Compensar la orientación de la pantalla (Portrait / Landscape)
-            switch (window.orientation) {
-                case -90: baseOrientation.setFromAxisAngle(zee, -Math.PI / 2); break;
-                case 90:  baseOrientation.setFromAxisAngle(zee, Math.PI / 2); break;
-                case 180: baseOrientation.setFromAxisAngle(zee, Math.PI); break;
-                default:  baseOrientation.setFromAxisAngle(zee, 0); break;
-            }
-            cameraQuaternion.multiply(baseOrientation);
-            
-            // Rotación base para ajustar la vista cenital inicial
-            const rotX = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
-            cameraQuaternion.multiply(rotX);
-
-            targetQuaternion.copy(cameraQuaternion);
+            const alpha = event.alpha ? THREE.MathUtils.degToRad(event.alpha) : 0;
+            const beta = event.beta ? THREE.MathUtils.degToRad(event.beta) : 0;
+            const gamma = event.gamma ? THREE.MathUtils.degToRad(event.gamma) : 0;
+            const Euler = new THREE.Euler(beta, alpha, -gamma, 'YXZ');
+            targetQuaternion.setFromEuler(Euler);
         }
 
         function animate() {
@@ -110,66 +94,56 @@
                 renderer.render(scene, camera);
             } else {
                 if(stars) stars.rotation.y += 0.0005;
+                internalCamera.quaternion.slerp(targetQuaternion, 0.1);
                 
-                // Suavizar el movimiento del giroscopio con slerp (Interpolación esférica)
-                if (internalCamera) {
-                    internalCamera.quaternion.slerp(targetQuaternion, 0.1);
+                if (isVRMode) {
+                    renderVR();
+                } else {
+                    internalRenderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+                    internalRenderer.render(internalScene, internalCamera);
                 }
-
-                internalRenderer.render(internalScene, internalCamera);
             }
         }
+
+        function renderVR() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            
+            // Render Left
+            internalRenderer.setViewport(0, 0, width / 2, height);
+            internalRenderer.setScissor(0, 0, width / 2, height);
+            internalRenderer.setScissorTest(true);
+            internalRenderer.render(internalScene, internalCamera);
+            
+            // Render Right
+            internalRenderer.setViewport(width / 2, 0, width / 2, height);
+            internalRenderer.setScissor(width / 2, 0, width / 2, height);
+            internalRenderer.render(internalScene, internalCamera);
+            internalRenderer.setScissorTest(false);
+        }
+
         animate();
 
-        // Activación de la experiencia y permisos
         async function startExperience() {
             if (isSystemActive) return;
-
-            // Solicitar permisos explícitos si es requerido (iOS 13+)
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                try {
-                    const permissionState = await DeviceOrientationEvent.requestPermission();
-                    if (permissionState !== 'granted') {
-                        alert('Se requiere permiso para usar el giroscopio.');
-                        return;
-                    }
-                } catch (error) {
-                    console.error(error);
-                }
-            }
-
-            // Escuchar el evento del giroscopio compatible con Android e iOS
             window.addEventListener('deviceorientation', handleOrientation, true);
-
             document.getElementById('instruction').style.opacity = '0';
-            
-            gsap.to(camera.position, { 
-                z: 0.5, 
-                duration: 2, 
-                ease: "power2.inOut", 
-                onComplete: () => {
-                    initInternalSystem();
-                    envContainer.style.opacity = '1';
-                    envContainer.style.pointerEvents = 'auto';
-                    container.style.opacity = '0';
-                    isSystemActive = true;
-                }
-            });
+            gsap.to(camera.position, { z: 0.5, duration: 2, onComplete: () => {
+                initInternalSystem();
+                envContainer.style.opacity = '1';
+                envContainer.style.pointerEvents = 'auto';
+                container.style.opacity = '0';
+                isSystemActive = true;
+            }});
         }
+
+        vrBtn.addEventListener('click', () => {
+            isVRMode = !isVRMode;
+            vrBtn.innerText = isVRMode ? "Salir de VR" : "Ver en VR";
+        });
 
         window.addEventListener('click', startExperience);
         window.addEventListener('touchend', startExperience);
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            if (internalCamera && internalRenderer) {
-                internalCamera.aspect = window.innerWidth / window.innerHeight;
-                internalCamera.updateProjectionMatrix();
-                internalRenderer.setSize(window.innerWidth, window.innerHeight);
-            }
-        });
     </script>
 </body>
 </html>
