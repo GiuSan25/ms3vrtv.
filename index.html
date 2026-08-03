@@ -6,8 +6,6 @@
     <title>Experiencia MS3 - Visor Inmersivo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Importante: Añadimos DeviceOrientationControls para un movimiento fluido -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/DeviceOrientationControls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; }
@@ -27,9 +25,13 @@
         const container = document.getElementById('webgl-container');
         const envContainer = document.getElementById('ms3-environment');
         let isSystemActive = false;
-        let internalScene, internalCamera, internalRenderer, stars, controls;
+        let internalScene, internalCamera, internalRenderer, stars;
+        
+        // Variables para almacenar la orientación del dispositivo
+        let deviceQuaternion = new THREE.Quaternion();
+        let targetQuaternion = new THREE.Quaternion();
 
-        // Entry Scene
+        // Entry Scene (Planeta inicial)
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -47,9 +49,6 @@
             internalRenderer.setSize(window.innerWidth, window.innerHeight);
             internalRenderer.setClearColor(0x000000, 0); 
             envContainer.appendChild(internalRenderer.domElement);
-
-            // Inicializar controles de giroscopio
-            controls = new THREE.DeviceOrientationControls(internalCamera);
 
             // Create Stars
             const starGeometry = new THREE.BufferGeometry();
@@ -73,6 +72,37 @@
             }
         }
 
+        // Capturador Universal de Orientación (Android e iOS)
+        function handleOrientation(event) {
+            const alpha = event.alpha ? THREE.MathUtils.degToRad(event.alpha) : 0; // Z
+            const beta = event.beta ? THREE.MathUtils.degToRad(event.beta) : 0;   // X
+            const gamma = event.gamma ? THREE.MathUtils.degToRad(event.gamma) : 0; // Y
+
+            const zee = new THREE.Vector3(0, 0, 1);
+            const cameraQuaternion = new THREE.Quaternion();
+            const Euler = new THREE.Euler();
+            const baseOrientation = new THREE.Quaternion();
+
+            // Convertir datos del sensor a orientaciones 3D compatibles con Three.js
+            Euler.set(beta, alpha, -gamma, 'YXZ');
+            cameraQuaternion.setFromEuler(Euler);
+            
+            // Compensar la orientación de la pantalla (Portrait / Landscape)
+            switch (window.orientation) {
+                case -90: baseOrientation.setFromAxisAngle(zee, -Math.PI / 2); break;
+                case 90:  baseOrientation.setFromAxisAngle(zee, Math.PI / 2); break;
+                case 180: baseOrientation.setFromAxisAngle(zee, Math.PI); break;
+                default:  baseOrientation.setFromAxisAngle(zee, 0); break;
+            }
+            cameraQuaternion.multiply(baseOrientation);
+            
+            // Rotación base para ajustar la vista cenital inicial
+            const rotX = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
+            cameraQuaternion.multiply(rotX);
+
+            targetQuaternion.copy(cameraQuaternion);
+        }
+
         function animate() {
             requestAnimationFrame(animate);
             if (!isSystemActive) {
@@ -80,17 +110,22 @@
                 renderer.render(scene, camera);
             } else {
                 if(stars) stars.rotation.y += 0.0005;
-                if(controls) controls.update(); // Actualizar la orientación del giroscopio en cada fotograma
+                
+                // Suavizar el movimiento del giroscopio con slerp (Interpolación esférica)
+                if (internalCamera) {
+                    internalCamera.quaternion.slerp(targetQuaternion, 0.1);
+                }
+
                 internalRenderer.render(internalScene, internalCamera);
             }
         }
         animate();
 
-        // Función para activar permisos y la transición
+        // Activación de la experiencia y permisos
         async function startExperience() {
             if (isSystemActive) return;
 
-            // Solicitar permisos de giroscopio en iOS (13+) de forma segura
+            // Solicitar permisos explícitos si es requerido (iOS 13+)
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 try {
                     const permissionState = await DeviceOrientationEvent.requestPermission();
@@ -102,6 +137,9 @@
                     console.error(error);
                 }
             }
+
+            // Escuchar el evento del giroscopio compatible con Android e iOS
+            window.addEventListener('deviceorientation', handleOrientation, true);
 
             document.getElementById('instruction').style.opacity = '0';
             
