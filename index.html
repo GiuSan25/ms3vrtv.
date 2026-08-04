@@ -33,7 +33,7 @@
         .hud-btn:hover { background: #0ff; color: #000; box-shadow: 0 0 20px #0ff; }
 
         #vr-btn { top: 20px; display: none; }
-        #gyro-btn { top: 80px; display: none; } /* Ubicado debajo del botón VR */
+        #gyro-btn { top: 80px; display: none; background: #0ff; color: #000; pointer-events: none; cursor: default;} /* Botón informativo, siempre activo en VR */
 
         #multiverse-hud {
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -62,8 +62,8 @@
 <body>
 
     <!-- Botones del visor -->
-    <button id="vr-btn" class="hud-btn">Ver en VR</button>
-    <button id="gyro-btn" class="hud-btn">Giroscopio: OFF</button>
+    <button id="vr-btn" class="hud-interactive hud-btn">Ver en VR</button>
+    <button id="gyro-btn" class="hud-btn">GIROSCOPIO: ACTIVO</button> <!-- Indicador fijo en VR -->
 
     <div id="instruction">Presiona la esfera para ingresar al multiverso MS3</div>
     <div id="webgl-container"></div>
@@ -83,7 +83,6 @@
 
         let isSystemActive = false;
         let isVRMode = false;
-        let isGyroActive = false;
         let internalScene, internalCamera, internalRenderer, stars;
         let multiverseButtonsGroup, videoScreensGroup;
         let targetQuaternion = new THREE.Quaternion();
@@ -91,6 +90,7 @@
         let isDragging = false;
         let previousMousePosition = { x: 0, y: 0 };
         let videoTextures = [];
+        let isGyroPermissionGranted = false;
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -271,8 +271,4 @@
                     const frameGeo = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
                     const frameMat = new THREE.MeshBasicMaterial({ 
                         color: data.color, 
-                        wireframe: true, 
-                        transparent: true, 
-                        opacity: 0.9 
-                    });
-                    const frameMesh = new THREE.Mesh(frameGeo, frame
+                        wireframe: true
