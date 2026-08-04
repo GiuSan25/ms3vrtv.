@@ -61,6 +61,9 @@
             position: relative;
             overflow: hidden;
             pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         /* Contenedor de los botones neón planos */
@@ -370,10 +373,23 @@
             internalScene.add(stars);
 
             vrBtn.style.display = 'block';
-            leftMenu.style.opacity = '1';
-            leftMenu.style.pointerEvents = 'auto';
-            rightMenu.style.opacity = '1';
-            rightMenu.style.pointerEvents = 'auto';
+            updateMenuLayout();
+        }
+
+        function updateMenuLayout() {
+            if (isVRMode) {
+                leftMenu.style.display = 'flex';
+                rightMenu.style.display = 'flex';
+                leftMenu.style.opacity = '1';
+                leftMenu.style.pointerEvents = 'auto';
+                rightMenu.style.opacity = '1';
+                rightMenu.style.pointerEvents = 'auto';
+            } else {
+                leftMenu.style.display = 'flex';
+                rightMenu.style.display = 'none';
+                leftMenu.style.opacity = '1';
+                leftMenu.style.pointerEvents = 'auto';
+            }
         }
 
         // Nueva Sala 360° con Pantallas VR alrededor del usuario
@@ -478,10 +494,7 @@
 
             envContainer.style.opacity = '1';
             envContainer.style.pointerEvents = 'auto';
-            leftMenu.style.opacity = '1';
-            leftMenu.style.pointerEvents = 'auto';
-            rightMenu.style.opacity = '1';
-            rightMenu.style.pointerEvents = 'auto';
+            updateMenuLayout();
         }
 
         function onPointerDown(e) {
@@ -655,6 +668,7 @@
         vrBtn.addEventListener('click', () => {
             isVRMode = !isVRMode;
             vrBtn.innerText = isVRMode ? "Salir de VR" : "Ver en VR";
+            updateMenuLayout();
         });
 
         window.addEventListener('click', startExperience);
