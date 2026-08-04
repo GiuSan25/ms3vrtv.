@@ -76,11 +76,12 @@
         let isSystemActive = false;
         let isVRMode = false;
         let internalScene, internalCamera, internalRenderer, stars;
-        let multiverseButtonsGroup;
+        let multiverseButtonsGroup, videoScreensGroup;
         let targetQuaternion = new THREE.Quaternion();
         let manualRotation = { x: 0, y: 0 };
         let isDragging = false;
         let previousMousePosition = { x: 0, y: 0 };
+        let videoTextures = [];
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -158,14 +159,59 @@
             stars = new THREE.Points(starGeometry, starMaterial);
             internalScene.add(stars);
 
+            // Grupo de Pantallas de Videos alrededor (360)
+            videoScreensGroup = new THREE.Group();
+            internalScene.add(videoScreensGroup);
+
+            const screenUrls = [
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+            ];
+
+            const radius = 5.5;
+            screenUrls.forEach((url, index) => {
+                const angle = (index / screenUrls.length) * Math.PI * 2;
+                const x = Math.sin(angle) * radius;
+                const z = Math.cos(angle) * radius;
+
+                // Crear elemento video dinámico
+                const video = document.createElement('video');
+                video.src = url;
+                video.crossOrigin = 'anonymous';
+                video.loop = true;
+                video.muted = true;
+                video.playsInline = true;
+                video.play();
+
+                const videoTexture = new THREE.VideoTexture(video);
+                videoTextures.push(videoTexture);
+
+                const planeGeo = new THREE.PlaneGeometry(3.2, 1.8);
+                const planeMat = new THREE.MeshBasicMaterial({ map: videoTexture, side: THREE.DoubleSide });
+                const screenMesh = new THREE.Mesh(planeGeo, planeMat);
+
+                screenMesh.position.set(x, 0.5, z);
+                screenMesh.lookAt(0, 0.5, 0); // Mirando hacia el centro (usuario)
+
+                // Marco brillante de neón para la pantalla de video
+                const frameGeo = new THREE.EdgesGeometry(planeGeo);
+                const frameMat = new THREE.LineBasicMaterial({ color: index === 0 ? 0x00ffff : (index === 1 ? 0xff00ff : 0x00ffcc), linewidth: 2 });
+                const frameLine = new THREE.LineSegments(frameGeo, frameMat);
+                screenMesh.add(frameLine);
+
+                videoScreensGroup.add(screenMesh);
+            });
+
             multiverseButtonsGroup = new THREE.Group();
             internalScene.add(multiverseButtonsGroup);
 
             loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
+                // Altura centralizada exacta a la visión del usuario (y: 0.6, 0.0, -0.6)
                 const btnData = [
-                    { text: "VER PROGRAMAS VR", y: 2.2, z: -3.5, color: 0x00ffff, emissive: 0x008888 },
-                    { text: "VER PROGRAMAS 2D", y: 1.0, z: -3.5, color: 0xff00ff, emissive: 0x880055 },
-                    { text: "VER EN VIVO", y: -0.2, z: -3.5, color: 0x00ffcc, emissive: 0x008866 }
+                    { text: "VER PROGRAMAS VR", y: 0.6, z: -3.2, color: 0x00ffff, emissive: 0x008888 },
+                    { text: "VER PROGRAMAS 2D", y: 0.0, z: -3.2, color: 0xff00ff, emissive: 0x880055 },
+                    { text: "VER EN VIVO", y: -0.6, z: -3.2, color: 0x00ffcc, emissive: 0x008866 }
                 ];
 
                 btnData.forEach((data) => {
@@ -184,7 +230,6 @@
                     
                     const buttonGroup = new THREE.Group();
 
-                    // Relleno sólido brillante con luz propia (Phong)
                     const fillMat = new THREE.MeshPhongMaterial({ 
                         color: data.color, 
                         emissive: data.emissive,
@@ -194,7 +239,6 @@
                     const fillMesh = new THREE.Mesh(bGeo, fillMat);
                     buttonGroup.add(fillMesh);
 
-                    // Borde / Contorno de neón tridimensional de alto contraste y brillo envolvente
                     const neonOutlineMat = new THREE.MeshBasicMaterial({ 
                         color: 0xffffff, 
                         wireframe: true, 
