@@ -10,39 +10,25 @@
     <style>
         body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; }
         #webgl-container, #ms3-environment { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
-        #webgl-container { z-index: 2; }
+        #webgl-container { z-index: 2; cursor: pointer; }
         #ms3-environment { z-index: 1; opacity: 0; pointer-events: none; transition: opacity 1.5s ease; background: radial-gradient(circle, #1e1b4b 0%, #000 100%); }
+        #instruction { position: absolute; bottom: 30px; width: 100%; text-align: center; color: #fff; z-index: 3; font-size: 1.2rem; pointer-events: none; transition: opacity 0.5s; padding: 0 20px; }
         
-        #instruction-overlay {
-            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.85); display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 100; padding: 20px; text-align: center;
-            transition: opacity 0.5s ease;
-        }
-
-        #start-btn, #vr-btn {
+        #vr-btn {
+            position: absolute; top: 20px; right: 20px; z-index: 10;
             padding: 12px 24px; background: transparent; color: #0ff;
             border: 2px solid #0ff; border-radius: 8px; font-weight: bold;
             text-transform: uppercase; letter-spacing: 2px;
             box-shadow: 0 0 10px #0ff, inset 0 0 10px #0ff;
             cursor: pointer; transition: all 0.3s;
         }
-        #start-btn:hover, #vr-btn:hover { background: #0ff; color: #000; box-shadow: 0 0 20px #0ff; }
-        
-        #vr-btn {
-            position: absolute; top: 20px; right: 20px; z-index: 10; display: none;
-        }
-        #instruction { color: #fff; font-size: 1.1rem; margin-bottom: 20px; max-width: 400px; }
+        #vr-btn:hover { background: #0ff; color: #000; box-shadow: 0 0 20px #0ff; }
     </style>
 </head>
 <body>
 
-    <div id="instruction-overlay">
-        <div id="instruction">Bienvenido a la experiencia inmersiva MS3. Pulsa el botón para calibrar los sensores de tu dispositivo.</div>
-        <button id="start-btn">Iniciar Experiencia</button>
-    </div>
-
-    <button id="vr-btn">Ver en VR</button>
+    <button id="vr-btn" style="display: none;">Ver en VR</button>
+    <div id="instruction">Toca la pantalla para activar la experiencia inmersiva</div>
     <div id="webgl-container"></div>
     <div id="ms3-environment"></div>
 
@@ -50,14 +36,10 @@
         const container = document.getElementById('webgl-container');
         const envContainer = document.getElementById('ms3-environment');
         const vrBtn = document.getElementById('vr-btn');
-        const startBtn = document.getElementById('start-btn');
-        const overlay = document.getElementById('instruction-overlay');
-
         let isSystemActive = false;
         let isVRMode = false;
         let internalScene, internalCamera, internalRenderer, stars;
         let targetQuaternion = new THREE.Quaternion();
-        let baseOrientation = new THREE.Quaternion();
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -101,25 +83,8 @@
             const alpha = event.alpha ? THREE.MathUtils.degToRad(event.alpha) : 0;
             const beta = event.beta ? THREE.MathUtils.degToRad(event.beta) : 0;
             const gamma = event.gamma ? THREE.MathUtils.degToRad(event.gamma) : 0;
-            
-            const orient = window.orientation ? THREE.MathUtils.degToRad(window.orientation) : 0;
-
-            const zee = new THREE.Vector3(0, 0, 1);
-            const europaQuaternion = new THREE.Quaternion();
-            const euler = new THREE.Euler();
-
-            euler.set(beta, alpha, -gamma, 'YXZ');
-            europaQuaternion.setFromEuler(euler);
-            
-            // Compensación de orientación de pantalla para iOS/Android
-            const orientQuaternion = new THREE.Quaternion().setFromAxisAngle(zee, -orient);
-            europaQuaternion.multiply(orientQuaternion);
-            
-            // Ajuste de perspectiva base
-            const adjustQuaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
-            europaQuaternion.multiply(adjustQuaternion);
-
-            targetQuaternion.copy(europaQuaternion);
+            const Euler = new THREE.Euler(beta, alpha, -gamma, 'YXZ');
+            targetQuaternion.setFromEuler(Euler);
         }
 
         function animate() {
@@ -144,11 +109,13 @@
             const width = window.innerWidth;
             const height = window.innerHeight;
             
+            // Render Left
             internalRenderer.setViewport(0, 0, width / 2, height);
             internalRenderer.setScissor(0, 0, width / 2, height);
             internalRenderer.setScissorTest(true);
             internalRenderer.render(internalScene, internalCamera);
             
+            // Render Right
             internalRenderer.setViewport(width / 2, 0, width / 2, height);
             internalRenderer.setScissor(width / 2, 0, width / 2, height);
             internalRenderer.render(internalScene, internalCamera);
@@ -157,31 +124,10 @@
 
         animate();
 
-        async function requestSensorsAndStart() {
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                try {
-                    const response = await DeviceOrientationEvent.requestPermission();
-                    if (response === 'granted') {
-                        window.addEventListener('deviceorientation', handleOrientation, true);
-                        launchExperience();
-                    } else {
-                        alert('Se requieren permisos de giroscopio para vivir la experiencia inmersiva.');
-                    }
-                } catch (e) {
-                    console.error(e);
-                }
-            } else {
-                // Android y navegadores estándar
-                window.addEventListener('deviceorientation', handleOrientation, true);
-                launchExperience();
-            }
-        }
-
-        function launchExperience() {
+        async function startExperience() {
             if (isSystemActive) return;
-            overlay.style.opacity = '0';
-            setTimeout(() => { overlay.style.display = 'none'; }, 500);
-
+            window.addEventListener('deviceorientation', handleOrientation, true);
+            document.getElementById('instruction').style.opacity = '0';
             gsap.to(camera.position, { z: 0.5, duration: 2, onComplete: () => {
                 initInternalSystem();
                 envContainer.style.opacity = '1';
@@ -196,18 +142,8 @@
             vrBtn.innerText = isVRMode ? "Salir de VR" : "Ver en VR";
         });
 
-        startBtn.addEventListener('click', requestSensorsAndStart);
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            if (internalCamera) {
-                internalCamera.aspect = window.innerWidth / window.innerHeight;
-                internalCamera.updateProjectionMatrix();
-                internalRenderer.setSize(window.innerWidth, window.innerHeight);
-            }
-        });
+        window.addEventListener('click', startExperience);
+        window.addEventListener('touchend', startExperience);
     </script>
 </body>
 </html>
