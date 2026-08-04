@@ -11,12 +11,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; width: 100vw; height: 100vh; }
-        
-        /* Contenedor de la escena inicial */
-        #webgl-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 2; cursor: pointer; transition: opacity 1s ease; }
-        
-        /* Contenedor del entorno interno (VR) */
-        #ms3-environment { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; opacity: 0; pointer-events: none; transition: opacity 1.5s ease; background: radial-gradient(circle, #1e1b4b 0%, #000 100%); }
+        #webgl-container, #ms3-environment { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
+        #webgl-container { z-index: 2; cursor: pointer; }
+        #ms3-environment { z-index: 1; opacity: 0; pointer-events: none; transition: opacity 1.5s ease; background: radial-gradient(circle, #1e1b4b 0%, #000 100%); }
         
         #instruction { 
             position: absolute; bottom: 35px; width: 100%; text-align: center; color: #fff; z-index: 3; 
@@ -36,7 +33,7 @@
         .hud-btn:hover { background: #0ff; color: #000; box-shadow: 0 0 20px #0ff; }
 
         #vr-btn { top: 20px; display: none; }
-        #gyro-status-btn { top: 80px; display: none; background: #0ff; color: #000; pointer-events: none; cursor: default; font-size: 0.9rem;} 
+        #gyro-btn { top: 80px; display: none; } /* Ubicado debajo del botón VR */
 
         #multiverse-hud {
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -64,40 +61,29 @@
 </head>
 <body>
 
-    <!-- UI del Entorno Inmersivo -->
-    <button id="vr-btn" class="hud-interactive hud-btn">Entrar a VR</button>
-    <button id="gyro-status-btn" class="hud-btn">Giroscopio Activo</button>
+    <!-- Botones del visor -->
+    <button id="vr-btn" class="hud-btn">Ver en VR</button>
+    <button id="gyro-btn" class="hud-btn">Giroscopio: OFF</button>
 
-    <!-- Escena Inicial (Esfera y Logo MS3) -->
+    <div id="instruction">Presiona la esfera para ingresar al multiverso MS3</div>
     <div id="webgl-container"></div>
-
-    <!-- Contenedor de la experiencia inmersiva (Oculto inicialmente) -->
     <div id="ms3-environment"></div>
-
-    <div id="instruction">Presiona la pantalla para ingresar al multiverso MS3</div>
 
     <div id="multiverse-hud">
         <button id="btn-volver" class="hud-interactive">VOLVER</button>
     </div>
 
     <script>
-        // --- Variables Globales ---
         const container = document.getElementById('webgl-container');
         const envContainer = document.getElementById('ms3-environment');
         const vrBtn = document.getElementById('vr-btn');
-        const gyroStatusBtn = document.getElementById('gyro-status-btn');
+        const gyroBtn = document.getElementById('gyro-btn');
         const multiverseHud = document.getElementById('multiverse-hud');
         const btnVolver = document.getElementById('btn-volver');
-        const instructionText = document.getElementById('instruction');
 
-        let isExperienceRunning = false; // Controla si estamos en la escena inicial o inmersiva
+        let isSystemActive = false;
         let isVRMode = false;
         let isGyroActive = false;
-        
-        // Variables Escena Inicial
-        let scene, camera, renderer, planet, textGroup;
-        
-        // Variables Entorno Inmersivo
         let internalScene, internalCamera, internalRenderer, stars;
         let multiverseButtonsGroup, videoScreensGroup;
         let targetQuaternion = new THREE.Quaternion();
@@ -106,117 +92,78 @@
         let previousMousePosition = { x: 0, y: 0 };
         let videoTextures = [];
 
-        // --- Inicialización Escena Inicial ---
-        function initInitialScene() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            container.appendChild(renderer.domElement);
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
 
-            const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
-            scene.add(ambientLight);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.8);
+        scene.add(ambientLight);
 
-            const pointLight1 = new THREE.PointLight(0xff00ff, 3, 50);
-            pointLight1.position.set(5, 5, 5);
-            scene.add(pointLight1);
+        const pointLight1 = new THREE.PointLight(0xff00ff, 4, 60);
+        pointLight1.position.set(6, 6, 6);
+        scene.add(pointLight1);
 
-            const pointLight2 = new THREE.PointLight(0x00ffff, 3, 50);
-            pointLight2.position.set(-5, -5, 5);
-            scene.add(pointLight2);
+        const pointLight2 = new THREE.PointLight(0x00ffff, 4, 60);
+        pointLight2.position.set(-6, -6, 6);
+        scene.add(pointLight2);
 
-            // Planeta (Esfera)
-            const planetGeometry = new THREE.IcosahedronGeometry(1.5, 3);
-            const planetMaterial = new THREE.MeshBasicMaterial({
-                color: 0x00ffff,
-                wireframe: true,
-                transparent: true,
-                opacity: 0.8
-            });
-            planet = new THREE.Mesh(planetGeometry, planetMaterial);
-            planet.position.y = -1.2;
-            scene.add(planet);
+        const planetGroup = new THREE.Group();
+        const planetGeometry = new THREE.IcosahedronGeometry(1.4, 4); 
+        const planetMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0x00ffff, 
+            wireframe: true,
+            transparent: true,
+            opacity: 0.9
+        });
+        const planet = new THREE.Mesh(planetGeometry, planetMaterial);
+        planet.position.y = -1.5;
+        planetGroup.add(planet);
 
-            // Texto MS3
-            textGroup = new THREE.Group();
-            const loader = new THREE.FontLoader();
-            loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
-                const textGeo = new THREE.TextGeometry('MS3', {
-                    font: font, size: 1.2, height: 0.3, curveSegments: 12,
-                    bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.04, bevelSegments: 5
-                });
-                textGeo.computeBoundingBox();
-                const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
-                
-                const matNormal = new THREE.MeshPhysicalMaterial({ 
-                    color: 0x00ffff, metalness: 0.6, roughness: 0.2, clearcoat: 1, transparent:true, opacity: 0.9
-                });
-                const textMesh = new THREE.Mesh(textGeo, matNormal);
-                textMesh.position.x = centerOffset;
-                textGroup.add(textMesh);
-                
-                const matWire = new THREE.MeshBasicMaterial({color:0xffffff, wireframe:true, transparent:true, opacity:0.3});
-                const textWire = new THREE.Mesh(textGeo, matWire);
-                textWire.position.x = centerOffset;
-                textWire.scale.set(1.02, 1.05, 1.2);
-                textGroup.add(textWire);
-                
-                textGroup.position.y = 0.8;
-                scene.add(textGroup);
+        const textGroup = new THREE.Group();
+        textGroup.position.y = 0.8;
+
+        const loader = new THREE.FontLoader();
+        loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
+            const textGeo = new THREE.TextGeometry('MS3', {
+                font: font, size: 1.2, height: 0.4, curveSegments: 12,
+                bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.05, bevelOffset: 0, bevelSegments: 5
             });
 
-            camera.position.z = 5;
-        }
-
-        // --- Animación Escena Inicial ---
-        function animateInitialScene() {
-            if (isExperienceRunning || scene === undefined) return;
-            requestAnimationFrame(animateInitialScene);
+            textGeo.computeBoundingBox();
+            const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
             
-            if (planet) {
-                planet.rotation.y += 0.005;
-                planet.rotation.x += 0.002;
-            }
-            if (textGroup) {
-                textGroup.rotation.y = Math.sin(Date.now() * 0.001) * 0.1;
-            }
-            
-            renderer.render(scene, camera);
-        }
+            const mirrorMaterial = new THREE.MeshPhysicalMaterial({ 
+                color: 0xffffff, metalness: 0.9, roughness: 0.05, clearcoat: 1.0, clearcoatRoughness: 0.05, reflectivity: 1.0
+            });
+            const textMesh = new THREE.Mesh(textGeo, mirrorMaterial);
+            textMesh.position.x = centerOffset;
+            textGroup.add(textMesh);
 
-        // --- Transición: Iniciar Experiencia ---
-        function startExperience() {
-            if (isExperienceRunning) return;
-            isExperienceRunning = true;
+            const neonBorderMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.7 });
+            const borderMesh = new THREE.Mesh(textGeo, neonBorderMaterial);
+            borderMesh.position.x = centerOffset;
+            borderMesh.scale.set(1.02, 1.02, 1.02);
+            textGroup.add(borderMesh);
+        });
 
-            // Ocultar UI inicial
-            instructionText.style.opacity = '0';
-            
-            // Zoom de cámara yfadeOut de la escena inicial
-            gsap.to(camera.position, { z: -1, duration: 2.5, ease: "power2.inOut" });
-            gsap.to(container, { opacity: 0, duration: 1.5, delay: 1, onComplete: () => {
-                container.style.display = 'none';
-                initInternalSystem(); // Crear entorno VR
-                envContainer.style.opacity = '1'; // Aparecer entorno VR
-                envContainer.style.pointerEvents = 'auto';
-            }});
-        }
+        scene.add(planetGroup);
+        scene.add(textGroup);
+        camera.position.z = 5;
 
-        // --- Inicialización Entorno Interno (VR) ---
         function initInternalSystem() {
             internalScene = new THREE.Scene();
             internalCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             internalRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             internalRenderer.setSize(window.innerWidth, window.innerHeight);
-            internalRenderer.setClearColor(0x000000, 0);
+            internalRenderer.setClearColor(0x000000, 0); 
             envContainer.appendChild(internalRenderer.domElement);
 
-            // Estrellas
             const starGeometry = new THREE.BufferGeometry();
-            const starMaterial = new THREE.PointsMaterial({ color: 0x00ffff, size: 0.1 });
-            const starPositions = new Float32Array(6000);
-            for(let i=0; i<6000; i++) starPositions[i] = (Math.random() - 0.5) * 150;
+            const starMaterial = new THREE.PointsMaterial({ color: 0x00ffff, size: 0.15 });
+            const starPositions = new Float32Array(5000);
+            for(let i=0; i<5000; i++) starPositions[i] = (Math.random() - 0.5) * 120;
             starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
             stars = new THREE.Points(starGeometry, starMaterial);
             internalScene.add(stars);
@@ -225,9 +172,9 @@
             userHeadGroup.position.set(0, 0, 0);
             internalScene.add(userHeadGroup);
 
-            // 7 Pantallas de Video
             videoScreensGroup = new THREE.Group();
             userHeadGroup.add(videoScreensGroup);
+
             const videoUrls = [
                 "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
                 "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
@@ -239,21 +186,93 @@
             ];
 
             const screensConfig = [
-                { angle: -1.2, y: 1.4, r: 5.5, w: 3.2, h: 1.8 }, { angle: 1.2, y: 1.5, r: 5.3, w: 2.6, h: 1.4 },
-                { angle: -2.0, y: 0.0, r: 6.0, w: 3.8, h: 2.1 }, { angle: 2.0, y: 0.2, r: 5.8, w: 2.2, h: 1.2 },
-                { angle: -1.0, y: -1.3, r: 5.0, w: 2.4, h: 1.3 }, { angle: 1.0, y: -1.2, r: 5.2, w: 3.0, h: 1.6 },
-                { angle: 0.0, y: 2.2, r: 5.5, w: 2.8, h: 1.5 }
+                { angle: -1.2, y: 1.4, r: 5.5, w: 3.2, h: 1.8 }, 
+                { angle:  1.2, y: 1.5, r: 5.3, w: 2.6, h: 1.4 }, 
+                { angle: -2.0, y: 0.0, r: 6.0, w: 3.8, h: 2.1 }, 
+                { angle:  2.0, y: 0.2, r: 5.8, w: 2.2, h: 1.2 }, 
+                { angle: -1.0, y: -1.3, r: 5.0, w: 2.4, h: 1.3 }, 
+                { angle:  1.0, y: -1.2, r: 5.2, w: 3.0, h: 1.6 }, 
+                { angle:  0.0, y: 2.2, r: 5.5, w: 2.8, h: 1.5 }  
             ];
 
             screensConfig.forEach((config, index) => {
                 const video = document.createElement('video');
-                video.src = videoUrls[index]; video.crossOrigin = 'anonymous'; video.loop = true; video.muted = true; video.playsInline = true; video.play();
-                const videoTexture = new THREE.VideoTexture(video); videoTextures.push(videoTexture);
+                video.src = videoUrls[index];
+                video.crossOrigin = 'anonymous';
+                video.loop = true;
+                video.muted = true;
+                video.playsInline = true;
+                video.play();
+
+                const videoTexture = new THREE.VideoTexture(video);
+                videoTextures.push(videoTexture);
+
                 const planeGeo = new THREE.PlaneGeometry(config.w, config.h);
                 const planeMat = new THREE.MeshBasicMaterial({ map: videoTexture, side: THREE.DoubleSide });
                 const screenMesh = new THREE.Mesh(planeGeo, planeMat);
-                const x = Math.sin(config.angle) * config.r; const z = Math.cos(config.angle) * config.r;
-                screenMesh.position.set(x, config.y, z); screenMesh.lookAt(0, config.y, 0);
+
+                const x = Math.sin(config.angle) * config.r;
+                const z = Math.cos(config.angle) * config.r;
+
+                screenMesh.position.set(x, config.y, z);
+                screenMesh.lookAt(0, config.y, 0);
+
                 const frameGeo = new THREE.EdgesGeometry(planeGeo);
-                const frameMat = new THREE.LineBasicMaterial({ color: index % 2 === 0 ? 0x00ffff : 0xff00ff, linewidth: 2 });
-                const frameLine = new THREE.LineSegments(frameGeo
+                const frameMat = new THREE.LineBasicMaterial({ 
+                    color: index % 2 === 0 ? 0x00ffff : 0xff00ff, 
+                    linewidth: 2 
+                });
+                const frameLine = new THREE.LineSegments(frameGeo, frameMat);
+                screenMesh.add(frameLine);
+
+                videoScreensGroup.add(screenMesh);
+            });
+
+            multiverseButtonsGroup = new THREE.Group();
+            userHeadGroup.add(multiverseButtonsGroup);
+
+            loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
+                const btnData = [
+                    { text: "VER PROGRAMAS VR", y: 0.7, z: -3.0, color: 0x00ffff, emissive: 0x008888 },
+                    { text: "VER PROGRAMAS 2D", y: 0.0, z: -3.0, color: 0xff00ff, emissive: 0x880055 },
+                    { text: "VER EN VIVO", y: -0.7, z: -3.0, color: 0x00ffcc, emissive: 0x008866 }
+                ];
+
+                btnData.forEach((data) => {
+                    const buttonGroup = new THREE.Group();
+
+                    const bGeo = new THREE.TextGeometry(data.text, {
+                        font: font, 
+                        size: 0.25, 
+                        height: 0.05, 
+                        curveSegments: 12, 
+                        bevelEnabled: true, 
+                        bevelThickness: 0.01, 
+                        bevelSize: 0.01, 
+                        bevelSegments: 3
+                    });
+                    bGeo.computeBoundingBox();
+                    const bOffset = -0.5 * (bGeo.boundingBox.max.x - bGeo.boundingBox.min.x);
+                    
+                    const fillMat = new THREE.MeshPhongMaterial({ 
+                        color: data.color, 
+                        emissive: data.emissive,
+                        emissiveIntensity: 0.9,
+                        shininess: 120
+                    });
+                    const fillMesh = new THREE.Mesh(bGeo, fillMat);
+                    fillMesh.position.x = bOffset;
+                    buttonGroup.add(fillMesh);
+
+                    const boxWidth = (bGeo.boundingBox.max.x - bGeo.boundingBox.min.x) + 0.8;
+                    const boxHeight = 0.7;
+                    const boxDepth = 0.25;
+
+                    const frameGeo = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+                    const frameMat = new THREE.MeshBasicMaterial({ 
+                        color: data.color, 
+                        wireframe: true, 
+                        transparent: true, 
+                        opacity: 0.9 
+                    });
+                    const frameMesh = new THREE.Mesh(frameGeo, frame
