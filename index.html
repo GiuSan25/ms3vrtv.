@@ -12,7 +12,7 @@
         #webgl-container, #ms3-environment { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
         #webgl-container { z-index: 2; cursor: pointer; }
         #ms3-environment { z-index: 1; opacity: 0; pointer-events: none; transition: opacity 1.5s ease; background: radial-gradient(circle, #1e1b4b 0%, #000 100%); }
-        #instruction { position: absolute; bottom: 30px; width: 100%; text-align: center; color: #fff; z-index: 3; font-size: 1.2rem; pointer-events: none; transition: opacity 0.5s; padding: 0 20px; }
+        #instruction { position: absolute; bottom: 30px; width: 100%; text-align: center; color: #fff; z-index: 3; font-size: 1.2rem; pointer-events: none; transition: opacity 0.5s; padding: 0 20px; text-shadow: 0 0 10px #0ff; }
         
         #vr-btn {
             position: absolute; top: 20px; right: 20px; z-index: 10;
@@ -28,7 +28,7 @@
 <body>
 
     <button id="vr-btn" style="display: none;">Ver en VR</button>
-    <div id="instruction">Toca la pantalla para activar la experiencia inmersiva</div>
+    <div id="instruction">Toca la esfera para ingresar al multiverso MS3</div>
     <div id="webgl-container"></div>
     <div id="ms3-environment"></div>
 
@@ -47,8 +47,48 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         container.appendChild(renderer.domElement);
 
-        const planet = new THREE.Mesh(new THREE.IcosahedronGeometry(2, 2), new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true }));
-        scene.add(planet);
+        // 1. Esfera con más líneas (mayor subdivisión y wireframe denso) positioned lower
+        const planetGroup = new THREE.Group();
+        const planetGeometry = new THREE.IcosahedronGeometry(1.6, 3); // Más detalle/líneas
+        const planetMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0x00ffff, 
+            wireframe: true,
+            transparent: true,
+            opacity: 0.8
+        });
+        const planet = new THREE.Mesh(planetGeometry, planetMaterial);
+        planet.position.y = -1.2; // Ubicada más abajo
+        planetGroup.add(planet);
+
+        // 2. Letras MS3 3D Neón futurista ubicadas por encima
+        const textGroup = new THREE.Group();
+        textGroup.position.y = 1.2; // Ubicadas arriba
+
+        // Creación procedural de estructuras estéticas estilo neón para simular las letras "MS3"
+        const neonMaterial = new THREE.MeshBasicMaterial({ color: 0xff00ff, wireframe: true });
+        const cyanNeonMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true });
+
+        // Estructura modular futurista representativa de MS3
+        const barGeo = new THREE.BoxGeometry(0.3, 1.8, 0.3);
+        
+        // M
+        const m1 = new THREE.Mesh(barGeo, cyanNeonMaterial); m1.position.set(-1.8, 0, 0);
+        const m2 = new THREE.Mesh(barGeo, cyanNeonMaterial); m2.position.set(-1.0, 0, 0);
+        textGroup.add(m1, m2);
+
+        // S
+        const s1 = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.3, 0.3), neonMaterial); s1.position.set(0.1, 0.8, 0);
+        const s2 = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.3, 0.3), neonMaterial); s2.position.set(0.1, 0, 0);
+        const s3 = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.3, 0.3), neonMaterial); s3.position.set(0.1, -0.8, 0);
+        textGroup.add(s1, s2, s3);
+
+        // 3 (Forma geométrica neón lateral)
+        const numGeo = new THREE.BoxGeometry(1.0, 1.8, 0.3);
+        const num = new THREE.Mesh(numGeo, cyanNeonMaterial); num.position.set(1.8, 0, 0);
+        textGroup.add(num);
+
+        scene.add(planetGroup);
+        scene.add(textGroup);
         camera.position.z = 5;
 
         function initInternalSystem() {
@@ -59,16 +99,17 @@
             internalRenderer.setClearColor(0x000000, 0); 
             envContainer.appendChild(internalRenderer.domElement);
 
+            // Multiverso interior: Estrellas y portales flotantes dinámicos
             const starGeometry = new THREE.BufferGeometry();
-            const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
-            const starPositions = new Float32Array(3000);
-            for(let i=0; i<3000; i++) starPositions[i] = (Math.random() - 0.5) * 100;
+            const starMaterial = new THREE.PointsMaterial({ color: 0x00ffff, size: 0.15 });
+            const starPositions = new Float32Array(4500);
+            for(let i=0; i<4500; i++) starPositions[i] = (Math.random() - 0.5) * 120;
             starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
             stars = new THREE.Points(starGeometry, starMaterial);
             internalScene.add(stars);
 
             const screenGeometry = new THREE.PlaneGeometry(2, 1.5);
-            const material = new THREE.MeshBasicMaterial({ color: 0x0ff, wireframe: true });
+            const material = new THREE.MeshBasicMaterial({ color: 0xff00ff, wireframe: true });
             for(let y = -1; y <= 1; y++) {
                 for(let x = -2; x <= 2; x++) {
                     const screen = new THREE.Mesh(screenGeometry, material);
@@ -90,7 +131,10 @@
         function animate() {
             requestAnimationFrame(animate);
             if (!isSystemActive) {
-                planet.rotation.y += 0.005;
+                // Rotación en su propio eje a 360 grados de la esfera y el texto
+                planet.rotation.y += 0.008;
+                planet.rotation.x += 0.003;
+                textGroup.rotation.y += 0.008;
                 renderer.render(scene, camera);
             } else {
                 if(stars) stars.rotation.y += 0.0005;
@@ -128,7 +172,9 @@
             if (isSystemActive) return;
             window.addEventListener('deviceorientation', handleOrientation, true);
             document.getElementById('instruction').style.opacity = '0';
-            gsap.to(camera.position, { z: 0.5, duration: 2, onComplete: () => {
+            
+            // Animación de entrada directa simulando el viaje hacia el multiverso dentro de la esfera
+            gsap.to(camera.position, { z: -1.5, duration: 2.2, ease: "power2.inOut", onComplete: () => {
                 initInternalSystem();
                 envContainer.style.opacity = '1';
                 envContainer.style.pointerEvents = 'auto';
