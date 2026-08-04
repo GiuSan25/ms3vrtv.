@@ -78,6 +78,9 @@
         let internalScene, internalCamera, internalRenderer, stars;
         let multiverseButtonsGroup;
         let targetQuaternion = new THREE.Quaternion();
+        let manualRotation = { x: 0, y: 0 };
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -158,31 +161,104 @@
             multiverseButtonsGroup = new THREE.Group();
             internalScene.add(multiverseButtonsGroup);
 
+            loader.load('https://cdn.jsdelivr.net/npm/the-fonts-json-path-or-helvetiker... /examples/fonts/helvetiker_bold.typeface.json', function (font) {});
+            
+            // Usamos el cargador existente con la fuente predeterminada
             loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
                 const btnData = [
-                    { text: "VER PROGRAMAS VR", y: 1.2, z: -3.5, color: 0x00ffff },
-                    { text: "VER PROGRAMAS 2D", y: 0.0, z: -3.5, color: 0xff00ff },
-                    { text: "VER EN VIVO", y: -1.2, z: -3.5, color: 0x00ffff }
+                    { text: "VER PROGRAMAS VR", y: 2.2, z: -3.5, color: 0x00ffff },
+                    { text: "VER PROGRAMAS 2D", y: 1.0, z: -3.5, color: 0xff00ff },
+                    { text: "VER EN VIVO", y: -0.2, z: -3.5, color: 0x00ffff }
                 ];
 
                 btnData.forEach((data) => {
+                    // Geometría 3D robusta con extrusión (height y bevel) para dar relieve sólido
                     const bGeo = new THREE.TextGeometry(data.text, {
-                        font: font, size: 0.3, height: 0.06, curveSegments: 6, bevelEnabled: true, bevelThickness: 0.01, bevelSize: 0.01
+                        font: font, 
+                        size: 0.32, 
+                        height: 0.08, 
+                        curveSegments: 12, 
+                        bevelEnabled: true, 
+                        bevelThickness: 0.03, 
+                        bevelSize: 0.02, 
+                        bevelSegments: 5
                     });
                     bGeo.computeBoundingBox();
                     const bOffset = -0.5 * (bGeo.boundingBox.max.x - bGeo.boundingBox.min.x);
-                    const bMat = new THREE.MeshBasicMaterial({ color: data.color, wireframe: true });
-                    const bMesh = new THREE.Mesh(bGeo, bMat);
-                    bMesh.position.set(bOffset, data.y, data.z);
-                    multiverseButtonsGroup.add(bMesh);
+                    
+                    // Contenedor individual para cada botón 3D
+                    const buttonGroup = new THREE.Group();
+
+                    // Malla principal con material brillante
+                    const coreMat = new THREE.MeshStandardMaterial({ 
+                        color: data.color, 
+                        roughness: 0.2, 
+                        metalness: 0.8,
+                        emissive: data.color,
+                        emissiveIntensity: 0.4
+                    });
+                    const coreMesh = new THREE.Mesh(bGeo, coreMat);
+                    buttonGroup.add(coreMesh);
+
+                    // Malla exterior tipo Borde Neón 3D (Wireframe expandido y brillante)
+                    const neonBorderMat = new THREE.MeshBasicMaterial({ 
+                        color: 0xffffff, 
+                        wireframe: true, 
+                        transparent: true, 
+                        opacity: 0.9 
+                    });
+                    const borderMesh = new THREE.Mesh(bGeo, neonBorderMat);
+                    borderMesh.scale.set(1.03, 1.03, 1.1);
+                    buttonGroup.add(borderMesh);
+
+                    buttonGroup.position.set(bOffset, data.y, data.z);
+                    multiverseButtonsGroup.add(buttonGroup);
                 });
             });
 
             vrBtn.style.display = 'block';
             multiverseHud.style.display = 'block';
+
+            window.addEventListener('mousedown', onPointerDown);
+            window.addEventListener('mousemove', onPointerMove);
+            window.addEventListener('mouseup', onPointerUp);
+
+            window.addEventListener('touchstart', onPointerDown, { passive: true });
+            window.addEventListener('touchmove', onPointerMove, { passive: true });
+            window.addEventListener('touchend', onPointerUp);
         }
 
-        // Activación completa y unificada del giroscopio tanto para iOS (permisos) como Android (detección directa/DeviceMotionEvent si es requerido)
+        function onPointerDown(e) {
+            if (!isSystemActive || isVRMode) return;
+            isDragging = true;
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            previousMousePosition = { x: clientX, y: clientY };
+        }
+
+        function onPointerMove(e) {
+            if (!isSystemActive || !isDragging || isVRMode) return;
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+            const deltaX = clientX - previousMousePosition.x;
+            const deltaY = clientY - previousMousePosition.y;
+
+            manualRotation.y -= deltaX * 0.005;
+            manualRotation.x -= deltaY * 0.005;
+
+            manualRotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, manualRotation.x));
+
+            const euler = new THREE.Euler(manualRotation.x, manualRotation.y, 0, 'YXZ');
+            targetQuaternion.setFromEuler(euler);
+
+            previousMousePosition = { x: clientX, y: clientY };
+        }
+
+        function onPointerUp() {
+            isDragging = false;
+        }
+
         function requestGyroscope() {
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission()
@@ -193,30 +269,28 @@
                     })
                     .catch(console.error);
             } else {
-                // En Android y navegadores compatibles por defecto, se activa de manera directa
                 window.addEventListener('deviceorientation', handleOrientation, true);
-            }
-
-            // Fallback para ciertos dispositivos Android modernos que requieren DeviceMotionEvent explícito para desbloquear sensores de movimiento
-            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-                DeviceMotionEvent.requestPermission().catch(console.error);
             }
         }
 
         function handleOrientation(event) {
+            if (isDragging) return;
+
             const alpha = event.alpha ? THREE.MathUtils.degToRad(event.alpha) : 0;
             const beta = event.beta ? THREE.MathUtils.degToRad(event.beta) : 0;
             const gamma = event.gamma ? THREE.MathUtils.degToRad(event.gamma) : 0;
             
+            const rotX = beta;
+            const rotY = alpha;
+            const rotZ = -gamma;
+
+            const euler = new THREE.Euler(rotX, rotY, rotZ, 'YXZ');
+            targetQuaternion.setFromEuler(euler);
+
             const orientation = window.screen.orientation ? window.screen.orientation.angle : (window.orientation || 0);
-            const degToRad = THREE.MathUtils.degToRad;
-
-            const Euler = new THREE.Euler(beta, alpha, -gamma, 'YXZ');
-            targetQuaternion.setFromEuler(Euler);
-
             if (Math.abs(orientation) === 90) {
                 const correction = new THREE.Quaternion();
-                correction.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -degToRad(orientation));
+                correction.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -THREE.MathUtils.degToRad(orientation));
                 targetQuaternion.multiply(correction);
             }
         }
@@ -292,6 +366,13 @@
             if (!isSystemActive) return;
 
             window.removeEventListener('deviceorientation', handleOrientation, true);
+            window.removeEventListener('mousedown', onPointerDown);
+            window.removeEventListener('mousemove', onPointerMove);
+            window.removeEventListener('mouseup', onPointerUp);
+            window.removeEventListener('touchstart', onPointerDown);
+            window.removeEventListener('touchmove', onPointerMove);
+            window.removeEventListener('touchend', onPointerUp);
+
             vrBtn.style.display = 'none';
             multiverseHud.style.display = 'none';
             envContainer.style.opacity = '0';
