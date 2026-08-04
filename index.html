@@ -54,6 +54,18 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         container.appendChild(renderer.domElement);
 
+        // Iluminación para dar efecto de brillo y reflejo tipo vidrio en 3D
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
+        scene.add(ambientLight);
+
+        const pointLight1 = new THREE.PointLight(0xff00ff, 3, 50);
+        pointLight1.position.set(5, 5, 5);
+        scene.add(pointLight1);
+
+        const pointLight2 = new THREE.PointLight(0x00ffff, 3, 50);
+        pointLight2.position.set(-5, -5, 5);
+        scene.add(pointLight2);
+
         // Esfera con líneas densas posicionada abajo
         const planetGroup = new THREE.Group();
         const planetGeometry = new THREE.IcosahedronGeometry(1.4, 4); 
@@ -67,7 +79,7 @@
         planet.position.y = -1.5;
         planetGroup.add(planet);
 
-        // Grupo para el Texto 3D MS3 relleno de color sólido neón
+        // Grupo para el Texto 3D MS3 con acabado brillante tipo vidrio/degradé
         const textGroup = new THREE.Group();
         textGroup.position.y = 0.8;
 
@@ -76,11 +88,11 @@
             const textGeo = new THREE.TextGeometry('MS3', {
                 font: font,
                 size: 1.2,
-                height: 0.35, // Grosor 3D pronunciado
+                height: 0.4, // Grosor 3D pronunciado
                 curveSegments: 12,
                 bevelEnabled: true,
-                bevelThickness: 0.06,
-                bevelSize: 0.04,
+                bevelThickness: 0.08,
+                bevelSize: 0.05,
                 bevelOffset: 0,
                 bevelSegments: 5
             });
@@ -88,9 +100,17 @@
             textGeo.computeBoundingBox();
             const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
             
-            // Material con color sólido e iluminado estilo neón relleno
-            const textMaterial = new THREE.MeshBasicMaterial({ 
-                color: 0xff007f // Color fucsia/magenta neón sólido y definido
+            // Material con propiedades físicas (MeshPhysicalMaterial) para simular vidrio brillante y efecto reflectivo/degradé
+            const textMaterial = new THREE.MeshPhysicalMaterial({ 
+                color: 0xff00aa,
+                metalness: 0.1,
+                roughness: 0.1,
+                transmission: 0.6, // Efecto translúcido tipo vidrio
+                thickness: 1.2,
+                clearcoat: 1.0,     // Brillo superficial extra
+                clearcoatRoughness: 0.1,
+                transparent: true,
+                opacity: 0.95
             });
             
             const textMesh = new THREE.Mesh(textGeo, textMaterial);
