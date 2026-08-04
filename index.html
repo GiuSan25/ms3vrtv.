@@ -6,7 +6,6 @@
     <title>Experiencia MS3 - Visor Inmersivo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Incluimos la librería de fuentes para Three.js -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -55,7 +54,7 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         container.appendChild(renderer.domElement);
 
-        // Grupo principal para la esfera de líneas densas (posicionada abajo)
+        // Esfera con líneas densas posicionada abajo
         const planetGroup = new THREE.Group();
         const planetGeometry = new THREE.IcosahedronGeometry(1.4, 4); 
         const planetMaterial = new THREE.MeshBasicMaterial({ 
@@ -68,32 +67,30 @@
         planet.position.y = -1.5;
         planetGroup.add(planet);
 
-        // Grupo para el Texto 3D Neón MS3 (posicionado arriba)
+        // Grupo para el Texto 3D MS3 relleno de color sólido neón
         const textGroup = new THREE.Group();
         textGroup.position.y = 0.8;
 
-        // Carga de tipografía oficial en 3D para asegurar la visibilidad perfecta de "MS3"
         const loader = new THREE.FontLoader();
         loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
             const textGeo = new THREE.TextGeometry('MS3', {
                 font: font,
                 size: 1.2,
-                height: 0.3, // Grosor 3D
+                height: 0.35, // Grosor 3D pronunciado
                 curveSegments: 12,
                 bevelEnabled: true,
-                bevelThickness: 0.05,
-                bevelSize: 0.03,
+                bevelThickness: 0.06,
+                bevelSize: 0.04,
                 bevelOffset: 0,
                 bevelSegments: 5
             });
 
-            // Centrar el texto correctamente en pantalla
             textGeo.computeBoundingBox();
             const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
             
+            // Material con color sólido e iluminado estilo neón relleno
             const textMaterial = new THREE.MeshBasicMaterial({ 
-                color: 0xff00ff, 
-                wireframe: true 
+                color: 0xff007f // Color fucsia/magenta neón sólido y definido
             });
             
             const textMesh = new THREE.Mesh(textGeo, textMaterial);
@@ -144,7 +141,6 @@
         function animate() {
             requestAnimationFrame(animate);
             if (!isSystemActive) {
-                // Rotación simultánea de 360 grados sobre su propio eje tanto para la esfera como para el texto
                 planet.rotation.y += 0.008;
                 planet.rotation.x += 0.003;
                 textGroup.rotation.y += 0.006;
@@ -184,7 +180,6 @@
             window.addEventListener('deviceorientation', handleOrientation, true);
             document.getElementById('instruction').style.opacity = '0';
             
-            // Transición inmersiva hacia el interior del multiverso al hacer clic en la esfera
             gsap.to(camera.position, { z: -1.5, duration: 2.2, ease: "power2.inOut", onComplete: () => {
                 initInternalSystem();
                 envContainer.style.opacity = '1';
