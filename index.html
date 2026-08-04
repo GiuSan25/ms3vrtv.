@@ -31,7 +31,6 @@
         }
         #vr-btn:hover { background: #0ff; color: #000; box-shadow: 0 0 20px #0ff; }
 
-        /* Interfaz HUD 3D del Multiverso (Botones flotantes alrededor y botón VOLVER) */
         #multiverse-hud {
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
             z-index: 5; pointer-events: none; display: none;
@@ -63,7 +62,6 @@
     <div id="webgl-container"></div>
     <div id="ms3-environment"></div>
 
-    <!-- HUD Interactivo dentro del Multiverso -->
     <div id="multiverse-hud">
         <button id="btn-volver" class="hud-interactive">VOLVER</button>
     </div>
@@ -87,7 +85,6 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         container.appendChild(renderer.domElement);
 
-        // Iluminación
         const ambientLight = new THREE.AmbientLight(0xffffff, 1.8);
         scene.add(ambientLight);
 
@@ -99,7 +96,6 @@
         pointLight2.position.set(-6, -6, 6);
         scene.add(pointLight2);
 
-        // Esfera principal posicionada abajo
         const planetGroup = new THREE.Group();
         const planetGeometry = new THREE.IcosahedronGeometry(1.4, 4); 
         const planetMaterial = new THREE.MeshBasicMaterial({ 
@@ -112,7 +108,6 @@
         planet.position.y = -1.5;
         planetGroup.add(planet);
 
-        // Texto MS3 3D espejo con bordes neón
         const textGroup = new THREE.Group();
         textGroup.position.y = 0.8;
 
@@ -161,37 +156,26 @@
             stars = new THREE.Points(starGeometry, starMaterial);
             internalScene.add(stars);
 
-            // Estructura de paneles geométricos neón alrededor (Multiverso)
-            const screenGeometry = new THREE.PlaneGeometry(2, 1.5);
-            const material = new THREE.MeshBasicMaterial({ color: 0xff00ff, wireframe: true });
-            for(let y = -1; y <= 1; y++) {
-                for(let x = -2; x <= 2; x++) {
-                    const screen = new THREE.Mesh(screenGeometry, material);
-                    screen.position.set(x * 2.2, y * 1.7, -5);
-                    internalScene.add(screen);
-                }
-            }
-
-            // Crear botones 3D neón flotantes alrededor del usuario
+            // Sin pantallas laterales: únicamente botones 3D neón distribuidos alrededor del usuario en el espacio virtual
             multiverseButtonsGroup = new THREE.Group();
             internalScene.add(multiverseButtonsGroup);
 
             loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
                 const btnData = [
-                    { text: "VER PROGRAMAS VR", y: 1.0 },
-                    { text: "VER PROGRAMAS 2D", y: 0.0 },
-                    { text: "VER EN VIVO", y: -1.0 }
+                    { text: "VER PROGRAMAS VR", y: 1.2, z: -3.5, color: 0x00ffff },
+                    { text: "VER PROGRAMAS 2D", y: 0.0, z: -3.5, color: 0xff00ff },
+                    { text: "VER EN VIVO", y: -1.2, z: -3.5, color: 0x00ffff }
                 ];
 
                 btnData.forEach((data) => {
                     const bGeo = new THREE.TextGeometry(data.text, {
-                        font: font, size: 0.35, height: 0.08, curveSegments: 6, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.01
+                        font: font, size: 0.3, height: 0.06, curveSegments: 6, bevelEnabled: true, bevelThickness: 0.01, bevelSize: 0.01
                     });
                     bGeo.computeBoundingBox();
                     const bOffset = -0.5 * (bGeo.boundingBox.max.x - bGeo.boundingBox.min.x);
-                    const bMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true });
+                    const bMat = new THREE.MeshBasicMaterial({ color: data.color, wireframe: true });
                     const bMesh = new THREE.Mesh(bGeo, bMat);
-                    bMesh.position.set(bOffset, data.y, -3);
+                    bMesh.position.set(bOffset, data.y, data.z);
                     multiverseButtonsGroup.add(bMesh);
                 });
             });
@@ -200,7 +184,6 @@
             multiverseHud.style.display = 'block';
         }
 
-        // Activación del giroscopio compatible con Android e iOS (permisos para iOS 13+)
         function requestGyroscope() {
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission()
@@ -274,7 +257,6 @@
             }});
         }
 
-        // Función para volver a la pantalla principal
         function returnToMain(e) {
             if (e) e.stopPropagation();
             if (!isSystemActive) return;
