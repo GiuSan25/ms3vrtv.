@@ -2,126 +2,234 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Experiencia MS3 - Multiverso Inmersivo 360</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MS3 - Interfaz Multiverso</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
         body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; }
-        #webgl-container, #multiverse-room { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
-        #webgl-container { z-index: 2; cursor: pointer; }
-        #multiverse-room { z-index: 5; opacity: 0; pointer-events: none; transition: opacity 1.5s ease; cursor: grab; }
-        #multiverse-room:active { cursor: grabbing; }
+        
+        #webgl-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 2; cursor: pointer; }
         
         #instruction { 
             position: absolute; bottom: 35px; width: 100%; text-align: center; color: #fff; z-index: 3; 
-            font-size: 1.1rem; pointer-events: none; transition: opacity 0.5s; padding: 0 20px; 
-            text-shadow: 0 0 10px #0ff, 0 0 20px #f0f; font-weight: 600; letter-spacing: 1px;
+            font-size: 1.1rem; pointer-events: none; text-shadow: 0 0 10px #0ff, 0 0 20px #f0f; font-weight: 600; letter-spacing: 1px;
+            transition: opacity 0.5s;
         }
-        
-        #vr-btn {
-            position: absolute; top: 20px; right: 20px; z-index: 20;
-            padding: 12px 24px; background: transparent; color: #0ff;
-            border: 2px solid #0ff; border-radius: 8px; font-weight: bold;
-            text-transform: uppercase; letter-spacing: 2px;
-            box-shadow: 0 0 10px #0ff, inset 0 0 10px #0ff;
-            cursor: pointer; transition: all 0.3s;
-            display: none;
-        }
-        #vr-btn:hover { background: #0ff; color: #000; box-shadow: 0 0 20px #0ff; }
 
-        #touch-instruction {
-            position: absolute; bottom: 20px; width: 100%; text-align: center; color: #0ff; z-index: 20;
-            font-size: 0.9rem; pointer-events: none; text-shadow: 0 0 8px #0ff; display: none; font-weight: 500;
+        /* Panel UI Flotante Estilo Web Exacto a la Imagen */
+        #ui-interface {
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10;
+            background: radial-gradient(circle at center, #0a0618 0%, #030108 100%);
+            opacity: 0; pointer-events: none; transition: opacity 1s ease;
+            overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 40px 20px;
         }
+
+        .neon-box-cyan {
+            border: 2px solid #00f0ff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4), inset 0 0 15px rgba(0, 240, 255, 0.2);
+            border-radius: 16px;
+        }
+
+        .neon-box-magenta {
+            border: 2px solid #f000ff;
+            box-shadow: 0 0 15px rgba(240, 0, 255, 0.4), inset 0 0 15px rgba(240, 0, 255, 0.2);
+            border-radius: 16px;
+        }
+
+        .pill-btn {
+            background: rgba(10, 10, 25, 0.8);
+            border-radius: 9999px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+        .pill-btn:hover { transform: scale(1.05); }
+
+        /* Modal de reproducción de video */
+        #video-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 50;
+            display: none; justify-content: center; align-items: center; flex-direction: column;
+        }
+        #video-modal video { width: 80%; max-width: 900px; border-radius: 12px; box-shadow: 0 0 30px #0ff; }
+        #close-modal { margin-top: 20px; padding: 10px 25px; background: #0ff; color: #000; font-weight: bold; border-radius: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <button id="vr-btn">Ver en VR</button>
     <div id="instruction">Presiona la esfera para ingresar al multiverso MS3</div>
-    <div id="touch-instruction">💡 Arrastra con el dedo o mouse para girar en 360° y explorar las pantallas inmersivas</div>
-    
     <div id="webgl-container"></div>
-    <div id="multiverse-room"></div>
+
+    <!-- Panel Flotante Web Interactivo (Idéntico a la imagen) -->
+    <div id="ui-interface">
+        <div class="w-full max-w-6xl flex flex-col items-center space-y-8 pb-16">
+            
+            <!-- Banner Principal Superior -->
+            <div class="w-full relative neon-box-cyan overflow-hidden bg-[#0c091f] p-8 flex flex-col justify-between h-[360px]" style="background-image: linear-gradient(to right, rgba(12,9,31,0.9), rgba(12,9,31,0.5)), url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=1200&auto=format&fit=crop'); background-size: cover; background-position: center;">
+                <div class="absolute top-6 right-6 bg-[#8b5cf6] text-white text-xs font-bold px-4 py-1.5 rounded-md uppercase tracking-wider shadow-lg">
+                    MS3 EXCLUSIVO
+                </div>
+                
+                <div class="max-w-xl z-10 mt-auto">
+                    <div class="flex items-center space-x-3 mb-2 text-white">
+                        <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        <span class="text-sm font-semibold tracking-widest text-cyan-300">MS3 LIVE</span>
+                    </div>
+                    <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-wide mb-6 drop-shadow-md">
+                        MS3 LIVE: EL CONCIERTO DEL SIGLO
+                    </h1>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="bg-white text-black font-extxl px-8 py-3.5 rounded-xl font-bold hover:bg-cyan-300 transition shadow-lg">
+                            VER AHORA
+                        </button>
+                        <button onclick="alert('Información del Concierto del Siglo en MS3 Multiverso.')" class="border-2 border-white text-white px-8 py-3.5 rounded-xl font-bold hover:bg-white/10 transition">
+                            INFO
+                        </button>
+                    </div>
+                </div>
+
+                <div class="absolute bottom-6 right-6 text-cyan-400 font-bold flex items-center space-x-1 text-lg">
+                    <span>360°</span>
+                    <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                </div>
+            </div>
+
+            <!-- Fila de Botones Neón Superiores -->
+            <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-6">
+                <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')" class="pill-btn neon-box-cyan py-4 text-cyan-400 hover:bg-cyan-400/10 text-sm md:text-base">
+                    VER PROGRAMAS VR
+                </button>
+                <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="pill-btn neon-box-magenta py-4 text-fuchsia-400 hover:bg-fuchsia-400/10 text-sm md:text-base">
+                    VER PROGRAMAS 2D
+                </button>
+                <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')" class="pill-btn neon-box-cyan py-4 text-cyan-400 hover:bg-cyan-400/10 text-sm md:text-base">
+                    VER EN VIVO
+                </button>
+            </div>
+
+            <!-- Fila de Tarjetas Medianas -->
+            <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Tarjeta 1 -->
+                <div onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="neon-box-cyan bg-[#0b081d] p-6 rounded-2xl flex flex-col justify-between h-[240px] cursor-pointer hover:scale-[1.02] transition relative overflow-hidden">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-white bg-black/40 px-3 py-1 rounded-md border border-cyan-500/30">220 min</span>
+                        <span class="text-xs font-bold bg-[#8b5cf6] text-white px-3 py-1 rounded-md">MS3 EXCLUSIVO</span>
+                    </div>
+                    <div>
+                        <p class="text-xs text-cyan-400 font-semibold mb-1">TENDENCIAS AHORA</p>
+                        <h3 class="text-xl font-bold text-white">CÓDIGO VR: INVESTIGACIÓN</h3>
+                    </div>
+                    <div class="flex justify-between items-center text-xs text-gray-400">
+                        <span class="flex items-center text-cyan-400 font-medium">◉ Interactivo</span>
+                        <span>360° ↺</span>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 2 -->
+                <div onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')" class="neon-box-magenta bg-[#0b081d] p-6 rounded-2xl flex flex-col justify-between h-[240px] cursor-pointer hover:scale-[1.02] transition relative overflow-hidden" style="background-image: linear-gradient(to bottom, rgba(11,8,29,0.7), rgba(11,8,29,0.9)), url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop'); background-size: cover;">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-white bg-black/40 px-3 py-1 rounded-md border border-fuchsia-500/30">30 min</span>
+                        <span class="text-xs font-bold bg-[#8b5cf6] text-white px-3 py-1 rounded-md">MS3 EXCLUSIVO</span>
+                    </div>
+                    <div>
+                        <p class="text-xs text-fuchsia-400 font-semibold mb-1">NOTICIAS INMERSIVAS</p>
+                        <h3 class="text-xl font-bold text-white">PLANETA 360</h3>
+                    </div>
+                    <div class="flex justify-between items-center text-xs text-gray-400">
+                        <span class="flex items-center text-cyan-400 font-medium">◉ Interactivo</span>
+                        <span>360° ↺</span>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 3 -->
+                <div onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="neon-box-cyan bg-[#0b081d] p-6 rounded-2xl flex flex-col justify-between h-[240px] cursor-pointer hover:scale-[1.02] transition relative overflow-hidden">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-white bg-black/40 px-3 py-1 rounded-md border border-cyan-500/30">230 min</span>
+                        <span class="text-xs font-bold bg-[#8b5cf6] text-white px-3 py-1 rounded-md">MS3 EXCLUSIVO</span>
+                    </div>
+                    <div>
+                        <p class="text-xs text-cyan-400 font-semibold mb-1">CINE VR</p>
+                        <h3 class="text-xl font-bold text-white">CINE VR: EXPERIENCIA</h3>
+                    </div>
+                    <div class="flex justify-between items-center text-xs text-gray-400">
+                        <span class="flex items-center text-cyan-400 font-medium">◉ Cortos</span>
+                        <span>360° ↺</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Fila Inferior de Tarjetas Grandes -->
+            <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="neon-box-magenta bg-[#0b081d] p-8 rounded-2xl flex flex-col justify-between h-[280px] cursor-pointer hover:scale-[1.02] transition">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-bold text-white bg-black/40 px-3.5 py-1.5 rounded-md border border-fuchsia-500/30">230 min</span>
+                        <span class="text-xs font-bold bg-[#8b5cf6] text-white px-3.5 py-1.5 rounded-md">MS3 EXCLUSIVO</span>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-white mb-1">CÓDIGO VR: INVESTIGACIÓN</h3>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-gray-300">
+                        <span class="text-cyan-400 font-medium">◉ Interactivo</span>
+                        <span>360° ↺</span>
+                    </div>
+                </div>
+
+                <div onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')" class="neon-box-cyan bg-[#0b081d] p-8 rounded-2xl flex flex-col justify-between h-[280px] cursor-pointer hover:scale-[1.02] transition" style="background-image: linear-gradient(to bottom, rgba(11,8,29,0.7), rgba(11,8,29,0.9)), url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop'); background-size: cover;">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-bold text-white bg-black/40 px-3.5 py-1.5 rounded-md border border-cyan-500/30">210 min</span>
+                        <span class="text-xs font-bold bg-[#8b5cf6] text-white px-3.5 py-1.5 rounded-md">MS3 EXCLUSIVO</span>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-white mb-1">PLANETA 360</h3>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-gray-300">
+                        <span class="text-cyan-400 font-medium">◉ Interactivo</span>
+                        <span>360° ↺</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal Reproductor de Video -->
+    <div id="video-modal">
+        <video id="active-video" controls autoplay playsinline></video>
+        <button id="close-modal" onclick="closeVideo()">Cerrar Reproductor</button>
+    </div>
 
     <script>
         const container = document.getElementById('webgl-container');
-        const multiverseRoomContainer = document.getElementById('multiverse-room');
-        const vrBtn = document.getElementById('vr-btn');
-        const touchInstruction = document.getElementById('touch-instruction');
+        const uiInterface = document.getElementById('ui-interface');
+        const instruction = document.getElementById('instruction');
+        const videoModal = document.getElementById('video-modal');
+        const activeVideo = document.getElementById('active-video');
 
         let isSystemActive = false;
-        let isVRMode = false;
-        let mainScene, mainCamera, mainRenderer, planet, textGroup, planetGroup;
-        let multiScene, multiCamera, multiRenderer, multiStars;
-        let targetQuaternion = new THREE.Quaternion();
+        let scene, camera, renderer, planet, textGroup, planetGroup;
 
-        let isDragging = false;
-        let previousMousePosition = { x: 0, y: 0 };
-        let cameraLon = 0, cameraLat = 0;
-        let targetLon = 0, targetLat = 0;
+        // Escena 3D Inicial (Esfera y Logo MS3)
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
 
-        const videoLibrary = {
-            'live': { title: 'MS3 LIVE: EL CONCIERTO DEL SIGLO', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', tag: 'MS3 EXCLUSIVO' },
-            'vr_prog': { title: 'VER PROGRAMAS VR', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', tag: 'INTERACTIVO 360°' },
-            'td_prog': { title: 'VER PROGRAMAS 2D', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', tag: 'ESTELAR' },
-            'tendencias': { title: 'CÓDIGO VR: INVESTIGACIÓN', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', tag: 'TENDENCIAS' },
-            'noticias': { title: 'PLANETA 360: NOTICIAS INMERSIVAS', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', tag: 'NOTICIAS' },
-            'cine': { title: 'CINE VR: EXPERIENCIA TOTAL', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', tag: 'CINEMATOGRÁFICO' }
-        };
-
-        let activeVideoElement = null;
-        let activeVideoTexture = null;
-
-        function playVideoOnScreen(videoKey, meshToReplace) {
-            const data = videoLibrary[videoKey];
-            if (!data) return;
-
-            if (activeVideoElement) {
-                activeVideoElement.pause();
-                activeVideoElement.remove();
-            }
-
-            const video = document.createElement('video');
-            video.src = data.url;
-            video.crossOrigin = 'anonymous';
-            video.loop = true;
-            video.muted = false;
-            video.playsInline = true;
-            video.autoplay = true;
-            video.play().catch(e => console.log("Reproducción automática bloqueada por navegador:", e));
-
-            activeVideoElement = video;
-            activeVideoTexture = new THREE.VideoTexture(video);
-            activeVideoTexture.minFilter = THREE.LinearFilter;
-            activeVideoTexture.magFilter = THREE.LinearFilter;
-
-            if (meshToReplace) {
-                meshToReplace.material.map = activeVideoTexture;
-                meshToReplace.material.needsUpdate = true;
-            }
-        }
-
-        // Escena de Presentación Inicial
-        mainScene = new THREE.Scene();
-        mainCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        mainRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        mainRenderer.setSize(window.innerWidth, window.innerHeight);
-        container.appendChild(mainRenderer.domElement);
-
-        mainScene.add(new THREE.AmbientLight(0xffffff, 1.8));
+        scene.add(new THREE.AmbientLight(0xffffff, 1.8));
 
         const pointLight1 = new THREE.PointLight(0xff00ff, 4, 60);
         pointLight1.position.set(6, 6, 6);
-        mainScene.add(pointLight1);
+        scene.add(pointLight1);
 
         const pointLight2 = new THREE.PointLight(0x00ffff, 4, 60);
         pointLight2.position.set(-6, -6, 6);
-        mainScene.add(pointLight2);
+        scene.add(pointLight2);
 
         planetGroup = new THREE.Group();
         const planetGeometry = new THREE.IcosahedronGeometry(1.4, 4); 
@@ -158,273 +266,51 @@
             textGroup.add(borderMesh);
         });
 
-        mainScene.add(planetGroup);
-        mainScene.add(textGroup);
-        mainCamera.position.z = 5;
-
-        // Entorno Multiverso 360° Inmersivo con pantallas alrededor
-        let interactiveScreens = [];
-        function initMultiverseRoom() {
-            multiScene = new THREE.Scene();
-            multiCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            multiRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            multiRenderer.setSize(window.innerWidth, window.innerHeight);
-            multiRenderer.setClearColor(0x000000, 0);
-            multiverseRoomContainer.appendChild(multiRenderer.domElement);
-
-            const starGeo = new THREE.BufferGeometry();
-            const starMat = new THREE.PointsMaterial({ color: 0x00ffff, size: 0.2 });
-            const positions = new Float32Array(6000);
-            for(let i = 0; i < 6000; i++) positions[i] = (Math.random() - 0.5) * 150;
-            starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            multiStars = new THREE.Points(starGeo, starMat);
-            multiScene.add(multiStars);
-
-            multiScene.add(new THREE.AmbientLight(0xffffff, 2.0));
-
-            interactiveScreens = [];
-            const radius = 5.0;
-            
-            // Configuración de pantallas alrededor distribuidas en 360 grados inspiradas en la interfaz de la imagen
-            const screensData = [
-                { key: 'live', title: 'MS3 LIVE: EL CONCIERTO DEL SIGLO', subtitle: 'MS3 EXCLUSIVO • 360°', angle: 0, y: 1.2, w: 4.2, h: 2.2, color: '#00ffff' },
-                { key: 'vr_prog', title: 'VER PROGRAMAS VR', subtitle: 'EXPERIENCIA INTERACTIVA', angle: Math.PI * 0.35, y: -0.2, w: 3.2, h: 1.8, color: '#ff00ff' },
-                { key: 'td_prog', title: 'VER PROGRAMAS 2D', subtitle: 'CONTENIDO ESTELAR', angle: Math.PI * 0.7, y: 1.0, w: 3.4, h: 1.9, color: '#00ffff' },
-                { key: 'tendencias', title: 'CÓDIGO VR: INVESTIGACIÓN', subtitle: 'TENDENCIAS AHORA • 230 min', angle: Math.PI, y: -1.0, w: 3.4, h: 1.8, color: '#ff00ff' },
-                { key: 'noticias', title: 'PLANETA 360: NOTICIAS', subtitle: 'NOTICIAS INMERSIVAS • 30 min', angle: Math.PI * 1.35, y: 0.8, w: 3.2, h: 1.7, color: '#00ffff' },
-                { key: 'cine', title: 'CINE VR: CARTELERA', subtitle: 'ESTRENOS EXCLUSIVOS', angle: Math.PI * 1.7, y: -0.5, w: 3.5, h: 1.8, color: '#ff00ff' }
-            ];
-
-            screensData.forEach((item) => {
-                const x = Math.sin(item.angle) * radius;
-                const z = Math.cos(item.angle) * radius;
-
-                const canvas = document.createElement('canvas');
-                canvas.width = 1024; canvas.height = 512;
-                const ctx = canvas.getContext('2d');
-                
-                // Fondo y estilo de tarjeta similar al banner de la plataforma
-                ctx.fillStyle = '#0a0a23';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                ctx.strokeStyle = item.color;
-                ctx.lineWidth = 12;
-                ctx.strokeRect(0, 0, canvas.width, canvas.height);
-
-                // Badge superior derecho
-                ctx.fillStyle = item.color;
-                ctx.fillRect(canvas.width - 320, 30, 280, 50);
-                ctx.fillStyle = '#000000';
-                ctx.font = 'bold 22px Inter';
-                ctx.textAlign = 'center';
-                ctx.fillText(item.subtitle, canvas.width - 180, 63);
-
-                // Título principal
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 42px Inter';
-                ctx.textAlign = 'left';
-                ctx.fillText(item.title, 60, 180);
-
-                // Botón interactivo "VER AHORA" / "REPRODUCIR"
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(60, 280, 240, 80);
-                ctx.fillStyle = '#000000';
-                ctx.font = 'bold 28px Inter';
-                ctx.textAlign = 'center';
-                ctx.fillText('▶ VER AHORA', 180, 332);
-
-                const texture = new THREE.CanvasTexture(canvas);
-                const planeGeo = new THREE.PlaneGeometry(item.w, item.h);
-                const planeMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
-                const screenMesh = new THREE.Mesh(planeGeo, planeMat);
-
-                screenMesh.position.set(x, item.y, z);
-                screenMesh.lookAt(0, item.y, 0);
-                screenMesh.userData = { videoKey: item.key };
-                
-                multiScene.add(screenMesh);
-                interactiveScreens.push(screenMesh);
-            });
-
-            setupControls(multiverseRoomContainer);
-        }
-
-        function enterMultiverse() {
-            if (isSystemActive) return;
-            isSystemActive = true;
-            window.addEventListener('deviceorientation', handleOrientation, true);
-            document.getElementById('instruction').style.opacity = '0';
-            
-            gsap.to(mainCamera.position, { z: -1.5, duration: 2.0, ease: "power2.inOut", onComplete: () => {
-                initMultiverseRoom();
-                container.style.opacity = '0';
-                multiverseRoomContainer.style.opacity = '1';
-                multiverseRoomContainer.style.pointerEvents = 'auto';
-                vrBtn.style.display = 'block';
-                touchInstruction.style.display = 'block';
-            }});
-        }
-
-        function setupControls(domElem) {
-            domElem.addEventListener('mousedown', onPointerDown);
-            window.addEventListener('mousemove', onPointerMove);
-            window.addEventListener('mouseup', onPointerUp);
-
-            domElem.addEventListener('touchstart', onTouchStart, { passive: false });
-            window.addEventListener('touchmove', onTouchMove, { passive: false });
-            window.addEventListener('touchend', onTouchEnd);
-        }
-
-        function onPointerDown(e) {
-            isDragging = true;
-            previousMousePosition = { x: e.clientX, y: e.clientY };
-        }
-
-        function onPointerMove(e) {
-            if (!isDragging || !isSystemActive) return;
-            const deltaX = e.clientX - previousMousePosition.x;
-            const deltaY = e.clientY - previousMousePosition.y;
-
-            targetLon -= deltaX * 0.4;
-            targetLat += deltaY * 0.4;
-            targetLat = Math.max(-85, Math.min(85, targetLat));
-
-            previousMousePosition = { x: e.clientX, y: e.clientY };
-        }
-
-        function onPointerUp(e) {
-            if (!isDragging) return;
-            isDragging = false;
-            checkScreenClick(e.clientX, e.clientY);
-        }
-
-        let touchStartX = 0, touchStartY = 0;
-        function onTouchStart(e) {
-            if (e.touches.length === 1) {
-                isDragging = true;
-                touchStartX = e.touches[0].clientX;
-                touchStartY = e.touches[0].clientY;
-                previousMousePosition = { x: touchStartX, y: touchStartY };
-            }
-        }
-
-        function onTouchMove(e) {
-            if (!isDragging || !isSystemActive || e.touches.length !== 1) return;
-            const currentX = e.touches[0].clientX;
-            const currentY = e.touches[0].clientY;
-            const deltaX = currentX - previousMousePosition.x;
-            const deltaY = currentY - previousMousePosition.y;
-
-            targetLon -= deltaX * 0.5;
-            targetLat += deltaY * 0.5;
-            targetLat = Math.max(-85, Math.min(85, targetLat));
-
-            previousMousePosition = { x: currentX, y: currentY };
-        }
-
-        function onTouchEnd(e) {
-            if (!isDragging) return;
-            isDragging = false;
-            if (e.changedTouches.length > 0) {
-                checkScreenClick(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-            }
-        }
-
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-
-        function checkScreenClick(clientX, clientY) {
-            mouse.x = (clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(clientY / window.innerHeight) * 2 + 1;
-
-            if (!multiCamera) return;
-
-            raycaster.setFromCamera(mouse, multiCamera);
-            const intersects = raycaster.intersectObjects(interactiveScreens);
-
-            if (intersects.length > 0) {
-                const selectedScreen = intersects[0].object;
-                const videoKey = selectedScreen.userData.videoKey;
-                playVideoOnScreen(videoKey, selectedScreen);
-            }
-        }
-
-        function handleOrientation(event) {
-            const alpha = event.alpha ? THREE.MathUtils.degToRad(event.alpha) : 0;
-            const beta = event.beta ? THREE.MathUtils.degToRad(event.beta) : 0;
-            const gamma = event.gamma ? THREE.MathUtils.degToRad(event.gamma) : 0;
-            const Euler = new THREE.Euler(beta, alpha, -gamma, 'YXZ');
-            targetQuaternion.setFromEuler(Euler);
-        }
+        scene.add(planetGroup);
+        scene.add(textGroup);
+        camera.position.z = 5;
 
         function animate() {
             requestAnimationFrame(animate);
-            if (activeVideoTexture) {
-                activeVideoTexture.needsUpdate = true;
-            }
-
             if (!isSystemActive) {
                 planet.rotation.y += 0.008;
                 planet.rotation.x += 0.003;
                 textGroup.rotation.y += 0.006;
-                mainRenderer.render(mainScene, mainCamera);
-            } else {
-                cameraLon += (targetLon - cameraLon) * 0.1;
-                cameraLat += (targetLat - cameraLat) * 0.1;
-
-                const phi = THREE.MathUtils.degToRad(90 - cameraLat);
-                const theta = THREE.MathUtils.degToRad(cameraLon);
-
-                const targetLookAt = new THREE.Vector3(
-                    Math.sin(phi) * Math.sin(theta),
-                    Math.cos(phi),
-                    Math.sin(phi) * Math.cos(theta)
-                );
-
-                multiCamera.lookAt(targetLookAt);
-                if (multiStars) multiStars.rotation.y += 0.0005;
-
-                if (isVRMode) {
-                    renderStereo(multiRenderer, multiScene, multiCamera);
-                } else {
-                    multiRenderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-                    multiRenderer.render(multiScene, multiCamera);
-                }
+                renderer.render(scene, camera);
             }
         }
-
-        function renderStereo(targetRenderer, targetScene, targetCamera) {
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            
-            targetRenderer.setViewport(0, 0, width / 2, height);
-            targetRenderer.setScissor(0, 0, width / 2, height);
-            targetRenderer.setScissorTest(true);
-            targetRenderer.render(targetScene, targetCamera);
-            
-            targetRenderer.setViewport(width / 2, 0, width / 2, height);
-            targetRenderer.setScissor(width / 2, 0, width / 2, height);
-            targetRenderer.render(targetScene, targetCamera);
-            targetRenderer.setScissorTest(false);
-        }
-
         animate();
 
-        vrBtn.addEventListener('click', () => {
-            isVRMode = !isVRMode;
-            vrBtn.innerText = isVRMode ? "Salir de VR" : "Ver en VR";
-        });
+        function enterMultiverse() {
+            if (isSystemActive) return;
+            isSystemActive = true;
+            instruction.style.opacity = '0';
+            
+            gsap.to(camera.position, { z: -1.5, duration: 1.5, ease: "power2.inOut", onComplete: () => {
+                container.style.display = 'none';
+                uiInterface.style.opacity = '1';
+                uiInterface.style.pointerEvents = 'auto';
+            }});
+        }
 
         window.addEventListener('click', (e) => {
-            if (!isSystemActive && e.target !== vrBtn) {
-                enterMultiverse();
-            }
+            if (!isSystemActive) enterMultiverse();
         });
         window.addEventListener('touchend', (e) => {
-            if (!isSystemActive && e.target !== vrBtn) {
-                enterMultiverse();
-            }
+            if (!isSystemActive) enterMultiverse();
         });
+
+        function openVideo(url) {
+            activeVideo.src = url;
+            videoModal.style.display = 'flex';
+            activeVideo.play();
+        }
+
+        function closeVideo() {
+            activeVideo.pause();
+            activeVideo.src = "";
+            videoModal.style.display = 'none';
+        }
     </script>
 </body>
 </html>
