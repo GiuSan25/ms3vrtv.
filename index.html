@@ -22,17 +22,18 @@
         }
         
         .hud-btn {
-            position: absolute; top: 20px; z-index: 10;
+            position: absolute; right: 20px; z-index: 10;
             padding: 12px 24px; background: transparent; color: #0ff;
             border: 2px solid #0ff; border-radius: 8px; font-weight: bold;
             text-transform: uppercase; letter-spacing: 2px;
             box-shadow: 0 0 10px #0ff, inset 0 0 10px #0ff;
             cursor: pointer; transition: all 0.3s;
+            width: 180px; text-align: center;
         }
         .hud-btn:hover { background: #0ff; color: #000; box-shadow: 0 0 20px #0ff; }
 
-        #vr-btn { right: 20px; }
-        #gyro-btn { right: 160px; display: none; }
+        #vr-btn { top: 20px; display: none; }
+        #gyro-btn { top: 80px; display: none; } /* Ubicado debajo del botón VR */
 
         #multiverse-hud {
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -60,8 +61,10 @@
 </head>
 <body>
 
-    <button id="vr-btn" class="hud-btn" style="display: none;">Ver en VR</button>
+    <!-- Botones del visor -->
+    <button id="vr-btn" class="hud-btn">Ver en VR</button>
     <button id="gyro-btn" class="hud-btn">Giroscopio: OFF</button>
+
     <div id="instruction">Presiona la esfera para ingresar al multiverso MS3</div>
     <div id="webgl-container"></div>
     <div id="ms3-environment"></div>
@@ -272,228 +275,4 @@
                         transparent: true, 
                         opacity: 0.9 
                     });
-                    const frameMesh = new THREE.Mesh(frameGeo, frameMat);
-                    frameMesh.position.set(0, 0.12, -0.05);
-                    buttonGroup.add(frameMesh);
-
-                    buttonGroup.position.set(0, data.y, data.z);
-                    multiverseButtonsGroup.add(buttonGroup);
-                });
-            });
-
-            vrBtn.style.display = 'block';
-            gyroBtn.style.display = 'block';
-            multiverseHud.style.display = 'block';
-
-            window.addEventListener('mousedown', onPointerDown);
-            window.addEventListener('mousemove', onPointerMove);
-            window.addEventListener('mouseup', onPointerUp);
-
-            window.addEventListener('touchstart', onPointerDown, { passive: true });
-            window.addEventListener('touchmove', onPointerMove, { passive: true });
-            window.addEventListener('touchend', onPointerUp);
-        }
-
-        function onPointerDown(e) {
-            if (!isSystemActive || isVRMode) return;
-            isDragging = true;
-            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-            previousMousePosition = { x: clientX, y: clientY };
-        }
-
-        function onPointerMove(e) {
-            if (!isSystemActive || !isDragging || isVRMode) return;
-            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-
-            const deltaX = clientX - previousMousePosition.x;
-            const deltaY = clientY - previousMousePosition.y;
-
-            manualRotation.y -= deltaX * 0.005;
-            manualRotation.x -= deltaY * 0.005;
-
-            manualRotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, manualRotation.x));
-
-            const euler = new THREE.Euler(manualRotation.x, manualRotation.y, 0, 'YXZ');
-            targetQuaternion.setFromEuler(euler);
-
-            previousMousePosition = { x: clientX, y: clientY };
-        }
-
-        function onPointerUp() {
-            isDragging = false;
-        }
-
-        function toggleGyroscope() {
-            if (!isGyroActive) {
-                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    DeviceOrientationEvent.requestPermission()
-                        .then(response => {
-                            if (response === 'granted') {
-                                enableGyro();
-                            }
-                        })
-                        .catch(console.error);
-                } else {
-                    enableGyro();
-                }
-            } else {
-                disableGyro();
-            }
-        }
-
-        function enableGyro() {
-            isGyroActive = true;
-            gyroBtn.innerText = "Giroscopio: ON";
-            gyroBtn.style.background = "#0ff";
-            gyroBtn.style.color = "#000";
-            window.addEventListener('deviceorientation', handleOrientation, true);
-        }
-
-        function disableGyro() {
-            isGyroActive = false;
-            gyroBtn.innerText = "Giroscopio: OFF";
-            gyroBtn.style.background = "transparent";
-            gyroBtn.style.color = "#0ff";
-            window.removeEventListener('deviceorientation', handleOrientation, true);
-        }
-
-        function handleOrientation(event) {
-            if (!isGyroActive || isDragging) return;
-
-            const alpha = event.alpha ? THREE.MathUtils.degToRad(event.alpha) : 0;
-            const beta = event.beta ? THREE.MathUtils.degToRad(event.beta) : 0;
-            const gamma = event.gamma ? THREE.MathUtils.degToRad(event.gamma) : 0;
-            
-            const rotX = beta;
-            const rotY = alpha;
-            const rotZ = -gamma;
-
-            const euler = new THREE.Euler(rotX, rotY, rotZ, 'YXZ');
-            targetQuaternion.setFromEuler(euler);
-
-            const orientation = window.screen.orientation ? window.screen.orientation.angle : (window.orientation || 0);
-            if (Math.abs(orientation) === 90) {
-                const correction = new THREE.Quaternion();
-                correction.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -THREE.MathUtils.degToRad(orientation));
-                targetQuaternion.multiply(correction);
-            }
-        }
-
-        window.addEventListener('resize', () => {
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-
-            camera.aspect = width / height;
-            camera.updateProjectionMatrix();
-            renderer.setSize(width, height);
-
-            if (internalCamera && internalRenderer) {
-                internalCamera.aspect = width / height;
-                internalCamera.updateProjectionMatrix();
-                internalRenderer.setSize(width, height);
-            }
-        });
-
-        function animate() {
-            requestAnimationFrame(animate);
-            if (!isSystemActive) {
-                planet.rotation.y += 0.008;
-                planet.rotation.x += 0.003;
-                textGroup.rotation.y += 0.006;
-                renderer.render(scene, camera);
-            } else {
-                if(stars) stars.rotation.y += 0.0005;
-                internalCamera.quaternion.slerp(targetQuaternion, 0.1);
-                
-                if (isVRMode) {
-                    renderVR();
-                } else {
-                    internalRenderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-                    internalRenderer.render(internalScene, internalCamera);
-                }
-            }
-        }
-
-        function renderVR() {
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            
-            internalRenderer.setViewport(0, 0, width / 2, height);
-            internalRenderer.setScissor(0, 0, width / 2, height);
-            internalRenderer.setScissorTest(true);
-            internalRenderer.render(internalScene, internalCamera);
-            
-            internalRenderer.setViewport(width / 2, 0, width / 2, height);
-            internalRenderer.setScissor(width / 2, 0, width / 2, height);
-            internalRenderer.render(internalScene, internalCamera);
-            internalRenderer.setScissorTest(false);
-        }
-
-        animate();
-
-        async function startExperience() {
-            if (isSystemActive) return;
-            document.getElementById('instruction').style.opacity = '0';
-            
-            gsap.to(camera.position, { z: -1.5, duration: 2.2, ease: "power2.inOut", onComplete: () => {
-                initInternalSystem();
-                envContainer.style.opacity = '1';
-                envContainer.style.pointerEvents = 'auto';
-                container.style.opacity = '0';
-                isSystemActive = true;
-            }});
-        }
-
-        function returnToMain(e) {
-            if (e) e.stopPropagation();
-            if (!isSystemActive) return;
-
-            if (isGyroActive) disableGyro();
-
-            window.removeEventListener('mousedown', onPointerDown);
-            window.removeEventListener('mousemove', onPointerMove);
-            window.removeEventListener('mouseup', onPointerUp);
-            window.removeEventListener('touchstart', onPointerDown);
-            window.removeEventListener('touchmove', onPointerMove);
-            window.removeEventListener('touchend', onPointerUp);
-
-            vrBtn.style.display = 'none';
-            gyroBtn.style.display = 'none';
-            multiverseHud.style.display = 'none';
-            envContainer.style.opacity = '0';
-            envContainer.style.pointerEvents = 'none';
-            container.style.opacity = '1';
-
-            gsap.to(camera.position, { z: 5, duration: 1.8, ease: "power2.inOut", onComplete: () => {
-                if (internalRenderer && internalRenderer.domElement) {
-                    internalRenderer.domElement.remove();
-                }
-                internalScene = null;
-                isVRMode = false;
-                vrBtn.innerText = "Ver en VR";
-                isSystemActive = false;
-                document.getElementById('instruction').style.opacity = '1';
-            }});
-        }
-
-        vrBtn.addEventListener('click', () => {
-            isVRMode = !isVRMode;
-            vrBtn.innerText = isVRMode ? "Salir de VR" : "Ver en VR";
-        });
-
-        gyroBtn.addEventListener('click', toggleGyroscope);
-
-        btnVolver.addEventListener('click', returnToMain);
-        btnVolver.addEventListener('touchend', returnToMain);
-
-        window.addEventListener('click', (e) => {
-            if (!isSystemActive && e.target !== vrBtn && e.target !== gyroBtn) startExperience();
-        });
-        window.addEventListener('touchend', (e) => {
-            if (!isSystemActive && e.target !== vrBtn && e.target !== gyroBtn) startExperience();
-        });
-    </script>
-</body>
-</html>
+                    const frameMesh = new THREE.Mesh(frameGeo, frame
