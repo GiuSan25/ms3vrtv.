@@ -184,7 +184,7 @@
                     
                     const buttonGroup = new THREE.Group();
 
-                    // Relleno sólido brillante con MeshPhongMaterial (sin bordes ni caja detectora)
+                    // Relleno sólido brillante con MeshPhongMaterial
                     const fillMat = new THREE.MeshPhongMaterial({ 
                         color: data.color, 
                         emissive: data.emissive,
@@ -193,6 +193,17 @@
                     });
                     const fillMesh = new THREE.Mesh(bGeo, fillMat);
                     buttonGroup.add(fillMesh);
+
+                    // Borde neón exterior escalado para envolver las letras con contraste puro y legibilidad total
+                    const neonOutlineMat = new THREE.MeshBasicMaterial({ 
+                        color: 0xffffff, 
+                        wireframe: true, 
+                        transparent: true, 
+                        opacity: 0.95 
+                    });
+                    const outlineMesh = new THREE.Mesh(bGeo, neonOutlineMat);
+                    outlineMesh.scale.set(1.04, 1.04, 1.15);
+                    buttonGroup.add(outlineMesh);
 
                     buttonGroup.position.set(bOffset, data.y, data.z);
                     multiverseButtonsGroup.add(buttonGroup);
