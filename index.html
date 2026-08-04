@@ -2,39 +2,40 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MS3 - Universo 360 Neón Inmersivo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MS3 - Universo 360 Neón Móvil</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-        body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; }
+        body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; -webkit-user-select: none; user-select: none; }
         
         #webgl-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 2; cursor: pointer; }
         
         #instruction { 
-            position: absolute; bottom: 35px; width: 100%; text-align: center; color: #fff; z-index: 3; 
-            font-size: 1.1rem; pointer-events: none; text-shadow: 0 0 10px #0ff, 0 0 20px #f0f; font-weight: 600; letter-spacing: 1px;
+            position: absolute; bottom: 40px; width: 100%; text-align: center; color: #fff; z-index: 3; 
+            font-size: 1rem; pointer-events: none; text-shadow: 0 0 10px #0ff, 0 0 20px #f0f; font-weight: 600; letter-spacing: 1px;
             transition: opacity 0.5s; padding: 0 20px;
         }
 
-        /* Controles superiores (Giroscopio y VR) */
+        /* Controles superiores optimizados para móvil */
         #vr-controls {
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            z-index: 20; display: none; gap: 15px; pointer-events: auto;
+            position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+            z-index: 20; display: none; gap: 10px; pointer-events: auto; width: 92%; justify-content: center;
         }
         .control-btn {
-            background: rgba(10, 6, 24, 0.85);
+            background: rgba(10, 6, 24, 0.9);
             border: 2px solid #00f0ff;
             color: #00f0ff;
-            padding: 8px 20px;
+            padding: 7px 14px;
             border-radius: 9999px;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             cursor: pointer;
             box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
         .control-btn.active {
             background: #00f0ff;
@@ -42,116 +43,123 @@
             box-shadow: 0 0 25px rgba(0, 240, 255, 0.8);
         }
 
-        /* Contenedor principal de la interfaz */
+        /* Contenedor principal para móvil */
         #ui-interface {
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10;
             opacity: 0; pointer-events: none; transition: opacity 1s ease;
-            display: flex; justify-content: center; align-items: center; padding: 60px 15px 20px 15px;
+            display: flex; justify-content: center; align-items: center; padding: 55px 12px 15px 12px;
         }
 
-        /* Pantalla rectangular vertical flotante */
+        /* Pantalla rectangular vertical adaptada 100% a pantallas táctiles de celulares */
         .vertical-screen {
-            width: 480px;
-            height: 82vh;
+            width: 100%;
+            max-width: 420px;
+            height: 85vh;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            padding: 25px;
+            gap: 14px;
+            padding: 16px;
             overflow-y: auto;
-            border: 3px solid #00f0ff;
-            box-shadow: 0 0 40px rgba(0, 240, 255, 0.6), inset 0 0 30px rgba(0, 240, 255, 0.25);
-            border-radius: 24px;
-            background: rgba(8, 4, 20, 0.92);
-            backdrop-filter: blur(15px);
+            border: 2px solid #00f0ff;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.5), inset 0 0 20px rgba(0, 240, 255, 0.2);
+            border-radius: 20px;
+            background: rgba(8, 4, 20, 0.94);
+            backdrop-filter: blur(12px);
+            -webkit-overflow-scrolling: touch;
         }
-        .vertical-screen::-webkit-scrollbar { width: 6px; }
+        .vertical-screen::-webkit-scrollbar { width: 4px; }
         .vertical-screen::-webkit-scrollbar-thumb { background: #00f0ff; border-radius: 10px; }
 
         .neon-box-cyan {
             border: 2px solid #00f0ff;
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4), inset 0 0 15px rgba(0, 240, 255, 0.2);
-            border-radius: 14px;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.35), inset 0 0 10px rgba(0, 240, 255, 0.15);
+            border-radius: 12px;
             background: rgba(10, 6, 24, 0.85);
-            backdrop-filter: blur(10px);
         }
 
         .neon-box-magenta {
             border: 2px solid #f000ff;
-            box-shadow: 0 0 20px rgba(240, 0, 255, 0.4), inset 0 0 15px rgba(240, 0, 255, 0.2);
-            border-radius: 14px;
+            box-shadow: 0 0 15px rgba(240, 0, 255, 0.35), inset 0 0 10px rgba(240, 0, 255, 0.15);
+            border-radius: 12px;
             background: rgba(10, 6, 24, 0.85);
-            backdrop-filter: blur(10px);
         }
 
         .pill-btn {
             background: rgba(10, 10, 25, 0.9);
             border-radius: 9999px;
             font-weight: 700;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
             cursor: pointer;
             text-align: center;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .pill-btn:hover { transform: scale(1.02); }
+        .pill-btn:active { transform: scale(0.97); }
 
-        /* Modo Split Screen para Gafas VR (Estereoscópico) */
+        /* Modo Split Screen Móvil (Gafas VR Cardboard) */
         .vr-split #ui-interface {
             width: 50vw;
             left: 0;
+            padding: 40px 6px 10px 6px;
         }
-        .vr-split #ui-interface.right-eye {
-            left: 50vw;
+        .vr-split .vertical-screen {
+            max-width: 100%;
+            height: 88vh;
+            padding: 10px;
+            gap: 10px;
         }
-        #vr-container-right {
+        .vr-split .vertical-screen h1 { font-size: 1rem !important; }
+        .vr-split .vertical-screen h3 { font-size: 0.8rem !important; }
+
+        #ui-interface-right {
             position: absolute; top: 0; left: 50vw; width: 50vw; height: 100vh; z-index: 10;
-            display: none; pointer-events: none; overflow: hidden;
+            display: none; justify-content: center; align-items: center; padding: 40px 6px 10px 6px; pointer-events: none;
         }
 
         #video-modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 50;
-            display: none; justify-content: center; align-items: center; flex-direction: column; padding: 20px;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 50;
+            display: none; justify-content: center; align-items: center; flex-direction: column; padding: 15px;
         }
-        #video-modal video { width: 100%; max-width: 900px; border-radius: 12px; box-shadow: 0 0 30px #0ff; }
-        #close-modal { margin-top: 20px; padding: 10px 25px; background: #0ff; color: #000; font-weight: bold; border-radius: 8px; cursor: pointer; }
+        #video-modal video { width: 100%; max-height: 75vh; border-radius: 10px; box-shadow: 0 0 25px #0ff; }
+        #close-modal { margin-top: 15px; padding: 10px 20px; background: #0ff; color: #000; font-weight: bold; border-radius: 8px; font-size: 0.9rem; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="instruction">Presiona la esfera para ingresar al universo 360 MS3</div>
+    <div id="instruction">Toca la esfera para ingresar al universo MS3</div>
     <div id="webgl-container"></div>
 
-    <!-- Botones de Control Superior (Giroscopio y VR) -->
+    <!-- Controles Superiores para Móvil -->
     <div id="vr-controls">
         <button id="gyro-btn" class="control-btn" onclick="toggleGyroscope()">GIROSCOPIO: OFF</button>
-        <button id="vr-btn" class="control-btn" onclick="toggleVRMode()">VER EN VR</button>
+        <button id="vr-btn" class="control-btn" onclick="toggleVRMode()">MODO VR</button>
     </div>
 
-    <!-- Panel Vertical Flotante con el Contenido Exacto -->
+    <!-- Pantalla Vertical Flotante Central -->
     <div id="ui-interface">
         <div class="vertical-screen">
             
             <!-- 1. Banner Principal Superior -->
-            <div class="w-full relative neon-box-cyan overflow-hidden p-6 flex flex-col justify-between h-[280px]" style="background-image: linear-gradient(to bottom, rgba(12,9,31,0.85), rgba(12,9,31,0.95)), url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=800&auto=format&fit=crop'); background-size: cover; background-position: center;">
-                <div class="absolute top-4 right-4 bg-[#8b5cf6] text-white text-[10px] font-bold px-3 py-1 rounded uppercase tracking-wider shadow-lg">
+            <div class="w-full relative neon-box-cyan overflow-hidden p-4 flex flex-col justify-between h-[220px]" style="background-image: linear-gradient(to bottom, rgba(12,9,31,0.85), rgba(12,9,31,0.95)), url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=600&auto=format&fit=crop'); background-size: cover; background-position: center;">
+                <div class="absolute top-3 right-3 bg-[#8b5cf6] text-white text-[9px] font-bold px-2.5 py-0.5 rounded uppercase tracking-wider shadow">
                     MS3 EXCLUSIVO
                 </div>
                 
                 <div class="z-10 mt-auto">
-                    <div class="flex items-center space-x-2 mb-1 text-white">
-                        <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                        <span class="text-xs font-semibold tracking-widest text-cyan-300">MS3 LIVE</span>
+                    <div class="flex items-center space-x-1.5 mb-1 text-white">
+                        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        <span class-[10px] font-semibold tracking-widest text-cyan-300 text-xs">MS3 LIVE</span>
                     </div>
-                    <h1 class="text-2xl font-extrabold text-white tracking-wide mb-4 drop-shadow-md leading-tight">
+                    <h1 class="text-lg font-extrabold text-white tracking-wide mb-3 drop-shadow leading-tight">
                         MS3 LIVE: EL CONCIERTO DEL SIGLO
                     </h1>
-                    <div class="flex items-center space-x-3">
-                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="bg-white text-black px-5 py-2.5 rounded-xl font-bold hover:bg-cyan-300 transition shadow-lg text-xs">
+                    <div class="flex items-center space-x-2">
+                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="bg-white text-black px-4 py-2 rounded-lg font-bold active:bg-cyan-300 transition text-[11px] shadow">
                             VER AHORA
                         </button>
-                        <button onclick="alert('Información detallada del Concierto del Siglo.')" class="border-2 border-white text-white px-5 py-2.5 rounded-xl font-bold hover:bg-white/10 transition text-xs">
+                        <button onclick="alert('Información detallada del Concierto del Siglo.')" class="border border-white text-white px-4 py-2 rounded-lg font-bold active:bg-white/10 transition text-[11px]">
                             INFO
                         </button>
                     </div>
@@ -159,61 +167,61 @@
             </div>
 
             <!-- 2. Botones Neón Verticales -->
-            <div class="w-full flex flex-col gap-3">
-                <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')" class="pill-btn neon-box-cyan py-3 text-cyan-400 hover:bg-cyan-400/10 text-sm">
+            <div class="w-full flex flex-col gap-2.5">
+                <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')" class="pill-btn neon-box-cyan py-2.5 text-cyan-400 text-xs">
                     VER PROGRAMAS VR
                 </button>
-                <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="pill-btn neon-box-magenta py-3 text-fuchsia-400 hover:bg-fuchsia-400/10 text-sm">
+                <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="pill-btn neon-box-magenta py-2.5 text-fuchsia-400 text-xs">
                     VER PROGRAMAS 2D
                 </button>
-                <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')" class="pill-btn neon-box-cyan py-3 text-cyan-400 hover:bg-cyan-400/10 text-sm">
+                <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')" class="pill-btn neon-box-cyan py-2.5 text-cyan-400 text-xs">
                     VER EN VIVO
                 </button>
             </div>
 
             <!-- 3. Tarjetas en Columna -->
-            <div class="w-full flex flex-col gap-3">
+            <div class="w-full flex flex-col gap-2.5">
                 
-                <div onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="neon-box-cyan p-4 rounded-xl flex flex-col justify-between h-[150px] cursor-pointer hover:scale-[1.02] transition relative">
+                <div onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="neon-box-cyan p-3.5 rounded-xl flex flex-col justify-between h-[130px] cursor-pointer relative">
                     <div class="flex justify-between items-center">
-                        <span class="text-[10px] font-bold text-white bg-black/40 px-2.5 py-0.5 rounded border border-cyan-500/30">220 min</span>
-                        <span class="text-[10px] font-bold bg-[#8b5cf6] text-white px-2.5 py-0.5 rounded">MS3 EXCLUSIVO</span>
+                        <span class="text-[9px] font-bold text-white bg-black/40 px-2 py-0.5 rounded border border-cyan-500/30">220 min</span>
+                        <span class="text-[9px] font-bold bg-[#8b5cf6] text-white px-2 py-0.5 rounded">MS3 EXCLUSIVO</span>
                     </div>
                     <div>
-                        <p class="text-[10px] text-cyan-400 font-semibold mb-0.5">TENDENCIAS AHORA</p>
-                        <h3 class="text-base font-bold text-white">CÓDIGO VR: INVESTIGACIÓN</h3>
+                        <p class="text-[9px] text-cyan-400 font-semibold mb-0.5">TENDENCIAS AHORA</p>
+                        <h3 class="text-sm font-bold text-white">CÓDIGO VR: INVESTIGACIÓN</h3>
                     </div>
-                    <div class="flex justify-between items-center text-[11px] text-gray-400">
+                    <div class="flex justify-between items-center text-[10px] text-gray-400">
                         <span class="text-cyan-400 font-medium">◉ Interactivo</span>
                         <span>360° ↺</span>
                     </div>
                 </div>
 
-                <div onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')" class="neon-box-magenta p-4 rounded-xl flex flex-col justify-between h-[150px] cursor-pointer hover:scale-[1.02] transition relative" style="background-image: linear-gradient(to bottom, rgba(11,8,29,0.8), rgba(11,8,29,0.95)), url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=500&auto=format&fit=crop'); background-size: cover;">
+                <div onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')" class="neon-box-magenta p-3.5 rounded-xl flex flex-col justify-between h-[130px] cursor-pointer relative" style="background-image: linear-gradient(to bottom, rgba(11,8,29,0.85), rgba(11,8,29,0.95)), url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=400&auto=format&fit=crop'); background-size: cover;">
                     <div class="flex justify-between items-center">
-                        <span class="text-[10px] font-bold text-white bg-black/40 px-2.5 py-0.5 rounded border border-fuchsia-500/30">30 min</span>
-                        <span class="text-[10px] font-bold bg-[#8b5cf6] text-white px-2.5 py-0.5 rounded">MS3 EXCLUSIVO</span>
+                        <span class="text-[9px] font-bold text-white bg-black/40 px-2 py-0.5 rounded border border-fuchsia-500/30">30 min</span>
+                        <span class="text-[9px] font-bold bg-[#8b5cf6] text-white px-2 py-0.5 rounded">MS3 EXCLUSIVO</span>
                     </div>
                     <div>
-                        <p class="text-[10px] text-fuchsia-400 font-semibold mb-0.5">NOTICIAS INMERSIVAS</p>
-                        <h3 class="text-base font-bold text-white">PLANETA 360</h3>
+                        <p class="text-[9px] text-fuchsia-400 font-semibold mb-0.5">NOTICIAS INMERSIVAS</p>
+                        <h3 class="text-sm font-bold text-white">PLANETA 360</h3>
                     </div>
-                    <div class="flex justify-between items-center text-[11px] text-gray-400">
+                    <div class="flex justify-between items-center text-[10px] text-gray-400">
                         <span class="text-cyan-400 font-medium">◉ Interactivo</span>
                         <span>360° ↺</span>
                     </div>
                 </div>
 
-                <div onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="neon-box-cyan p-4 rounded-xl flex flex-col justify-between h-[150px] cursor-pointer hover:scale-[1.02] transition relative">
+                <div onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="neon-box-cyan p-3.5 rounded-xl flex flex-col justify-between h-[130px] cursor-pointer relative">
                     <div class="flex justify-between items-center">
-                        <span class="text-[10px] font-bold text-white bg-black/40 px-2.5 py-0.5 rounded border border-cyan-500/30">230 min</span>
-                        <span class="text-[10px] font-bold bg-[#8b5cf6] text-white px-2.5 py-0.5 rounded">MS3 EXCLUSIVO</span>
+                        <span class="text-[9px] font-bold text-white bg-black/40 px-2 py-0.5 rounded border border-cyan-500/30">230 min</span>
+                        <span class="text-[9px] font-bold bg-[#8b5cf6] text-white px-2 py-0.5 rounded">MS3 EXCLUSIVO</span>
                     </div>
                     <div>
-                        <p class="text-[10px] text-cyan-400 font-semibold mb-0.5">CINE VR</p>
-                        <h3 class="text-base font-bold text-white">CINE VR: EXPERIENCIA</h3>
+                        <p class="text-[9px] text-cyan-400 font-semibold mb-0.5">CINE VR</p>
+                        <h3 class="text-sm font-bold text-white">CINE VR: EXPERIENCIA</h3>
                     </div>
-                    <div class="flex justify-between items-center text-[11px] text-gray-400">
+                    <div class="flex justify-between items-center text-[10px] text-gray-400">
                         <span class="text-cyan-400 font-medium">◉ Cortos</span>
                         <span>360° ↺</span>
                     </div>
@@ -224,15 +232,19 @@
         </div>
     </div>
 
-    <!-- Modal Reproductor de Video -->
+    <!-- Panel Clonado para Ojo Derecho en Modo VR Móvil -->
+    <div id="ui-interface-right"></div>
+
+    <!-- Modal de Video -->
     <div id="video-modal">
-        <video id="active-video" controls autoplay playsinline></video>
+        <video id="active-video" controls playsinline></video>
         <button id="close-modal" onclick="closeVideo()">Cerrar Reproductor</button>
     </div>
 
     <script>
         const container = document.getElementById('webgl-container');
         const uiInterface = document.getElementById('ui-interface');
+        const uiInterfaceRight = document.getElementById('ui-interface-right');
         const instruction = document.getElementById('instruction');
         const vrControls = document.getElementById('vr-controls');
         const gyroBtn = document.getElementById('gyro-btn');
@@ -249,9 +261,9 @@
 
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         container.appendChild(renderer.domElement);
 
         scene.add(new THREE.AmbientLight(0xffffff, 1.8));
@@ -266,15 +278,12 @@
 
         // --- UNIVERSO 360 ESTRELLADO Y PAREDES NEÓN ---
         const universeGeo = new THREE.SphereGeometry(70, 32, 32);
-        const universeMat = new THREE.MeshBasicMaterial({
-            color: 0x030112,
-            side: THREE.BackSide
-        });
+        const universeMat = new THREE.MeshBasicMaterial({ color: 0x030112, side: THREE.BackSide });
         universeSphere = new THREE.Mesh(universeGeo, universeMat);
         scene.add(universeSphere);
 
         const starsGeo = new THREE.BufferGeometry();
-        const starsCount = 2000;
+        const starsCount = 1200; // Optimizado para rendimiento móvil
         const starPositions = new Float32Array(starsCount * 3);
         const starColors = new Float32Array(starsCount * 3);
 
@@ -292,24 +301,22 @@
         starsGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
         starsGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
-        const starsMat = new THREE.PointsMaterial({ size: 0.8, vertexColors: true, transparent: true, opacity: 0.85 });
+        const starsMat = new THREE.PointsMaterial({ size: 0.9, vertexColors: true, transparent: true, opacity: 0.85 });
         starField = new THREE.Points(starsGeo, starsMat);
         scene.add(starField);
 
-        const floorGrid = new THREE.GridHelper(140, 45, 0x00ffff, 0xff00ff);
+        const floorGrid = new THREE.GridHelper(140, 35, 0x00ffff, 0xff00ff);
         floorGrid.position.y = -20;
         scene.add(floorGrid);
 
-        const ceilingGrid = new THREE.GridHelper(140, 45, 0xff00ff, 0x00ffff);
+        const ceilingGrid = new THREE.GridHelper(140, 35, 0xff00ff, 0x00ffff);
         ceilingGrid.position.y = 20;
         scene.add(ceilingGrid);
 
-        // --- ESFERA INICIAL MS3 ---
+        // --- ESFERA MS3 ---
         planetGroup = new THREE.Group();
-        const planetGeometry = new THREE.IcosahedronGeometry(1.4, 4); 
-        const planetMaterial = new THREE.MeshBasicMaterial({ 
-            color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.9
-        });
+        const planetGeometry = new THREE.IcosahedronGeometry(1.4, 3); 
+        const planetMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.9 });
         planet = new THREE.Mesh(planetGeometry, planetMaterial);
         planet.position.y = -1.5;
         planetGroup.add(planet);
@@ -320,15 +327,13 @@
         const loader = new THREE.FontLoader();
         loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
             const textGeo = new THREE.TextGeometry('MS3', {
-                font: font, size: 1.2, height: 0.4, curveSegments: 12,
-                bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.05, bevelOffset: 0, bevelSegments: 5
+                font: font, size: 1.2, height: 0.4, curveSegments: 8,
+                bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.05, bevelOffset: 0, bevelSegments: 3
             });
             textGeo.computeBoundingBox();
             const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
             
-            const mirrorMaterial = new THREE.MeshPhysicalMaterial({ 
-                color: 0xffffff, metalness: 0.9, roughness: 0.05, clearcoat: 1.0, reflectivity: 1.0
-            });
+            const mirrorMaterial = new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0.9, roughness: 0.05, clearcoat: 1.0, reflectivity: 1.0 });
             const textMesh = new THREE.Mesh(textGeo, mirrorMaterial);
             textMesh.position.x = centerOffset;
             textGroup.add(textMesh);
@@ -344,29 +349,45 @@
         scene.add(textGroup);
         camera.position.z = 5;
 
-        // --- INTERACCIÓN Y NAVEGACIÓN 360 ---
+        // --- TACTO Y ARRASTRE MÓVIL (TOUCH EVENTS) ---
         let isUserInteracting = false;
-        let onPointerDownPointerX = 0, onPointerDownPointerY = 0;
+        let startX = 0, startY = 0;
         let onPointerDownLon = 0, onPointerDownLat = 0;
 
-        document.addEventListener('pointerdown', (e) => {
-            if (!isSystemActive) return;
-            isUserInteracting = true;
-            onPointerDownPointerX = e.clientX;
-            onPointerDownPointerY = e.clientY;
-            onPointerDownLon = lon;
-            onPointerDownLat = lat;
-        });
+        document.addEventListener('touchstart', (e) => {
+            if (!isSystemActive || isGyroActive) return;
+            if (e.touches.length === 1) {
+                isUserInteracting = true;
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                onPointerDownLon = lon;
+                onPointerDownLat = lat;
+            }
+        }, {passive: true});
 
-        document.addEventListener('pointermove', (e) => {
-            if (!isSystemActive || !isUserInteracting || isGyroActive) return;
-            lon = (onPointerDownPointerX - e.clientX) * 0.1 + onPointerDownLon;
-            lat = (e.clientY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
-        });
+        document.addEventListener('touchmove', (e) => {
+            if (!isSystemActive || !isUserInteracting || isGyroActive || e.touches.length !== 1) return;
+            lon = (startX - e.touches[0].clientX) * 0.2 + onPointerDownLon;
+            lat = (e.touches[0].clientY - startY) * 0.2 + onPointerDownLat;
+        }, {passive: true});
 
-        document.addEventListener('pointerup', () => {
+        document.addEventListener('touchend', () => {
             isUserInteracting = false;
         });
+
+        // Soporte mouse por si se prueba en emulador móvil o PC
+        document.addEventListener('pointerdown', (e) => {
+            if (!isSystemActive || isGyroActive) return;
+            isUserInteracting = true;
+            startX = e.clientX; startY = e.clientY;
+            onPointerDownLon = lon; onPointerDownLat = lat;
+        });
+        document.addEventListener('pointermove', (e) => {
+            if (!isSystemActive || !isUserInteracting || isGyroActive) return;
+            lon = (startX - e.clientX) * 0.2 + onPointerDownLon;
+            lat = (e.clientY - startY) * 0.2 + onPointerDownLat;
+        });
+        document.addEventListener('pointerup', () => { isUserInteracting = false; });
 
         function animate() {
             requestAnimationFrame(animate);
@@ -376,7 +397,7 @@
                 planet.rotation.x += 0.003;
                 textGroup.rotation.y += 0.006;
             } else {
-                starField.rotation.y += 0.0004;
+                starField.rotation.y += 0.0003;
                 universeSphere.rotation.y += 0.0001;
 
                 if (!isGyroActive) {
@@ -411,16 +432,19 @@
             }});
         }
 
+        window.addEventListener('touchend', (e) => {
+            if (!isSystemActive && e.target === container) enterMultiverse();
+        });
         window.addEventListener('click', (e) => {
             if (!isSystemActive && e.target === container) enterMultiverse();
         });
 
-        // --- CONTROL DE GIROSCOPIO ---
+        // --- GIROSCOPIO MÓVIL ---
         function toggleGyroscope() {
             if (!isGyroActive) {
                 if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    DeviceOrientationEvent.requestPermission().then(permissionState => {
-                        if (permissionState === 'granted') {
+                    DeviceOrientationEvent.requestPermission().then(response => {
+                        if (response === 'granted') {
                             activateGyro();
                         } else {
                             alert('Permiso de giroscopio denegado.');
@@ -453,13 +477,11 @@
             const alpha = event.alpha ? THREE.MathUtils.degToRad(event.alpha) : 0;
             const beta = event.beta ? THREE.MathUtils.degToRad(event.beta) : 0;
             const gamma = event.gamma ? THREE.MathUtils.degToRad(event.gamma) : 0;
-
             const orient = window.orientation ? THREE.MathUtils.degToRad(window.orientation) : 0;
 
             const zee = new THREE.Vector3(0, 0, 1);
             const cameraEuler = new THREE.Euler();
-            const q0 = new THREE.Quaternion();
-            const q1 = new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)); // - PI/2 around X
+            const q1 = new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
 
             cameraEuler.set(beta, alpha, -gamma, 'YXZ');
             let cameraQuaternion = new THREE.Quaternion().setFromEuler(cameraEuler);
@@ -469,7 +491,7 @@
             camera.quaternion.copy(cameraQuaternion);
         }
 
-        // --- MODO VR (PANTALLA DIVIDIDA ESTEREOSCÓPICA) ---
+        // --- MODO VR MÓVIL (PANTALLA DIVIDIDA GAFAS CARDBOARD) ---
         function toggleVRMode() {
             isVRActive = !isVRActive;
             if (isVRActive) {
@@ -477,29 +499,23 @@
                 vrBtn.classList.add('active');
                 document.body.classList.add('vr-split');
                 
-                // Clonar interfaz para pantalla derecha
-                if(!document.getElementById('ui-interface-right')) {
-                    const clone = uiInterface.cloneNode(true);
-                    clone.id = 'ui-interface-right';
-                    clone.style.left = '50vw';
-                    clone.style.width = '50vw';
-                    document.body.appendChild(clone);
-                } else {
-                    document.getElementById('ui-interface-right').style.display = 'flex';
+                // Clonar contenido vertical para pantalla estereoscópica derecha
+                if(uiInterfaceRight.children.length === 0) {
+                    uiInterfaceRight.innerHTML = uiInterface.innerHTML;
                 }
-                
-                // Ajustar renderer Three.js para la mitad izquierda
+                uiInterfaceRight.style.display = 'flex';
+                uiInterfaceRight.style.pointerEvents = 'auto';
+
                 renderer.setSize(window.innerWidth / 2, window.innerHeight);
                 camera.aspect = (window.innerWidth / 2) / window.innerHeight;
                 camera.updateProjectionMatrix();
             } else {
-                vrBtn.innerText = "VER EN VR";
+                vrBtn.innerText = "MODO VR";
                 vrBtn.classList.remove('active');
                 document.body.classList.remove('vr-split');
                 
-                if(document.getElementById('ui-interface-right')) {
-                    document.getElementById('ui-interface-right').style.display = 'none';
-                }
+                uiInterfaceRight.style.display = 'none';
+                uiInterfaceRight.style.pointerEvents = 'none';
 
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 camera.aspect = window.innerWidth / window.innerHeight;
@@ -510,7 +526,7 @@
         function openVideo(url) {
             activeVideo.src = url;
             videoModal.style.display = 'flex';
-            activeVideo.play();
+            activeVideo.play().catch(err => console.log("Autoplay bloqueado:", err));
         }
 
         function closeVideo() {
