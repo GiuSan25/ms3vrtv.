@@ -163,51 +163,46 @@
 
             loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
                 const btnData = [
-                    { text: "VER PROGRAMAS VR", y: 2.2, z: -3.5, color: 0x00ffff },
-                    { text: "VER PROGRAMAS 2D", y: 1.0, z: -3.5, color: 0xff00ff },
-                    { text: "VER EN VIVO", y: -0.2, z: -3.5, color: 0x00ffff }
+                    { text: "VER PROGRAMAS VR", y: 2.2, z: -3.5, color: 0x00ffff, emissive: 0x008888 },
+                    { text: "VER PROGRAMAS 2D", y: 1.0, z: -3.5, color: 0xff00ff, emissive: 0x880055 },
+                    { text: "VER EN VIVO", y: -0.2, z: -3.5, color: 0x00ffcc, emissive: 0x008866 }
                 ];
 
                 btnData.forEach((data) => {
                     const bGeo = new THREE.TextGeometry(data.text, {
                         font: font, 
-                        size: 0.32, 
-                        height: 0.08, 
+                        size: 0.28, 
+                        height: 0.05, 
                         curveSegments: 12, 
                         bevelEnabled: true, 
-                        bevelThickness: 0.03, 
-                        bevelSize: 0.02, 
-                        bevelSegments: 5
+                        bevelThickness: 0.01, 
+                        bevelSize: 0.01, 
+                        bevelSegments: 3
                     });
                     bGeo.computeBoundingBox();
                     const bOffset = -0.5 * (bGeo.boundingBox.max.x - bGeo.boundingBox.min.x);
                     
                     const buttonGroup = new THREE.Group();
 
-                    const coreMat = new THREE.MeshStandardMaterial({ 
+                    // Relleno sólido brillante con MeshPhongMaterial para máxima legibilidad y contraste limpio
+                    const fillMat = new THREE.MeshPhongMaterial({ 
                         color: data.color, 
-                        roughness: 0.2, 
-                        metalness: 0.8,
-                        emissive: data.color,
-                        emissiveIntensity: 0.4
+                        emissive: data.emissive,
+                        emissiveIntensity: 0.8,
+                        shininess: 100
                     });
-                    const coreMesh = new THREE.Mesh(bGeo, coreMat);
-                    buttonGroup.add(coreMesh);
+                    const fillMesh = new THREE.Mesh(bGeo, fillMat);
+                    buttonGroup.add(fillMesh);
 
-                    // Marco o borde tridimensional sólido con relieve alrededor del texto
-                    const boxHelper = new THREE.BoxHelper(coreMesh, data.color);
-                    buttonGroup.add(boxHelper);
-
-                    // Malla exterior tipo Borde Neón 3D
-                    const neonBorderMat = new THREE.MeshBasicMaterial({ 
+                    // Borde neón frontal bien definido para remarcar las letras
+                    const borderMat = new THREE.MeshBasicMaterial({ 
                         color: 0xffffff, 
-                        wireframe: true, 
-                        transparent: true, 
-                        opacity: 0.9 
+                        wireframe: false
                     });
-                    const borderMesh = new THREE.Mesh(bGeo, neonBorderMat);
-                    borderMesh.scale.set(1.03, 1.03, 1.1);
-                    buttonGroup.add(borderMesh);
+                    
+                    // Marco de contorno tridimensional sólido
+                    const boxHelper = new THREE.BoxHelper(fillMesh, data.color);
+                    buttonGroup.add(boxHelper);
 
                     buttonGroup.position.set(bOffset, data.y, data.z);
                     multiverseButtonsGroup.add(buttonGroup);
