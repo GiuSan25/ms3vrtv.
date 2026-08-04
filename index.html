@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Experiencia MS3 - Visor Inmersivo</title>
+    <title>Experiencia MS3 - Visor Inmersivo con Videos 360</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
@@ -11,9 +11,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; }
-        #webgl-container, #ms3-environment { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
+        #webgl-container, #ms3-environment, #vr-room-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
         #webgl-container { z-index: 2; cursor: pointer; }
         #ms3-environment { z-index: 1; opacity: 0; pointer-events: none; transition: opacity 1.5s ease; background: radial-gradient(circle, #1e1b4b 0%, #000 100%); }
+        #vr-room-container { z-index: 5; opacity: 0; pointer-events: none; transition: opacity 1s ease; cursor: grab; }
+        #vr-room-container:active { cursor: grabbing; }
         
         #instruction { 
             position: absolute; bottom: 35px; width: 100%; text-align: center; color: #fff; z-index: 3; 
@@ -22,7 +24,7 @@
         }
         
         #vr-btn {
-            position: absolute; top: 20px; right: 20px; z-index: 10;
+            position: absolute; top: 20px; right: 20px; z-index: 20;
             padding: 12px 24px; background: transparent; color: #0ff;
             border: 2px solid #0ff; border-radius: 8px; font-weight: bold;
             text-transform: uppercase; letter-spacing: 2px;
@@ -31,7 +33,19 @@
         }
         #vr-btn:hover { background: #0ff; color: #000; box-shadow: 0 0 20px #0ff; }
 
-        /* Contenedor de los nuevos botones neón planos */
+        /* Botón para volver al menú principal desde la sala VR */
+        #back-to-menu-btn {
+            position: absolute; top: 20px; left: 20px; z-index: 20;
+            padding: 12px 20px; background: rgba(0,0,0,0.8); color: #ff00ff;
+            border: 2px solid #ff00ff; border-radius: 8px; font-weight: bold;
+            text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 0 10px #ff00ff;
+            cursor: pointer; transition: all 0.3s;
+            display: none;
+        }
+        #back-to-menu-btn:hover { background: #ff00ff; color: #000; box-shadow: 0 0 20px #ff00ff; }
+
+        /* Contenedor de los botones neón planos */
         #multiverse-menu {
             position: absolute;
             bottom: 40px;
@@ -70,40 +84,156 @@
             box-shadow: 0 0 20px #0ff, 0 0 40px #0ff;
             text-shadow: none;
         }
+
+        /* Modal para reproducción de video interactivo */
+        #video-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        #video-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            position: relative;
+            width: 85%;
+            max-width: 900px;
+            background: #0a0a16;
+            border: 2px solid #0ff;
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            padding: 20px;
+        }
+        .close-modal {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            background: #ff00ff;
+            color: #fff;
+            border: 2px solid #fff;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 0 10px #ff00ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .close-modal:hover { background: #fff; color: #ff00ff; }
+        
+        video {
+            width: 100%;
+            border-radius: 8px;
+            outline: none;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+
+        /* Indicador táctil 360 */
+        #touch-instruction {
+            position: absolute; bottom: 20px; width: 100%; text-align: center; color: #0ff; z-index: 20;
+            font-size: 0.9rem; pointer-events: none; text-shadow: 0 0 8px #0ff; display: none; font-weight: 500;
+        }
     </style>
 </head>
 <body>
 
     <button id="vr-btn" style="display: none;">Ver en VR</button>
+    <button id="back-to-menu-btn" onclick="returnToMultiverse()">← Volver al Multiverso</button>
     <div id="instruction">Presiona la esfera para ingresar al multiverso MS3</div>
+    <div id="touch-instruction">💡 Arrastra con el dedo o mouse para girar en 360° y explorar las pantallas</div>
     
     <!-- Menú flotante plano con diseño Neón -->
     <div id="multiverse-menu">
-        <button class="neon-flat-btn" onclick="alert('Cargando Programas VR...')">Ver Programas VR</button>
-        <button class="neon-flat-btn" onclick="alert('Cargando Programas 2D...')">Ver Programas 2D</button>
-        <button class="neon-flat-btn" onclick="alert('Iniciando Transmisión en Vivo...')">Ver en Vivo</button>
+        <button class="neon-flat-btn" onclick="enterVRProgramsRoom()">Ver Programas VR</button>
+        <button class="neon-flat-btn" onclick="openVideo('2d')">Ver Programas 2D</button>
+        <button class="neon-flat-btn" onclick="openVideo('live')">Ver en Vivo</button>
+    </div>
+
+    <!-- Modal de Video Estándar -->
+    <div id="video-modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeVideo()">×</button>
+            <h3 id="modal-title" style="color: #0ff; text-align: center; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px #0ff;">Reproductor MS3</h3>
+            <video id="multiverse-video" controls autoplay>
+                <source id="video-source" src="" type="video/mp4">
+                Tu navegador no soporta videos HTML5.
+            </video>
+        </div>
     </div>
 
     <div id="webgl-container"></div>
     <div id="ms3-environment"></div>
+    <div id="vr-room-container"></div>
 
     <script>
         const container = document.getElementById('webgl-container');
         const envContainer = document.getElementById('ms3-environment');
+        const vrRoomContainer = document.getElementById('vr-room-container');
         const vrBtn = document.getElementById('vr-btn');
+        const backToMenuBtn = document.getElementById('back-to-menu-btn');
         const multiverseMenu = document.getElementById('multiverse-menu');
+        const videoModal = document.getElementById('video-modal');
+        const multiverseVideo = document.getElementById('multiverse-video');
+        const videoSource = document.getElementById('video-source');
+        const modalTitle = document.getElementById('modal-title');
+        const touchInstruction = document.getElementById('touch-instruction');
+
         let isSystemActive = false;
+        let isInVRRoom = false;
         let isVRMode = false;
         let internalScene, internalCamera, internalRenderer, stars;
+        let vrRoomScene, vrRoomCamera, vrRoomRenderer, vrRoomStars;
         let targetQuaternion = new THREE.Quaternion();
 
+        // Control de rotación manual 360 (Mouse / Touch)
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let cameraLon = 0, cameraLat = 0;
+        let targetLon = 0, targetLat = 0;
+
+        const videoLibrary = {
+            'vr1': { title: 'Experiencia Inmersiva VR 1', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4' },
+            'vr2': { title: 'Experiencia Inmersiva VR 2', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
+            'vr3': { title: 'Experiencia Inmersiva VR 3', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4' },
+            'vr4': { title: 'Experiencia Inmersiva VR 4', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4' },
+            '2d': { title: 'Programas 2D - Catálogo MS3', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4' },
+            'live': { title: 'Transmisión en Vivo - Canal MS3', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' }
+        };
+
+        function openVideo(type) {
+            const data = videoLibrary[type];
+            if (data) {
+                modalTitle.innerText = data.title;
+                videoSource.src = data.url;
+                multiverseVideo.load();
+                videoModal.classList.add('active');
+                multiverseVideo.play().catch(e => console.log("Reproducción automática bloqueada:", e));
+            }
+        }
+
+        function closeVideo() {
+            multiverseVideo.pause();
+            videoSource.src = "";
+            videoModal.classList.remove('active');
+        }
+
+        // Escena Principal 1: Esfera inicial MS3
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         container.appendChild(renderer.domElement);
 
-        // Iluminación intensa para resaltar el efecto espejo reflectivo y los bordes neón
         const ambientLight = new THREE.AmbientLight(0xffffff, 1.8);
         scene.add(ambientLight);
 
@@ -115,64 +245,38 @@
         pointLight2.position.set(-6, -6, 6);
         scene.add(pointLight2);
 
-        // Esfera con líneas densas posicionada abajo
         const planetGroup = new THREE.Group();
         const planetGeometry = new THREE.IcosahedronGeometry(1.4, 4); 
         const planetMaterial = new THREE.MeshBasicMaterial({ 
-            color: 0x00ffff, 
-            wireframe: true,
-            transparent: true,
-            opacity: 0.9
+            color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.9
         });
         const planet = new THREE.Mesh(planetGeometry, planetMaterial);
         planet.position.y = -1.5;
         planetGroup.add(planet);
 
-        // Grupo para el Texto 3D MS3 con acabado espejo y bordes neón
         const textGroup = new THREE.Group();
         textGroup.position.y = 0.8;
 
         const loader = new THREE.FontLoader();
         loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
             const textGeo = new THREE.TextGeometry('MS3', {
-                font: font,
-                size: 1.2,
-                height: 0.4,
-                curveSegments: 12,
-                bevelEnabled: true,
-                bevelThickness: 0.08,
-                bevelSize: 0.05,
-                bevelOffset: 0,
-                bevelSegments: 5
+                font: font, size: 1.2, height: 0.4, curveSegments: 12,
+                bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.05, bevelOffset: 0, bevelSegments: 5
             });
-
             textGeo.computeBoundingBox();
             const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
             
-            // Núcleo reflectivo estilo espejo pulido
             const mirrorMaterial = new THREE.MeshPhysicalMaterial({ 
-                color: 0xffffff,
-                metalness: 0.9,
-                roughness: 0.05,
-                clearcoat: 1.0,
-                clearcoatRoughness: 0.05,
-                reflectivity: 1.0
+                color: 0xffffff, metalness: 0.9, roughness: 0.05, clearcoat: 1.0, reflectivity: 1.0
             });
-            
             const textMesh = new THREE.Mesh(textGeo, mirrorMaterial);
             textMesh.position.x = centerOffset;
             textGroup.add(textMesh);
 
-            // Capa externa estilo borde neón brillante para máxima visibilidad en 360°
-            const neonBorderMaterial = new THREE.MeshBasicMaterial({
-                color: 0x00ffff,
-                wireframe: true,
-                transparent: true,
-                opacity: 0.7
-            });
+            const neonBorderMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.7 });
             const borderMesh = new THREE.Mesh(textGeo, neonBorderMaterial);
             borderMesh.position.x = centerOffset;
-            borderMesh.scale.set(1.02, 1.02, 1.02); // Ligeramente más grande para crear el contorno neón
+            borderMesh.scale.set(1.02, 1.02, 1.02);
             textGroup.add(borderMesh);
         });
 
@@ -180,6 +284,7 @@
         scene.add(textGroup);
         camera.position.z = 5;
 
+        // Entrar a la sección del Multiverso base
         function initInternalSystem() {
             internalScene = new THREE.Scene();
             internalCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -191,7 +296,7 @@
             const starGeometry = new THREE.BufferGeometry();
             const starMaterial = new THREE.PointsMaterial({ color: 0x00ffff, size: 0.15 });
             const starPositions = new Float32Array(5000);
-            for(let i=0; i<5000; i++) starPositions[i] = (Math.random() - 0.5) * 120;
+            for(let i = 0; i < 5000; i++) starPositions[i] = (Math.random() - 0.5) * 120;
             starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
             stars = new THREE.Points(starGeometry, starMaterial);
             internalScene.add(stars);
@@ -206,10 +311,195 @@
                 }
             }
             vrBtn.style.display = 'block';
-            
-            // Mostrar los botones neón planos una vez dentro del multiverso
             multiverseMenu.style.opacity = '1';
             multiverseMenu.style.pointerEvents = 'auto';
+        }
+
+        // Nueva Sala 360° con Pantallas VR alrededor del usuario
+        let interactiveScreens = [];
+        function initVRProgramsRoom() {
+            vrRoomScene = new THREE.Scene();
+            vrRoomCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            vrRoomRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            vrRoomRenderer.setSize(window.innerWidth, window.innerHeight);
+            vrRoomRenderer.setClearColor(0x000000, 0);
+            vrRoomContainer.appendChild(vrRoomRenderer.domElement);
+
+            // Estrellas de fondo inmersivas
+            const starGeo = new THREE.BufferGeometry();
+            const starMat = new THREE.PointsMaterial({ color: 0xff00ff, size: 0.2 });
+            const positions = new Float32Array(6000);
+            for(let i = 0; i < 6000; i++) positions[i] = (Math.random() - 0.5) * 150;
+            starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            vrRoomStars = new THREE.Points(starGeo, starMat);
+            vrRoomScene.add(vrRoomStars);
+
+            // Luz ambiental para la sala VR
+            const ambient = new THREE.AmbientLight(0xffffff, 2.0);
+            vrRoomScene.add(ambient);
+
+            // Crear 4 pantallas panorámicas alrededor en círculo (360 grados)
+            interactiveScreens = [];
+            const radius = 6;
+            const videoKeys = ['vr1', 'vr2', 'vr3', 'vr4'];
+            const screenTitles = ['VR PROG 01', 'VR PROG 02', 'VR PROG 03', 'VR PROG 04'];
+            
+            for(let i = 0; i < 4; i++) {
+                const angle = (i / 4) * Math.PI * 2;
+                const x = Math.sin(angle) * radius;
+                const z = Math.cos(angle) * radius;
+
+                // Crear textura canvas simulando pantalla con interfaz neón
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 256;
+                const ctx = canvas.getContext('2d');
+                
+                // Fondo de pantalla
+                ctx.fillStyle = '#0a0a23';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = '#00ffff';
+                ctx.lineWidth = 10;
+                ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+                // Texto de la pantalla
+                ctx.fillStyle = '#00ffff';
+                ctx.font = 'bold 36px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText(screenTitles[i], canvas.width / 2, 90);
+
+                ctx.fillStyle = '#ff00ff';
+                ctx.font = 'bold 24px Inter';
+                ctx.fillText('▶ REPRODUCIR VR', canvas.width / 2, 170);
+
+                const texture = new THREE.CanvasTexture(canvas);
+                const planeGeo = new THREE.PlaneGeometry(3.6, 2.0);
+                const planeMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+                const screenMesh = new THREE.Mesh(planeGeo, planeMat);
+
+                screenMesh.position.set(x, 0.5, z);
+                screenMesh.lookAt(0, 0.5, 0); // Apuntar hacia el centro (usuario)
+                screenMesh.userData = { videoKey: videoKeys[i] };
+                
+                vrRoomScene.add(screenMesh);
+                interactiveScreens.push(screenMesh);
+            }
+
+            // Eventos de control táctil y mouse para arrastrar y mirar en 360°
+            const domElem = vrRoomContainer;
+            domElem.addEventListener('mousedown', onPointerDown);
+            window.addEventListener('mousemove', onPointerMove);
+            window.addEventListener('mouseup', onPointerUp);
+
+            domElem.addEventListener('touchstart', onTouchStart, { passive: false });
+            window.addEventListener('touchmove', onTouchMove, { passive: false });
+            window.addEventListener('touchend', onTouchEnd);
+        }
+
+        function enterVRProgramsRoom() {
+            isInVRRoom = true;
+            multiverseMenu.style.opacity = '0';
+            multiverseMenu.style.pointerEvents = 'none';
+            envContainer.style.opacity = '0';
+            envContainer.style.pointerEvents = 'none';
+
+            if (!vrRoomScene) {
+                initVRProgramsRoom();
+            }
+
+            vrRoomContainer.style.opacity = '1';
+            vrRoomContainer.style.pointerEvents = 'auto';
+            backToMenuBtn.style.display = 'block';
+            touchInstruction.style.display = 'block';
+        }
+
+        function returnToMultiverse() {
+            isInVRRoom = false;
+            vrRoomContainer.style.opacity = '0';
+            vrRoomContainer.style.pointerEvents = 'none';
+            backToMenuBtn.style.display = 'none';
+            touchInstruction.style.display = 'none';
+
+            envContainer.style.opacity = '1';
+            envContainer.style.pointerEvents = 'auto';
+            multiverseMenu.style.opacity = '1';
+            multiverseMenu.style.pointerEvents = 'auto';
+        }
+
+        // Manejo de interacción de arrastre 360°
+        function onPointerDown(e) {
+            isDragging = true;
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        }
+
+        function onPointerMove(e) {
+            if (!isDragging || !isInVRRoom) return;
+            const deltaX = e.clientX - previousMousePosition.x;
+            const deltaY = e.clientY - previousMousePosition.y;
+
+            targetLon -= deltaX * 0.4;
+            targetLat += deltaY * 0.4;
+            targetLat = Math.max(-85, Math.min(85, targetLat));
+
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        }
+
+        function onPointerUp(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            // Verificar si fue un clic corto para seleccionar una pantalla
+            checkScreenClick(e.clientX, e.clientY);
+        }
+
+        let touchStartX = 0, touchStartY = 0;
+        function onTouchStart(e) {
+            if (e.touches.length === 1) {
+                isDragging = true;
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                previousMousePosition = { x: touchStartX, y: touchStartY };
+            }
+        }
+
+        function onTouchMove(e) {
+            if (!isDragging || !isInVRRoom || e.touches.length !== 1) return;
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const deltaX = currentX - previousMousePosition.x;
+            const deltaY = currentY - previousMousePosition.y;
+
+            targetLon -= deltaX * 0.5;
+            targetLat += deltaY * 0.5;
+            targetLat = Math.max(-85, Math.min(85, targetLat));
+
+            previousMousePosition = { x: currentX, y: currentY };
+        }
+
+        function onTouchEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            if (e.changedTouches.length > 0) {
+                checkScreenClick(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+            }
+        }
+
+        // Raycaster para detectar clics en pantallas 3D
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        function checkScreenClick(clientX, clientY) {
+            mouse.x = (clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, vrRoomCamera);
+            const intersects = raycaster.intersectObjects(interactiveScreens);
+
+            if (intersects.length > 0) {
+                const selectedScreen = intersects[0].object;
+                const videoKey = selectedScreen.userData.videoKey;
+                openVideo(videoKey);
+            }
         }
 
         function handleOrientation(event) {
@@ -227,6 +517,29 @@
                 planet.rotation.x += 0.003;
                 textGroup.rotation.y += 0.006;
                 renderer.render(scene, camera);
+            } else if (isInVRRoom) {
+                // Actualizar rotación de cámara 360° mediante arrastre
+                cameraLon += (targetLon - cameraLon) * 0.1;
+                cameraLat += (targetLat - cameraLat) * 0.1;
+
+                const phi = THREE.MathUtils.degToRad(90 - cameraLat);
+                const theta = THREE.MathUtils.degToRad(cameraLon);
+
+                const targetLookAt = new THREE.Vector3(
+                    Math.sin(phi) * Math.sin(theta),
+                    Math.cos(phi),
+                    Math.sin(phi) * Math.cos(theta)
+                );
+                vrRoomCamera.lookAt(targetLookAt);
+
+                if(vrRoomStars) vrRoomStars.rotation.y += 0.0005;
+
+                if (isVRMode) {
+                    renderVRRoomStereo();
+                } else {
+                    vrRoomRenderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+                    vrRoomRenderer.render(vrRoomScene, vrRoomCamera);
+                }
             } else {
                 if(stars) stars.rotation.y += 0.0005;
                 internalCamera.quaternion.slerp(targetQuaternion, 0.1);
@@ -253,6 +566,21 @@
             internalRenderer.setScissor(width / 2, 0, width / 2, height);
             internalRenderer.render(internalScene, internalCamera);
             internalRenderer.setScissorTest(false);
+        }
+
+        function renderVRRoomStereo() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            
+            vrRoomRenderer.setViewport(0, 0, width / 2, height);
+            vrRoomRenderer.setScissor(0, 0, width / 2, height);
+            vrRoomRenderer.setScissorTest(true);
+            vrRoomRenderer.render(vrRoomScene, vrRoomCamera);
+            
+            vrRoomRenderer.setViewport(width / 2, 0, width / 2, height);
+            vrRoomRenderer.setScissor(width / 2, 0, width / 2, height);
+            vrRoomRenderer.render(vrRoomScene, vrRoomCamera);
+            vrRoomRenderer.setScissorTest(false);
         }
 
         animate();
