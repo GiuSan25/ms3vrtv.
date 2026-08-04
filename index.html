@@ -46,8 +46,25 @@
         }
         #back-to-menu-btn:hover { background: #ff00ff; color: #000; box-shadow: 0 0 20px #ff00ff; }
 
+        /* Contenedor estéreo para duplicar los menús en Modo VR */
+        #stereo-ui-container {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            display: flex;
+            z-index: 15;
+            pointer-events: none;
+        }
+
+        .screen-ui-half {
+            width: 50vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
         /* Contenedor de los botones neón planos */
-        #multiverse-menu {
+        .multiverse-menu {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -59,8 +76,8 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 1s ease 0.5s;
-            width: 90%;
-            max-width: 380px;
+            width: 85%;
+            max-width: 320px;
             align-items: center;
         }
 
@@ -68,8 +85,8 @@
             background: rgba(10, 10, 26, 0.85);
             color: #0ff;
             border: 2px solid #0ff;
-            padding: 16px 20px;
-            font-size: 1rem;
+            padding: 14px 18px;
+            font-size: 0.9rem;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -81,6 +98,7 @@
             width: 100%;
             text-align: center;
             animation: floatBtn 3s ease-in-out infinite;
+            pointer-events: auto;
         }
 
         .neon-flat-btn:nth-child(2) {
@@ -174,6 +192,11 @@
             position: absolute; bottom: 20px; width: 100%; text-align: center; color: #0ff; z-index: 20;
             font-size: 0.9rem; pointer-events: none; text-shadow: 0 0 8px #0ff; display: none; font-weight: 500;
         }
+        
+        /* Habilitar clicks en botones individuales dentro de las mitades */
+        .screen-ui-half .neon-flat-btn {
+            pointer-events: auto;
+        }
     </style>
 </head>
 <body>
@@ -183,11 +206,24 @@
     <div id="instruction">Presiona la esfera para ingresar al multiverso MS3</div>
     <div id="touch-instruction">💡 Arrastra con el dedo o mouse para girar en 360° y explorar las pantallas</div>
     
-    <!-- Menú flotante plano con diseño Neón -->
-    <div id="multiverse-menu">
-        <button class="neon-flat-btn" onclick="enterVRProgramsRoom()">Ver Programas VR</button>
-        <button class="neon-flat-btn" onclick="openVideo('2d')">Ver Programas 2D</button>
-        <button class="neon-flat-btn" onclick="openVideo('live')">Ver en Vivo</button>
+    <!-- Contenedor Estéreo para duplicar la interfaz en ambas pantallas VR -->
+    <div id="stereo-ui-container">
+        <!-- Ojo Izquierdo -->
+        <div class="screen-ui-half">
+            <div class="multiverse-menu left-menu">
+                <button class="neon-flat-btn" onclick="enterVRProgramsRoom()">Ver Programas VR</button>
+                <button class="neon-flat-btn" onclick="openVideo('2d')">Ver Programas 2D</button>
+                <button class="neon-flat-btn" onclick="openVideo('live')">Ver en Vivo</button>
+            </div>
+        </div>
+        <!-- Ojo Derecho -->
+        <div class="screen-ui-half">
+            <div class="multiverse-menu right-menu">
+                <button class="neon-flat-btn" onclick="enterVRProgramsRoom()">Ver Programas VR</button>
+                <button class="neon-flat-btn" onclick="openVideo('2d')">Ver Programas 2D</button>
+                <button class="neon-flat-btn" onclick="openVideo('live')">Ver en Vivo</button>
+            </div>
+        </div>
     </div>
 
     <!-- Modal de Video Estándar -->
@@ -212,7 +248,8 @@
         const vrRoomContainer = document.getElementById('vr-room-container');
         const vrBtn = document.getElementById('vr-btn');
         const backToMenuBtn = document.getElementById('back-to-menu-btn');
-        const multiverseMenu = document.getElementById('multiverse-menu');
+        const leftMenu = document.querySelector('.left-menu');
+        const rightMenu = document.querySelector('.right-menu');
         const videoModal = document.getElementById('video-modal');
         const multiverseVideo = document.getElementById('multiverse-video');
         const videoSource = document.getElementById('video-source');
@@ -333,8 +370,10 @@
             internalScene.add(stars);
 
             vrBtn.style.display = 'block';
-            multiverseMenu.style.opacity = '1';
-            multiverseMenu.style.pointerEvents = 'auto';
+            leftMenu.style.opacity = '1';
+            leftMenu.style.pointerEvents = 'auto';
+            rightMenu.style.opacity = '1';
+            rightMenu.style.pointerEvents = 'auto';
         }
 
         // Nueva Sala 360° con Pantallas VR alrededor del usuario
@@ -413,8 +452,10 @@
 
         function enterVRProgramsRoom() {
             isInVRRoom = true;
-            multiverseMenu.style.opacity = '0';
-            multiverseMenu.style.pointerEvents = 'none';
+            leftMenu.style.opacity = '0';
+            leftMenu.style.pointerEvents = 'none';
+            rightMenu.style.opacity = '0';
+            rightMenu.style.pointerEvents = 'none';
             envContainer.style.opacity = '0';
             envContainer.style.pointerEvents = 'none';
 
@@ -437,8 +478,10 @@
 
             envContainer.style.opacity = '1';
             envContainer.style.pointerEvents = 'auto';
-            multiverseMenu.style.opacity = '1';
-            multiverseMenu.style.pointerEvents = 'auto';
+            leftMenu.style.opacity = '1';
+            leftMenu.style.pointerEvents = 'auto';
+            rightMenu.style.opacity = '1';
+            rightMenu.style.pointerEvents = 'auto';
         }
 
         function onPointerDown(e) {
