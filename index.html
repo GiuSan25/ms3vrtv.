@@ -21,15 +21,18 @@
             text-shadow: 0 0 10px #0ff, 0 0 20px #f0f; font-weight: 600; letter-spacing: 1px;
         }
         
-        #vr-btn {
-            position: absolute; top: 20px; right: 20px; z-index: 10;
+        .hud-btn {
+            position: absolute; top: 20px; z-index: 10;
             padding: 12px 24px; background: transparent; color: #0ff;
             border: 2px solid #0ff; border-radius: 8px; font-weight: bold;
             text-transform: uppercase; letter-spacing: 2px;
             box-shadow: 0 0 10px #0ff, inset 0 0 10px #0ff;
             cursor: pointer; transition: all 0.3s;
         }
-        #vr-btn:hover { background: #0ff; color: #000; box-shadow: 0 0 20px #0ff; }
+        .hud-btn:hover { background: #0ff; color: #000; box-shadow: 0 0 20px #0ff; }
+
+        #vr-btn { right: 20px; }
+        #gyro-btn { right: 160px; display: none; }
 
         #multiverse-hud {
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -57,7 +60,8 @@
 </head>
 <body>
 
-    <button id="vr-btn" style="display: none;">Ver en VR</button>
+    <button id="vr-btn" class="hud-btn" style="display: none;">Ver en VR</button>
+    <button id="gyro-btn" class="hud-btn">Giroscopio: OFF</button>
     <div id="instruction">Presiona la esfera para ingresar al multiverso MS3</div>
     <div id="webgl-container"></div>
     <div id="ms3-environment"></div>
@@ -70,11 +74,13 @@
         const container = document.getElementById('webgl-container');
         const envContainer = document.getElementById('ms3-environment');
         const vrBtn = document.getElementById('vr-btn');
+        const gyroBtn = document.getElementById('gyro-btn');
         const multiverseHud = document.getElementById('multiverse-hud');
         const btnVolver = document.getElementById('btn-volver');
 
         let isSystemActive = false;
         let isVRMode = false;
+        let isGyroActive = false;
         let internalScene, internalCamera, internalRenderer, stars;
         let multiverseButtonsGroup, videoScreensGroup;
         let targetQuaternion = new THREE.Quaternion();
@@ -163,7 +169,6 @@
             userHeadGroup.position.set(0, 0, 0);
             internalScene.add(userHeadGroup);
 
-            // 1. Exactamente 7 pantallas alrededor (sin ninguna pantalla detrás de los botones centrales)
             videoScreensGroup = new THREE.Group();
             userHeadGroup.add(videoScreensGroup);
 
@@ -177,7 +182,6 @@
                 "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
             ];
 
-            // Pantallas distribuidas a los lados y arriba/abajo, evitando la zona frontal directa (ángulo 0 donde están los botones)
             const screensConfig = [
                 { angle: -1.2, y: 1.4, r: 5.5, w: 3.2, h: 1.8 }, 
                 { angle:  1.2, y: 1.5, r: 5.3, w: 2.6, h: 1.4 }, 
@@ -185,7 +189,7 @@
                 { angle:  2.0, y: 0.2, r: 5.8, w: 2.2, h: 1.2 }, 
                 { angle: -1.0, y: -1.3, r: 5.0, w: 2.4, h: 1.3 }, 
                 { angle:  1.0, y: -1.2, r: 5.2, w: 3.0, h: 1.6 }, 
-                { angle:  0.0, y: 2.2, r: 5.5, w: 2.8, h: 1.5 }  // Arriba del todo
+                { angle:  0.0, y: 2.2, r: 5.5, w: 2.8, h: 1.5 }  
             ];
 
             screensConfig.forEach((config, index) => {
@@ -221,7 +225,6 @@
                 videoScreensGroup.add(screenMesh);
             });
 
-            // 2. Botones principales estilo 3D con un borde volumétrico bastante separado y llamativo
             multiverseButtonsGroup = new THREE.Group();
             userHeadGroup.add(multiverseButtonsGroup);
 
@@ -235,7 +238,6 @@
                 btnData.forEach((data) => {
                     const buttonGroup = new THREE.Group();
 
-                    // Texto del botón
                     const bGeo = new THREE.TextGeometry(data.text, {
                         font: font, 
                         size: 0.25, 
@@ -259,7 +261,6 @@
                     fillMesh.position.x = bOffset;
                     buttonGroup.add(fillMesh);
 
-                    // Marco 3D exterior bastante separado y llamativo estilo caja/cercco flotante
                     const boxWidth = (bGeo.boundingBox.max.x - bGeo.boundingBox.min.x) + 0.8;
                     const boxHeight = 0.7;
                     const boxDepth = 0.25;
@@ -272,7 +273,6 @@
                         opacity: 0.9 
                     });
                     const frameMesh = new THREE.Mesh(frameGeo, frameMat);
-                    // Centrar el marco respecto al texto
                     frameMesh.position.set(0, 0.12, -0.05);
                     buttonGroup.add(frameMesh);
 
@@ -282,6 +282,7 @@
             });
 
             vrBtn.style.display = 'block';
+            gyroBtn.style.display = 'block';
             multiverseHud.style.display = 'block';
 
             window.addEventListener('mousedown', onPointerDown);
@@ -324,22 +325,42 @@
             isDragging = false;
         }
 
-        function requestGyroscope() {
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission()
-                    .then(response => {
-                        if (response === 'granted') {
-                            window.addEventListener('deviceorientation', handleOrientation, true);
-                        }
-                    })
-                    .catch(console.error);
+        function toggleGyroscope() {
+            if (!isGyroActive) {
+                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    DeviceOrientationEvent.requestPermission()
+                        .then(response => {
+                            if (response === 'granted') {
+                                enableGyro();
+                            }
+                        })
+                        .catch(console.error);
+                } else {
+                    enableGyro();
+                }
             } else {
-                window.addEventListener('deviceorientation', handleOrientation, true);
+                disableGyro();
             }
         }
 
+        function enableGyro() {
+            isGyroActive = true;
+            gyroBtn.innerText = "Giroscopio: ON";
+            gyroBtn.style.background = "#0ff";
+            gyroBtn.style.color = "#000";
+            window.addEventListener('deviceorientation', handleOrientation, true);
+        }
+
+        function disableGyro() {
+            isGyroActive = false;
+            gyroBtn.innerText = "Giroscopio: OFF";
+            gyroBtn.style.background = "transparent";
+            gyroBtn.style.color = "#0ff";
+            window.removeEventListener('deviceorientation', handleOrientation, true);
+        }
+
         function handleOrientation(event) {
-            if (isDragging) return;
+            if (!isGyroActive || isDragging) return;
 
             const alpha = event.alpha ? THREE.MathUtils.degToRad(event.alpha) : 0;
             const beta = event.beta ? THREE.MathUtils.degToRad(event.beta) : 0;
@@ -414,7 +435,6 @@
 
         async function startExperience() {
             if (isSystemActive) return;
-            requestGyroscope();
             document.getElementById('instruction').style.opacity = '0';
             
             gsap.to(camera.position, { z: -1.5, duration: 2.2, ease: "power2.inOut", onComplete: () => {
@@ -430,7 +450,8 @@
             if (e) e.stopPropagation();
             if (!isSystemActive) return;
 
-            window.removeEventListener('deviceorientation', handleOrientation, true);
+            if (isGyroActive) disableGyro();
+
             window.removeEventListener('mousedown', onPointerDown);
             window.removeEventListener('mousemove', onPointerMove);
             window.removeEventListener('mouseup', onPointerUp);
@@ -439,6 +460,7 @@
             window.removeEventListener('touchend', onPointerUp);
 
             vrBtn.style.display = 'none';
+            gyroBtn.style.display = 'none';
             multiverseHud.style.display = 'none';
             envContainer.style.opacity = '0';
             envContainer.style.pointerEvents = 'none';
@@ -461,14 +483,16 @@
             vrBtn.innerText = isVRMode ? "Salir de VR" : "Ver en VR";
         });
 
+        gyroBtn.addEventListener('click', toggleGyroscope);
+
         btnVolver.addEventListener('click', returnToMain);
         btnVolver.addEventListener('touchend', returnToMain);
 
         window.addEventListener('click', (e) => {
-            if (!isSystemActive && e.target !== vrBtn) startExperience();
+            if (!isSystemActive && e.target !== vrBtn && e.target !== gyroBtn) startExperience();
         });
         window.addEventListener('touchend', (e) => {
-            if (!isSystemActive && e.target !== vrBtn) startExperience();
+            if (!isSystemActive && e.target !== vrBtn && e.target !== gyroBtn) startExperience();
         });
     </script>
 </body>
