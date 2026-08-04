@@ -147,7 +147,7 @@
             internalRenderer.setClearColor(0x000000, 0); 
             envContainer.appendChild(internalRenderer.domElement);
 
-            // Fondo con líneas / estrellas inmersivas simulando estar dentro de la esfera
+            // Fondo inmersivo de estrellas/líneas dentro de la esfera
             const starGeometry = new THREE.BufferGeometry();
             const starMaterial = new THREE.PointsMaterial({ color: 0x00ffff, size: 0.15 });
             const starPositions = new Float32Array(5000);
@@ -156,7 +156,7 @@
             stars = new THREE.Points(starGeometry, starMaterial);
             internalScene.add(stars);
 
-            // Sin pantallas laterales: únicamente botones 3D neón distribuidos alrededor del usuario en el espacio virtual
+            // Pantallas cuadradas eliminadas por completo. Solo quedan los botones neón 3D alrededor.
             multiverseButtonsGroup = new THREE.Group();
             internalScene.add(multiverseButtonsGroup);
 
