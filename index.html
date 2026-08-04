@@ -10,7 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
-        body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; }
+        body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; width: 100vw; height: 100vh; }
         #webgl-container, #ms3-environment { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
         #webgl-container { z-index: 2; cursor: pointer; }
         #ms3-environment { z-index: 1; opacity: 0; pointer-events: none; transition: opacity 1.5s ease; background: radial-gradient(circle, #1e1b4b 0%, #000 100%); }
@@ -147,7 +147,6 @@
             internalRenderer.setClearColor(0x000000, 0); 
             envContainer.appendChild(internalRenderer.domElement);
 
-            // Fondo inmersivo de estrellas/líneas dentro de la esfera
             const starGeometry = new THREE.BufferGeometry();
             const starMaterial = new THREE.PointsMaterial({ color: 0x00ffff, size: 0.15 });
             const starPositions = new Float32Array(5000);
@@ -156,7 +155,6 @@
             stars = new THREE.Points(starGeometry, starMaterial);
             internalScene.add(stars);
 
-            // Pantallas cuadradas eliminadas por completo. Solo quedan los botones neón 3D alrededor.
             multiverseButtonsGroup = new THREE.Group();
             internalScene.add(multiverseButtonsGroup);
 
@@ -202,9 +200,36 @@
             const alpha = event.alpha ? THREE.MathUtils.degToRad(event.alpha) : 0;
             const beta = event.beta ? THREE.MathUtils.degToRad(event.beta) : 0;
             const gamma = event.gamma ? THREE.MathUtils.degToRad(event.gamma) : 0;
+            
+            // Adaptación automática para que al girar la pantalla de costado (modo horizontal/landscape) la orientación no se distorsione
+            const orientation = window.screen.orientation ? window.screen.orientation.angle : (window.orientation || 0);
+            const degToRad = THREE.MathUtils.degToRad;
+
             const Euler = new THREE.Euler(beta, alpha, -gamma, 'YXZ');
             targetQuaternion.setFromEuler(Euler);
+
+            if (Math.abs(orientation) === 90) {
+                const correction = new THREE.Quaternion();
+                correction.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -degToRad(orientation));
+                targetQuaternion.multiply(correction);
+            }
         }
+
+        // Manejo dinámico ante cambios de tamaño y rotación de pantalla en tiempo real
+        window.addEventListener('resize', () => {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+
+            if (internalCamera && internalRenderer) {
+                internalCamera.aspect = width / height;
+                internalCamera.updateProjectionMatrix();
+                internalRenderer.setSize(width, height);
+            }
+        });
 
         function animate() {
             requestAnimationFrame(animate);
