@@ -159,23 +159,30 @@
             stars = new THREE.Points(starGeometry, starMaterial);
             internalScene.add(stars);
 
-            // Grupo de Pantallas de Videos alrededor (360)
+            // Contenedor principal que se alinea exactamente a la cámara (visión del usuario)
+            const userHeadGroup = new THREE.Group();
+            userHeadGroup.position.set(0, 0, 0);
+            internalScene.add(userHeadGroup);
+
+            // 1. Pantallas de videos distribuidas alrededor a la altura de los ojos (y = 0)
             videoScreensGroup = new THREE.Group();
-            internalScene.add(videoScreensGroup);
+            userHeadGroup.add(videoScreensGroup);
 
             const screenUrls = [
                 "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
                 "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4",
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4"
             ];
 
-            const radius = 5.5;
+            const radius = 6.0;
             screenUrls.forEach((url, index) => {
                 const angle = (index / screenUrls.length) * Math.PI * 2;
                 const x = Math.sin(angle) * radius;
                 const z = Math.cos(angle) * radius;
 
-                // Crear elemento video dinámico
                 const video = document.createElement('video');
                 video.src = url;
                 video.crossOrigin = 'anonymous';
@@ -187,31 +194,31 @@
                 const videoTexture = new THREE.VideoTexture(video);
                 videoTextures.push(videoTexture);
 
-                const planeGeo = new THREE.PlaneGeometry(3.2, 1.8);
+                const planeGeo = new THREE.PlaneGeometry(3.5, 2.0);
                 const planeMat = new THREE.MeshBasicMaterial({ map: videoTexture, side: THREE.DoubleSide });
                 const screenMesh = new THREE.Mesh(planeGeo, planeMat);
 
-                screenMesh.position.set(x, 0.5, z);
-                screenMesh.lookAt(0, 0.5, 0); // Mirando hacia el centro (usuario)
+                // Posicionadas exactamente a la altura de la vista (y = 0)
+                screenMesh.position.set(x, 0, z);
+                screenMesh.lookAt(0, 0, 0);
 
-                // Marco brillante de neón para la pantalla de video
                 const frameGeo = new THREE.EdgesGeometry(planeGeo);
-                const frameMat = new THREE.LineBasicMaterial({ color: index === 0 ? 0x00ffff : (index === 1 ? 0xff00ff : 0x00ffcc), linewidth: 2 });
+                const frameMat = new THREE.LineBasicMaterial({ color: index % 2 === 0 ? 0x00ffff : 0xff00ff, linewidth: 2 });
                 const frameLine = new THREE.LineSegments(frameGeo, frameMat);
                 screenMesh.add(frameLine);
 
                 videoScreensGroup.add(screenMesh);
             });
 
+            // 2. Botones principales centrados frente a la vista (y = 0.5, 0.0, -0.5)
             multiverseButtonsGroup = new THREE.Group();
-            internalScene.add(multiverseButtonsGroup);
+            userHeadGroup.add(multiverseButtonsGroup);
 
             loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
-                // Altura centralizada exacta a la visión del usuario (y: 0.6, 0.0, -0.6)
                 const btnData = [
-                    { text: "VER PROGRAMAS VR", y: 0.6, z: -3.2, color: 0x00ffff, emissive: 0x008888 },
-                    { text: "VER PROGRAMAS 2D", y: 0.0, z: -3.2, color: 0xff00ff, emissive: 0x880055 },
-                    { text: "VER EN VIVO", y: -0.6, z: -3.2, color: 0x00ffcc, emissive: 0x008866 }
+                    { text: "VER PROGRAMAS VR", y: 0.6, z: -3.0, color: 0x00ffff, emissive: 0x008888 },
+                    { text: "VER PROGRAMAS 2D", y: 0.0, z: -3.0, color: 0xff00ff, emissive: 0x880055 },
+                    { text: "VER EN VIVO", y: -0.6, z: -3.0, color: 0x00ffcc, emissive: 0x008866 }
                 ];
 
                 btnData.forEach((data) => {
