@@ -182,6 +182,7 @@
             multiverseHud.style.display = 'block';
         }
 
+        // Activación completa y unificada del giroscopio tanto para iOS (permisos) como Android (detección directa/DeviceMotionEvent si es requerido)
         function requestGyroscope() {
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission()
@@ -192,7 +193,13 @@
                     })
                     .catch(console.error);
             } else {
+                // En Android y navegadores compatibles por defecto, se activa de manera directa
                 window.addEventListener('deviceorientation', handleOrientation, true);
+            }
+
+            // Fallback para ciertos dispositivos Android modernos que requieren DeviceMotionEvent explícito para desbloquear sensores de movimiento
+            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                DeviceMotionEvent.requestPermission().catch(console.error);
             }
         }
 
@@ -201,7 +208,6 @@
             const beta = event.beta ? THREE.MathUtils.degToRad(event.beta) : 0;
             const gamma = event.gamma ? THREE.MathUtils.degToRad(event.gamma) : 0;
             
-            // Adaptación automática para que al girar la pantalla de costado (modo horizontal/landscape) la orientación no se distorsione
             const orientation = window.screen.orientation ? window.screen.orientation.angle : (window.orientation || 0);
             const degToRad = THREE.MathUtils.degToRad;
 
@@ -215,7 +221,6 @@
             }
         }
 
-        // Manejo dinámico ante cambios de tamaño y rotación de pantalla en tiempo real
         window.addEventListener('resize', () => {
             const width = window.innerWidth;
             const height = window.innerHeight;
