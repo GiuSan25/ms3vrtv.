@@ -30,6 +30,30 @@
             cursor: pointer; transition: all 0.3s;
         }
         #vr-btn:hover { background: #0ff; color: #000; box-shadow: 0 0 20px #0ff; }
+
+        /* Interfaz HUD 3D del Multiverso (Botones flotantes alrededor y botón VOLVER) */
+        #multiverse-hud {
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 5; pointer-events: none; display: none;
+            box-sizing: border-box;
+        }
+
+        .hud-interactive {
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        #btn-volver {
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            padding: 12px 30px; background: rgba(0, 0, 0, 0.7); color: #ff007f;
+            border: 2px solid #ff007f; border-radius: 30px; font-weight: bold;
+            text-transform: uppercase; letter-spacing: 2px; font-size: 1rem;
+            box-shadow: 0 0 15px #ff007f, inset 0 0 10px #ff007f;
+            transition: all 0.3s ease;
+        }
+        #btn-volver:hover {
+            background: #ff007f; color: #000; box-shadow: 0 0 25px #ff007f;
+        }
     </style>
 </head>
 <body>
@@ -39,13 +63,22 @@
     <div id="webgl-container"></div>
     <div id="ms3-environment"></div>
 
+    <!-- HUD Interactivo dentro del Multiverso -->
+    <div id="multiverse-hud">
+        <button id="btn-volver" class="hud-interactive">VOLVER</button>
+    </div>
+
     <script>
         const container = document.getElementById('webgl-container');
         const envContainer = document.getElementById('ms3-environment');
         const vrBtn = document.getElementById('vr-btn');
+        const multiverseHud = document.getElementById('multiverse-hud');
+        const btnVolver = document.getElementById('btn-volver');
+
         let isSystemActive = false;
         let isVRMode = false;
         let internalScene, internalCamera, internalRenderer, stars;
+        let multiverseButtonsGroup;
         let targetQuaternion = new THREE.Quaternion();
 
         const scene = new THREE.Scene();
@@ -54,7 +87,7 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         container.appendChild(renderer.domElement);
 
-        // Iluminación intensa para resaltar el efecto espejo reflectivo y los bordes neón
+        // Iluminación
         const ambientLight = new THREE.AmbientLight(0xffffff, 1.8);
         scene.add(ambientLight);
 
@@ -66,7 +99,7 @@
         pointLight2.position.set(-6, -6, 6);
         scene.add(pointLight2);
 
-        // Esfera con líneas densas posicionada abajo
+        // Esfera principal posicionada abajo
         const planetGroup = new THREE.Group();
         const planetGeometry = new THREE.IcosahedronGeometry(1.4, 4); 
         const planetMaterial = new THREE.MeshBasicMaterial({ 
@@ -79,51 +112,31 @@
         planet.position.y = -1.5;
         planetGroup.add(planet);
 
-        // Grupo para el Texto 3D MS3 con acabado espejo y bordes neón
+        // Texto MS3 3D espejo con bordes neón
         const textGroup = new THREE.Group();
         textGroup.position.y = 0.8;
 
         const loader = new THREE.FontLoader();
         loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
             const textGeo = new THREE.TextGeometry('MS3', {
-                font: font,
-                size: 1.2,
-                height: 0.4,
-                curveSegments: 12,
-                bevelEnabled: true,
-                bevelThickness: 0.08,
-                bevelSize: 0.05,
-                bevelOffset: 0,
-                bevelSegments: 5
+                font: font, size: 1.2, height: 0.4, curveSegments: 12,
+                bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.05, bevelOffset: 0, bevelSegments: 5
             });
 
             textGeo.computeBoundingBox();
             const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
             
-            // Núcleo reflectivo estilo espejo pulido
             const mirrorMaterial = new THREE.MeshPhysicalMaterial({ 
-                color: 0xffffff,
-                metalness: 0.9,
-                roughness: 0.05,
-                clearcoat: 1.0,
-                clearcoatRoughness: 0.05,
-                reflectivity: 1.0
+                color: 0xffffff, metalness: 0.9, roughness: 0.05, clearcoat: 1.0, clearcoatRoughness: 0.05, reflectivity: 1.0
             });
-            
             const textMesh = new THREE.Mesh(textGeo, mirrorMaterial);
             textMesh.position.x = centerOffset;
             textGroup.add(textMesh);
 
-            // Capa externa estilo borde neón brillante para máxima visibilidad en 360°
-            const neonBorderMaterial = new THREE.MeshBasicMaterial({
-                color: 0x00ffff,
-                wireframe: true,
-                transparent: true,
-                opacity: 0.7
-            });
+            const neonBorderMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.7 });
             const borderMesh = new THREE.Mesh(textGeo, neonBorderMaterial);
             borderMesh.position.x = centerOffset;
-            borderMesh.scale.set(1.02, 1.02, 1.02); // Ligeramente más grande para crear el contorno neón
+            borderMesh.scale.set(1.02, 1.02, 1.02);
             textGroup.add(borderMesh);
         });
 
@@ -139,6 +152,7 @@
             internalRenderer.setClearColor(0x000000, 0); 
             envContainer.appendChild(internalRenderer.domElement);
 
+            // Fondo con líneas / estrellas inmersivas simulando estar dentro de la esfera
             const starGeometry = new THREE.BufferGeometry();
             const starMaterial = new THREE.PointsMaterial({ color: 0x00ffff, size: 0.15 });
             const starPositions = new Float32Array(5000);
@@ -147,6 +161,7 @@
             stars = new THREE.Points(starGeometry, starMaterial);
             internalScene.add(stars);
 
+            // Estructura de paneles geométricos neón alrededor (Multiverso)
             const screenGeometry = new THREE.PlaneGeometry(2, 1.5);
             const material = new THREE.MeshBasicMaterial({ color: 0xff00ff, wireframe: true });
             for(let y = -1; y <= 1; y++) {
@@ -156,7 +171,48 @@
                     internalScene.add(screen);
                 }
             }
+
+            // Crear botones 3D neón flotantes alrededor del usuario
+            multiverseButtonsGroup = new THREE.Group();
+            internalScene.add(multiverseButtonsGroup);
+
+            loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
+                const btnData = [
+                    { text: "VER PROGRAMAS VR", y: 1.0 },
+                    { text: "VER PROGRAMAS 2D", y: 0.0 },
+                    { text: "VER EN VIVO", y: -1.0 }
+                ];
+
+                btnData.forEach((data) => {
+                    const bGeo = new THREE.TextGeometry(data.text, {
+                        font: font, size: 0.35, height: 0.08, curveSegments: 6, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.01
+                    });
+                    bGeo.computeBoundingBox();
+                    const bOffset = -0.5 * (bGeo.boundingBox.max.x - bGeo.boundingBox.min.x);
+                    const bMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true });
+                    const bMesh = new THREE.Mesh(bGeo, bMat);
+                    bMesh.position.set(bOffset, data.y, -3);
+                    multiverseButtonsGroup.add(bMesh);
+                });
+            });
+
             vrBtn.style.display = 'block';
+            multiverseHud.style.display = 'block';
+        }
+
+        // Activación del giroscopio compatible con Android e iOS (permisos para iOS 13+)
+        function requestGyroscope() {
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(response => {
+                        if (response === 'granted') {
+                            window.addEventListener('deviceorientation', handleOrientation, true);
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                window.addEventListener('deviceorientation', handleOrientation, true);
+            }
         }
 
         function handleOrientation(event) {
@@ -206,7 +262,7 @@
 
         async function startExperience() {
             if (isSystemActive) return;
-            window.addEventListener('deviceorientation', handleOrientation, true);
+            requestGyroscope();
             document.getElementById('instruction').style.opacity = '0';
             
             gsap.to(camera.position, { z: -1.5, duration: 2.2, ease: "power2.inOut", onComplete: () => {
@@ -218,13 +274,44 @@
             }});
         }
 
+        // Función para volver a la pantalla principal
+        function returnToMain(e) {
+            if (e) e.stopPropagation();
+            if (!isSystemActive) return;
+
+            window.removeEventListener('deviceorientation', handleOrientation, true);
+            vrBtn.style.display = 'none';
+            multiverseHud.style.display = 'none';
+            envContainer.style.opacity = '0';
+            envContainer.style.pointerEvents = 'none';
+            container.style.opacity = '1';
+
+            gsap.to(camera.position, { z: 5, duration: 1.8, ease: "power2.inOut", onComplete: () => {
+                if (internalRenderer && internalRenderer.domElement) {
+                    internalRenderer.domElement.remove();
+                }
+                internalScene = null;
+                isVRMode = false;
+                vrBtn.innerText = "Ver en VR";
+                isSystemActive = false;
+                document.getElementById('instruction').style.opacity = '1';
+            }});
+        }
+
         vrBtn.addEventListener('click', () => {
             isVRMode = !isVRMode;
             vrBtn.innerText = isVRMode ? "Salir de VR" : "Ver en VR";
         });
 
-        window.addEventListener('click', startExperience);
-        window.addEventListener('touchend', startExperience);
+        btnVolver.addEventListener('click', returnToMain);
+        btnVolver.addEventListener('touchend', returnToMain);
+
+        window.addEventListener('click', (e) => {
+            if (!isSystemActive && e.target !== vrBtn) startExperience();
+        });
+        window.addEventListener('touchend', (e) => {
+            if (!isSystemActive && e.target !== vrBtn) startExperience();
+        });
     </script>
 </body>
 </html>
