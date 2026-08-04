@@ -33,19 +33,6 @@
         }
         #vr-btn:hover { background: #0ff; color: #000; box-shadow: 0 0 20px #0ff; }
 
-        /* Botón Giroscopio en la sala VR */
-        #gyro-btn {
-            position: absolute; top: 20px; right: 165px; z-index: 20;
-            padding: 12px 18px; background: rgba(0,0,0,0.8); color: #0ff;
-            border: 2px solid #0ff; border-radius: 8px; font-weight: bold;
-            text-transform: uppercase; letter-spacing: 1px;
-            box-shadow: 0 0 10px #0ff;
-            cursor: pointer; transition: all 0.3s;
-            display: none;
-        }
-        #gyro-btn:hover { background: #0ff; color: #000; box-shadow: 0 0 20px #0ff; }
-        #gyro-btn.active { background: #0ff; color: #000; box-shadow: 0 0 20px #0ff, inset 0 0 10px #000; }
-
         /* Botón para volver al menú principal desde la sala VR */
         #back-to-menu-btn {
             position: absolute; top: 20px; left: 20px; z-index: 20;
@@ -58,7 +45,7 @@
         }
         #back-to-menu-btn:hover { background: #ff00ff; color: #000; box-shadow: 0 0 20px #ff00ff; }
 
-        /* Contenedor de los botones neón planos flotantes */
+        /* Contenedor de los botones neón planos */
         #multiverse-menu {
             position: absolute;
             top: 50%;
@@ -191,10 +178,9 @@
 <body>
 
     <button id="vr-btn" style="display: none;">Ver en VR</button>
-    <button id="gyro-btn" onclick="toggleGyroscope()">Giroscopio: OFF</button>
-    <button id="back-to-menu-btn" onclick="returnToMultiverse()">← Volver</button>
+    <button id="back-to-menu-btn" onclick="returnToMultiverse()">← Volver al Multiverso</button>
     <div id="instruction">Presiona la esfera para ingresar al multiverso MS3</div>
-    <div id="touch-instruction">💡 Arrastra con el dedo o mouse para girar en 360° y presiona una pantalla</div>
+    <div id="touch-instruction">💡 Arrastra con el dedo o mouse para girar en 360° y explorar las pantallas</div>
     
     <!-- Menú flotante plano con diseño Neón -->
     <div id="multiverse-menu">
@@ -224,7 +210,6 @@
         const envContainer = document.getElementById('ms3-environment');
         const vrRoomContainer = document.getElementById('vr-room-container');
         const vrBtn = document.getElementById('vr-btn');
-        const gyroBtn = document.getElementById('gyro-btn');
         const backToMenuBtn = document.getElementById('back-to-menu-btn');
         const multiverseMenu = document.getElementById('multiverse-menu');
         const videoModal = document.getElementById('video-modal');
@@ -236,7 +221,6 @@
         let isSystemActive = false;
         let isInVRRoom = false;
         let isVRMode = false;
-        let isGyroActive = false;
         let internalScene, internalCamera, internalRenderer, stars;
         let vrRoomScene, vrRoomCamera, vrRoomRenderer, vrRoomStars;
         let targetQuaternion = new THREE.Quaternion();
@@ -342,14 +326,12 @@
             const starGeometry = new THREE.BufferGeometry();
             const starMaterial = new THREE.PointsMaterial({ color: 0x00ffff, size: 0.15 });
             const starPositions = new Float32Array(5000);
-            for(let i = 0; i < 5000; i++) {
-                let val = (Math.random() - 0.5) * 120;
-                starPositions[i] = isNaN(val) ? 0 : val;
-            }
+            for(let i = 0; i < 5000; i++) starPositions[i] = (Math.random() - 0.5) * 120;
             starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
             stars = new THREE.Points(starGeometry, starMaterial);
             internalScene.add(stars);
 
+            // Se removieron los cuadrados violetas flotantes (plantilla wireframe) para dejar el entorno limpio con estrellas espaciales.
             vrBtn.style.display = 'block';
             multiverseMenu.style.opacity = '1';
             multiverseMenu.style.pointerEvents = 'auto';
@@ -358,85 +340,99 @@
         // Nueva Sala 360° con Pantallas VR alrededor del usuario
         let interactiveScreens = [];
         function initVRProgramsRoom() {
-            isInVRRoom = true;
-            multiverseMenu.style.opacity = '0';
-            multiverseMenu.style.pointerEvents = 'none';
-            vrBtn.style.display = 'none';
-            gyroBtn.style.display = 'block';
-            backToMenuBtn.style.display = 'block';
-            touchInstruction.style.display = 'block';
-            envContainer.style.opacity = '0';
-
             vrRoomScene = new THREE.Scene();
             vrRoomCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             vrRoomRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             vrRoomRenderer.setSize(window.innerWidth, window.innerHeight);
             vrRoomRenderer.setClearColor(0x000000, 0);
             vrRoomContainer.appendChild(vrRoomRenderer.domElement);
-            vrRoomContainer.style.opacity = '1';
-            vrRoomContainer.style.pointerEvents = 'auto';
 
+            // Estrellas de fondo inmersivas
             const starGeo = new THREE.BufferGeometry();
             const starMat = new THREE.PointsMaterial({ color: 0xff00ff, size: 0.2 });
             const positions = new Float32Array(6000);
-            for(let i = 0; i < 6000; i++) {
-                let val = (Math.random() - 0.5) * 150;
-                positions[i] = isNaN(val) ? 0 : val;
-            }
+            for(let i = 0; i < 6000; i++) positions[i] = (Math.random() - 0.5) * 150;
             starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             vrRoomStars = new THREE.Points(starGeo, starMat);
             vrRoomScene.add(vrRoomStars);
 
-            const ambientLightRoom = new THREE.AmbientLight(0xffffff, 2.0);
-            vrRoomScene.add(ambientLightRoom);
+            // Luz ambiental para la sala VR
+            const ambient = new THREE.AmbientLight(0xffffff, 2.0);
+            vrRoomScene.add(ambient);
 
-            // Crear pantallas 360 alrededor
-            const screenData = [
-                { title: 'VR 1', key: 'vr1', angle: 0, color: 0x00ffff },
-                { title: 'VR 2', key: 'vr2', angle: Math.PI / 2, color: 0xff00ff },
-                { title: 'VR 3', key: 'vr3', angle: Math.PI, color: 0x00ff88 },
-                { title: 'VR 4', key: 'vr4', angle: (3 * Math.PI) / 2, color: 0xffff00 }
-            ];
-
+            // Crear 4 pantallas panorámicas alrededor en círculo (360 grados)
             interactiveScreens = [];
-            screenData.forEach(data => {
-                const screenGroup = new THREE.Group();
-                const radius = 6;
-                screenGroup.position.x = Math.sin(data.angle) * radius;
-                screenGroup.position.z = Math.cos(data.angle) * radius;
-                screenGroup.position.y = 0.5;
-                screenGroup.lookAt(0, 0.5, 0);
+            const radius = 6;
+            const videoKeys = ['vr1', 'vr2', 'vr3', 'vr4'];
+            const screenTitles = ['VR PROG 01', 'VR PROG 02', 'VR PROG 03', 'VR PROG 04'];
+            
+            for(let i = 0; i < 4; i++) {
+                const angle = (i / 4) * Math.PI * 2;
+                const x = Math.sin(angle) * radius;
+                const z = Math.cos(angle) * radius;
 
-                // Plano de pantalla
-                const planeGeo = new THREE.PlaneGeometry(3.5, 2.2);
-                const planeMat = new THREE.MeshBasicMaterial({ color: 0x111122, wireframe: false });
-                const plane = new THREE.Mesh(planeGeo, planeMat);
-                screenGroup.add(plane);
+                // Crear textura canvas simulando pantalla con interfaz neón
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 256;
+                const ctx = canvas.getContext('2d');
+                
+                // Fondo de pantalla
+                ctx.fillStyle = '#0a0a23';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = '#00ffff';
+                ctx.lineWidth = 10;
+                ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
-                // Marco Neón
-                const borderGeo = new THREE.EdgesGeometry(planeGeo);
-                const borderMat = new THREE.LineBasicMaterial({ color: data.color, linewidth: 3 });
-                const border = new THREE.LineSegments(borderGeo, borderMat);
-                screenGroup.add(border);
+                // Texto de la pantalla
+                ctx.fillStyle = '#00ffff';
+                ctx.font = 'bold 36px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText(screenTitles[i], canvas.width / 2, 90);
 
-                // Texto flotante de la pantalla
-                const loaderFont = new THREE.FontLoader();
-                loaderFont.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
-                    const textGeo = new THREE.TextGeometry(data.title, {
-                        font: font, size: 0.35, height: 0.08
-                    });
-                    textGeo.computeBoundingBox();
-                    const textOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
-                    const textMat = new THREE.MeshBasicMaterial({ color: data.color });
-                    const textMesh = new THREE.Mesh(textGeo, textMat);
-                    textMesh.position.set(textOffset, 1.3, 0);
-                    screenGroup.add(textMesh);
-                });
+                ctx.fillStyle = '#ff00ff';
+                ctx.font = 'bold 24px Inter';
+                ctx.fillText('▶ REPRODUCIR VR', canvas.width / 2, 170);
 
-                plane.userData = { videoKey: data.key };
-                interactiveScreens.push(plane);
-                vrRoomScene.add(screenGroup);
-            });
+                const texture = new THREE.CanvasTexture(canvas);
+                const planeGeo = new THREE.PlaneGeometry(3.6, 2.0);
+                const planeMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+                const screenMesh = new THREE.Mesh(planeGeo, planeMat);
+
+                screenMesh.position.set(x, 0.5, z);
+                screenMesh.lookAt(0, 0.5, 0); // Apuntar hacia el centro (usuario)
+                screenMesh.userData = { videoKey: videoKeys[i] };
+                
+                vrRoomScene.add(screenMesh);
+                interactiveScreens.push(screenMesh);
+            }
+
+            // Eventos de control táctil y mouse para arrastrar y mirar en 360°
+            const domElem = vrRoomContainer;
+            domElem.addEventListener('mousedown', onPointerDown);
+            window.addEventListener('mousemove', onPointerMove);
+            window.addEventListener('mouseup', onPointerUp);
+
+            domElem.addEventListener('touchstart', onTouchStart, { passive: false });
+            window.addEventListener('touchmove', onTouchMove, { passive: false });
+            window.addEventListener('touchend', onTouchEnd);
+        }
+
+        function enterVRProgramsRoom() {
+            isInVRRoom = true;
+            multiverseMenu.style.opacity = '0';
+            multiverseMenu.style.pointerEvents = 'none';
+            envContainer.style.opacity = '0';
+            envContainer.style.pointerEvents = 'none';
+
+            if (!vrRoomScene) {
+                initVRProgramsRoom();
+            }
+
+            vrRoomContainer.style.opacity = '1';
+            vrRoomContainer.style.pointerEvents = 'auto';
+            backToMenuBtn.style.display = 'block';
+            touchInstruction.style.display = 'block';
         }
 
         function returnToMultiverse() {
@@ -444,102 +440,89 @@
             vrRoomContainer.style.opacity = '0';
             vrRoomContainer.style.pointerEvents = 'none';
             backToMenuBtn.style.display = 'none';
-            gyroBtn.style.display = 'none';
             touchInstruction.style.display = 'none';
-            vrBtn.style.display = 'block';
+
+            envContainer.style.opacity = '1';
+            envContainer.style.pointerEvents = 'auto';
             multiverseMenu.style.opacity = '1';
             multiverseMenu.style.pointerEvents = 'auto';
-            envContainer.style.opacity = '1';
-            
-            if (vrRoomContainer.firstChild) {
-                vrRoomContainer.removeChild(vrRoomContainer.firstChild);
-            }
         }
 
-        function toggleGyroscope() {
-            isGyroActive = !isGyroActive;
-            if (isGyroActive) {
-                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    DeviceOrientationEvent.requestPermission().then(response => {
-                        if (response === 'granted') {
-                            window.addEventListener('deviceorientation', handleOrientation, true);
-                            gyroBtn.innerText = "Giroscopio: ON";
-                            gyroBtn.classList.add('active');
-                        } else {
-                            alert("Permiso de giroscopio denegado");
-                            isGyroActive = false;
-                        }
-                    }).catch(() => {
-                        isGyroActive = false;
-                    });
-                } else {
-                    window.addEventListener('deviceorientation', handleOrientation, true);
-                    gyroBtn.innerText = "Giroscopio: ON";
-                    gyroBtn.classList.add('active');
-                }
-            } else {
-                window.removeEventListener('deviceorientation', handleOrientation, true);
-                gyroBtn.innerText = "Giroscopio: OFF";
-                gyroBtn.classList.remove('active');
-            }
-        }
-
-        // Listeners de arrastre táctil / mouse para la Sala VR 360
-        window.addEventListener('mousedown', (e) => {
-            if (!isInVRRoom) return;
+        // Manejo de interacción de arrastre 360°
+        function onPointerDown(e) {
             isDragging = true;
             previousMousePosition = { x: e.clientX, y: e.clientY };
-        });
+        }
 
-        window.addEventListener('mousemove', (e) => {
-            if (!isInVRRoom || !isDragging || isGyroActive) return;
+        function onPointerMove(e) {
+            if (!isDragging || !isInVRRoom) return;
             const deltaX = e.clientX - previousMousePosition.x;
             const deltaY = e.clientY - previousMousePosition.y;
 
-            targetLon -= deltaX * 0.3;
-            targetLat += deltaY * 0.3;
+            targetLon -= deltaX * 0.4;
+            targetLat += deltaY * 0.4;
             targetLat = Math.max(-85, Math.min(85, targetLat));
 
             previousMousePosition = { x: e.clientX, y: e.clientY };
-        });
+        }
 
-        window.addEventListener('mouseup', () => { isDragging = false; });
+        function onPointerUp(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            // Verificar si fue un clic corto para seleccionar una pantalla
+            checkScreenClick(e.clientX, e.clientY);
+        }
 
-        window.addEventListener('touchstart', (e) => {
-            if (!isInVRRoom || e.touches.length !== 1) return;
-            isDragging = true;
-            previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        }, { passive: true });
+        let touchStartX = 0, touchStartY = 0;
+        function onTouchStart(e) {
+            if (e.touches.length === 1) {
+                isDragging = true;
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                previousMousePosition = { x: touchStartX, y: touchStartY };
+            }
+        }
 
-        window.addEventListener('touchmove', (e) => {
-            if (!isInVRRoom || !isDragging || isGyroActive || e.touches.length !== 1) return;
-            const deltaX = e.touches[0].clientX - previousMousePosition.x;
-            const deltaY = e.touches[0].clientY - previousMousePosition.y;
+        function onTouchMove(e) {
+            if (!isDragging || !isInVRRoom || e.touches.length !== 1) return;
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const deltaX = currentX - previousMousePosition.x;
+            const deltaY = currentY - previousMousePosition.y;
 
-            targetLon -= deltaX * 0.3;
-            targetLat += deltaY * 0.3;
+            targetLon -= deltaX * 0.5;
+            targetLat += deltaY * 0.5;
             targetLat = Math.max(-85, Math.min(85, targetLat));
 
-            previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        }, { passive: true });
+            previousMousePosition = { x: currentX, y: currentY };
+        }
 
-        window.addEventListener('touchend', () => { isDragging = false; });
+        function onTouchEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            if (e.changedTouches.length > 0) {
+                checkScreenClick(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+            }
+        }
 
-        // Raycaster para detectar clics en pantallas 360
+        // Raycaster para detectar clics en pantallas 3D
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
 
-        window.addEventListener('click', (e) => {
-            if (!isInVRRoom) return;
-            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        function checkScreenClick(clientX, clientY) {
+            mouse.x = (clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+
             raycaster.setFromCamera(mouse, vrRoomCamera);
             const intersects = raycaster.intersectObjects(interactiveScreens);
+
             if (intersects.length > 0) {
-                const videoKey = intersects[0].object.userData.videoKey;
-                if (videoKey) openVideo(videoKey);
+                const selectedScreen = intersects[0].object;
+                const videoKey = selectedScreen.userData.videoKey;
+                openVideo(videoKey);
             }
-        });
+        }
 
         function handleOrientation(event) {
             const alpha = event.alpha ? THREE.MathUtils.degToRad(event.alpha) : 0;
@@ -556,34 +539,38 @@
                 planet.rotation.x += 0.003;
                 textGroup.rotation.y += 0.006;
                 renderer.render(scene, camera);
-            } else {
-                if (isInVRRoom) {
-                    if (vrRoomStars) vrRoomStars.rotation.y += 0.0005;
-                    if (isGyroActive) {
-                        vrRoomCamera.quaternion.slerp(targetQuaternion, 0.1);
-                    } else {
-                        cameraLon += (targetLon - cameraLon) * 0.1;
-                        cameraLat += (targetLat - cameraLat) * 0.1;
-                        const phi = THREE.MathUtils.degToRad(90 - cameraLat);
-                        const theta = THREE.MathUtils.degToRad(cameraLon);
-                        const targetLookAt = new THREE.Vector3(
-                            Math.sin(phi) * Math.sin(theta),
-                            Math.cos(phi),
-                            Math.sin(phi) * Math.cos(theta)
-                        ).add(vrRoomCamera.position);
-                        vrRoomCamera.lookAt(targetLookAt);
-                    }
-                    vrRoomRenderer.render(vrRoomScene, vrRoomCamera);
+            } else if (isInVRRoom) {
+                // Actualizar rotación de cámara 360° mediante arrastre
+                cameraLon += (targetLon - cameraLon) * 0.1;
+                cameraLat += (targetLat - cameraLat) * 0.1;
+
+                const phi = THREE.MathUtils.degToRad(90 - cameraLat);
+                const theta = THREE.MathUtils.degToRad(cameraLon);
+
+                const targetLookAt = new THREE.Vector3(
+                    Math.sin(phi) * Math.sin(theta),
+                    Math.cos(phi),
+                    Math.sin(phi) * Math.cos(theta)
+                );
+                vrRoomCamera.lookAt(targetLookAt);
+
+                if(vrRoomStars) vrRoomStars.rotation.y += 0.0005;
+
+                if (isVRMode) {
+                    renderVRRoomStereo();
                 } else {
-                    if (stars) stars.rotation.y += 0.0005;
-                    internalCamera.quaternion.slerp(targetQuaternion, 0.1);
-                    
-                    if (isVRMode) {
-                        renderVR();
-                    } else {
-                        internalRenderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-                        internalRenderer.render(internalScene, internalCamera);
-                    }
+                    vrRoomRenderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+                    vrRoomRenderer.render(vrRoomScene, vrRoomCamera);
+                }
+            } else {
+                if(stars) stars.rotation.y += 0.0005;
+                internalCamera.quaternion.slerp(targetQuaternion, 0.1);
+                
+                if (isVRMode) {
+                    renderVR();
+                } else {
+                    internalRenderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+                    internalRenderer.render(internalScene, internalCamera);
                 }
             }
         }
@@ -603,10 +590,26 @@
             internalRenderer.setScissorTest(false);
         }
 
+        function renderVRRoomStereo() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            
+            vrRoomRenderer.setViewport(0, 0, width / 2, height);
+            vrRoomRenderer.setScissor(0, 0, width / 2, height);
+            vrRoomRenderer.setScissorTest(true);
+            vrRoomRenderer.render(vrRoomScene, vrRoomCamera);
+            
+            vrRoomRenderer.setViewport(width / 2, 0, width / 2, height);
+            vrRoomRenderer.setScissor(width / 2, 0, width / 2, height);
+            vrRoomRenderer.render(vrRoomScene, vrRoomCamera);
+            vrRoomRenderer.setScissorTest(false);
+        }
+
         animate();
 
         async function startExperience() {
             if (isSystemActive) return;
+            window.addEventListener('deviceorientation', handleOrientation, true);
             document.getElementById('instruction').style.opacity = '0';
             
             gsap.to(camera.position, { z: -1.5, duration: 2.2, ease: "power2.inOut", onComplete: () => {
@@ -623,12 +626,8 @@
             vrBtn.innerText = isVRMode ? "Salir de VR" : "Ver en VR";
         });
 
-        window.addEventListener('click', (e) => {
-            if (!isSystemActive && !e.target.closest('button')) startExperience();
-        });
-        window.addEventListener('touchend', (e) => {
-            if (!isSystemActive && !e.target.closest('button')) startExperience();
-        });
+        window.addEventListener('click', startExperience);
+        window.addEventListener('touchend', startExperience);
     </script>
 </body>
 </html>
