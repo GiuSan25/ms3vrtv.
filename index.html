@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MS3 - Interfaz Multiverso Idéntica</title>
+    <title>MS3 - Multiverso Inmersivo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -19,7 +19,6 @@
             transition: opacity 0.5s; padding: 0 20px;
         }
 
-        /* Contenedor principal de la interfaz idéntico en móvil y PC usando flex-shrink y min-width fijo proporcional */
         #ui-interface {
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10;
             background: radial-gradient(circle at center, #0a0618 0%, #030108 100%);
@@ -27,7 +26,6 @@
             overflow-x: auto; overflow-y: auto; display: flex; justify-content: center; padding: 30px 15px;
         }
 
-        /* Estructura fija de escritorio forzada para mantener la misma distribución idéntica en pantallas pequeñas */
         .desktop-canvas-frame {
             width: 1200px;
             min-width: 1200px;
@@ -298,6 +296,7 @@
             isSystemActive = true;
             instruction.style.opacity = '0';
             
+            // Efecto original: la cámara se adentra y atraviesa la esfera tridimensionalmente
             gsap.to(camera.position, { z: -1.5, duration: 1.5, ease: "power2.inOut", onComplete: () => {
                 container.style.display = 'none';
                 uiInterface.style.opacity = '1';
