@@ -36,8 +36,9 @@
         /* Botón para volver al menú principal desde la sala VR */
         #back-to-menu-btn {
             position: absolute; top: 20px; left: 20px; z-index: 20;
-            padding: 12px 20px; background: rgba(0,0,0,0.8); color: #ff00ff;
-            border: 2px solid #ff00ff; border-radius: 8px; font-weight: bold;
+            padding: 8px 14px; background: rgba(0,0,0,0.8); color: #ff00ff;
+            border: 2px solid #ff00ff; border-radius: 6px; font-weight: bold;
+            font-size: 0.85rem;
             text-transform: uppercase; letter-spacing: 1px;
             box-shadow: 0 0 10px #ff00ff;
             cursor: pointer; transition: all 0.3s;
@@ -178,7 +179,7 @@
 <body>
 
     <button id="vr-btn" style="display: none;">Ver en VR</button>
-    <button id="back-to-menu-btn" onclick="returnToMultiverse()">← Volver al Multiverso</button>
+    <button id="back-to-menu-btn" onclick="returnToMultiverse()">← Volver</button>
     <div id="instruction">Presiona la esfera para ingresar al multiverso MS3</div>
     <div id="touch-instruction">💡 Arrastra con el dedo o mouse para girar en 360° y explorar las pantallas</div>
     
@@ -331,7 +332,6 @@
             stars = new THREE.Points(starGeometry, starMaterial);
             internalScene.add(stars);
 
-            // Se removieron los cuadrados violetas flotantes (plantilla wireframe) para dejar el entorno limpio con estrellas espaciales.
             vrBtn.style.display = 'block';
             multiverseMenu.style.opacity = '1';
             multiverseMenu.style.pointerEvents = 'auto';
@@ -347,7 +347,6 @@
             vrRoomRenderer.setClearColor(0x000000, 0);
             vrRoomContainer.appendChild(vrRoomRenderer.domElement);
 
-            // Estrellas de fondo inmersivas
             const starGeo = new THREE.BufferGeometry();
             const starMat = new THREE.PointsMaterial({ color: 0xff00ff, size: 0.2 });
             const positions = new Float32Array(6000);
@@ -356,11 +355,9 @@
             vrRoomStars = new THREE.Points(starGeo, starMat);
             vrRoomScene.add(vrRoomStars);
 
-            // Luz ambiental para la sala VR
             const ambient = new THREE.AmbientLight(0xffffff, 2.0);
             vrRoomScene.add(ambient);
 
-            // Crear 4 pantallas panorámicas alrededor en círculo (360 grados)
             interactiveScreens = [];
             const radius = 6;
             const videoKeys = ['vr1', 'vr2', 'vr3', 'vr4'];
@@ -371,20 +368,17 @@
                 const x = Math.sin(angle) * radius;
                 const z = Math.cos(angle) * radius;
 
-                // Crear textura canvas simulando pantalla con interfaz neón
                 const canvas = document.createElement('canvas');
                 canvas.width = 512;
                 canvas.height = 256;
                 const ctx = canvas.getContext('2d');
                 
-                // Fondo de pantalla
                 ctx.fillStyle = '#0a0a23';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.strokeStyle = '#00ffff';
                 ctx.lineWidth = 10;
                 ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
-                // Texto de la pantalla
                 ctx.fillStyle = '#00ffff';
                 ctx.font = 'bold 36px Inter';
                 ctx.textAlign = 'center';
@@ -400,14 +394,13 @@
                 const screenMesh = new THREE.Mesh(planeGeo, planeMat);
 
                 screenMesh.position.set(x, 0.5, z);
-                screenMesh.lookAt(0, 0.5, 0); // Apuntar hacia el centro (usuario)
+                screenMesh.lookAt(0, 0.5, 0);
                 screenMesh.userData = { videoKey: videoKeys[i] };
                 
                 vrRoomScene.add(screenMesh);
                 interactiveScreens.push(screenMesh);
             }
 
-            // Eventos de control táctil y mouse para arrastrar y mirar en 360°
             const domElem = vrRoomContainer;
             domElem.addEventListener('mousedown', onPointerDown);
             window.addEventListener('mousemove', onPointerMove);
@@ -448,7 +441,6 @@
             multiverseMenu.style.pointerEvents = 'auto';
         }
 
-        // Manejo de interacción de arrastre 360°
         function onPointerDown(e) {
             isDragging = true;
             previousMousePosition = { x: e.clientX, y: e.clientY };
@@ -469,8 +461,6 @@
         function onPointerUp(e) {
             if (!isDragging) return;
             isDragging = false;
-            
-            // Verificar si fue un clic corto para seleccionar una pantalla
             checkScreenClick(e.clientX, e.clientY);
         }
 
@@ -506,7 +496,6 @@
             }
         }
 
-        // Raycaster para detectar clics en pantallas 3D
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
 
@@ -540,7 +529,6 @@
                 textGroup.rotation.y += 0.006;
                 renderer.render(scene, camera);
             } else if (isInVRRoom) {
-                // Actualizar rotación de cámara 360° mediante arrastre
                 cameraLon += (targetLon - cameraLon) * 0.1;
                 cameraLat += (targetLat - cameraLat) * 0.1;
 
