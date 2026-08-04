@@ -54,16 +54,16 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         container.appendChild(renderer.domElement);
 
-        // Iluminación para dar efecto de brillo y reflejo tipo vidrio en 3D
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
+        // Iluminación intensa para resaltar el efecto espejo reflectivo y los bordes neón
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.8);
         scene.add(ambientLight);
 
-        const pointLight1 = new THREE.PointLight(0xff00ff, 3, 50);
-        pointLight1.position.set(5, 5, 5);
+        const pointLight1 = new THREE.PointLight(0xff00ff, 4, 60);
+        pointLight1.position.set(6, 6, 6);
         scene.add(pointLight1);
 
-        const pointLight2 = new THREE.PointLight(0x00ffff, 3, 50);
-        pointLight2.position.set(-5, -5, 5);
+        const pointLight2 = new THREE.PointLight(0x00ffff, 4, 60);
+        pointLight2.position.set(-6, -6, 6);
         scene.add(pointLight2);
 
         // Esfera con líneas densas posicionada abajo
@@ -79,7 +79,7 @@
         planet.position.y = -1.5;
         planetGroup.add(planet);
 
-        // Grupo para el Texto 3D MS3 con acabado brillante tipo vidrio/degradé
+        // Grupo para el Texto 3D MS3 con acabado espejo y bordes neón
         const textGroup = new THREE.Group();
         textGroup.position.y = 0.8;
 
@@ -88,7 +88,7 @@
             const textGeo = new THREE.TextGeometry('MS3', {
                 font: font,
                 size: 1.2,
-                height: 0.4, // Grosor 3D pronunciado
+                height: 0.4,
                 curveSegments: 12,
                 bevelEnabled: true,
                 bevelThickness: 0.08,
@@ -100,22 +100,31 @@
             textGeo.computeBoundingBox();
             const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
             
-            // Material con propiedades físicas (MeshPhysicalMaterial) para simular vidrio brillante y efecto reflectivo/degradé
-            const textMaterial = new THREE.MeshPhysicalMaterial({ 
-                color: 0xff00aa,
-                metalness: 0.1,
-                roughness: 0.1,
-                transmission: 0.6, // Efecto translúcido tipo vidrio
-                thickness: 1.2,
-                clearcoat: 1.0,     // Brillo superficial extra
-                clearcoatRoughness: 0.1,
-                transparent: true,
-                opacity: 0.95
+            // Núcleo reflectivo estilo espejo pulido
+            const mirrorMaterial = new THREE.MeshPhysicalMaterial({ 
+                color: 0xffffff,
+                metalness: 0.9,
+                roughness: 0.05,
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.05,
+                reflectivity: 1.0
             });
             
-            const textMesh = new THREE.Mesh(textGeo, textMaterial);
+            const textMesh = new THREE.Mesh(textGeo, mirrorMaterial);
             textMesh.position.x = centerOffset;
             textGroup.add(textMesh);
+
+            // Capa externa estilo borde neón brillante para máxima visibilidad en 360°
+            const neonBorderMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00ffff,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.7
+            });
+            const borderMesh = new THREE.Mesh(textGeo, neonBorderMaterial);
+            borderMesh.position.x = centerOffset;
+            borderMesh.scale.set(1.02, 1.02, 1.02); // Ligeramente más grande para crear el contorno neón
+            textGroup.add(borderMesh);
         });
 
         scene.add(planetGroup);
