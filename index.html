@@ -172,29 +172,29 @@
                     const bGeo = new THREE.TextGeometry(data.text, {
                         font: font, 
                         size: 0.28, 
-                        height: 0.05, 
+                        height: 0.06, 
                         curveSegments: 12, 
                         bevelEnabled: true, 
-                        bevelThickness: 0.01, 
-                        bevelSize: 0.01, 
-                        bevelSegments: 3
+                        bevelThickness: 0.015, 
+                        bevelSize: 0.015, 
+                        bevelSegments: 4
                     });
                     bGeo.computeBoundingBox();
                     const bOffset = -0.5 * (bGeo.boundingBox.max.x - bGeo.boundingBox.min.x);
                     
                     const buttonGroup = new THREE.Group();
 
-                    // Relleno sólido brillante con MeshPhongMaterial
+                    // Relleno sólido brillante con luz propia (Phong)
                     const fillMat = new THREE.MeshPhongMaterial({ 
                         color: data.color, 
                         emissive: data.emissive,
-                        emissiveIntensity: 0.8,
-                        shininess: 100
+                        emissiveIntensity: 0.9,
+                        shininess: 120
                     });
                     const fillMesh = new THREE.Mesh(bGeo, fillMat);
                     buttonGroup.add(fillMesh);
 
-                    // Borde neón exterior escalado para envolver las letras con contraste puro y legibilidad total
+                    // Borde / Contorno de neón tridimensional de alto contraste y brillo envolvente
                     const neonOutlineMat = new THREE.MeshBasicMaterial({ 
                         color: 0xffffff, 
                         wireframe: true, 
@@ -202,7 +202,7 @@
                         opacity: 0.95 
                     });
                     const outlineMesh = new THREE.Mesh(bGeo, neonOutlineMat);
-                    outlineMesh.scale.set(1.04, 1.04, 1.15);
+                    outlineMesh.scale.set(1.05, 1.05, 1.2);
                     buttonGroup.add(outlineMesh);
 
                     buttonGroup.position.set(bOffset, data.y, data.z);
