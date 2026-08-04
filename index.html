@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MS3 - Universo 360 Neón Inmersivo</title>
+    <title>MS3 - Universo 360 Inmersivo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -19,7 +19,7 @@
             transition: opacity 0.5s; padding: 0 20px;
         }
 
-        /* Contenedor del panel flotante 3D / HTML superpuesto en el universo 360 */
+        /* Contenedor del panel flotante dentro del universo 360 */
         #ui-interface {
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10;
             opacity: 0; pointer-events: none; transition: opacity 1s ease;
@@ -76,10 +76,10 @@
 </head>
 <body>
 
-    <div id="instruction">Presiona la esfera para ingresar al universo 360 MS3</div>
+    <div id="instruction">Presiona la esfera para ingresar al multiverso MS3</div>
     <div id="webgl-container"></div>
 
-    <!-- Panel Flotante Identico dentro del Universo 360 -->
+    <!-- Panel Flotante Identico con el Contenido de la Interfaz -->
     <div id="ui-interface">
         <div class="desktop-canvas-frame">
             
@@ -227,7 +227,7 @@
         const activeVideo = document.getElementById('active-video');
 
         let isSystemActive = false;
-        let scene, camera, renderer, planet, textGroup, planetGroup, universeSphere, neonGrid;
+        let scene, camera, renderer, planet, textGroup, planetGroup, universeSphere, starField;
 
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -245,52 +245,49 @@
         pointLight2.position.set(-6, -6, 6);
         scene.add(pointLight2);
 
-        // --- CREACIÓN DEL UNIVERSO 360 ESTRELLADO CON EFECTOS NEÓN ---
-        // 1. Esfera gigante invertida con estrellas y paredes holográficas neón
-        const universeGeo = new THREE.SphereGeometry(60, 32, 32);
+        // --- UNIVERSO 360 ESTRELLADO Y PAREDES NEÓN ---
+        const universeGeo = new THREE.SphereGeometry(70, 32, 32);
         const universeMat = new THREE.MeshBasicMaterial({
-            color: 0x05021a,
-            side: THREE.BackSide,
-            wireframe: false
+            color: 0x030112,
+            side: THREE.BackSide
         });
         universeSphere = new THREE.Mesh(universeGeo, universeMat);
         scene.add(universeSphere);
 
-        // Estrellas y partículas de neón flotantes en el universo 360
+        // Estrellas / partículas de neón distribuidas 360°
         const starsGeo = new THREE.BufferGeometry();
-        const starsCount = 1500;
+        const starsCount = 2000;
         const starPositions = new Float32Array(starsCount * 3);
         const starColors = new Float32Array(starsCount * 3);
 
         for(let i = 0; i < starsCount * 3; i += 3) {
-            starPositions[i] = (Math.random() - 0.5) * 100;
-            starPositions[i+1] = (Math.random() - 0.5) * 100;
-            starPositions[i+2] = (Math.random() - 0.5) * 100;
+            starPositions[i] = (Math.random() - 0.5) * 120;
+            starPositions[i+1] = (Math.random() - 0.5) * 120;
+            starPositions[i+2] = (Math.random() - 0.5) * 120;
 
-            // Alternar colores entre cian neón y magenta neón
             if(Math.random() > 0.5) {
-                starColors[i] = 0; starColors[i+1] = 0.94; starColors[i+2] = 1; // Cian
+                starColors[i] = 0; starColors[i+1] = 0.94; starColors[i+2] = 1; // Cian neón
             } else {
-                starColors[i] = 0.94; starColors[i+1] = 0; starColors[i+2] = 1; // Magenta
+                starColors[i] = 0.94; starColors[i+1] = 0; starColors[i+2] = 1; // Magenta neón
             }
         }
         starsGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
         starsGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
-        const starsMat = new THREE.PointsMaterial({ size: 0.7, vertexColors: true, transparent: true, opacity: 0.8 });
-        const starField = new THREE.Points(starsGeo, starsMat);
+        const starsMat = new THREE.PointsMaterial({ size: 0.8, vertexColors: true, transparent: true, opacity: 0.85 });
+        starField = new THREE.Points(starsGeo, starsMat);
         scene.add(starField);
 
-        // 2. Grid de celdas neón en estilo cúpula / paredes del universo
-        const gridHelper = new THREE.GridHelper(120, 40, 0x00ffff, 0xff00ff);
-        gridHelper.position.y = -15;
-        scene.add(gridHelper);
+        // Rejillas de luz neón superior e inferior estilo cúpula cibernética
+        const floorGrid = new THREE.GridHelper(140, 45, 0x00ffff, 0xff00ff);
+        floorGrid.position.y = -20;
+        scene.add(floorGrid);
 
-        const ceilingGrid = new THREE.GridHelper(120, 40, 0xff00ff, 0x00ffff);
-        ceilingGrid.position.y = 15;
+        const ceilingGrid = new THREE.GridHelper(140, 45, 0xff00ff, 0x00ffff);
+        ceilingGrid.position.y = 20;
         scene.add(ceilingGrid);
 
-        // --- OBJETO INICIAL: ESFERA MS3 ---
+        // --- ESFERA INICIAL MS3 ---
         planetGroup = new THREE.Group();
         const planetGeometry = new THREE.IcosahedronGeometry(1.4, 4); 
         const planetMaterial = new THREE.MeshBasicMaterial({ 
@@ -337,10 +334,9 @@
             planet.rotation.x += 0.003;
             textGroup.rotation.y += 0.006;
             
-            // Rotación suave del universo 360 si ya ingresamos
             if (isSystemActive) {
-                starField.rotation.y += 0.0005;
-                universeSphere.rotation.y += 0.0002;
+                starField.rotation.y += 0.0004;
+                universeSphere.rotation.y += 0.0001;
             }
 
             renderer.render(scene, camera);
@@ -352,13 +348,12 @@
             isSystemActive = true;
             instruction.style.opacity = '0';
             
-            // Efecto inmersivo: Atraviesa la esfera y entra al universo 360 estelar
+            // Efecto de inmersión: la cámara atraviesa físicamente el interior de la esfera hacia el universo 360
             gsap.to(camera.position, { z: -1.5, duration: 1.5, ease: "power2.inOut", onComplete: () => {
-                // Ocultamos la esfera inicial pero mantenemos el renderer para el fondo 360 y estrellas
                 planetGroup.visible = false;
                 textGroup.visible = false;
                 
-                // Hacemos interactivo el panel flotante gigante con el contenido exacto
+                // Muestra la interfaz idéntica flotando en el universo estelar neón
                 uiInterface.style.opacity = '1';
                 uiInterface.style.pointerEvents = 'auto';
             }});
