@@ -116,6 +116,58 @@
             animation: none;
         }
 
+        #video-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        #video-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            position: relative;
+            width: 85%;
+            max-width: 900px;
+            background: #0a0a16;
+            border: 2px solid #0ff;
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            padding: 20px;
+        }
+        .close-modal {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            background: #ff00ff;
+            color: #fff;
+            border: 2px solid #fff;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 0 10px #ff00ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .close-modal:hover { background: #fff; color: #ff00ff; }
+        
+        video {
+            width: 100%;
+            border-radius: 8px;
+            outline: none;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+
         #touch-instruction {
             position: absolute; bottom: 20px; width: 100%; text-align: center; color: #0ff; z-index: 20;
             font-size: 0.9rem; pointer-events: none; text-shadow: 0 0 8px #0ff; display: none; font-weight: 500;
@@ -133,7 +185,19 @@
     <div id="multiverse-menu">
         <button class="neon-flat-btn" onclick="enterVRProgramsRoom()">Ver Programas VR</button>
         <button class="neon-flat-btn" onclick="enter2DProgramsRoom()">Ver Programas 2D</button>
-        <button class="neon-flat-btn" onclick="openVideoInVR('live', null)">Ver en Vivo</button>
+        <button class="neon-flat-btn" onclick="openVideo('live')">Ver en Vivo</button>
+    </div>
+
+    <!-- Modal de Video Estándar -->
+    <div id="video-modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeVideo()">×</button>
+            <h3 id="modal-title" style="color: #0ff; text-align: center; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px #0ff;">Reproductor MS3</h3>
+            <video id="multiverse-video" controls autoplay>
+                <source id="video-source" src="" type="video/mp4">
+                Tu navegador no soporta videos HTML5.
+            </video>
+        </div>
     </div>
 
     <div id="webgl-container"></div>
@@ -149,6 +213,10 @@
         const vrBtn = document.getElementById('vr-btn');
         const backToMenuBtn = document.getElementById('back-to-menu-btn');
         const multiverseMenu = document.getElementById('multiverse-menu');
+        const videoModal = document.getElementById('video-modal');
+        const multiverseVideo = document.getElementById('multiverse-video');
+        const videoSource = document.getElementById('video-source');
+        const modalTitle = document.getElementById('modal-title');
         const touchInstruction = document.getElementById('touch-instruction');
 
         let isSystemActive = false;
@@ -170,53 +238,29 @@
             'vr2': { title: 'Experiencia Inmersiva VR 2', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
             'vr3': { title: 'Experiencia Inmersiva VR 3', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4' },
             'vr4': { title: 'Experiencia Inmersiva VR 4', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4' },
-            '2d_1': { title: 'EDICIÓN ESTELAR', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4' },
-            '2d_2': { title: 'DOCUMENTAL MS3', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
-            '2d_3': { title: 'VARIEDADES', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4' },
-            '2d_4': { title: 'SERIE ORIGINAL', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4' },
-            '2d_5': { title: 'CORTOMETRAJE', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4' },
-            '2d_6': { title: 'SHOW EN VIVO', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
-            '2d_7': { title: 'MUSICAL EXCLUSIVO', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4' },
-            '2d_8': { title: 'ENTREVISTA VIP', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4' },
-            '2d_9': { title: 'TEATRO EN VIVO', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4' },
-            '2d_10': { title: 'BACKSTAGE MS3', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
-            '2d_11': { title: 'TROPIC LA REVISTA', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4' },
-            '2d_12': { title: 'ESPECIAL NOCTURNO', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4' },
+            '2d_1': { title: 'Programa 2D - Edición Estelar', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4' },
+            '2d_2': { title: 'Programa 2D - Documental MS3', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
+            '2d_3': { title: 'Programa 2D - Especial de Variedades', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4' },
+            '2d_4': { title: 'Programa 2D - Serie Original', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4' },
+            '2d_5': { title: 'Programa 2D - Cortometraje Exclusivo', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4' },
             'live': { title: 'Transmisión en Vivo - Canal MS3', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' }
         };
 
-        // Reproductor de video integrado en el entorno 3D (Textura de video en la malla)
-        let activeVideoElement = null;
-        let activeVideoTexture = null;
-
-        function openVideoInVR(videoKey, meshToReplace) {
-            const data = videoLibrary[videoKey];
-            if (!data) return;
-
-            // Si ya hay un elemento de video reproduciéndose, pausarlo
-            if (activeVideoElement) {
-                activeVideoElement.pause();
-                activeVideoElement.remove();
+        function openVideo(type) {
+            const data = videoLibrary[type];
+            if (data) {
+                modalTitle.innerText = data.title;
+                videoSource.src = data.url;
+                multiverseVideo.load();
+                videoModal.classList.add('active');
+                multiverseVideo.play().catch(e => console.log("Reproducción automática bloqueada:", e));
             }
+        }
 
-            const video = document.createElement('video');
-            video.src = data.url;
-            video.crossOrigin = 'anonymous';
-            video.loop = true;
-            video.muted = false; // Permitir audio
-            video.playsInline = true;
-            video.autoplay = true;
-            video.play().catch(e => console.log("Reproducción automática bloqueada, se requiere interacción:", e));
-
-            activeVideoElement = video;
-            activeVideoTexture = new THREE.VideoTexture(video);
-            activeVideoTexture.minFilter = THREE.LinearFilter;
-            activeVideoTexture.magFilter = THREE.LinearFilter;
-
-            if (meshToReplace) {
-                meshToReplace.material.map = activeVideoTexture;
-                meshToReplace.material.needsUpdate = true;
-            }
+        function closeVideo() {
+            multiverseVideo.pause();
+            videoSource.src = "";
+            videoModal.classList.remove('active');
         }
 
         // Escena Principal 1: Esfera inicial MS3
@@ -362,7 +406,7 @@
             setupControls(vrRoomContainer);
         }
 
-        // Sala 360° Programas 2D: Múltiples pantallas muy juntas, distribuidas en 360° y distintas alturas
+        // Nueva Sala 360° Programas 2D (Con pantallas de distintos tamaños en todas partes)
         let interactiveScreens2D = [];
         function init2DProgramsRoom() {
             tdRoomScene = new THREE.Scene();
@@ -384,21 +428,18 @@
 
             interactiveScreens2D = [];
             
-            // 12 pantallas distribuidas de forma compacta (más juntas) en 360 grados y con alturas escalonadas
-            const totalScreens = 12;
-            const radius = 5.2; // Cercanas al usuario
+            // Configuración de múltiples pantallas de tamaños variables distribuidas en 360 grados y distintas alturas
+            const screensData = [
+                { key: '2d_1', title: 'EDICIÓN ESTELAR', width: 4.5, height: 2.5, angle: 0, y: 1.0, distance: 7 },
+                { key: '2d_2', title: 'DOCUMENTAL MS3', width: 2.8, height: 3.5, angle: 1.25, y: -0.5, distance: 6 },
+                { key: '2d_3', title: 'VARIEDADES', width: 3.2, height: 1.8, angle: 2.5, y: 2.0, distance: 6.5 },
+                { key: '2d_4', title: 'SERIE ORIGINAL', width: 5.0, height: 2.2, angle: 3.75, y: -1.2, distance: 7.5 },
+                { key: '2d_5', title: 'CORTOMETRAJE', width: 2.5, height: 2.5, angle: 5.0, y: 0.2, distance: 5.5 }
+            ];
 
-            for (let i = 1; i <= totalScreens; i++) {
-                const angle = (i / totalScreens) * Math.PI * 2;
-                // Alturas alternadas (niveles superior, medio e inferior)
-                const yOffset = (i % 3 === 0) ? 1.4 : ((i % 3 === 1) ? -1.0 : 0.2);
-                
-                // Variaciones de tamaño para dinamismo
-                const wSize = 2.4 + (i % 3) * 0.5;
-                const hSize = 1.4 + (i % 2) * 0.4;
-
-                const x = Math.sin(angle) * radius;
-                const z = Math.cos(angle) * radius;
+            screensData.forEach(data => {
+                const x = Math.sin(data.angle) * data.distance;
+                const z = Math.cos(data.angle) * data.distance;
 
                 const canvas = document.createElement('canvas');
                 canvas.width = 512; canvas.height = 256;
@@ -411,28 +452,26 @@
                 ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
                 ctx.fillStyle = '#ff00ff';
-                ctx.font = 'bold 32px Inter';
+                ctx.font = 'bold 34px Inter';
                 ctx.textAlign = 'center';
-                ctx.fillText(`PROGRAMA 2D #${i < 10 ? '0' + i : i}`, canvas.width / 2, 90);
+                ctx.fillText(data.title, canvas.width / 2, 85);
 
                 ctx.fillStyle = '#00ffff';
-                ctx.font = 'bold 22px Inter';
-                ctx.fillText('▶ REPRODUCIR', canvas.width / 2, 170);
+                ctx.font = 'bold 24px Inter';
+                ctx.fillText('▶ VER PROGRAMA 2D', canvas.width / 2, 175);
 
                 const texture = new THREE.CanvasTexture(canvas);
-                const planeGeo = new THREE.PlaneGeometry(wSize, hSize);
+                const planeGeo = new THREE.PlaneGeometry(data.width, data.height);
                 const planeMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
                 const screenMesh = new THREE.Mesh(planeGeo, planeMat);
 
-                screenMesh.position.set(x, yOffset, z);
-                screenMesh.lookAt(0, yOffset, 0);
-                
-                const videoKeyRef = `2d_${((i - 1) % 5) + 1}`;
-                screenMesh.userData = { videoKey: videoKeyRef };
+                screenMesh.position.set(x, data.y, z);
+                screenMesh.lookAt(0, data.y, 0);
+                screenMesh.userData = { videoKey: data.key };
                 
                 tdRoomScene.add(screenMesh);
                 interactiveScreens2D.push(screenMesh);
-            }
+            });
 
             setupControls(tdRoomContainer);
         }
@@ -468,12 +507,6 @@
         }
 
         function returnToMultiverse() {
-            if (activeVideoElement) {
-                activeVideoElement.pause();
-                activeVideoElement.remove();
-                activeVideoElement = null;
-            }
-
             isInVRRoom = false;
             isIn2DRoom = false;
             vrRoomContainer.style.opacity = '0';
@@ -489,6 +522,7 @@
             multiverseMenu.style.pointerEvents = 'auto';
         }
 
+        // Configuración unificada de eventos táctiles y mouse para las salas 360
         function setupControls(domElem) {
             domElem.addEventListener('mousedown', onPointerDown);
             window.addEventListener('mousemove', onPointerMove);
@@ -572,7 +606,7 @@
             if (intersects.length > 0) {
                 const selectedScreen = intersects[0].object;
                 const videoKey = selectedScreen.userData.videoKey;
-                openVideoInVR(videoKey, selectedScreen);
+                openVideo(videoKey);
             }
         }
 
@@ -586,10 +620,6 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            if (activeVideoTexture) {
-                activeVideoTexture.needsUpdate = true;
-            }
-
             if (!isSystemActive) {
                 planet.rotation.y += 0.008;
                 planet.rotation.x += 0.003;
