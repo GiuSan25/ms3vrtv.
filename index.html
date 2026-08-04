@@ -161,9 +161,6 @@
             multiverseButtonsGroup = new THREE.Group();
             internalScene.add(multiverseButtonsGroup);
 
-            loader.load('https://cdn.jsdelivr.net/npm/the-fonts-json-path-or-helvetiker... /examples/fonts/helvetiker_bold.typeface.json', function (font) {});
-            
-            // Usamos el cargador existente con la fuente predeterminada
             loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
                 const btnData = [
                     { text: "VER PROGRAMAS VR", y: 2.2, z: -3.5, color: 0x00ffff },
@@ -172,7 +169,6 @@
                 ];
 
                 btnData.forEach((data) => {
-                    // Geometría 3D robusta con extrusión (height y bevel) para dar relieve sólido
                     const bGeo = new THREE.TextGeometry(data.text, {
                         font: font, 
                         size: 0.32, 
@@ -186,10 +182,8 @@
                     bGeo.computeBoundingBox();
                     const bOffset = -0.5 * (bGeo.boundingBox.max.x - bGeo.boundingBox.min.x);
                     
-                    // Contenedor individual para cada botón 3D
                     const buttonGroup = new THREE.Group();
 
-                    // Malla principal con material brillante
                     const coreMat = new THREE.MeshStandardMaterial({ 
                         color: data.color, 
                         roughness: 0.2, 
@@ -200,7 +194,11 @@
                     const coreMesh = new THREE.Mesh(bGeo, coreMat);
                     buttonGroup.add(coreMesh);
 
-                    // Malla exterior tipo Borde Neón 3D (Wireframe expandido y brillante)
+                    // Marco o borde tridimensional sólido con relieve alrededor del texto
+                    const boxHelper = new THREE.BoxHelper(coreMesh, data.color);
+                    buttonGroup.add(boxHelper);
+
+                    // Malla exterior tipo Borde Neón 3D
                     const neonBorderMat = new THREE.MeshBasicMaterial({ 
                         color: 0xffffff, 
                         wireframe: true, 
