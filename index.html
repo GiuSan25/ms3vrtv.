@@ -516,17 +516,30 @@
             isSystemActive = true;
             instruction.style.opacity = '0';
             
-            gsap.to(camera.position, { z: 0, duration: 1.5, ease: "power2.inOut", onComplete: () => {
-                planetGroup.visible = false;
-                textGroup.visible = false;
-                
-                uiInterface.style.opacity = '1';
-                uiInterface.style.pointerEvents = 'auto';
-                vrTopControls.style.opacity = '1';
-                vrTopControls.style.pointerEvents = 'auto';
-                vrBottomControls.style.opacity = '1';
-                vrBottomControls.style.pointerEvents = 'auto';
-            }});
+            // Efecto inmersivo: La cámara se acerca y atraviesa la esfera (Z negativo profundo)
+            gsap.to(camera.position, { 
+                z: -3, 
+                duration: 1.6, 
+                ease: "power3.inOut", 
+                onComplete: () => {
+                    planetGroup.visible = false;
+                    textGroup.visible = false;
+                    
+                    // Reiniciamos la posición Z de la cámara a 0 para que el 360 gire correctamente desde el centro del universo
+                    camera.position.z = 0;
+
+                    uiInterface.style.opacity = '1';
+                    uiInterface.style.pointerEvents = 'auto';
+                    vrTopControls.style.opacity = '1';
+                    vrTopControls.style.pointerEvents = 'auto';
+                    vrBottomControls.style.opacity = '1';
+                    vrBottomControls.style.pointerEvents = 'auto';
+                }
+            });
+
+            // Animación extra para expandir/fundir la esfera de bienvenida en el trayecto
+            gsap.to(planet.scale, { x: 4, y: 4, z: 4, duration: 1.2, ease: "power2.in" });
+            gsap.to(planet.material, { opacity: 0, duration: 1.4, ease: "power2.in" });
         }
 
         function exitMultiverse() {
@@ -542,9 +555,13 @@
             vrBottomControls.style.opacity = '0';
             vrBottomControls.style.pointerEvents = 'none';
 
+            // Restauramos la esfera y la escala para el retorno
+            planet.scale.set(1, 1, 1);
+            planet.material.opacity = 0.9;
             planetGroup.visible = true;
             textGroup.visible = true;
             lon = 0; lat = 0;
+            camera.position.z = -3;
 
             gsap.to(camera.position, { z: 5, duration: 1.5, ease: "power2.inOut", onComplete: () => {
                 isSystemActive = false;
