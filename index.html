@@ -13,6 +13,62 @@
         
         #webgl-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 2; cursor: pointer; }
         
+        /* Barra de Controles VR / Giroscopio Superior Fija */
+        #top-controls {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            gap: 15px;
+        }
+
+        .control-btn {
+            background: rgba(10, 6, 24, 0.85);
+            border: 2px solid #00f0ff;
+            color: #00f0ff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+            backdrop-filter: blur(8px);
+            padding: 10px 20px;
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 240, 255, 0.2);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.8);
+            transform: scale(1.05);
+        }
+
+        .control-btn.active {
+            border-color: #f000ff;
+            color: #f000ff;
+            box-shadow: 0 0 20px rgba(240, 0, 255, 0.6);
+        }
+
+        /* Estilo para pantalla dividida en modo VR */
+        body.vr-mode #webgl-container {
+            clip-path: inset(0 50% 0 0);
+        }
+        body.vr-mode #webgl-container-vr-clone {
+            display: block !important;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 2;
+            clip-path: inset(0 0 0 50%);
+            pointer-events: none;
+        }
+
         #instruction { 
             position: absolute; bottom: 35px; width: 100%; text-align: center; color: #fff; z-index: 3; 
             font-size: 1.1rem; pointer-events: none; text-shadow: 0 0 10px #0ff, 0 0 20px #f0f; font-weight: 600; letter-spacing: 1px;
@@ -23,7 +79,7 @@
         #ui-interface {
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10;
             opacity: 0; pointer-events: none; transition: opacity 1s ease;
-            overflow-x: auto; overflow-y: auto; display: flex; justify-content: center; padding: 30px 15px;
+            overflow-x: auto; overflow-y: auto; display: flex; justify-content: center; padding: 80px 15px 30px 15px;
         }
 
         .desktop-canvas-frame {
@@ -67,7 +123,7 @@
         .pill-btn:hover { transform: scale(1.02); }
 
         #video-modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 50;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 200;
             display: none; justify-content: center; align-items: center; flex-direction: column; padding: 20px;
         }
         #video-modal video { width: 100%; max-width: 900px; border-radius: 12px; box-shadow: 0 0 30px #0ff; }
@@ -76,8 +132,24 @@
 </head>
 <body>
 
+    <!-- Botones Superiores para Giroscopio y VR -->
+    <div id="top-controls">
+        <button id="gyro-btn" class="control-btn" onclick="toggleGyroscope()">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4m15.364 6.364l-14.14-14.14m14.14 0l-14.14 14.14"></path></svg>
+            <span>GIROSCOPIO: OFF</span>
+        </button>
+        <button id="vr-btn" class="control-btn" onclick="toggleVRMode()">
+            <!-- Ícono Gafas VR -->
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20.8 7H3.2C2.5 7 2 7.5 2 8.2v7.6c0 .7.5 1.2 1.2 1.2h4.7c.5 0 .9-.3 1.1-.7l1.2-2.4c.3-.6 1.3-.6 1.6 0l1.2 2.4c.2.4.6.7 1.1.7h4.7c.7 0 1.2-.5 1.2-1.2V8.2c0-.7-.5-1.2-1.2-1.2zM7.5 13.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm9 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+            </svg>
+            <span>VER EN VR</span>
+        </button>
+    </div>
+
     <div id="instruction">Presiona la esfera para ingresar al universo 360 MS3</div>
     <div id="webgl-container"></div>
+    <div id="webgl-container-vr-clone" style="display: none;"></div>
 
     <!-- Panel Flotante Identico dentro del Universo 360 -->
     <div id="ui-interface">
@@ -128,8 +200,6 @@
 
             <!-- 3. Fila de Tarjetas Medianas (3 columnas) -->
             <div class="w-full grid grid-cols-3 gap-6">
-                
-                <!-- Tarjeta 1 -->
                 <div onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="neon-box-cyan p-6 rounded-2xl flex flex-col justify-between h-[230px] cursor-pointer hover:scale-[1.02] transition relative overflow-hidden">
                     <div class="flex justify-between items-center">
                         <span class="text-xs font-bold text-white bg-black/40 px-3 py-1 rounded-md border border-cyan-500/30">220 min</span>
@@ -145,7 +215,6 @@
                     </div>
                 </div>
 
-                <!-- Tarjeta 2 -->
                 <div onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')" class="neon-box-magenta p-6 rounded-2xl flex flex-col justify-between h-[230px] cursor-pointer hover:scale-[1.02] transition relative overflow-hidden" style="background-image: linear-gradient(to bottom, rgba(11,8,29,0.7), rgba(11,8,29,0.9)), url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop'); background-size: cover;">
                     <div class="flex justify-between items-center">
                         <span class="text-xs font-bold text-white bg-black/40 px-3 py-1 rounded-md border border-fuchsia-500/30">30 min</span>
@@ -161,7 +230,6 @@
                     </div>
                 </div>
 
-                <!-- Tarjeta 3 -->
                 <div onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="neon-box-cyan p-6 rounded-2xl flex flex-col justify-between h-[230px] cursor-pointer hover:scale-[1.02] transition relative overflow-hidden">
                     <div class="flex justify-between items-center">
                         <span class="text-xs font-bold text-white bg-black/40 px-3 py-1 rounded-md border border-cyan-500/30">230 min</span>
@@ -176,7 +244,6 @@
                         <span>360° ↺</span>
                     </div>
                 </div>
-
             </div>
 
             <!-- 4. Fila Inferior de Tarjetas Grandes (2 columnas) -->
@@ -221,13 +288,19 @@
 
     <script>
         const container = document.getElementById('webgl-container');
+        const vrCloneContainer = document.getElementById('webgl-container-vr-clone');
         const uiInterface = document.getElementById('ui-interface');
         const instruction = document.getElementById('instruction');
         const videoModal = document.getElementById('video-modal');
         const activeVideo = document.getElementById('active-video');
+        const gyroBtn = document.getElementById('gyro-btn');
+        const vrBtn = document.getElementById('vr-btn');
 
         let isSystemActive = false;
-        let scene, camera, renderer, planet, textGroup, planetGroup, universeSphere, neonGrid;
+        let isGyroActive = false;
+        let isVRMode = false;
+        
+        let scene, camera, renderer, planet, textGroup, planetGroup, universeSphere, starField;
 
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -245,18 +318,12 @@
         pointLight2.position.set(-6, -6, 6);
         scene.add(pointLight2);
 
-        // --- CREACIÓN DEL UNIVERSO 360 ESTRELLADO CON EFECTOS NEÓN ---
-        // 1. Esfera gigante invertida con estrellas y paredes holográficas neón
+        // --- UNIVERSO 360 ---
         const universeGeo = new THREE.SphereGeometry(60, 32, 32);
-        const universeMat = new THREE.MeshBasicMaterial({
-            color: 0x05021a,
-            side: THREE.BackSide,
-            wireframe: false
-        });
+        const universeMat = new THREE.MeshBasicMaterial({ color: 0x05021a, side: THREE.BackSide });
         universeSphere = new THREE.Mesh(universeGeo, universeMat);
         scene.add(universeSphere);
 
-        // Estrellas y partículas de neón flotantes en el universo 360
         const starsGeo = new THREE.BufferGeometry();
         const starsCount = 1500;
         const starPositions = new Float32Array(starsCount * 3);
@@ -267,21 +334,19 @@
             starPositions[i+1] = (Math.random() - 0.5) * 100;
             starPositions[i+2] = (Math.random() - 0.5) * 100;
 
-            // Alternar colores entre cian neón y magenta neón
             if(Math.random() > 0.5) {
-                starColors[i] = 0; starColors[i+1] = 0.94; starColors[i+2] = 1; // Cian
+                starColors[i] = 0; starColors[i+1] = 0.94; starColors[i+2] = 1;
             } else {
-                starColors[i] = 0.94; starColors[i+1] = 0; starColors[i+2] = 1; // Magenta
+                starColors[i] = 0.94; starColors[i+1] = 0; starColors[i+2] = 1;
             }
         }
         starsGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
         starsGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
         const starsMat = new THREE.PointsMaterial({ size: 0.7, vertexColors: true, transparent: true, opacity: 0.8 });
-        const starField = new THREE.Points(starsGeo, starsMat);
+        starField = new THREE.Points(starsGeo, starsMat);
         scene.add(starField);
 
-        // 2. Grid de celdas neón en estilo cúpula / paredes del universo
         const gridHelper = new THREE.GridHelper(120, 40, 0x00ffff, 0xff00ff);
         gridHelper.position.y = -15;
         scene.add(gridHelper);
@@ -290,12 +355,10 @@
         ceilingGrid.position.y = 15;
         scene.add(ceilingGrid);
 
-        // --- OBJETO INICIAL: ESFERA MS3 ---
+        // --- ESFERA INICIAL ---
         planetGroup = new THREE.Group();
         const planetGeometry = new THREE.IcosahedronGeometry(1.4, 4); 
-        const planetMaterial = new THREE.MeshBasicMaterial({ 
-            color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.9
-        });
+        const planetMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.9 });
         planet = new THREE.Mesh(planetGeometry, planetMaterial);
         planet.position.y = -1.5;
         planetGroup.add(planet);
@@ -312,9 +375,7 @@
             textGeo.computeBoundingBox();
             const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
             
-            const mirrorMaterial = new THREE.MeshPhysicalMaterial({ 
-                color: 0xffffff, metalness: 0.9, roughness: 0.05, clearcoat: 1.0, reflectivity: 1.0
-            });
+            const mirrorMaterial = new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0.9, roughness: 0.05, clearcoat: 1.0, reflectivity: 1.0 });
             const textMesh = new THREE.Mesh(textGeo, mirrorMaterial);
             textMesh.position.x = centerOffset;
             textGroup.add(textMesh);
@@ -330,6 +391,67 @@
         scene.add(textGroup);
         camera.position.z = 5;
 
+        // --- LÓGICA DEL GIROSCOPIC ---
+        function handleOrientation(e) {
+            if (!isGyroActive) return;
+            const alpha = e.alpha ? THREE.MathUtils.degToRad(e.alpha) : 0;
+            const beta = e.beta ? THREE.MathUtils.degToRad(e.beta) : 0;
+            const gamma = e.gamma ? THREE.MathUtils.degToRad(e.gamma) : 0;
+
+            camera.rotation.x = beta * 0.3;
+            camera.rotation.y = gamma * 0.3;
+        }
+
+        function toggleGyroscope() {
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            setGyroState(!isGyroActive);
+                        } else {
+                            alert('Permiso de giroscopio denegado.');
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                setGyroState(!isGyroActive);
+            }
+        }
+
+        function setGyroState(enable) {
+            isGyroActive = enable;
+            if (isGyroActive) {
+                window.addEventListener('deviceorientation', handleOrientation);
+                gyroBtn.classList.add('active');
+                gyroBtn.querySelector('span').innerText = 'GIROSCOPIO: ON';
+            } else {
+                window.removeEventListener('deviceorientation', handleOrientation);
+                gyroBtn.classList.remove('active');
+                gyroBtn.querySelector('span').innerText = 'GIROSCOPIO: OFF';
+                camera.rotation.set(0, 0, 0);
+            }
+        }
+
+        // --- LÓGICA MODO VR (Split Screen) ---
+        function toggleVRMode() {
+            isVRMode = !isVRMode;
+            if (isVRMode) {
+                document.body.classList.add('vr-mode');
+                vrBtn.classList.add('active');
+                vrBtn.querySelector('span').innerText = 'SALIR DE VR';
+                
+                // Clonar la vista visual para gafas VR
+                if (!vrCloneContainer.hasChildNodes()) {
+                    vrCloneContainer.appendChild(renderer.domElement.cloneNode(true));
+                }
+            } else {
+                document.body.classList.remove('vr-mode');
+                vrBtn.classList.remove('active');
+                vrBtn.querySelector('span').innerText = 'VER EN VR';
+                vrCloneContainer.innerHTML = '';
+            }
+        }
+
         function animate() {
             requestAnimationFrame(animate);
             
@@ -337,7 +459,6 @@
             planet.rotation.x += 0.003;
             textGroup.rotation.y += 0.006;
             
-            // Rotación suave del universo 360 si ya ingresamos
             if (isSystemActive) {
                 starField.rotation.y += 0.0005;
                 universeSphere.rotation.y += 0.0002;
@@ -352,23 +473,20 @@
             isSystemActive = true;
             instruction.style.opacity = '0';
             
-            // Efecto inmersivo: Atraviesa la esfera y entra al universo 360 estelar
             gsap.to(camera.position, { z: -1.5, duration: 1.5, ease: "power2.inOut", onComplete: () => {
-                // Ocultamos la esfera inicial pero mantenemos el renderer para el fondo 360 y estrellas
                 planetGroup.visible = false;
                 textGroup.visible = false;
                 
-                // Hacemos interactivo el panel flotante gigante con el contenido exacto
                 uiInterface.style.opacity = '1';
                 uiInterface.style.pointerEvents = 'auto';
             }});
         }
 
         window.addEventListener('click', (e) => {
-            if (!isSystemActive) enterMultiverse();
+            if (!isSystemActive && !e.target.closest('#top-controls')) enterMultiverse();
         });
         window.addEventListener('touchend', (e) => {
-            if (!isSystemActive) enterMultiverse();
+            if (!isSystemActive && !e.target.closest('#top-controls')) enterMultiverse();
         });
 
         function openVideo(url) {
