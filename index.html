@@ -23,7 +23,7 @@
         #ui-interface {
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10;
             opacity: 0; pointer-events: none; transition: opacity 1s ease;
-            overflow-x: auto; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 70px 15px 30px 15px;
+            overflow-x: auto; overflow-y: auto; display: flex; justify-content: center; padding: 30px 15px;
         }
 
         .desktop-canvas-frame {
@@ -81,14 +81,6 @@
 
     <!-- Panel Flotante Identico dentro del Universo 360 -->
     <div id="ui-interface">
-        
-        <!-- Botón Superior: Activar / Desactivar Giroscopio -->
-        <div class="w-full max-w-[1200px] flex justify-center mb-6 z-20">
-            <button id="gyro-btn" onclick="toggleGyroscope()" class="neon-box-cyan px-6 py-2.5 text-cyan-400 font-bold rounded-xl text-sm hover:bg-cyan-400/10 transition shadow-lg">
-                Giroscopio: DESACTIVADO
-            </button>
-        </div>
-
         <div class="desktop-canvas-frame">
             
             <!-- 1. Banner Principal Superior -->
@@ -218,13 +210,6 @@
                 </div>
             </div>
 
-            <!-- Botón Inferior: Volver -->
-            <div class="w-full flex justify-center mt-6">
-                <button onclick="exitMultiverse()" class="neon-box-magenta px-10 py-4 text-fuchsia-400 font-extrabold rounded-xl text-base hover:bg-fuchsia-400/10 transition shadow-lg tracking-wider">
-                    VOLVER
-                </button>
-            </div>
-
         </div>
     </div>
 
@@ -240,14 +225,9 @@
         const instruction = document.getElementById('instruction');
         const videoModal = document.getElementById('video-modal');
         const activeVideo = document.getElementById('active-video');
-        const gyroBtn = document.getElementById('gyro-btn');
 
         let isSystemActive = false;
-        let isGyroEnabled = false;
-        let scene, camera, renderer, planet, textGroup, planetGroup, universeSphere, starField;
-        let lon = 0, lat = 0, phi = 0, theta = 0;
-        let touchX = 0, touchY = 0;
-        let isUserInteracting = false;
+        let scene, camera, renderer, planet, textGroup, planetGroup, universeSphere, neonGrid;
 
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -265,7 +245,8 @@
         pointLight2.position.set(-6, -6, 6);
         scene.add(pointLight2);
 
-        // --- CREACIÓN DEL UNIVERSO 360 ESTRELLADO ---
+        // --- CREACIÓN DEL UNIVERSO 360 ESTRELLADO CON EFECTOS NEÓN ---
+        // 1. Esfera gigante invertida con estrellas y paredes holográficas neón
         const universeGeo = new THREE.SphereGeometry(60, 32, 32);
         const universeMat = new THREE.MeshBasicMaterial({
             color: 0x05021a,
@@ -275,6 +256,7 @@
         universeSphere = new THREE.Mesh(universeGeo, universeMat);
         scene.add(universeSphere);
 
+        // Estrellas y partículas de neón flotantes en el universo 360
         const starsGeo = new THREE.BufferGeometry();
         const starsCount = 1500;
         const starPositions = new Float32Array(starsCount * 3);
@@ -285,19 +267,21 @@
             starPositions[i+1] = (Math.random() - 0.5) * 100;
             starPositions[i+2] = (Math.random() - 0.5) * 100;
 
+            // Alternar colores entre cian neón y magenta neón
             if(Math.random() > 0.5) {
-                starColors[i] = 0; starColors[i+1] = 0.94; starColors[i+2] = 1; 
+                starColors[i] = 0; starColors[i+1] = 0.94; starColors[i+2] = 1; // Cian
             } else {
-                starColors[i] = 0.94; starColors[i+1] = 0; starColors[i+2] = 1; 
+                starColors[i] = 0.94; starColors[i+1] = 0; starColors[i+2] = 1; // Magenta
             }
         }
         starsGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
         starsGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
         const starsMat = new THREE.PointsMaterial({ size: 0.7, vertexColors: true, transparent: true, opacity: 0.8 });
-        starField = new THREE.Points(starsGeo, starsMat);
+        const starField = new THREE.Points(starsGeo, starsMat);
         scene.add(starField);
 
+        // 2. Grid de celdas neón en estilo cúpula / paredes del universo
         const gridHelper = new THREE.GridHelper(120, 40, 0x00ffff, 0xff00ff);
         gridHelper.position.y = -15;
         scene.add(gridHelper);
@@ -346,82 +330,6 @@
         scene.add(textGroup);
         camera.position.z = 5;
 
-        // Control de vista 360 por Arrastre (Mouse / Touch)
-        document.addEventListener('pointerdown', (e) => {
-            if (!isSystemActive) return;
-            isUserInteracting = true;
-            touchX = e.clientX;
-            touchY = e.clientY;
-        });
-
-        document.addEventListener('pointermove', (e) => {
-            if (!isSystemActive || !isUserInteracting || isGyroEnabled) return;
-            lon -= (e.clientX - touchX) * 0.1;
-            lat += (e.clientY - touchY) * 0.1;
-            touchX = e.clientX;
-            touchY = e.clientY;
-        });
-
-        document.addEventListener('pointerup', () => {
-            isUserInteracting = false;
-        });
-
-        // Control por Giroscopio (DeviceOrientation)
-        function handleOrientation(e) {
-            if (!isGyroEnabled || !isSystemActive) return;
-            let alpha = e.alpha ? THREE.MathUtils.degToRad(e.alpha) : 0;
-            let beta = e.beta ? THREE.MathUtils.degToRad(e.beta) : 0;
-            let gamma = e.gamma ? THREE.MathUtils.degToRad(e.gamma) : 0;
-            
-            let zee = new THREE.Vector3(0, 0, 1);
-            let cameraEuler = new THREE.Euler();
-            let q = new THREE.Quaternion();
-            let q1 = new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)); // -90 degrees around X
-
-            cameraEuler.set(beta, alpha, -gamma, 'YXZ');
-            q.setFromEuler(cameraEuler);
-            q.multiply(q1);
-            camera.quaternion.copy(q);
-        }
-
-        function toggleGyroscope() {
-            if (!isGyroEnabled) {
-                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    DeviceOrientationEvent.requestPermission().then(response => {
-                        if (response === 'granted') {
-                            enableGyro();
-                        } else {
-                            alert("Permiso de giroscopio denegado.");
-                        }
-                    }).catch(console.error);
-                } else {
-                    enableGyro();
-                }
-            } else {
-                disableGyro();
-            }
-        }
-
-        function enableGyro() {
-            isGyroEnabled = true;
-            window.addEventListener('deviceorientation', handleOrientation, true);
-            gyroBtn.innerText = "Giroscopio: ACTIVADO";
-            gyroBtn.classList.remove('neon-box-cyan');
-            gyroBtn.classList.add('neon-box-magenta');
-            gyroBtn.style.color = "#f000ff";
-        }
-
-        function disableGyro() {
-            isGyroEnabled = false;
-            window.removeEventListener('deviceorientation', handleOrientation, true);
-            gyroBtn.innerText = "Giroscopio: DESACTIVADO";
-            gyroBtn.classList.remove('neon-box-magenta');
-            gyroBtn.classList.add('neon-box-cyan');
-            gyroBtn.style.color = "#00f0ff";
-            camera.quaternion.identity();
-            lon = 0; lat = 0;
-        }
-
         function animate() {
             requestAnimationFrame(animate);
             
@@ -429,21 +337,10 @@
             planet.rotation.x += 0.003;
             textGroup.rotation.y += 0.006;
             
+            // Rotación suave del universo 360 si ya ingresamos
             if (isSystemActive) {
                 starField.rotation.y += 0.0005;
                 universeSphere.rotation.y += 0.0002;
-
-                if (!isGyroEnabled) {
-                    lat = Math.max(-85, Math.min(85, lat));
-                    phi = THREE.MathUtils.degToRad(90 - lat);
-                    theta = THREE.MathUtils.degToRad(lon);
-
-                    const target = new THREE.Vector3();
-                    target.x = Math.sin(phi) * Math.cos(theta);
-                    target.y = Math.cos(phi);
-                    target.z = Math.sin(phi) * Math.sin(theta);
-                    camera.lookAt(target);
-                }
             }
 
             renderer.render(scene, camera);
@@ -455,38 +352,23 @@
             isSystemActive = true;
             instruction.style.opacity = '0';
             
-            gsap.to(camera.position, { z: 0, duration: 1.5, ease: "power2.inOut", onComplete: () => {
+            // Efecto inmersivo: Atraviesa la esfera y entra al universo 360 estelar
+            gsap.to(camera.position, { z: -1.5, duration: 1.5, ease: "power2.inOut", onComplete: () => {
+                // Ocultamos la esfera inicial pero mantenemos el renderer para el fondo 360 y estrellas
                 planetGroup.visible = false;
                 textGroup.visible = false;
                 
+                // Hacemos interactivo el panel flotante gigante con el contenido exacto
                 uiInterface.style.opacity = '1';
                 uiInterface.style.pointerEvents = 'auto';
             }});
         }
 
-        function exitMultiverse() {
-            if (!isSystemActive) return;
-            if (isGyroEnabled) disableGyro();
-            
-            uiInterface.style.opacity = '0';
-            uiInterface.style.pointerEvents = 'none';
-            
-            planetGroup.visible = true;
-            textGroup.visible = true;
-
-            gsap.to(camera.position, { z: 5, duration: 1.5, ease: "power2.inOut", onComplete: () => {
-                isSystemActive = false;
-                instruction.style.opacity = '1';
-                camera.quaternion.identity();
-                lon = 0; lat = 0;
-            }});
-        }
-
         window.addEventListener('click', (e) => {
-            if (!isSystemActive && e.target.id === 'webgl-container') enterMultiverse();
+            if (!isSystemActive) enterMultiverse();
         });
         window.addEventListener('touchend', (e) => {
-            if (!isSystemActive && e.target.id === 'webgl-container') enterMultiverse();
+            if (!isSystemActive) enterMultiverse();
         });
 
         function openVideo(url) {
