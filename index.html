@@ -274,6 +274,10 @@
         let vrSplitActive = false;
         let scene, camera, renderer, planet, textGroup, planetGroup, universeSphere, starField;
 
+        // Raycaster para detectar el clic directo sobre la esfera MS3
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
         // Variables para control 360 manual (Mouse / Táctil)
         let isUserInteracting = false;
         let onPointerDownMouseX = 0, onPointerDownMouseY = 0;
@@ -377,11 +381,21 @@
 
         scene.add(planetGroup);
         scene.add(textGroup);
-        camera.position.z = 5;
+        camera.position.set(0, -1.5, 6); // Posición inicial enfocada directamente a la altura de la esfera
 
         // --- INTERACCIÓN 360 (MOUSE / TÁCTIL) ---
         container.addEventListener('pointerdown', (e) => {
-            if (!isSystemActive) return;
+            if (!isSystemActive) {
+                // Verificamos si hace clic específicamente sobre la esfera MS3
+                mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObject(planet);
+                if (intersects.length > 0) {
+                    enterMultiverse();
+                }
+                return;
+            }
             isUserInteracting = true;
             onPointerDownMouseX = e.clientX;
             onPointerDownMouseY = e.clientY;
@@ -516,17 +530,17 @@
             isSystemActive = true;
             instruction.style.opacity = '0';
             
-            // Efecto inmersivo: La cámara se acerca y atraviesa la esfera (Z negativo profundo)
+            // Efecto real de zoom hacia adentro: La cámara se desplaza exactamente hacia las coordenadas Z de la esfera (-1.5)
             gsap.to(camera.position, { 
-                z: -3, 
-                duration: 1.6, 
+                z: -1.5, 
+                duration: 1.4, 
                 ease: "power3.inOut", 
                 onComplete: () => {
                     planetGroup.visible = false;
                     textGroup.visible = false;
                     
-                    // Reiniciamos la posición Z de la cámara a 0 para que el 360 gire correctamente desde el centro del universo
-                    camera.position.z = 0;
+                    // Colocamos la cámara exactamente en el centro del universo 360 (0,0,0)
+                    camera.position.set(0, 0, 0);
 
                     uiInterface.style.opacity = '1';
                     uiInterface.style.pointerEvents = 'auto';
@@ -537,9 +551,9 @@
                 }
             });
 
-            // Animación extra para expandir/fundir la esfera de bienvenida en el trayecto
-            gsap.to(planet.scale, { x: 4, y: 4, z: 4, duration: 1.2, ease: "power2.in" });
-            gsap.to(planet.material, { opacity: 0, duration: 1.4, ease: "power2.in" });
+            // Animación dramática para expandir la esfera gigante envolviendo la pantalla mientras entras
+            gsap.to(planet.scale, { x: 8, y: 8, z: 8, duration: 1.2, ease: "power2.in" });
+            gsap.to(planet.material, { opacity: 0, duration: 1.3, ease: "power2.in" });
         }
 
         function exitMultiverse() {
@@ -555,26 +569,19 @@
             vrBottomControls.style.opacity = '0';
             vrBottomControls.style.pointerEvents = 'none';
 
-            // Restauramos la esfera y la escala para el retorno
+            // Restauramos los valores de la esfera para el retorno
             planet.scale.set(1, 1, 1);
             planet.material.opacity = 0.9;
             planetGroup.visible = true;
             textGroup.visible = true;
             lon = 0; lat = 0;
-            camera.position.z = -3;
+            camera.position.set(0, -1.5, -1.5);
 
-            gsap.to(camera.position, { z: 5, duration: 1.5, ease: "power2.inOut", onComplete: () => {
+            gsap.to(camera.position, { z: 6, duration: 1.5, ease: "power2.inOut", onComplete: () => {
                 isSystemActive = false;
                 instruction.style.opacity = '1';
             }});
         }
-
-        window.addEventListener('click', (e) => {
-            if (!isSystemActive && e.target === container) enterMultiverse();
-        });
-        window.addEventListener('touchend', (e) => {
-            if (!isSystemActive && e.target === container) enterMultiverse();
-        });
 
         function openVideo(url) {
             activeVideo.src = url;
