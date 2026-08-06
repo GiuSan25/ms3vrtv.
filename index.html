@@ -19,39 +19,11 @@
             transition: opacity 0.5s; padding: 0 20px;
         }
 
-        /* Contenedores de botones flotantes para el Multiverso VR */
-        #vr-top-controls {
-            position: absolute; top: 20px; left: 0; width: 100%; z-index: 20;
-            display: flex; justify-content: center; gap: 20px; opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
-        }
-
-        #vr-bottom-controls {
-            position: absolute; bottom: 30px; left: 0; width: 100%; z-index: 20;
-            display: flex; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
-        }
-
-        .vr-control-btn {
-            background: rgba(10, 6, 24, 0.9);
-            border: 2px solid #00f0ff;
-            color: #00f0ff;
-            padding: 10px 26px;
-            border-radius: 9999px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            letter-spacing: 1px;
-            cursor: pointer;
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
-            transition: all 0.3s ease;
-            backdrop-filter: blur(8px);
-        }
-        .vr-control-btn:hover { background: rgba(0, 240, 255, 0.2); transform: scale(1.05); }
-        .vr-control-btn.active { border-color: #f000ff; color: #f000ff; box-shadow: 0 0 20px rgba(240, 0, 255, 0.4); }
-
         /* Contenedor del panel flotante 3D / HTML superpuesto en el universo 360 */
         #ui-interface {
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10;
             opacity: 0; pointer-events: none; transition: opacity 1s ease;
-            overflow-x: auto; overflow-y: auto; display: flex; justify-content: center; padding: 80px 15px 30px 15px;
+            overflow-x: auto; overflow-y: auto; display: flex; justify-content: center; padding: 30px 15px;
         }
 
         .desktop-canvas-frame {
@@ -106,17 +78,6 @@
 
     <div id="instruction">Presiona la esfera para ingresar al universo 360 MS3</div>
     <div id="webgl-container"></div>
-
-    <!-- Botones Superiores dentro del Multiverso (Giroscopio y Ver en VR) -->
-    <div id="vr-top-controls">
-        <button id="gyro-btn" class="vr-control-btn" onclick="toggleGyroscope()">Giroscopio</button>
-        <button id="vr-split-btn" class="vr-control-btn" onclick="toggleVRSplit()">Ver en VR</button>
-    </div>
-
-    <!-- Botón Inferior para Volver (debajo del usuario / interfaz) -->
-    <div id="vr-bottom-controls">
-        <button class="vr-control-btn" onclick="exitMultiverse()">Volver</button>
-    </div>
 
     <!-- Panel Flotante Identico dentro del Universo 360 -->
     <div id="ui-interface">
@@ -262,34 +223,16 @@
         const container = document.getElementById('webgl-container');
         const uiInterface = document.getElementById('ui-interface');
         const instruction = document.getElementById('instruction');
-        const vrTopControls = document.getElementById('vr-top-controls');
-        const vrBottomControls = document.getElementById('vr-bottom-controls');
-        const gyroBtn = document.getElementById('gyro-btn');
-        const vrSplitBtn = document.getElementById('vr-split-btn');
         const videoModal = document.getElementById('video-modal');
         const activeVideo = document.getElementById('active-video');
 
         let isSystemActive = false;
-        let gyroActive = false;
-        let vrSplitActive = false;
-        let scene, camera, renderer, planet, textGroup, planetGroup, universeSphere, starField;
-
-        // Raycaster para detectar el clic directo sobre la esfera MS3
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-
-        // Variables para control 360 manual (Mouse / Táctil)
-        let isUserInteracting = false;
-        let onPointerDownMouseX = 0, onPointerDownMouseY = 0;
-        let lon = 0, onPointerDownLon = 0;
-        let lat = 0, onPointerDownLat = 0;
-        let phi = 0, theta = 0;
+        let scene, camera, renderer, planet, textGroup, planetGroup, universeSphere, neonGrid;
 
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
 
         scene.add(new THREE.AmbientLight(0xffffff, 1.8));
@@ -303,6 +246,7 @@
         scene.add(pointLight2);
 
         // --- CREACIÓN DEL UNIVERSO 360 ESTRELLADO CON EFECTOS NEÓN ---
+        // 1. Esfera gigante invertida con estrellas y paredes holográficas neón
         const universeGeo = new THREE.SphereGeometry(60, 32, 32);
         const universeMat = new THREE.MeshBasicMaterial({
             color: 0x05021a,
@@ -312,6 +256,7 @@
         universeSphere = new THREE.Mesh(universeGeo, universeMat);
         scene.add(universeSphere);
 
+        // Estrellas y partículas de neón flotantes en el universo 360
         const starsGeo = new THREE.BufferGeometry();
         const starsCount = 1500;
         const starPositions = new Float32Array(starsCount * 3);
@@ -322,19 +267,21 @@
             starPositions[i+1] = (Math.random() - 0.5) * 100;
             starPositions[i+2] = (Math.random() - 0.5) * 100;
 
+            // Alternar colores entre cian neón y magenta neón
             if(Math.random() > 0.5) {
-                starColors[i] = 0; starColors[i+1] = 0.94; starColors[i+2] = 1;
+                starColors[i] = 0; starColors[i+1] = 0.94; starColors[i+2] = 1; // Cian
             } else {
-                starColors[i] = 0.94; starColors[i+1] = 0; starColors[i+2] = 1;
+                starColors[i] = 0.94; starColors[i+1] = 0; starColors[i+2] = 1; // Magenta
             }
         }
         starsGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
         starsGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
         const starsMat = new THREE.PointsMaterial({ size: 0.7, vertexColors: true, transparent: true, opacity: 0.8 });
-        starField = new THREE.Points(starsGeo, starsMat);
+        const starField = new THREE.Points(starsGeo, starsMat);
         scene.add(starField);
 
+        // 2. Grid de celdas neón en estilo cúpula / paredes del universo
         const gridHelper = new THREE.GridHelper(120, 40, 0x00ffff, 0xff00ff);
         gridHelper.position.y = -15;
         scene.add(gridHelper);
@@ -343,7 +290,7 @@
         ceilingGrid.position.y = 15;
         scene.add(ceilingGrid);
 
-        // --- OBJETO INICIAL: ESFERA MS3 (INALTERABLE) ---
+        // --- OBJETO INICIAL: ESFERA MS3 ---
         planetGroup = new THREE.Group();
         const planetGeometry = new THREE.IcosahedronGeometry(1.4, 4); 
         const planetMaterial = new THREE.MeshBasicMaterial({ 
@@ -381,144 +328,19 @@
 
         scene.add(planetGroup);
         scene.add(textGroup);
-        camera.position.set(0, -1.5, 6); // Posición inicial enfocada directamente a la altura de la esfera
+        camera.position.z = 5;
 
-        // --- INTERACCIÓN 360 (MOUSE / TÁCTIL) ---
-        container.addEventListener('pointerdown', (e) => {
-            if (!isSystemActive) {
-                // Verificamos si hace clic específicamente sobre la esfera MS3
-                mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-                mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-                raycaster.setFromCamera(mouse, camera);
-                const intersects = raycaster.intersectObject(planet);
-                if (intersects.length > 0) {
-                    enterMultiverse();
-                }
-                return;
-            }
-            isUserInteracting = true;
-            onPointerDownMouseX = e.clientX;
-            onPointerDownMouseY = e.clientY;
-            onPointerDownLon = lon;
-            onPointerDownLat = lat;
-        });
-
-        window.addEventListener('pointermove', (e) => {
-            if (!isSystemActive || !isUserInteracting || gyroActive) return;
-            lon = (onPointerDownMouseX - e.clientX) * 0.1 + onPointerDownLon;
-            lat = (e.clientY - onPointerDownMouseY) * 0.1 + onPointerDownLat;
-        });
-
-        window.addEventListener('pointerup', () => {
-            isUserInteracting = false;
-        });
-
-        // --- GIROSCOPIO ---
-        function toggleGyroscope() {
-            if (!gyroActive) {
-                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    DeviceOrientationEvent.requestPermission().then(response => {
-                        if (response === 'granted') {
-                            enableGyro();
-                        } else {
-                            alert("Permiso de giroscopio denegado.");
-                        }
-                    }).catch(console.error);
-                } else {
-                    enableGyro();
-                }
-            } else {
-                disableGyro();
-            }
-        }
-
-        function enableGyro() {
-            gyroActive = true;
-            gyroBtn.innerText = "Giroscopio: ON";
-            gyroBtn.classList.add('active');
-            window.addEventListener('deviceorientation', onDeviceOrientationChange, false);
-        }
-
-        function disableGyro() {
-            gyroActive = false;
-            gyroBtn.innerText = "Giroscopio";
-            gyroBtn.classList.remove('active');
-            window.removeEventListener('deviceorientation', onDeviceOrientationChange, false);
-        }
-
-        let initialGamma = null;
-        let initialBeta = null;
-        function onDeviceOrientationChange(event) {
-            if (!gyroActive) return;
-            let beta = event.beta ? THREE.MathUtils.degToRad(event.beta) : 0;
-            let gamma = event.gamma ? THREE.MathUtils.degToRad(event.gamma) : 0;
-
-            if (initialBeta === null) {
-                initialBeta = beta;
-                initialGamma = gamma;
-            }
-
-            lat = THREE.MathUtils.radToDeg(beta - initialBeta);
-            lon = THREE.MathUtils.radToDeg(gamma - initialGamma);
-        }
-
-        // --- VER EN VR (Pantalla Partida Estéreo) ---
-        function toggleVRSplit() {
-            vrSplitActive = !vrSplitActive;
-            if (vrSplitActive) {
-                vrSplitBtn.innerText = "Salir VR";
-                vrSplitBtn.classList.add('active');
-            } else {
-                vrSplitBtn.innerText = "Ver en VR";
-                vrSplitBtn.classList.remove('active');
-                renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-                renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
-                renderer.setScissorTest(false);
-            }
-        }
-
-        // --- ANIMACIÓN ---
         function animate() {
             requestAnimationFrame(animate);
             
-            if (!isSystemActive) {
-                planet.rotation.y += 0.008;
-                planet.rotation.x += 0.003;
-                textGroup.rotation.y += 0.006;
-            } else {
+            planet.rotation.y += 0.008;
+            planet.rotation.x += 0.003;
+            textGroup.rotation.y += 0.006;
+            
+            // Rotación suave del universo 360 si ya ingresamos
+            if (isSystemActive) {
                 starField.rotation.y += 0.0005;
                 universeSphere.rotation.y += 0.0002;
-
-                lat = Math.max(-85, Math.min(85, lat));
-                phi = THREE.MathUtils.degToRad(90 - lat);
-                theta = THREE.MathUtils.degToRad(lon);
-
-                const target = new THREE.Vector3();
-                target.x = 500 * Math.sin(phi) * Math.cos(theta);
-                target.y = 500 * Math.cos(phi);
-                target.z = 500 * Math.sin(phi) * Math.sin(theta);
-                camera.lookAt(target);
-
-                if (vrSplitActive) {
-                    const width = window.innerWidth;
-                    const height = window.innerHeight;
-                    const halfWidth = width / 2;
-
-                    renderer.setScissorTest(true);
-
-                    // Ojo Izquierdo
-                    renderer.setViewport(0, 0, halfWidth, height);
-                    renderer.setScissor(0, 0, halfWidth, height);
-                    renderer.render(scene, camera);
-
-                    // Ojo Derecho
-                    renderer.setViewport(halfWidth, 0, halfWidth, height);
-                    renderer.setScissor(halfWidth, 0, halfWidth, height);
-                    renderer.render(scene, camera);
-                    
-                    renderer.setScissorTest(false);
-                    return;
-                }
             }
 
             renderer.render(scene, camera);
@@ -530,58 +352,24 @@
             isSystemActive = true;
             instruction.style.opacity = '0';
             
-            // Efecto real de zoom hacia adentro: La cámara se desplaza exactamente hacia las coordenadas Z de la esfera (-1.5)
-            gsap.to(camera.position, { 
-                z: -1.5, 
-                duration: 1.4, 
-                ease: "power3.inOut", 
-                onComplete: () => {
-                    planetGroup.visible = false;
-                    textGroup.visible = false;
-                    
-                    // Colocamos la cámara exactamente en el centro del universo 360 (0,0,0)
-                    camera.position.set(0, 0, 0);
-
-                    uiInterface.style.opacity = '1';
-                    uiInterface.style.pointerEvents = 'auto';
-                    vrTopControls.style.opacity = '1';
-                    vrTopControls.style.pointerEvents = 'auto';
-                    vrBottomControls.style.opacity = '1';
-                    vrBottomControls.style.pointerEvents = 'auto';
-                }
-            });
-
-            // Animación dramática para expandir la esfera gigante envolviendo la pantalla mientras entras
-            gsap.to(planet.scale, { x: 8, y: 8, z: 8, duration: 1.2, ease: "power2.in" });
-            gsap.to(planet.material, { opacity: 0, duration: 1.3, ease: "power2.in" });
-        }
-
-        function exitMultiverse() {
-            if (!isSystemActive) return;
-            
-            if (gyroActive) disableGyro();
-            if (vrSplitActive) toggleVRSplit();
-
-            uiInterface.style.opacity = '0';
-            uiInterface.style.pointerEvents = 'none';
-            vrTopControls.style.opacity = '0';
-            vrTopControls.style.pointerEvents = 'none';
-            vrBottomControls.style.opacity = '0';
-            vrBottomControls.style.pointerEvents = 'none';
-
-            // Restauramos los valores de la esfera para el retorno
-            planet.scale.set(1, 1, 1);
-            planet.material.opacity = 0.9;
-            planetGroup.visible = true;
-            textGroup.visible = true;
-            lon = 0; lat = 0;
-            camera.position.set(0, -1.5, -1.5);
-
-            gsap.to(camera.position, { z: 6, duration: 1.5, ease: "power2.inOut", onComplete: () => {
-                isSystemActive = false;
-                instruction.style.opacity = '1';
+            // Efecto inmersivo: Atraviesa la esfera y entra al universo 360 estelar
+            gsap.to(camera.position, { z: -1.5, duration: 1.5, ease: "power2.inOut", onComplete: () => {
+                // Ocultamos la esfera inicial pero mantenemos el renderer para el fondo 360 y estrellas
+                planetGroup.visible = false;
+                textGroup.visible = false;
+                
+                // Hacemos interactivo el panel flotante gigante con el contenido exacto
+                uiInterface.style.opacity = '1';
+                uiInterface.style.pointerEvents = 'auto';
             }});
         }
+
+        window.addEventListener('click', (e) => {
+            if (!isSystemActive) enterMultiverse();
+        });
+        window.addEventListener('touchend', (e) => {
+            if (!isSystemActive) enterMultiverse();
+        });
 
         function openVideo(url) {
             activeVideo.src = url;
