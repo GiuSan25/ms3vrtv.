@@ -86,7 +86,7 @@
 
         .floating-card { pointer-events: auto; user-select: none; }
         .interactive-btn { pointer-events: auto; transition: transform 0.2s ease, border-color 0.2s ease; cursor: pointer; }
-        .interactive-btn.gaze-hover, .floating-card.gaze-hover { transform: scale(1.06); border-color: #f000ff !important; }
+        .interactive-btn.gaze-hover, .floating-card.gaze-hover { transform: scale(1.08); border-color: #f000ff !important; }
 
         .neon-box-cyan {
             border: 2px solid #00f0ff; box-shadow: 0 0 25px rgba(0, 240, 255, 0.5), inset 0 0 20px rgba(0, 240, 255, 0.25);
@@ -149,7 +149,8 @@
         let scene, cssScene, camera, cameraLeft, cameraRight, cameraRig;
         let rendererLeft, rendererRight, cssRendererLeft, cssRendererRight;
         let planet, textGroup, planetGroup, universeSphere, starField;
-        let hudGroup = null, menu3dGroup = null;
+        let hudGroup = null, menuTriggerGroup = null;
+        let isMenuOpen = false;
 
         let isSystemActive = false, isGyroActive = false, isVRMode = false;
 
@@ -173,7 +174,7 @@
         const cssContainerRight = document.getElementById('css3d-container-right');
         const instruction = document.getElementById('instruction');
 
-        // Inicializar Escenas 3D y CSS3D
+        // Escenas 3D
         scene = new THREE.Scene();
         cssScene = new THREE.Scene();
 
@@ -243,7 +244,7 @@
         starField = new THREE.Points(starsGeometry, new THREE.PointsMaterial({ size: 0.25, vertexColors: true, transparent: true, opacity: 0.9 }));
         scene.add(starField);
 
-        // Esfera e Identificador MS3
+        // INICIO ORIGINAL: Esfera + Texto MS3
         planetGroup = new THREE.Group();
         planet = new THREE.Mesh(new THREE.IcosahedronGeometry(1.4, 4), new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.9 }));
         planet.position.y = -1.5;
@@ -261,9 +262,56 @@
         });
         scene.add(textGroup);
 
-        // CREACIÓN DINÁMICA DE PANELES 3D (HUD PRINCIPAL Y MENÚ LATERAL)
+        // MENÚ DESPLEGABLE 3D (Ubicado arriba a la derecha de la esfera)
+        function create3DMenuTrigger() {
+            const triggerDiv = document.createElement('div');
+            triggerDiv.className = "flex flex-col items-end pointer-events-auto";
+            triggerDiv.innerHTML = `
+                <button id="menu-toggle-btn" class="interactive-btn bg-black/80 border-2 border-cyan-400 text-cyan-300 p-3 rounded-full shadow-[0_0_20px_#00f0ff] flex items-center justify-center gap-2 font-bold" onclick="toggle3DMenu(event)">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <span class="text-xs tracking-wider pr-1">MENÚ</span>
+                </button>
+                <div id="dropdown-panel-3d" class="hidden mt-3 w-[260px] neon-box-cyan p-4 flex flex-col gap-3 floating-card transition-all duration-300 transform scale-95 opacity-0">
+                    <button class="interactive-btn control-btn justify-start w-full text-xs" onclick="requestIOSPermissions()"><span>GIROSCOPIO</span></button>
+                    <button class="interactive-btn control-btn justify-start w-full text-xs" onclick="toggleVRMode()"><span>MODO VR</span></button>
+                    <button class="interactive-btn control-btn justify-start w-full text-xs" onclick="openAboutModal()"><span>NOSOTROS</span></button>
+                </div>
+            `;
+
+            menuTriggerGroup = new THREE.Group();
+            const cssObject = new THREE.CSS3DObject(triggerDiv);
+            cssObject.scale.set(0.0025, 0.0025, 0.0025);
+            menuTriggerGroup.add(cssObject);
+            
+            // Arriba y a la derecha de la esfera en el espacio 360°
+            menuTriggerGroup.position.set(1.8, 1.8, -1.8);
+            menuTriggerGroup.rotation.y = -Math.PI / 8;
+            cssScene.add(menuTriggerGroup);
+        }
+
+        function toggle3DMenu(e) {
+            if (e) e.stopPropagation();
+            const panel = document.getElementById('dropdown-panel-3d');
+            if (!panel) return;
+
+            isMenuOpen = !isMenuOpen;
+            if (isMenuOpen) {
+                panel.classList.remove('hidden');
+                setTimeout(() => {
+                    panel.classList.remove('scale-95', 'opacity-0');
+                    panel.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            } else {
+                panel.classList.remove('scale-100', 'opacity-100');
+                panel.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => panel.classList.add('hidden'), 300);
+            }
+        }
+
+        create3DMenuTrigger();
+
+        // PANTALLA MULTIVERSO
         function createMultiverseHUD() {
-            // 1. Pantalla Principal
             const mainContainer = document.createElement('div');
             mainContainer.className = "w-[850px] flex flex-col gap-6 floating-card";
             mainContainer.innerHTML = `
@@ -294,37 +342,15 @@
             const cssObject = new THREE.CSS3DObject(mainContainer);
             cssObject.scale.set(0.0022, 0.0022, 0.0022);
             hudGroup.add(cssObject);
-            // Acerqué la pantalla a z = -1.8
-            hudGroup.position.set(0, 0, -1.8);
+            hudGroup.position.set(0, 0, -1.1);
             cssScene.add(hudGroup);
-
-            // 2. Menú Lateral Flotante 3D (A la derecha en el espacio 360°)
-            const menuContainer = document.createElement('div');
-            menuContainer.className = "w-[300px] neon-box-cyan p-6 flex flex-col gap-4 floating-card";
-            menuContainer.innerHTML = `
-                <h3 class="text-cyan-400 font-bold text-lg text-center border-b border-cyan-500/30 pb-2">MENÚ 360 MS3</h3>
-                <button class="interactive-btn control-btn justify-center w-full" onclick="requestIOSPermissions()"><span>GIROSCOPIO</span></button>
-                <button class="interactive-btn control-btn justify-center w-full" onclick="toggleVRMode()"><span>VER EN VR</span></button>
-                <button class="interactive-btn control-btn justify-center w-full" onclick="openAboutModal()"><span>NOSOTROS</span></button>
-                <button class="interactive-btn control-btn justify-center w-full text-fuchsia-400 border-fuchsia-500" onclick="exitMultiverse(event)"><span>SALIR</span></button>
-            `;
-
-            menu3dGroup = new THREE.Group();
-            const menuCssObject = new THREE.CSS3DObject(menuContainer);
-            menuCssObject.scale.set(0.0022, 0.0022, 0.0022);
-            menu3dGroup.add(menuCssObject);
-            // Posicionado a la derecha y rotado hacia el usuario
-            menu3dGroup.position.set(2.2, 0, -1.2);
-            menu3dGroup.rotation.y = -Math.PI / 4;
-            cssScene.add(menu3dGroup);
         }
 
         function destroyMultiverseHUD() {
             if (hudGroup) { cssScene.remove(hudGroup); hudGroup = null; }
-            if (menu3dGroup) { cssScene.remove(menu3dGroup); menu3dGroup = null; }
         }
 
-        // Interacción por Mirada (Gaze Raycaster)
+        // Interacción por Mirada
         function checkGazePointer() {
             let elementToTrigger = null;
 
@@ -332,7 +358,9 @@
                 raycaster.setFromCamera(new THREE.Vector2(0, 0), isVRMode ? cameraLeft : camera);
                 const intersects = raycaster.intersectObjects([planet]);
                 if (intersects.length > 0) elementToTrigger = planet;
-            } else {
+            }
+            
+            if (!elementToTrigger) {
                 const centerElement = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2);
                 if (centerElement && centerElement.closest('.interactive-btn')) {
                     elementToTrigger = centerElement.closest('.interactive-btn');
@@ -398,7 +426,7 @@
 
         function onPointerUp(e) {
             if (isDragging && dragDistance < 10 && !isSystemActive) {
-                if (!e.target.closest('#top-controls')) {
+                if (!e.target.closest('#top-controls') && !e.target.closest('#menu-toggle-btn') && !e.target.closest('#dropdown-panel-3d')) {
                     enterMultiverse();
                 }
             }
@@ -500,13 +528,15 @@
             isSystemActive = true;
             instruction.style.opacity = '0';
 
+            gsap.to(menuTriggerGroup.scale, { x: 0, y: 0, z: 0, duration: 0.5 });
             gsap.to(planetGroup.scale, { x: 0, y: 0, z: 0, duration: 0.8 });
             gsap.to(textGroup.scale, { x: 0, y: 0, z: 0, duration: 0.8, onComplete: () => {
                 planetGroup.visible = false;
                 textGroup.visible = false;
+                menuTriggerGroup.visible = false;
                 
                 createMultiverseHUD();
-                gsap.fromTo([hudGroup.scale, menu3dGroup.scale], { x: 0.01, y: 0.01, z: 0.01 }, { x: 1, y: 1, z: 1, duration: 1, ease: "back.out(1.4)" });
+                gsap.fromTo(hudGroup.scale, { x: 0.01, y: 0.01, z: 0.01 }, { x: 1, y: 1, z: 1, duration: 1, ease: "back.out(1.4)" });
             }});
         }
 
@@ -515,14 +545,16 @@
             if (event) event.stopPropagation();
             if (!isSystemActive || !hudGroup) return;
 
-            gsap.to([hudGroup.scale, menu3dGroup.scale], { x: 0, y: 0, z: 0, duration: 0.6, onComplete: () => {
+            gsap.to(hudGroup.scale, { x: 0, y: 0, z: 0, duration: 0.6, onComplete: () => {
                 destroyMultiverseHUD();
                 
                 planetGroup.visible = true;
                 textGroup.visible = true;
+                menuTriggerGroup.visible = true;
 
                 gsap.to(planetGroup.scale, { x: 1, y: 1, z: 1, duration: 0.8 });
                 gsap.to(textGroup.scale, { x: 1, y: 1, z: 1, duration: 0.8 });
+                gsap.to(menuTriggerGroup.scale, { x: 1, y: 1, z: 1, duration: 0.8 });
 
                 isSystemActive = false;
                 instruction.style.opacity = '1';
