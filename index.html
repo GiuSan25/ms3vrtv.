@@ -23,9 +23,7 @@
             cursor: grab;
         }
 
-        #vr-view-container:active {
-            cursor: grabbing;
-        }
+        #vr-view-container:active { cursor: grabbing; }
 
         .vr-eye {
             position: relative;
@@ -37,18 +35,14 @@
             align-items: center;
         }
 
-        body.vr-mode .vr-eye {
-            width: 50vw;
-        }
+        body.vr-mode .vr-eye { width: 50vw; }
 
         body.vr-mode #eye-right {
             display: flex !important;
             border-left: 2px solid rgba(0, 240, 255, 0.4);
         }
 
-        #eye-right {
-            display: none;
-        }
+        #eye-right { display: none; }
 
         .webgl-canvas-container {
             position: absolute;
@@ -108,31 +102,13 @@
             width: 100%; max-width: 1000px; display: flex; flex-direction: column; align-items: center; gap: 20px; transition: transform 0.3s ease;
         }
 
-        /* Botón Flotante Volver */
         .back-btn-floating {
-            background: rgba(10, 6, 24, 0.9);
-            border: 2px solid #f000ff;
-            color: #f000ff;
-            box-shadow: 0 0 15px rgba(240, 0, 255, 0.5);
-            backdrop-filter: blur(8px);
-            padding: 8px 18px;
-            border-radius: 9999px;
-            font-weight: 800;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            align-self: flex-start;
-            margin-bottom: -10px;
+            background: rgba(10, 6, 24, 0.9); border: 2px solid #f000ff; color: #f000ff; box-shadow: 0 0 15px rgba(240, 0, 255, 0.5);
+            backdrop-filter: blur(8px); padding: 8px 18px; border-radius: 9999px; font-weight: 800; font-size: 0.85rem; cursor: pointer;
+            transition: all 0.3s ease; display: flex; align-items: center; gap: 6px; align-self: flex-start; margin-bottom: -10px;
         }
 
-        .back-btn-floating:hover {
-            background: rgba(240, 0, 255, 0.2);
-            box-shadow: 0 0 25px rgba(240, 0, 255, 0.8);
-            transform: scale(1.05);
-        }
+        .back-btn-floating:hover { background: rgba(240, 0, 255, 0.2); box-shadow: 0 0 25px rgba(240, 0, 255, 0.8); transform: scale(1.05); }
 
         .neon-box-cyan {
             border: 2px solid #00f0ff; box-shadow: 0 0 25px rgba(0, 240, 255, 0.5), inset 0 0 20px rgba(0, 240, 255, 0.25);
@@ -251,16 +227,20 @@
     </div>
 
     <script>
-        let scene, camera, rendererLeft, rendererRight;
+        let scene, camera, cameraLeft, cameraRight, cameraRig, rendererLeft, rendererRight;
         let planet, textGroup, planetGroup, universeSphere, starField, backgroundRingGroup;
         let isSystemActive = false, isGyroActive = false, isVRMode = false, mobileMenuOpen = false;
 
-        // Variables de Rotación 360° mediante Mouse / Táctil
+        // Variables de Rotación y Arrastre Táctil / Mouse
         let isDragging = false;
         let previousMousePosition = { x: 0, y: 0 };
         let targetRotationX = 0, targetRotationY = 0;
         let currentRotationX = 0, currentRotationY = 0;
         let dragDistance = 0;
+
+        // Quaternions para orientación inmersiva 360 en VR
+        let deviceQuaternion = new THREE.Quaternion();
+        const eyeSeparation = 0.064; // Distancia interocular aproximada
 
         const containerLeft = document.getElementById('canvas-container-left');
         const containerRight = document.getElementById('canvas-container-right');
@@ -269,7 +249,22 @@
         const instruction = document.getElementById('instruction');
 
         scene = new THREE.Scene();
+
+        // Contenedor / Rig de Cámara
+        cameraRig = new THREE.Object3D();
+        scene.add(cameraRig);
+
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        cameraLeft = new THREE.PerspectiveCamera(75, (window.innerWidth / 2) / window.innerHeight, 0.1, 1000);
+        cameraRight = new THREE.PerspectiveCamera(75, (window.innerWidth / 2) / window.innerHeight, 0.1, 1000);
+
+        cameraLeft.position.x = -eyeSeparation / 2;
+        cameraRight.position.x = eyeSeparation / 2;
+
+        cameraRig.add(camera);
+        cameraRig.add(cameraLeft);
+        cameraRig.add(cameraRight);
+        cameraRig.position.z = 5;
 
         rendererLeft = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         rendererLeft.setSize(window.innerWidth, window.innerHeight);
@@ -279,18 +274,18 @@
         rendererRight.setSize(window.innerWidth, window.innerHeight);
         containerRight.appendChild(rendererRight.domElement);
 
-        // Luces neón en tres dimensiones
+        // Iluminación
         scene.add(new THREE.AmbientLight(0x3a1050, 1.5));
         const pLightCyan = new THREE.PointLight(0x00f0ff, 4, 80); pLightCyan.position.set(-8, 8, 8); scene.add(pLightCyan);
         const pLightPink = new THREE.PointLight(0xf000ff, 4, 80); pLightPink.position.set(8, -8, 8); scene.add(pLightPink);
         const pLightViolet = new THREE.PointLight(0x8a2be2, 3, 80); pLightViolet.position.set(0, 0, -10); scene.add(pLightViolet);
 
-        // Fondo espacial
+        // Fondo Universo
         const universeGeo = new THREE.SphereGeometry(70, 32, 32);
         universeSphere = new THREE.Mesh(universeGeo, new THREE.MeshBasicMaterial({ color: 0x070216, side: THREE.BackSide }));
         scene.add(universeSphere);
 
-        // Fondo 3D Estrellado Animado
+        // Estrellas 3D Animadas
         const starsGeometry = new THREE.BufferGeometry();
         const starCount = 2500;
         const starPositions = new Float32Array(starCount * 3);
@@ -321,13 +316,7 @@
         starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
         starsGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
-        const starsMaterial = new THREE.PointsMaterial({
-            size: 0.25,
-            vertexColors: true,
-            transparent: true,
-            opacity: 0.9
-        });
-
+        const starsMaterial = new THREE.PointsMaterial({ size: 0.25, vertexColors: true, transparent: true, opacity: 0.9 });
         starField = new THREE.Points(starsGeometry, starsMaterial);
         scene.add(starField);
 
@@ -355,7 +344,7 @@
         planetGroup.add(planet);
         scene.add(planetGroup);
 
-        // Logo MS3 Original
+        // Logo MS3
         textGroup = new THREE.Group();
         textGroup.position.y = 0.8;
 
@@ -380,9 +369,8 @@
             textGroup.add(borderMesh);
         });
         scene.add(textGroup);
-        camera.position.z = 5;
 
-        // --- SISTEMA DE NAVEGACIÓN TOUCH / DRAG 360° ---
+        // Control Táctil / Mouse
         function onPointerDown(e) {
             if (e.target.closest('#top-controls') || e.target.closest('#mobile-drawer') || e.target.closest('#mobile-menu-toggle') || e.target.closest('.ui-interface') || e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
             
@@ -407,15 +395,12 @@
             targetRotationY += deltaX * 0.005;
             targetRotationX += deltaY * 0.005;
 
-            // Limitar la rotación vertical para evitar inversión brusca
             targetRotationX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, targetRotationX));
 
             previousMousePosition = { x, y };
         }
 
-        function onPointerUp() {
-            isDragging = false;
-        }
+        function onPointerUp() { isDragging = false; }
 
         window.addEventListener('mousedown', onPointerDown);
         window.addEventListener('mousemove', onPointerMove);
@@ -425,14 +410,21 @@
         window.addEventListener('touchmove', onPointerMove, { passive: true });
         window.addEventListener('touchend', onPointerUp);
 
-        // Giroscopio integrado
+        // Giroscopio Inmersivo 360 Grados
         function handleOrientation(e) {
             if (!isGyroActive) return;
+
+            const alpha = e.alpha ? THREE.MathUtils.degToRad(e.alpha) : 0;
             const beta = e.beta ? THREE.MathUtils.degToRad(e.beta) : 0;
             const gamma = e.gamma ? THREE.MathUtils.degToRad(e.gamma) : 0;
 
-            targetRotationX = beta * 0.5;
-            targetRotationY = gamma * 0.5;
+            const euler = new THREE.Euler(beta, alpha, -gamma, 'YXZ');
+            deviceQuaternion.setFromEuler(euler);
+
+            // Ajuste para sostener el dispositivo en orientación horizontal (VR Landscape)
+            const orientFix = new THREE.Quaternion();
+            orientFix.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -Math.PI / 2);
+            deviceQuaternion.multiply(orientFix);
         }
 
         function toggleGyroscope() {
@@ -452,10 +444,11 @@
             });
 
             if (isGyroActive) {
-                window.addEventListener('deviceorientation', handleOrientation);
+                window.addEventListener('deviceorientation', handleOrientation, true);
                 if (!isVRMode) toggleVRMode();
             } else {
-                window.removeEventListener('deviceorientation', handleOrientation);
+                window.removeEventListener('deviceorientation', handleOrientation, true);
+                cameraRig.quaternion.set(0, 0, 0, 1);
                 targetRotationX = 0;
                 targetRotationY = 0;
             }
@@ -468,18 +461,25 @@
                 b.classList.toggle('active', isVRMode);
                 b.querySelector('span').innerText = isVRMode ? 'SALIR DE VR' : 'VER EN VR';
             });
+
+            if (isVRMode && !isGyroActive) {
+                setGyro(true);
+            }
             onWindowResize();
         }
 
         function animate() {
             requestAnimationFrame(animate);
 
-            // Suavizado dinámico de la rotación de cámara
-            currentRotationX += (targetRotationX - currentRotationX) * 0.08;
-            currentRotationY += (targetRotationY - currentRotationY) * 0.08;
+            if (isGyroActive) {
+                cameraRig.quaternion.slerp(deviceQuaternion, 0.2);
+            } else {
+                currentRotationX += (targetRotationX - currentRotationX) * 0.08;
+                currentRotationY += (targetRotationY - currentRotationY) * 0.08;
 
-            camera.rotation.x = currentRotationX;
-            camera.rotation.y = currentRotationY;
+                cameraRig.rotation.x = currentRotationX;
+                cameraRig.rotation.y = currentRotationY;
+            }
 
             planet.rotation.y += 0.008;
             textGroup.rotation.y += 0.006;
@@ -489,9 +489,11 @@
             backgroundRingGroup.rotation.y += 0.002;
             backgroundRingGroup.rotation.z += 0.001;
 
-            rendererLeft.render(scene, camera);
             if (isVRMode) {
-                rendererRight.render(scene, camera);
+                rendererLeft.render(scene, cameraLeft);
+                rendererRight.render(scene, cameraRight);
+            } else {
+                rendererLeft.render(scene, camera);
             }
         }
         animate();
@@ -502,7 +504,7 @@
             isSystemActive = true;
             instruction.style.opacity = '0';
             
-            gsap.to(camera.position, { z: -1.5, duration: 1.5, onComplete: () => {
+            gsap.to(cameraRig.position, { z: -1.5, duration: 1.5, onComplete: () => {
                 planetGroup.visible = false;
                 textGroup.visible = false;
                 
@@ -513,7 +515,7 @@
             }});
         }
 
-        // Salir / Volver a la sección anterior
+        // Volver a la sección anterior
         function exitMultiverse(event) {
             if (event) event.stopPropagation();
             if (!isSystemActive) return;
@@ -526,19 +528,17 @@
             planetGroup.visible = true;
             textGroup.visible = true;
 
-            // Restablecer ángulo de la cámara al volver
             targetRotationX = 0;
             targetRotationY = 0;
 
-            gsap.to(camera.position, { z: 5, duration: 1.5, onComplete: () => {
+            gsap.to(cameraRig.position, { z: 5, duration: 1.5, onComplete: () => {
                 isSystemActive = false;
                 instruction.style.opacity = '1';
             }});
         }
 
-        // Click para entrar solo si no se estuvo arrastrando la pantalla
         window.addEventListener('click', (e) => {
-            if (dragDistance > 10) return; // Evita activar el clic si fue un arrastre de pantalla
+            if (dragDistance > 10) return;
             if (!isSystemActive && !e.target.closest('#top-controls') && !e.target.closest('#mobile-drawer') && !e.target.closest('#mobile-menu-toggle')) {
                 enterMultiverse();
             }
@@ -567,10 +567,16 @@
             const width = isVRMode ? window.innerWidth / 2 : window.innerWidth;
             const height = window.innerHeight;
             
-            camera.aspect = width / height;
+            camera.aspect = window.innerWidth / height;
             camera.updateProjectionMatrix();
 
-            rendererLeft.setSize(width, height);
+            cameraLeft.aspect = width / height;
+            cameraLeft.updateProjectionMatrix();
+
+            cameraRight.aspect = width / height;
+            cameraRight.updateProjectionMatrix();
+
+            rendererLeft.setSize(isVRMode ? width : window.innerWidth, height);
             rendererRight.setSize(width, height);
         }
         window.addEventListener('resize', onWindowResize);
