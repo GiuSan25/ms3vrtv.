@@ -32,7 +32,7 @@
             align-items: center;
         }
 
-        /* Cuando entra en modo VR, se divide en 2 pantallas iguales */
+        /* En modo VR se divide en 2 pantallas simétricas */
         body.vr-mode .vr-eye {
             width: 50vw;
         }
@@ -55,7 +55,7 @@
             z-index: 1;
         }
 
-        /* Controles */
+        /* Controles superiores */
         #top-controls {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; gap: 15px;
         }
@@ -90,14 +90,13 @@
             font-size: 1.1rem; pointer-events: none; text-shadow: 0 0 10px #0ff, 0 0 20px #f0f; font-weight: 600;
         }
 
-        /* Paneles UI duplicados dentro del Universo */
+        /* Paneles UI duplicados en VR */
         .ui-interface {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;
             opacity: 0; pointer-events: none; transition: opacity 1s ease;
             overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 80px 10px 30px 10px;
         }
 
-        /* Escala del contenido dentro de cada ojo VR */
         body.vr-mode .desktop-canvas-frame {
             transform: scale(0.65);
             transform-origin: top center;
@@ -176,7 +175,7 @@
             </div>
         </div>
 
-        <!-- OJO DERECHO (CLON COMPLETO) -->
+        <!-- OJO DERECHO (CLON) -->
         <div class="vr-eye" id="eye-right">
             <div class="webgl-canvas-container" id="canvas-container-right"></div>
             <div class="ui-interface" id="ui-right">
@@ -225,7 +224,6 @@
         const uiRight = document.getElementById('ui-right');
         const instruction = document.getElementById('instruction');
 
-        // Configuración Renderers Estereoscópicos
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
@@ -237,36 +235,54 @@
         rendererRight.setSize(window.innerWidth, window.innerHeight);
         containerRight.appendChild(rendererRight.domElement);
 
-        // Iluminación
+        // Luces para el brillo metálico neón original
         scene.add(new THREE.AmbientLight(0xffffff, 1.8));
-        const pLight1 = new THREE.PointLight(0xff00ff, 4, 60); pLight1.position.set(6, 6, 6); scene.add(pLight1);
-        const pLight2 = new THREE.PointLight(0x00ffff, 4, 60); pLight2.position.set(-6, -6, 6); scene.add(pLight2);
+        const pointLight1 = new THREE.PointLight(0xff00ff, 4, 60); pointLight1.position.set(6, 6, 6); scene.add(pointLight1);
+        const pointLight2 = new THREE.PointLight(0x00ffff, 4, 60); pointLight2.position.set(-6, -6, 6); scene.add(pointLight2);
 
         // Universo 360
         const universeGeo = new THREE.SphereGeometry(60, 32, 32);
         universeSphere = new THREE.Mesh(universeGeo, new THREE.MeshBasicMaterial({ color: 0x05021a, side: THREE.BackSide }));
         scene.add(universeSphere);
 
-        // Esferas e inicio
+        // Esfera neón cian
         planetGroup = new THREE.Group();
-        planet = new THREE.Mesh(new THREE.IcosahedronGeometry(1.4, 4), new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true }));
+        const planetMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.9 });
+        planet = new THREE.Mesh(new THREE.IcosahedronGeometry(1.4, 4), planetMaterial);
         planet.position.y = -1.5;
         planetGroup.add(planet);
         scene.add(planetGroup);
 
+        // Restauración del Logo MS3 Neón Metálico Original
         textGroup = new THREE.Group();
         textGroup.position.y = 0.8;
-        new THREE.FontLoader().load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', font => {
-            const geo = new THREE.TextGeometry('MS3', { font: font, size: 1.2, height: 0.4 });
-            geo.computeBoundingBox();
-            const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true }));
-            mesh.position.x = -0.5 * (geo.boundingBox.max.x - geo.boundingBox.min.x);
-            textGroup.add(mesh);
+
+        const loader = new THREE.FontLoader();
+        loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
+            const textGeo = new THREE.TextGeometry('MS3', {
+                font: font, size: 1.2, height: 0.4, curveSegments: 12,
+                bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.05, bevelOffset: 0, bevelSegments: 5
+            });
+            textGeo.computeBoundingBox();
+            const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
+            
+            // Texto Metálico Reflectante Original
+            const mirrorMaterial = new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0.9, roughness: 0.05, clearcoat: 1.0, reflectivity: 1.0 });
+            const textMesh = new THREE.Mesh(textGeo, mirrorMaterial);
+            textMesh.position.x = centerOffset;
+            textGroup.add(textMesh);
+
+            // Borde Neón Cian Neón Original
+            const neonBorderMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.7 });
+            const borderMesh = new THREE.Mesh(textGeo, neonBorderMaterial);
+            borderMesh.position.x = centerOffset;
+            borderMesh.scale.set(1.02, 1.02, 1.02);
+            textGroup.add(borderMesh);
         });
         scene.add(textGroup);
         camera.position.z = 5;
 
-        // Giroscopio con Sincronización SBS
+        // Giroscopio SBS
         function handleOrientation(e) {
             if (!isGyroActive) return;
             const beta = e.beta ? THREE.MathUtils.degToRad(e.beta) : 0;
@@ -294,7 +310,7 @@
 
             if (isGyroActive) {
                 window.addEventListener('deviceorientation', handleOrientation);
-                if (!isVRMode) toggleVRMode(); // Activa la pantalla dividida automáticamente al encender giroscopio
+                if (!isVRMode) toggleVRMode();
             } else {
                 window.removeEventListener('deviceorientation', handleOrientation);
                 camera.rotation.set(0, 0, 0);
