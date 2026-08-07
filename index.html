@@ -92,8 +92,8 @@
             border-radius: 24px; background: rgba(10, 6, 24, 0.92); backdrop-filter: blur(16px);
         }
 
-        #about-modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 2000;
+        #admin-modal, #about-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 3000;
             display: none; justify-content: center; align-items: center; flex-direction: column; padding: 20px; pointer-events: auto;
         }
         .modal-close-btn { margin-top: 20px; padding: 10px 25px; background: #0ff; color: #000; font-weight: bold; border-radius: 8px; cursor: pointer; }
@@ -113,7 +113,7 @@
         </div>
     </div>
 
-    <div id="instruction">Arrastra con el dedo/mouse en 360° | Toca la esfera MS3 para entrar</div>
+    <div id="instruction">Escribe la clave secreta o arrastra en 360° | Toca la esfera MS3 para entrar</div>
 
     <div id="vr-view-container">
         <div class="vr-eye" id="eye-left">
@@ -125,6 +125,19 @@
             <div class="gaze-reticle" id="reticle-right"><div class="gaze-dot"></div><div class="gaze-progress"></div></div>
             <div class="webgl-canvas-container" id="canvas-container-right"></div>
             <div class="css3d-container" id="css3d-container-right"></div>
+        </div>
+    </div>
+
+    <!-- PANEL DE ADMINISTRACIÓN (Se abre escribiendo Hhxz#) -->
+    <div id="admin-modal">
+        <div class="neon-box-cyan p-8 max-w-lg w-full text-center flex flex-col gap-4">
+            <h2 class="text-3xl font-bold text-fuchsia-400">PANEL DE ADMINISTRADOR MS3</h2>
+            <p class="text-gray-300 text-sm">Pega aquí el enlace directo de tu video (de Archive.org, Catbox, etc.). Se guardará automáticamente para todos los visitantes.</p>
+            <input type="text" id="admin-video-url-input" class="bg-black/80 border-2 border-cyan-400 p-3 rounded-xl text-white w-full outline-none focus:border-fuchsia-500 text-sm" placeholder="https://...">
+            <div class="flex gap-4 justify-center mt-4">
+                <button class="modal-close-btn interactive-btn bg-cyan-400 text-black border-none" onclick="saveNewVideoUrl()">GUARDAR Y FIJAR</button>
+                <button class="modal-close-btn interactive-btn bg-gray-800 text-gray-300 border-none" onclick="closeAdminModal()">CANCELAR</button>
+            </div>
         </div>
     </div>
 
@@ -160,9 +173,40 @@
         const GAZE_TIME = 3000;
 
         // ==========================================
-        // TU VIDEO DE ARCHIVE.ORG YA CONFIGURADO
+        // SISTEMA DE CLAVE SECRETA Y PERSISTENCIA
         // ==========================================
-        const FIXED_VIDEO_URL = "https://archive.org/download/buscando-h-265-injected/BUSCANDO%20H265_injected.mp4"; 
+        let typedBuffer = "";
+        const SECRET_CODE = "Hhxz#";
+
+        window.addEventListener('keypress', (e) => {
+            typedBuffer += e.key;
+            if (typedBuffer.length > 20) typedBuffer = typedBuffer.slice(-20);
+            if (typedBuffer.includes(SECRET_CODE)) {
+                typedBuffer = "";
+                openAdminModal();
+            }
+        });
+
+        function openAdminModal() {
+            document.getElementById('admin-video-url-input').value = localStorage.getItem('ms3_custom_video_url') || FIXED_VIDEO_URL;
+            document.getElementById('admin-modal').style.display = 'flex';
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-modal').style.display = 'none';
+        }
+
+        function saveNewVideoUrl() {
+            const newUrl = document.getElementById('admin-video-url-input').value.trim();
+            if (newUrl) {
+                localStorage.setItem('ms3_custom_video_url', newUrl);
+                alert("¡Video guardado con éxito! La página se recargará para aplicar los cambios globales.");
+                location.reload();
+            }
+        }
+
+        // Recuperar enlace guardado o usar el tuyo por defecto
+        const FIXED_VIDEO_URL = localStorage.getItem('ms3_custom_video_url') || "https://archive.org/download/buscando-h-265-injected/BUSCANDO%20H265_injected.mp4"; 
         const FIXED_THUMBNAIL_URL = "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=800&auto=format&fit=crop";
 
         const videoElement = document.createElement('video');
@@ -312,9 +356,9 @@
 
                     <div class="flex flex-col justify-between h-[300px] flex-grow">
                         <div>
-                            <span class="text-green-400 font-bold text-lg flex items-center gap-2"><span class="w-3 h-3 bg-green-400 rounded-full animate-ping"></span> VIDEO FIJO INTEGRADO PERMANENTE</span>
-                            <h1 class="text-5xl font-black text-white mt-2 drop-shadow-[0_0_15px_#00f0ff]">BÚSQUEDA H265 - 360°</h1>
-                            <p class="text-gray-300 text-xl mt-3 leading-relaxed">Tu video ya se encuentra conectado de forma global. Cualquier persona que abra esta página desde cualquier dispositivo podrá visualizarlo de inmediato sin pantallas negras.</p>
+                            <span class="text-green-400 font-bold text-lg flex items-center gap-2"><span class="w-3 h-3 bg-green-400 rounded-full animate-ping"></span> VIDEO CONFIGURADO ACTIVO</span>
+                            <h1 class="text-5xl font-black text-white mt-2 drop-shadow-[0_0_15px_#00f0ff]">EXPERIENCIA 360° VR</h1>
+                            <p class="text-gray-300 text-xl mt-3 leading-relaxed">Disfruta de la experiencia inmersiva global para todos los usuarios.</p>
                         </div>
                         <div>
                             <button onclick="start360Video()" class="interactive-btn bg-cyan-400 text-black px-10 py-4 rounded-2xl font-black text-2xl shadow-[0_0_35px_#00f0ff] hover:scale-105 transition-transform flex items-center gap-4">
@@ -433,7 +477,7 @@
         }
 
         function onPointerDown(e) {
-            if (e.target.closest('#top-ui-container') || e.target.closest('#about-modal')) return;
+            if (e.target.closest('#top-ui-container') || e.target.closest('#about-modal') || e.target.closest('#admin-modal')) return;
             isDragging = true;
             dragDistance = 0;
             const x = e.touches ? e.touches[0].clientX : e.clientX;
