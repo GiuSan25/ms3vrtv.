@@ -11,7 +11,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
         body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; width: 100vw; height: 100vh; }
         
-        /* Modos VR Estéril SBS (Side-by-Side) */
+        /* Modos VR SBS (Side-by-Side) */
         #vr-view-container {
             display: flex;
             width: 100vw;
@@ -32,7 +32,6 @@
             align-items: center;
         }
 
-        /* En modo VR se divide en 2 pantallas simétricas */
         body.vr-mode .vr-eye {
             width: 50vw;
         }
@@ -55,7 +54,6 @@
             z-index: 1;
         }
 
-        /* Controles superiores */
         #top-controls {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; gap: 15px;
         }
@@ -90,7 +88,6 @@
             font-size: 1.1rem; pointer-events: none; text-shadow: 0 0 10px #0ff, 0 0 20px #f0f; font-weight: 600;
         }
 
-        /* Paneles UI duplicados en VR */
         .ui-interface {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;
             opacity: 0; pointer-events: none; transition: opacity 1s ease;
@@ -150,7 +147,6 @@
 
     <div id="instruction">Presiona para ingresar al universo 360 MS3</div>
 
-    <!-- Contenedor VR SBS Dividido -->
     <div id="vr-view-container">
         <!-- OJO IZQUIERDO -->
         <div class="vr-eye" id="eye-left">
@@ -215,7 +211,7 @@
 
     <script>
         let scene, camera, rendererLeft, rendererRight;
-        let planet, textGroup, planetGroup, universeSphere, starField;
+        let planet, textGroup, planetGroup, universeSphere, starField, backgroundRingGroup;
         let isSystemActive = false, isGyroActive = false, isVRMode = false, mobileMenuOpen = false;
 
         const containerLeft = document.getElementById('canvas-container-left');
@@ -235,17 +231,75 @@
         rendererRight.setSize(window.innerWidth, window.innerHeight);
         containerRight.appendChild(rendererRight.domElement);
 
-        // Luces para el brillo metálico neón original
-        scene.add(new THREE.AmbientLight(0xffffff, 1.8));
-        const pointLight1 = new THREE.PointLight(0xff00ff, 4, 60); pointLight1.position.set(6, 6, 6); scene.add(pointLight1);
-        const pointLight2 = new THREE.PointLight(0x00ffff, 4, 60); pointLight2.position.set(-6, -6, 6); scene.add(pointLight2);
+        // Iluminación Neón Tridimensional (Rosa, Violeta y Celeste)
+        scene.add(new THREE.AmbientLight(0x3a1050, 1.5));
+        const pLightCyan = new THREE.PointLight(0x00f0ff, 4, 80); pLightCyan.position.set(-8, 8, 8); scene.add(pLightCyan);
+        const pLightPink = new THREE.PointLight(0xf000ff, 4, 80); pLightPink.position.set(8, -8, 8); scene.add(pLightPink);
+        const pLightViolet = new THREE.PointLight(0x8a2be2, 3, 80); pLightViolet.position.set(0, 0, -10); scene.add(pLightViolet);
 
-        // Universo 360
-        const universeGeo = new THREE.SphereGeometry(60, 32, 32);
-        universeSphere = new THREE.Mesh(universeGeo, new THREE.MeshBasicMaterial({ color: 0x05021a, side: THREE.BackSide }));
+        // Universo 360 con degradado espacial violeta
+        const universeGeo = new THREE.SphereGeometry(70, 32, 32);
+        universeSphere = new THREE.Mesh(universeGeo, new THREE.MeshBasicMaterial({ color: 0x070216, side: THREE.BackSide }));
         scene.add(universeSphere);
 
-        // Esfera neón cian
+        // FONDO TRIDIMENSIONAL ESTRELLADO ANIMADO CON CELESTE, ROSA Y VIOLETA
+        const starsGeometry = new THREE.BufferGeometry();
+        const starCount = 3000;
+        const starPositions = new Float32Array(starCount * 3);
+        const starColors = new Float32Array(starCount * 3);
+
+        const palette = [
+            new THREE.Color(0x00f0ff), // Celeste / Cian
+            new THREE.Color(0xf000ff), // Rosa / Magenta
+            new THREE.Color(0x9d4edd), // Violeta
+            new THREE.Color(0xffffff)  # Blanco brillante
+        ];
+
+        for (let i = 0; i < starCount; i++) {
+            const radius = 15 + Math.random() * 45;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos((Math.random() * 2) - 1);
+
+            starPositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+            starPositions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+            starPositions[i * 3 + 2] = radius * Math.cos(phi);
+
+            const color = palette[Math.floor(Math.random() * palette.length)];
+            starColors[i * 3] = color.r;
+            starColors[i * 3 + 1] = color.g;
+            starColors[i * 3 + 2] = color.b;
+        }
+
+        starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+        starsGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+
+        const starsMaterial = new THREE.PointsMaterial({
+            size: 0.25,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.9
+        });
+
+        starField = new THREE.Points(starsGeometry, starsMaterial);
+        scene.add(starField);
+
+        // Anillos Cósmicos Neón en 3D
+        backgroundRingGroup = new THREE.Group();
+        const ringGeo1 = new THREE.TorusGeometry(12, 0.05, 16, 100);
+        const ringMat1 = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.35 });
+        const ring1 = new THREE.Mesh(ringGeo1, ringMat1);
+        ring1.rotation.x = Math.PI / 3;
+
+        const ringGeo2 = new THREE.TorusGeometry(16, 0.05, 16, 100);
+        const ringMat2 = new THREE.MeshBasicMaterial({ color: 0xf000ff, wireframe: true, transparent: true, opacity: 0.3 });
+        const ring2 = new THREE.Mesh(ringGeo2, ringMat2);
+        ring2.rotation.y = Math.PI / 4;
+
+        backgroundRingGroup.add(ring1);
+        backgroundRingGroup.add(ring2);
+        scene.add(backgroundRingGroup);
+
+        // Esfera neón cian central
         planetGroup = new THREE.Group();
         const planetMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.9 });
         planet = new THREE.Mesh(new THREE.IcosahedronGeometry(1.4, 4), planetMaterial);
@@ -253,7 +307,7 @@
         planetGroup.add(planet);
         scene.add(planetGroup);
 
-        // Restauración del Logo MS3 Neón Metálico Original
+        // Logo MS3 Original
         textGroup = new THREE.Group();
         textGroup.position.y = 0.8;
 
@@ -266,13 +320,11 @@
             textGeo.computeBoundingBox();
             const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
             
-            // Texto Metálico Reflectante Original
             const mirrorMaterial = new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0.9, roughness: 0.05, clearcoat: 1.0, reflectivity: 1.0 });
             const textMesh = new THREE.Mesh(textGeo, mirrorMaterial);
             textMesh.position.x = centerOffset;
             textGroup.add(textMesh);
 
-            // Borde Neón Cian Neón Original
             const neonBorderMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.7 });
             const borderMesh = new THREE.Mesh(textGeo, neonBorderMaterial);
             borderMesh.position.x = centerOffset;
@@ -331,6 +383,12 @@
             requestAnimationFrame(animate);
             planet.rotation.y += 0.008;
             textGroup.rotation.y += 0.006;
+
+            // Animación del Fondo 3D
+            starField.rotation.y += 0.0006;
+            starField.rotation.x += 0.0003;
+            backgroundRingGroup.rotation.y += 0.002;
+            backgroundRingGroup.rotation.z += 0.001;
 
             rendererLeft.render(scene, camera);
             if (isVRMode) {
