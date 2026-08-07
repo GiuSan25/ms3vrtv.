@@ -66,13 +66,9 @@
             100% { transform: rotate(360deg); border-color: #f000ff; }
         }
 
-        #top-controls {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; gap: 15px;
-        }
-
         .control-btn {
             background: rgba(10, 6, 24, 0.85); border: 2px solid #00f0ff; color: #00f0ff; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
-            backdrop-filter: blur(8px); padding: 10px 20px; border-radius: 9999px; font-weight: 700; font-size: 0.9rem; cursor: pointer;
+            backdrop-filter: blur(8px); padding: 12px 24px; border-radius: 9999px; font-weight: 700; font-size: 1rem; cursor: pointer;
             display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; white-space: nowrap; pointer-events: auto;
         }
 
@@ -107,12 +103,6 @@
     </style>
 </head>
 <body>
-
-    <div id="top-controls">
-        <button id="gyro-btn" class="control-btn" onclick="requestIOSPermissions()"><span>GIROSCOPIO: OFF</span></button>
-        <button id="vr-btn" class="control-btn" onclick="toggleVRMode()"><span>VER EN VR</span></button>
-        <button class="control-btn" onclick="openAboutModal()"><span>NOSOTROS</span></button>
-    </div>
 
     <div id="instruction">Arrastra con el dedo/mouse en 360° | Toca la esfera MS3 para entrar</div>
 
@@ -262,30 +252,30 @@
         });
         scene.add(textGroup);
 
-        // MENÚ DESPLEGABLE 3D (Agrandado y más alejado hacia la derecha x = 3.6)
+        // MENÚ DESPLEGABLE 3D (Mucho más grande)
         function create3DMenuTrigger() {
             const triggerDiv = document.createElement('div');
             triggerDiv.className = "flex flex-col items-end pointer-events-auto";
             triggerDiv.innerHTML = `
-                <button id="menu-toggle-btn" class="interactive-btn bg-black/85 border-2 border-cyan-400 text-cyan-300 px-6 py-4 rounded-full shadow-[0_0_25px_#00f0ff] flex items-center justify-center gap-3 font-extrabold text-base tracking-wider" onclick="toggle3DMenu(event)">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                <button id="menu-toggle-btn" class="interactive-btn bg-black/90 border-4 border-cyan-400 text-cyan-300 px-10 py-6 rounded-full shadow-[0_0_35px_#00f0ff] flex items-center justify-center gap-4 font-black text-2xl tracking-wider" onclick="toggle3DMenu(event)">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     <span>MENÚ</span>
                 </button>
-                <div id="dropdown-panel-3d" class="hidden mt-4 w-[280px] neon-box-cyan p-5 flex flex-col gap-4 floating-card transition-all duration-300 transform scale-95 opacity-0">
-                    <button class="interactive-btn control-btn justify-start w-full text-sm py-3" onclick="requestIOSPermissions()"><span>GIROSCOPIO</span></button>
-                    <button class="interactive-btn control-btn justify-start w-full text-sm py-3" onclick="toggleVRMode()"><span>MODO VR</span></button>
-                    <button class="interactive-btn control-btn justify-start w-full text-sm py-3" onclick="openAboutModal()"><span>NOSOTROS</span></button>
+                <div id="dropdown-panel-3d" class="hidden mt-6 w-[360px] neon-box-cyan p-6 flex flex-col gap-5 floating-card transition-all duration-300 transform scale-95 opacity-0">
+                    <button class="interactive-btn control-btn justify-start w-full text-lg py-4" onclick="requestIOSPermissions()"><span id="gyro-btn-text">GIROSCOPIO: OFF</span></button>
+                    <button class="interactive-btn control-btn justify-start w-full text-lg py-4" onclick="toggleVRMode()"><span id="vr-btn-text">VER EN VR</span></button>
+                    <button class="interactive-btn control-btn justify-start w-full text-lg py-4" onclick="openAboutModal()"><span>NOSOTROS</span></button>
                 </div>
             `;
 
             menuTriggerGroup = new THREE.Group();
             const cssObject = new THREE.CSS3DObject(triggerDiv);
-            // Escala aumentada para mejor legibilidad
-            cssObject.scale.set(0.0032, 0.0032, 0.0032);
+            // Escala significativamente aumentada
+            cssObject.scale.set(0.005, 0.005, 0.005);
             menuTriggerGroup.add(cssObject);
             
-            // Separado más a la derecha y ajustado en ángulo
-            menuTriggerGroup.position.set(3.6, 1.5, -1.2);
+            // Ubicación en la escena 3D
+            menuTriggerGroup.position.set(3.8, 1.4, -1.2);
             menuTriggerGroup.rotation.y = -Math.PI / 4.5;
             cssScene.add(menuTriggerGroup);
         }
@@ -400,7 +390,7 @@
 
         // Navegación Táctil / Mouse 360°
         function onPointerDown(e) {
-            if (e.target.closest('#top-controls') || e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
+            if (e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
             isDragging = true;
             dragDistance = 0;
             const x = e.touches ? e.touches[0].clientX : e.clientX;
@@ -427,7 +417,7 @@
 
         function onPointerUp(e) {
             if (isDragging && dragDistance < 10 && !isSystemActive) {
-                if (!e.target.closest('#top-controls') && !e.target.closest('#menu-toggle-btn') && !e.target.closest('#dropdown-panel-3d')) {
+                if (!e.target.closest('#menu-toggle-btn') && !e.target.closest('#dropdown-panel-3d')) {
                     enterMultiverse();
                 }
             }
@@ -466,10 +456,8 @@
         function setGyro(enable) {
             isGyroActive = enable;
             const text = isGyroActive ? 'GIROSCOPIO: ON' : 'GIROSCOPIO: OFF';
-            document.querySelectorAll('#gyro-btn').forEach(b => {
-                b.classList.toggle('active', isGyroActive);
-                b.querySelector('span').innerText = text;
-            });
+            const gyroTextEl = document.getElementById('gyro-btn-text');
+            if (gyroTextEl) gyroTextEl.innerText = text;
 
             if (isGyroActive) {
                 window.addEventListener('deviceorientation', handleOrientation, true);
@@ -484,10 +472,9 @@
         function toggleVRMode() {
             isVRMode = !isVRMode;
             document.body.classList.toggle('vr-mode', isVRMode);
-            document.querySelectorAll('#vr-btn').forEach(b => {
-                b.classList.toggle('active', isVRMode);
-                b.querySelector('span').innerText = isVRMode ? 'SALIR DE VR' : 'VER EN VR';
-            });
+            const vrTextEl = document.getElementById('vr-btn-text');
+            if (vrTextEl) vrTextEl.innerText = isVRMode ? 'SALIR DE VR' : 'VER EN VR';
+
             if (isVRMode && !isGyroActive) requestIOSPermissions();
             onWindowResize();
         }
@@ -555,7 +542,7 @@
 
                 gsap.to(planetGroup.scale, { x: 1, y: 1, z: 1, duration: 0.8 });
                 gsap.to(textGroup.scale, { x: 1, y: 1, z: 1, duration: 0.8 });
-                gsap.to(menuTriggerGroup.scale, { x: 1, y: 1, z: 1, duration: 0.8 });
+                gsap.to(menuTriggerGroup.scale, { x: 0.005, y: 0.005, z: 0.005, duration: 0.8 });
 
                 isSystemActive = false;
                 instruction.style.opacity = '1';
