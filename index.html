@@ -1,4 +1,3 @@
-html_code = r'''
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,307 +10,192 @@ html_code = r'''
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
-        
         * { -webkit-tap-highlight-color: transparent; }
-        
         body, html { 
             margin: 0; padding: 0; overflow: hidden; background-color: #000; 
             font-family: 'Inter', sans-serif; width: 100vw; height: 100dvh; 
             user-select: none; -webkit-user-select: none; touch-action: none;
         }
-        
         #vr-view-container {
             display: flex; width: 100vw; height: 100dvh; position: absolute;
             top: 0; left: 0; z-index: 2; cursor: grab;
         }
-
         #vr-view-container:active { cursor: grabbing; }
-
         .vr-eye {
             position: relative; width: 100%; height: 100%; overflow: hidden;
             display: flex; justify-content: center; align-items: center;
         }
-
         body.vr-mode .vr-eye { width: 50vw; }
         body.vr-mode #eye-right { display: flex !important; border-left: 2px solid rgba(0, 240, 255, 0.4); }
         #eye-right { display: none; }
-
         .webgl-canvas-container, .css3d-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
         }
-        
         .css3d-container { z-index: 10; }
-
-        /* MENÚ EN LA ESQUINA SUPERIOR DERECHA (UI 2D) */
         #top-ui-container {
             position: fixed; top: 20px; right: 20px; z-index: 1000;
             display: flex; flex-direction: column; align-items: flex-end; pointer-events: auto;
         }
-
-        /* PUNTERO DE MIRADA (GAZE RETICLE) */
-        .gaze-reticle {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 32px; height: 32px; border-radius: 50%;
-            border: 2px solid rgba(0, 240, 255, 0.6); z-index: 999; pointer-events: none;
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5); display: flex; align-items: center; justify-content: center;
-        }
-
-        .gaze-dot { width: 6px; height: 6px; background: #00f0ff; border-radius: 50%; box-shadow: 0 0 8px #00f0ff; }
-
-        .gaze-progress {
-            position: absolute; top: -4px; left: -4px; width: 36px; height: 36px;
-            border-radius: 50%; border: 3px solid transparent; opacity: 0; transition: opacity 0.2s ease;
-        }
-
-        .gaze-reticle.active .gaze-progress {
-            opacity: 1; animation: gazeFill 3s linear forwards;
-        }
-
-        @keyframes gazeFill {
-            0% { transform: rotate(0deg); border-top-color: #00f0ff; }
-            50% { border-right-color: #f000ff; border-bottom-color: #f000ff; }
-            100% { transform: rotate(360deg); border-color: #f000ff; }
-        }
-
         .control-btn {
             background: rgba(10, 6, 24, 0.85); border: 2px solid #00f0ff; color: #00f0ff; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
             backdrop-filter: blur(8px); padding: 12px 24px; border-radius: 9999px; font-weight: 700; font-size: 0.95rem; cursor: pointer;
             display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; white-space: nowrap; pointer-events: auto;
         }
-
         .control-btn:hover { background: rgba(0, 240, 255, 0.2); box-shadow: 0 0 25px rgba(0, 240, 255, 0.8); transform: scale(1.05); }
-
         #instruction { 
             position: fixed; bottom: 35px; width: 100%; text-align: center; color: #fff; z-index: 100; 
             font-size: 1.1rem; pointer-events: none; text-shadow: 0 0 10px #0ff, 0 0 20px #f0f; font-weight: 600; transition: opacity 0.5s ease;
         }
-
         .floating-card { pointer-events: auto; user-select: none; }
         .interactive-btn { pointer-events: auto; transition: transform 0.2s ease, border-color 0.2s ease; cursor: pointer; }
-        .interactive-btn.gaze-hover, .floating-card.gaze-hover { transform: scale(1.06); border-color: #f000ff !important; }
-
         .neon-box-cyan {
             border: 3px solid #00f0ff; box-shadow: 0 0 35px rgba(0, 240, 255, 0.6), inset 0 0 30px rgba(0, 240, 255, 0.3);
             border-radius: 24px; background: rgba(10, 6, 24, 0.92); backdrop-filter: blur(16px);
         }
-
-        .neon-box-magenta {
-            border: 3px solid #f000ff; box-shadow: 0 0 35px rgba(240, 0, 255, 0.6), inset 0 0 30px rgba(240, 0, 255, 0.3);
-            border-radius: 24px; background: rgba(10, 6, 24, 0.92); backdrop-filter: blur(16px);
+        #video-controls-overlay {
+            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+            z-index: 2000; display: none; gap: 15px; pointer-events: auto;
         }
-
-        #video-modal, #about-modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 2000;
-            display: none; justify-content: center; align-items: center; flex-direction: column; padding: 20px; pointer-events: auto;
-        }
-        #video-modal video { width: 100%; max-width: 900px; border-radius: 12px; box-shadow: 0 0 30px #0ff; }
-        .modal-close-btn { margin-top: 20px; padding: 10px 25px; background: #0ff; color: #000; font-weight: bold; border-radius: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <!-- MENÚ FLOTANTE EN LA ESQUINA SUPERIOR DERECHA -->
     <div id="top-ui-container">
         <button id="menu-toggle-btn" class="interactive-btn control-btn" onclick="toggleTopMenu(event)">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             <span>MENÚ</span>
         </button>
         <div id="dropdown-menu" class="hidden mt-3 w-64 neon-box-cyan p-4 flex flex-col gap-3 transition-all duration-300 transform scale-95 opacity-0">
-            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="requestIOSPermissions()"><span id="gyro-btn-text">GIROSCOPIO: OFF</span></button>
-            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="toggleVRMode()"><span id="vr-btn-text">VER EN VR</span></button>
-            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="openAboutModal()"><span>NOSOTROS</span></button>
+            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="toggleVRMode()"><span id="vr-btn-text">VER EN VR (SPLIT)</span></button>
         </div>
     </div>
 
-    <div id="instruction">Arrastra con el dedo/mouse en 360° | Toca la esfera MS3 para entrar</div>
+    <div id="instruction">Arrastra con el mouse para mirar en 360° | Haz clic en la esfera MS3 para entrar</div>
 
     <div id="vr-view-container">
-        <!-- OJO IZQUIERDO -->
         <div class="vr-eye" id="eye-left">
-            <div class="gaze-reticle" id="reticle-left"><div class="gaze-dot"></div><div class="gaze-progress"></div></div>
             <div class="webgl-canvas-container" id="canvas-container-left"></div>
             <div class="css3d-container" id="css3d-container-left"></div>
         </div>
-
-        <!-- OJO DERECHO -->
         <div class="vr-eye" id="eye-right">
-            <div class="gaze-reticle" id="reticle-right"><div class="gaze-dot"></div><div class="gaze-progress"></div></div>
             <div class="webgl-canvas-container" id="canvas-container-right"></div>
             <div class="css3d-container" id="css3d-container-right"></div>
         </div>
     </div>
 
-    <div id="video-modal">
-        <video id="active-video" controls autoplay playsinline></video>
-        <button class="modal-close-btn interactive-btn" onclick="closeVideo()">Cerrar Reproductor</button>
+    <div id="video-controls-overlay">
+        <button class="control-btn" onclick="toggleVideoPlay()">REPRODUCIR / PAUSAR</button>
+        <button class="control-btn" onclick="exitVideo360()">SALIR DEL VIDEO 360</button>
     </div>
 
-    <div id="about-modal">
-        <div class="neon-box-cyan p-8 max-w-md text-center">
-            <h2 class="text-3xl font-bold text-cyan-400 mb-4">SOBRE NOSOTROS</h2>
-            <p class="text-gray-300 mb-6">Plataforma inmersiva 360° diseñada para experiencias interactivas y realidad virtual.</p>
-            <button class="modal-close-btn interactive-btn" onclick="closeAboutModal()">CERRAR</button>
-        </div>
-    </div>
+    <!-- CAMBIA 'tu_video_gear.mp4' por el nombre exacto del archivo de tu computadora -->
+    <video id="vr360-video" loop crossorigin="anonymous" playsinline style="display:none;">
+        <source src="tu_video_gear.mp4" type="video/mp4">
+    </video>
 
     <script>
         let scene, cssScene, camera, cameraLeft, cameraRight, cameraRig;
         let rendererLeft, rendererRight, cssRendererLeft, cssRendererRight;
         let planet, textGroup, planetGroup, universeSphere, starField;
-        let hudGroup = null;
-        let isTopMenuOpen = false;
-
-        let isSystemActive = false, isGyroActive = false, isVRMode = false;
-
-        let isDragging = false;
-        let previousMousePosition = { x: 0, y: 0 };
-        let targetRotationX = 0, targetRotationY = 0;
-        let currentRotationX = 0, currentRotationY = 0;
-        let dragDistance = 0;
-
-        let deviceQuaternion = new THREE.Quaternion();
+        let hudGroup = null, videoSphere = null, videoTexture = null;
+        let isTopMenuOpen = false, isVideoPlaying360 = false, isSystemActive = false, isVRMode = false;
+        let isDragging = false, previousMousePosition = { x: 0, y: 0 };
+        let targetRotationX = 0, targetRotationY = 0, currentRotationX = 0, currentRotationY = 0, dragDistance = 0;
         const eyeSeparation = 0.064;
 
-        let raycaster = new THREE.Raycaster();
-        let gazeTarget = null;
-        let gazeTimer = null;
-        const GAZE_TIME = 3000;
-
-        const containerLeft = document.getElementById('canvas-container-left');
-        const containerRight = document.getElementById('canvas-container-right');
-        const cssContainerLeft = document.getElementById('css3d-container-left');
-        const cssContainerRight = document.getElementById('css3d-container-right');
-        const instruction = document.getElementById('instruction');
-
-        // Escenas 3D
         scene = new THREE.Scene();
         cssScene = new THREE.Scene();
-
         cameraRig = new THREE.Object3D();
         scene.add(cameraRig);
 
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         cameraLeft = new THREE.PerspectiveCamera(75, (window.innerWidth / 2) / window.innerHeight, 0.1, 1000);
         cameraRight = new THREE.PerspectiveCamera(75, (window.innerWidth / 2) / window.innerHeight, 0.1, 1000);
-
         cameraLeft.position.x = -eyeSeparation / 2;
         cameraRight.position.x = eyeSeparation / 2;
-
-        cameraRig.add(camera);
-        cameraRig.add(cameraLeft);
-        cameraRig.add(cameraRight);
+        cameraRig.add(camera); cameraRig.add(cameraLeft); cameraRig.add(cameraRight);
         cameraRig.position.set(0, 0, 5);
 
-        // Renderizadores WebGL
         rendererLeft = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         rendererLeft.setSize(window.innerWidth, window.innerHeight);
-        containerLeft.appendChild(rendererLeft.domElement);
+        document.getElementById('canvas-container-left').appendChild(rendererLeft.domElement);
 
         rendererRight = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         rendererRight.setSize(window.innerWidth, window.innerHeight);
-        containerRight.appendChild(rendererRight.domElement);
+        document.getElementById('canvas-container-right').appendChild(rendererRight.domElement);
 
-        // Renderizadores CSS3D
         cssRendererLeft = new THREE.CSS3DRenderer();
         cssRendererLeft.setSize(window.innerWidth, window.innerHeight);
-        cssContainerLeft.appendChild(cssRendererLeft.domElement);
+        document.getElementById('css3d-container-left').appendChild(cssRendererLeft.domElement);
 
         cssRendererRight = new THREE.CSS3DRenderer();
         cssRendererRight.setSize(window.innerWidth / 2, window.innerHeight);
-        cssContainerRight.appendChild(cssRendererRight.domElement);
+        document.getElementById('css3d-container-right').appendChild(cssRendererRight.domElement);
 
-        // Luces
         scene.add(new THREE.AmbientLight(0x3a1050, 1.5));
-        const pLightCyan = new THREE.PointLight(0x00f0ff, 4, 80); pLightCyan.position.set(-8, 8, 8); scene.add(pLightCyan);
-        const pLightPink = new THREE.PointLight(0xf000ff, 4, 80); pLightPink.position.set(8, -8, 8); scene.add(pLightPink);
 
-        // Fondo Universo 360°
         const universeGeo = new THREE.SphereGeometry(70, 32, 32);
         universeSphere = new THREE.Mesh(universeGeo, new THREE.MeshBasicMaterial({ color: 0x070216, side: THREE.BackSide }));
         scene.add(universeSphere);
 
-        // Estrellas
         const starsGeometry = new THREE.BufferGeometry();
-        const starCount = 3000;
+        const starCount = 2000;
         const starPositions = new Float32Array(starCount * 3);
-        const starColors = new Float32Array(starCount * 3);
-        const palette = [new THREE.Color(0x00f0ff), new THREE.Color(0xf000ff), new THREE.Color(0x9d4edd), new THREE.Color(0xffffff)];
-
-        for (let i = 0; i < starCount; i++) {
-            const radius = 15 + Math.random() * 45;
-            const theta = Math.random() * Math.PI * 2;
-            const phi = Math.acos((Math.random() * 2) - 1);
-            starPositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-            starPositions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
-            starPositions[i * 3 + 2] = radius * Math.cos(phi);
-            const color = palette[Math.floor(Math.random() * palette.length)];
-            starColors[i * 3] = color.r; starColors[i * 3 + 1] = color.g; starColors[i * 3 + 2] = color.b;
+        for (let i = 0; i < starCount * 3; i += 3) {
+            starPositions[i] = (Math.random() - 0.5) * 100;
+            starPositions[i+1] = (Math.random() - 0.5) * 100;
+            starPositions[i+2] = (Math.random() - 0.5) * 100;
         }
-
         starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-        starsGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
-        starField = new THREE.Points(starsGeometry, new THREE.PointsMaterial({ size: 0.25, vertexColors: true, transparent: true, opacity: 0.9 }));
+        starField = new THREE.Points(starsGeometry, new THREE.PointsMaterial({ size: 0.2, color: 0xffffff }));
         scene.add(starField);
 
-        // INICIO: Esfera + Texto MS3
         planetGroup = new THREE.Group();
-        planet = new THREE.Mesh(new THREE.IcosahedronGeometry(1.4, 4), new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.9 }));
-        planet.position.y = -1.5;
-        planetGroup.add(planet);
+        planet = new THREE.Mesh(new THREE.IcosahedronGeometry(1.4, 4), new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true }));
+        planet.position.y = -1.5; planetGroup.add(planet);
         scene.add(planetGroup);
 
         textGroup = new THREE.Group(); textGroup.position.y = 0.8;
         const loader = new THREE.FontLoader();
         loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
-            const textGeo = new THREE.TextGeometry('MS3', { font: font, size: 1.2, height: 0.4, curveSegments: 12, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.05 });
+            const textGeo = new THREE.TextGeometry('MS3', { font: font, size: 1.2, height: 0.4 });
+            const textMesh = new THREE.Mesh(textGeo, new THREE.MeshBasicMaterial({ color: 0xffffff }));
             textGeo.computeBoundingBox();
-            const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
-            const textMesh = new THREE.Mesh(textGeo, new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0.9, roughness: 0.05, clearcoat: 1.0 }));
-            textMesh.position.x = centerOffset; textGroup.add(textMesh);
+            textMesh.position.x = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
+            textGroup.add(textMesh);
         });
         scene.add(textGroup);
 
-        // MENÚ FLOTANTE 2D (ESQUINA SUPERIOR DERECHA)
         function toggleTopMenu(e) {
             if (e) e.stopPropagation();
             const dropdown = document.getElementById('dropdown-menu');
             isTopMenuOpen = !isTopMenuOpen;
-
             if (isTopMenuOpen) {
                 dropdown.classList.remove('hidden');
-                setTimeout(() => {
-                    dropdown.classList.remove('scale-95', 'opacity-0');
-                    dropdown.classList.add('scale-100', 'opacity-100');
-                }, 10);
+                setTimeout(() => dropdown.classList.remove('scale-95', 'opacity-0'), 10);
             } else {
-                dropdown.classList.remove('scale-100', 'opacity-100');
                 dropdown.classList.add('scale-95', 'opacity-0');
                 setTimeout(() => dropdown.classList.add('hidden'), 300);
             }
         }
 
-        // PANTALLA MULTIVERSO
         function createMultiverseHUD() {
             const mainContainer = document.createElement('div');
             mainContainer.className = "w-[1600px] flex flex-col gap-10 floating-card";
             mainContainer.innerHTML = `
-                <button class="interactive-btn self-start bg-black/95 border-6 border-fuchsia-500 text-fuchsia-300 px-14 py-7 rounded-full font-black text-3xl flex items-center gap-6 shadow-[0_0_50px_rgba(240,0,255,0.9)] tracking-widest" onclick="exitMultiverse(event)">
-                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                <button class="interactive-btn self-start bg-black/95 border-6 border-fuchsia-500 text-fuchsia-300 px-14 py-7 rounded-full font-black text-3xl flex items-center gap-6 shadow-[0_0_50px_rgba(240,0,255,0.9)]" onclick="exitMultiverse(event)">
                     <span>VOLVER AL INICIO</span>
                 </button>
-
-                <div class="w-full neon-box-cyan p-12 flex flex-col justify-between h-[580px] rounded-3xl" style="background-image: linear-gradient(to right, rgba(10,6,24,0.95), rgba(10,6,24,0.6)), url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=1600&auto=format&fit=crop'); background-size: cover;">
+                <div class="w-full neon-box-cyan p-12 flex flex-col justify-between h-[580px] rounded-3xl bg-black/80">
                     <div>
                         <span class="text-xl font-extrabold tracking-widest text-cyan-300 uppercase">MS3 Multiverse Live</span>
-                        <h1 class="text-7xl font-black text-white mt-4 drop-shadow-[0_0_20px_#00f0ff]">EL CONCIERTO DEL SIGLO</h1>
-                        <p class="text-gray-200 text-2xl mt-4 max-w-2xl leading-relaxed">Experiencia inmersiva 360° en vivo.</p>
+                        <h1 class="text-7xl font-black text-white mt-4">VIDEO 360° GEAR VR</h1>
+                        <p class="text-gray-200 text-2xl mt-4 max-w-2xl">Reproduce tu archivo equirectangular local en inmersión total.</p>
                     </div>
-                    <div class="flex gap-6">
-                        <button onclick="openVideo('BUSCANDO H265_injected.mp4')" class="interactive-btn bg-white text-black px-12 py-5 rounded-2xl font-black text-2xl shadow-[0_0_30px_#fff]">REPRODUCIR VR</button>
+                    <div>
+                        <button onclick="start360VideoExperience()" class="interactive-btn bg-white text-black px-12 py-5 rounded-2xl font-black text-2xl shadow-[0_0_30px_#fff]">INICIAR REPRODUCCIÓN 360°</button>
                     </div>
                 </div>
             `;
-
             hudGroup = new THREE.Group();
             const cssObject = new THREE.CSS3DObject(mainContainer);
             cssObject.scale.set(0.0055, 0.0055, 0.0055);
@@ -320,89 +204,93 @@ html_code = r'''
             cssScene.add(hudGroup);
         }
 
-        function destroyMultiverseHUD() {
+        function start360VideoExperience() {
             if (hudGroup) { cssScene.remove(hudGroup); hudGroup = null; }
+            universeSphere.visible = false;
+            starField.visible = false;
+
+            const videoElement = document.getElementById('vr360-video');
+            videoTexture = new THREE.VideoTexture(videoElement);
+            videoTexture.minFilter = THREE.LinearFilter;
+            videoTexture.format = THREE.RGBAFormat;
+
+            // Esfera inversa de 60 metros para rodear la cámara con el video 360
+            const sphereGeo = new THREE.SphereGeometry(60, 60, 40);
+            const sphereMat = new THREE.MeshBasicMaterial({ map: videoTexture, side: THREE.BackSide });
+            videoSphere = new THREE.Mesh(sphereGeo, sphereMat);
+            scene.add(videoSphere);
+
+            videoElement.play().then(() => {
+                isVideoPlaying360 = true;
+                document.getElementById('video-controls-overlay').style.display = 'flex';
+            }).catch(err => {
+                alert("Haz clic en la pantalla para permitir que el navegador reproduzca el video local.");
+                console.error(err);
+            });
         }
 
-        // Interacción por Mirada
-        function checkGazePointer() {
-            let elementToTrigger = null;
+        function toggleVideoPlay() {
+            const videoElement = document.getElementById('vr360-video');
+            if (videoElement.paused) videoElement.play();
+            else videoElement.pause();
+        }
 
-            if (!isSystemActive) {
-                raycaster.setFromCamera(new THREE.Vector2(0, 0), isVRMode ? cameraLeft : camera);
-                const intersects = raycaster.intersectObjects([planet]);
-                if (intersects.length > 0) elementToTrigger = planet;
+        function exitVideo360() {
+            const videoElement = document.getElementById('vr360-video');
+            videoElement.pause();
+            if (videoSphere) {
+                scene.remove(videoSphere);
+                videoSphere.geometry.dispose();
+                videoSphere.material.dispose();
+                videoSphere = null;
             }
-            
-            if (!elementToTrigger) {
-                const centerElement = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2);
-                if (centerElement && centerElement.closest('.interactive-btn')) {
-                    elementToTrigger = centerElement.closest('.interactive-btn');
-                }
-            }
-
-            if (elementToTrigger) {
-                if (gazeTarget !== elementToTrigger) {
-                    resetGazeTimer();
-                    gazeTarget = elementToTrigger;
-                    document.querySelectorAll('.gaze-reticle').forEach(r => r.classList.add('active'));
-                    if (gazeTarget.classList) gazeTarget.classList.add('gaze-hover');
-
-                    gazeTimer = setTimeout(() => {
-                        triggerGazeAction(gazeTarget);
-                        resetGazeTimer();
-                    }, GAZE_TIME);
-                }
-            } else {
-                resetGazeTimer();
-            }
+            universeSphere.visible = true;
+            starField.visible = true;
+            document.getElementById('video-controls-overlay').style.display = 'none';
+            isSystemActive = false;
+            planetGroup.visible = true;
+            textGroup.visible = true;
+            document.getElementById('instruction').style.opacity = '1';
         }
 
-        function resetGazeTimer() {
-            if (gazeTimer) clearTimeout(gazeTimer);
-            if (gazeTarget && gazeTarget.classList) gazeTarget.classList.remove('gaze-hover');
-            gazeTarget = null;
-            gazeTimer = null;
-            document.querySelectorAll('.gaze-reticle').forEach(r => r.classList.remove('active'));
+        function enterMultiverse() {
+            if (isSystemActive) return;
+            isSystemActive = true;
+            document.getElementById('instruction').style.opacity = '0';
+            planetGroup.visible = false;
+            textGroup.visible = false;
+            createMultiverseHUD();
         }
 
-        function triggerGazeAction(target) {
-            if (target === planet) enterMultiverse();
-            else if (target && typeof target.click === 'function') target.click();
+        function exitMultiverse(event) {
+            if (event) event.stopPropagation();
+            if (hudGroup) { cssScene.remove(hudGroup); hudGroup = null; }
+            planetGroup.visible = true;
+            textGroup.visible = true;
+            isSystemActive = false;
+            document.getElementById('instruction').style.opacity = '1';
         }
 
-        // Navegación Táctil / Mouse 360°
         function onPointerDown(e) {
-            if (e.target.closest('#top-ui-container') || e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
-            isDragging = true;
-            dragDistance = 0;
-            const x = e.touches ? e.touches[0].clientX : e.clientX;
-            const y = e.touches ? e.touches[0].clientY : e.clientY;
-            previousMousePosition = { x, y };
+            if (e.target.closest('#top-ui-container') || e.target.closest('#video-controls-overlay')) return;
+            isDragging = true; dragDistance = 0;
+            previousMousePosition = { x: e.touches ? e.touches[0].clientX : e.clientX, y: e.touches ? e.touches[0].clientY : e.clientY };
         }
-
         function onPointerMove(e) {
             if (!isDragging) return;
             const x = e.touches ? e.touches[0].clientX : e.clientX;
             const y = e.touches ? e.touches[0].clientY : e.clientY;
-
             const deltaX = x - previousMousePosition.x;
             const deltaY = y - previousMousePosition.y;
-
             dragDistance += Math.abs(deltaX) + Math.abs(deltaY);
-
             targetRotationY += deltaX * 0.004;
             targetRotationX += deltaY * 0.004;
             targetRotationX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, targetRotationX));
-
             previousMousePosition = { x, y };
         }
-
         function onPointerUp(e) {
-            if (isDragging && dragDistance < 10 && !isSystemActive) {
-                if (!e.target.closest('#top-ui-container')) {
-                    enterMultiverse();
-                }
+            if (isDragging && dragDistance < 10 && !isSystemActive && !isVideoPlaying360) {
+                if (!e.target.closest('#top-ui-container')) enterMultiverse();
             }
             isDragging = false;
         }
@@ -414,72 +302,24 @@ html_code = r'''
         window.addEventListener('touchmove', onPointerMove, { passive: true });
         window.addEventListener('touchend', onPointerUp, { passive: true });
 
-        function requestIOSPermissions() {
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission().then(resp => {
-                    if (resp === 'granted') setGyro(!isGyroActive);
-                }).catch(console.error);
-            } else setGyro(!isGyroActive);
-        }
-
-        function handleOrientation(e) {
-            if (!isGyroActive) return;
-            const alpha = e.alpha ? THREE.MathUtils.degToRad(e.alpha) : 0;
-            const beta = e.beta ? THREE.MathUtils.degToRad(e.beta) : 0;
-            const gamma = e.gamma ? THREE.MathUtils.degToRad(e.gamma) : 0;
-
-            const euler = new THREE.Euler(beta, alpha, -gamma, 'YXZ');
-            deviceQuaternion.setFromEuler(euler);
-
-            const orientFix = new THREE.Quaternion();
-            orientFix.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -Math.PI / 2);
-            deviceQuaternion.multiply(orientFix);
-        }
-
-        function setGyro(enable) {
-            isGyroActive = enable;
-            const text = isGyroActive ? 'GIROSCOPIO: ON' : 'GIROSCOPIO: OFF';
-            const gyroTextEl = document.getElementById('gyro-btn-text');
-            if (gyroTextEl) gyroTextEl.innerText = text;
-
-            if (isGyroActive) {
-                window.addEventListener('deviceorientation', handleOrientation, true);
-                if (!isVRMode) toggleVRMode();
-            } else {
-                window.removeEventListener('deviceorientation', handleOrientation, true);
-                cameraRig.quaternion.set(0, 0, 0, 1);
-                targetRotationX = 0; targetRotationY = 0;
-            }
-        }
-
         function toggleVRMode() {
             isVRMode = !isVRMode;
             document.body.classList.toggle('vr-mode', isVRMode);
-            const vrTextEl = document.getElementById('vr-btn-text');
-            if (vrTextEl) vrTextEl.innerText = isVRMode ? 'SALIR DE VR' : 'VER EN VR';
-
-            if (isVRMode && !isGyroActive) requestIOSPermissions();
+            document.getElementById('vr-btn-text').innerText = isVRMode ? 'SALIR DE VR' : 'VER EN VR (SPLIT)';
             onWindowResize();
         }
 
-        // Bucle de Animación
         function animate() {
             requestAnimationFrame(animate);
+            currentRotationX += (targetRotationX - currentRotationX) * 0.08;
+            currentRotationY += (targetRotationY - currentRotationY) * 0.08;
+            cameraRig.rotation.x = currentRotationX;
+            cameraRig.rotation.y = currentRotationY;
 
-            if (isGyroActive) {
-                cameraRig.quaternion.slerp(deviceQuaternion, 0.2);
-            } else {
-                currentRotationX += (targetRotationX - currentRotationX) * 0.08;
-                currentRotationY += (targetRotationY - currentRotationY) * 0.08;
-                cameraRig.rotation.x = currentRotationX;
-                cameraRig.rotation.y = currentRotationY;
+            if (planetGroup.visible) {
+                planet.rotation.y += 0.008;
+                textGroup.rotation.y += 0.006;
             }
-
-            planet.rotation.y += 0.008;
-            textGroup.rotation.y += 0.006;
-            starField.rotation.y += 0.0005;
-
-            checkGazePointer();
 
             if (isVRMode) {
                 rendererLeft.render(scene, cameraLeft);
@@ -493,70 +333,14 @@ html_code = r'''
         }
         animate();
 
-        // Entrar al Multiverso
-        function enterMultiverse() {
-            if (isSystemActive) return;
-            isSystemActive = true;
-            instruction.style.opacity = '0';
-
-            gsap.to(planetGroup.scale, { x: 0, y: 0, z: 0, duration: 0.8 });
-            gsap.to(textGroup.scale, { x: 0, y: 0, z: 0, duration: 0.8, onComplete: () => {
-                planetGroup.visible = false;
-                textGroup.visible = false;
-                
-                createMultiverseHUD();
-                gsap.fromTo(hudGroup.scale, { x: 0.01, y: 0.01, z: 0.01 }, { x: 1, y: 1, z: 1, duration: 1, ease: "back.out(1.4)" });
-            }});
-        }
-
-        // Salir del Multiverso
-        function exitMultiverse(event) {
-            if (event) event.stopPropagation();
-            if (!isSystemActive || !hudGroup) return;
-
-            gsap.to(hudGroup.scale, { x: 0, y: 0, z: 0, duration: 0.6, onComplete: () => {
-                destroyMultiverseHUD();
-                
-                planetGroup.visible = true;
-                textGroup.visible = true;
-
-                gsap.to(planetGroup.scale, { x: 1, y: 1, z: 1, duration: 0.8 });
-                gsap.to(textGroup.scale, { x: 1, y: 1, z: 1, duration: 0.8 });
-
-                isSystemActive = false;
-                instruction.style.opacity = '1';
-            }});
-        }
-
-        function openAboutModal() { document.getElementById('about-modal').style.display = 'flex'; }
-        function closeAboutModal() { document.getElementById('about-modal').style.display = 'none'; }
-        function openVideo(url) {
-            const v = document.getElementById('active-video');
-            v.src = url;
-            document.getElementById('video-modal').style.display = 'flex';
-            v.play();
-        }
-        function closeVideo() {
-            const v = document.getElementById('active-video');
-            v.pause(); v.src = "";
-            document.getElementById('video-modal').style.display = 'none';
-        }
-
         function onWindowResize() {
             const width = isVRMode ? window.innerWidth / 2 : window.innerWidth;
             const height = window.innerHeight;
-
-            camera.aspect = window.innerWidth / height;
-            camera.updateProjectionMatrix();
-
-            cameraLeft.aspect = width / height;
-            cameraLeft.updateProjectionMatrix();
-            cameraRight.aspect = width / height;
-            cameraRight.updateProjectionMatrix();
-
+            camera.aspect = window.innerWidth / height; camera.updateProjectionMatrix();
+            cameraLeft.aspect = width / height; cameraLeft.updateProjectionMatrix();
+            cameraRight.aspect = width / height; cameraRight.updateProjectionMatrix();
             rendererLeft.setSize(isVRMode ? width : window.innerWidth, height);
             rendererRight.setSize(width, height);
-
             cssRendererLeft.setSize(isVRMode ? width : window.innerWidth, height);
             cssRendererRight.setSize(width, height);
         }
@@ -564,7 +348,3 @@ html_code = r'''
     </script>
 </body>
 </html>
-'''
-
-with open("index.html", "w", encoding="utf-8") as f:
-    f.write(html_code)
