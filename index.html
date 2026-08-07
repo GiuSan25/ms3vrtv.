@@ -94,8 +94,8 @@
     <!-- PANEL MODAL DE EDITOR SECRETO -->
     <div id="editor-modal">
         <div class="neon-box-cyan p-8 max-w-lg w-full text-center flex flex-col gap-6">
-            <h2 class="text-3xl font-black text-cyan-400">PANEL DE CONFIGURACIÓN FIJA</h2>
-            <p class="text-gray-300 text-sm">Sube tu video 360 (Equirectangular) desde la computadora. Quedará guardado fijo para todos los usuarios.</p>
+            <h2 class="text-3xl font-black text-cyan-400">PANEL DE CONFIGURACIÓN</h2>
+            <p class="text-gray-300 text-sm">Selecciona tu video 360 local. Se enlazará al instante sin demoras.</p>
             
             <div class="flex flex-col gap-3 items-center">
                 <input type="file" id="local-video-file" accept="video/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-500 file:text-black hover:file:bg-cyan-400 cursor-pointer"/>
@@ -103,7 +103,7 @@
             </div>
 
             <div class="flex gap-4 justify-center mt-4">
-                <button class="control-btn" onclick="saveFixedVideo()">GUARDAR Y FIJAR</button>
+                <button class="control-btn" onclick="linkInstantVideo()">VINCULAR VIDEO</button>
                 <button class="control-btn border-red-500 text-red-400" onclick="closeEditorModal()">CERRAR</button>
             </div>
         </div>
@@ -119,6 +119,7 @@
         let isTopMenuOpen = false, isVideoPlaying360 = false, isSystemActive = false, isVRMode = false;
         let isDragging = false, previousMousePosition = { x: 0, y: 0 };
         let targetRotationX = 0, targetRotationY = 0, currentRotationX = 0, currentRotationY = 0, dragDistance = 0;
+        let directVideoObjectURL = null;
         const eyeSeparation = 0.064;
 
         scene = new THREE.Scene();
@@ -184,14 +185,7 @@
         });
         scene.add(textGroup);
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedVideoData = localStorage.getItem('ms3_fixed_video_url');
-            if (savedVideoData) {
-                document.getElementById('vr360-video').src = savedVideoData;
-            }
-        });
-
-        // Escuchar la tecla 'e' o 'E' para abrir el panel secreto del editor
+        // Escuchar la tecla 'e' o 'E' para abrir el panel secreto
         window.addEventListener('keydown', (e) => {
             if (e.key === 'e' || e.key === 'E') {
                 const pass = prompt("Introduce la clave de acceso al panel de editor:");
@@ -220,30 +214,19 @@
             document.getElementById('editor-modal').style.display = 'none';
         }
 
-        function saveFixedVideo() {
+        function linkInstantVideo() {
             const fileInput = document.getElementById('local-video-file');
             if (fileInput.files && fileInput.files[0]) {
                 const file = fileInput.files[0];
-                const reader = new FileReader();
-                document.getElementById('file-status').innerText = "Cargando y guardando video...";
-                reader.onload = function(e) {
-                    const base64Data = e.target.result;
-                    try {
-                        localStorage.setItem('ms3_fixed_video_url', base64Data);
-                        document.getElementById('vr360-video').src = base64Data;
-                        document.getElementById('file-status').innerText = "¡Video fijado correctamente!";
-                        setTimeout(() => {
-                            closeEditorModal();
-                            document.getElementById('file-status').innerText = "";
-                        }, 1200);
-                    } catch (err) {
-                        alert("El archivo es demasiado pesado para el almacenamiento local del navegador.");
-                        console.error(err);
-                    }
-                };
-                reader.readAsDataURL(file);
+                directVideoObjectURL = URL.createObjectURL(file);
+                document.getElementById('vr360-video').src = directVideoObjectURL;
+                document.getElementById('file-status').innerText = "¡Video vinculado al instante!";
+                setTimeout(() => {
+                    closeEditorModal();
+                    document.getElementById('file-status').innerText = "";
+                }, 1000);
             } else {
-                alert("Selecciona un archivo de video primero.");
+                alert("Por favor selecciona un archivo de video primero.");
             }
         }
 
@@ -276,7 +259,7 @@
         function start360VideoExperience() {
             const videoElement = document.getElementById('vr360-video');
             if (!videoElement.src || videoElement.src === window.location.href) {
-                alert("No hay ningún video guardado. Presiona la tecla 'E' en tu teclado e introduce la clave para subir uno.");
+                alert("Presiona la tecla 'E' en tu teclado e introduce la clave para seleccionar tu video local.");
                 return;
             }
 
