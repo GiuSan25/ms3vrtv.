@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS3DRenderer.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
         
         * { -webkit-tap-highlight-color: transparent; }
         
@@ -289,13 +289,13 @@
             }
         }
 
-        // PANTALLA MULTIVERSO (MÁS CERCA Y CON BOTÓN MÁS GRANDE)
+        // PANTALLA MULTIVERSO (MÁS CERCA Y BOTÓN DE VOLVER AUMENTADO)
         function createMultiverseHUD() {
             const mainContainer = document.createElement('div');
             mainContainer.className = "w-[850px] flex flex-col gap-6 floating-card";
             mainContainer.innerHTML = `
-                <button class="interactive-btn self-start bg-black/90 border-3 border-fuchsia-500 text-fuchsia-300 px-8 py-4 rounded-full font-black text-xl flex items-center gap-3 shadow-[0_0_25px_rgba(240,0,255,0.7)] tracking-wide" onclick="exitMultiverse(event)">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                <button class="interactive-btn self-start bg-black/95 border-4 border-fuchsia-500 text-fuchsia-300 px-10 py-5 rounded-full font-black text-2xl flex items-center gap-4 shadow-[0_0_35px_rgba(240,0,255,0.85)] tracking-wider" onclick="exitMultiverse(event)">
+                    <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     <span>VOLVER AL INICIO</span>
                 </button>
 
@@ -320,12 +320,12 @@
             hudGroup = new THREE.Group();
             const cssObject = new THREE.CSS3DObject(mainContainer);
             
-            // Escala aumentada para mayor tamaño de lectura
+            // Escala para mantener la densidad visual sin perder nitidez en pantalla
             cssObject.scale.set(0.0028, 0.0028, 0.0028);
             hudGroup.add(cssObject);
             
-            // Posición acercada hacia el usuario en el eje Z (de -1.8 a -1.2)
-            hudGroup.position.set(0, 0, -1.2);
+            // Posición acercada hacia la cámara en Z (-1.0 la coloca cerca y en foco directo)
+            hudGroup.position.set(0, 0, -1.0);
             cssScene.add(hudGroup);
         }
 
