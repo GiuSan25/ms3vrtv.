@@ -262,7 +262,7 @@
         });
         scene.add(textGroup);
 
-        // MENÚ DESPLEGABLE 3D (Ubicado arriba a la derecha de la esfera)
+        // MENÚ DESPLEGABLE 3D (Arriba a la derecha de la esfera)
         function create3DMenuTrigger() {
             const triggerDiv = document.createElement('div');
             triggerDiv.className = "flex flex-col items-end pointer-events-auto";
@@ -283,7 +283,6 @@
             cssObject.scale.set(0.0025, 0.0025, 0.0025);
             menuTriggerGroup.add(cssObject);
             
-            // Arriba y a la derecha de la esfera en el espacio 360°
             menuTriggerGroup.position.set(1.8, 1.8, -1.8);
             menuTriggerGroup.rotation.y = -Math.PI / 8;
             cssScene.add(menuTriggerGroup);
@@ -310,7 +309,7 @@
 
         create3DMenuTrigger();
 
-        // PANTALLA MULTIVERSO
+        // PANTALLA MULTIVERSO (Restaurada a su distancia original z = -1.8)
         function createMultiverseHUD() {
             const mainContainer = document.createElement('div');
             mainContainer.className = "w-[850px] flex flex-col gap-6 floating-card";
@@ -342,7 +341,9 @@
             const cssObject = new THREE.CSS3DObject(mainContainer);
             cssObject.scale.set(0.0022, 0.0022, 0.0022);
             hudGroup.add(cssObject);
-            hudGroup.position.set(0, 0, -1.1);
+            
+            // Distancia original conservada
+            hudGroup.position.set(0, 0, -1.8);
             cssScene.add(hudGroup);
         }
 
