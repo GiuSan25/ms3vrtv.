@@ -262,30 +262,31 @@
         });
         scene.add(textGroup);
 
-        // MENÚ DESPLEGABLE 3D (Desplazado más a la derecha: x = 2.8)
+        // MENÚ DESPLEGABLE 3D (Agrandado y más alejado hacia la derecha x = 3.6)
         function create3DMenuTrigger() {
             const triggerDiv = document.createElement('div');
             triggerDiv.className = "flex flex-col items-end pointer-events-auto";
             triggerDiv.innerHTML = `
-                <button id="menu-toggle-btn" class="interactive-btn bg-black/80 border-2 border-cyan-400 text-cyan-300 p-3 rounded-full shadow-[0_0_20px_#00f0ff] flex items-center justify-center gap-2 font-bold" onclick="toggle3DMenu(event)">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                    <span class="text-xs tracking-wider pr-1">MENÚ</span>
+                <button id="menu-toggle-btn" class="interactive-btn bg-black/85 border-2 border-cyan-400 text-cyan-300 px-6 py-4 rounded-full shadow-[0_0_25px_#00f0ff] flex items-center justify-center gap-3 font-extrabold text-base tracking-wider" onclick="toggle3DMenu(event)">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <span>MENÚ</span>
                 </button>
-                <div id="dropdown-panel-3d" class="hidden mt-3 w-[260px] neon-box-cyan p-4 flex flex-col gap-3 floating-card transition-all duration-300 transform scale-95 opacity-0">
-                    <button class="interactive-btn control-btn justify-start w-full text-xs" onclick="requestIOSPermissions()"><span>GIROSCOPIO</span></button>
-                    <button class="interactive-btn control-btn justify-start w-full text-xs" onclick="toggleVRMode()"><span>MODO VR</span></button>
-                    <button class="interactive-btn control-btn justify-start w-full text-xs" onclick="openAboutModal()"><span>NOSOTROS</span></button>
+                <div id="dropdown-panel-3d" class="hidden mt-4 w-[280px] neon-box-cyan p-5 flex flex-col gap-4 floating-card transition-all duration-300 transform scale-95 opacity-0">
+                    <button class="interactive-btn control-btn justify-start w-full text-sm py-3" onclick="requestIOSPermissions()"><span>GIROSCOPIO</span></button>
+                    <button class="interactive-btn control-btn justify-start w-full text-sm py-3" onclick="toggleVRMode()"><span>MODO VR</span></button>
+                    <button class="interactive-btn control-btn justify-start w-full text-sm py-3" onclick="openAboutModal()"><span>NOSOTROS</span></button>
                 </div>
             `;
 
             menuTriggerGroup = new THREE.Group();
             const cssObject = new THREE.CSS3DObject(triggerDiv);
-            cssObject.scale.set(0.0025, 0.0025, 0.0025);
+            // Escala aumentada para mejor legibilidad
+            cssObject.scale.set(0.0032, 0.0032, 0.0032);
             menuTriggerGroup.add(cssObject);
             
-            // Posición separada a la derecha
-            menuTriggerGroup.position.set(2.8, 1.6, -1.5);
-            menuTriggerGroup.rotation.y = -Math.PI / 6;
+            // Separado más a la derecha y ajustado en ángulo
+            menuTriggerGroup.position.set(3.6, 1.5, -1.2);
+            menuTriggerGroup.rotation.y = -Math.PI / 4.5;
             cssScene.add(menuTriggerGroup);
         }
 
