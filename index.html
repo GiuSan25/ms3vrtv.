@@ -289,13 +289,13 @@
             }
         }
 
-        // PANTALLA MULTIVERSO
+        // PANTALLA MULTIVERSO (MÁS CERCA Y CON BOTÓN MÁS GRANDE)
         function createMultiverseHUD() {
             const mainContainer = document.createElement('div');
             mainContainer.className = "w-[850px] flex flex-col gap-6 floating-card";
             mainContainer.innerHTML = `
-                <button class="interactive-btn self-start bg-black/80 border-2 border-fuchsia-500 text-fuchsia-400 px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 shadow-[0_0_15px_rgba(240,0,255,0.4)]" onclick="exitMultiverse(event)">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                <button class="interactive-btn self-start bg-black/90 border-3 border-fuchsia-500 text-fuchsia-300 px-8 py-4 rounded-full font-black text-xl flex items-center gap-3 shadow-[0_0_25px_rgba(240,0,255,0.7)] tracking-wide" onclick="exitMultiverse(event)">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     <span>VOLVER AL INICIO</span>
                 </button>
 
@@ -319,9 +319,13 @@
 
             hudGroup = new THREE.Group();
             const cssObject = new THREE.CSS3DObject(mainContainer);
-            cssObject.scale.set(0.0022, 0.0022, 0.0022);
+            
+            // Escala aumentada para mayor tamaño de lectura
+            cssObject.scale.set(0.0028, 0.0028, 0.0028);
             hudGroup.add(cssObject);
-            hudGroup.position.set(0, 0, -1.8);
+            
+            // Posición acercada hacia el usuario en el eje Z (de -1.8 a -1.2)
+            hudGroup.position.set(0, 0, -1.2);
             cssScene.add(hudGroup);
         }
 
