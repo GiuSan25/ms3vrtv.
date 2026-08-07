@@ -2,55 +2,45 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MS3 - Universo 360 VR Inmersivo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-        body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; width: 100vw; height: 100vh; user-select: none; }
         
-        /* Contenedor Vista VR Dividida */
+        * { -webkit-tap-highlight-color: transparent; }
+        
+        body, html { 
+            margin: 0; padding: 0; overflow: hidden; background-color: #000; 
+            font-family: 'Inter', sans-serif; width: 100vw; height: 100dvh; 
+            user-select: none; -webkit-user-select: none;
+            touch-action: none;
+        }
+        
         #vr-view-container {
-            display: flex;
-            width: 100vw;
-            height: 100vh;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 2;
-            cursor: grab;
+            display: flex; width: 100vw; height: 100dvh; position: absolute;
+            top: 0; left: 0; z-index: 2; cursor: grab;
         }
 
         #vr-view-container:active { cursor: grabbing; }
 
         .vr-eye {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: relative; width: 100%; height: 100%; overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
         }
 
         body.vr-mode .vr-eye { width: 50vw; }
 
         body.vr-mode #eye-right {
-            display: flex !important;
-            border-left: 2px solid rgba(0, 240, 255, 0.4);
+            display: flex !important; border-left: 2px solid rgba(0, 240, 255, 0.4);
         }
 
         #eye-right { display: none; }
 
         .webgl-canvas-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
         }
 
         #top-controls {
@@ -72,7 +62,7 @@
         }
 
         #mobile-drawer {
-            position: fixed; top: 0; right: -280px; width: 260px; height: 100vh; background: rgba(10, 6, 24, 0.95);
+            position: fixed; top: 0; right: -280px; width: 260px; height: 100dvh; background: rgba(10, 6, 24, 0.95);
             border-left: 2px solid #00f0ff; z-index: 1050; display: flex; flex-direction: column; padding: 80px 20px 20px 20px; gap: 15px; transition: right 0.4s ease-in-out;
         }
         #mobile-drawer.open { right: 0; }
@@ -91,11 +81,11 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;
             opacity: 0; pointer-events: none; transition: opacity 1s ease;
             overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 80px 10px 30px 10px;
+            -webkit-overflow-scrolling: touch;
         }
 
         body.vr-mode .desktop-canvas-frame {
-            transform: scale(0.65);
-            transform-origin: top center;
+            transform: scale(0.65); transform-origin: top center;
         }
 
         .desktop-canvas-frame {
@@ -141,18 +131,18 @@
 
     <div id="mobile-drawer">
         <h3 class="text-cyan-400 font-bold text-lg mb-2 text-center border-b border-cyan-500/30 pb-2">MENÚ MS3</h3>
-        <button id="gyro-btn-mobile" class="control-btn justify-center" onclick="toggleGyroscope()"><span>GIROSCOPIO: OFF</span></button>
+        <button id="gyro-btn-mobile" class="control-btn justify-center" onclick="requestIOSPermissions()"><span>GIROSCOPIO: OFF</span></button>
         <button id="vr-btn-mobile" class="control-btn justify-center" onclick="toggleVRMode()"><span>VER EN VR</span></button>
         <button class="control-btn justify-center" onclick="openAboutModal()"><span>NOSOTROS</span></button>
     </div>
 
     <div id="top-controls">
-        <button id="gyro-btn" class="control-btn" onclick="toggleGyroscope()"><span>GIROSCOPIO: OFF</span></button>
+        <button id="gyro-btn" class="control-btn" onclick="requestIOSPermissions()"><span>GIROSCOPIO: OFF</span></button>
         <button id="vr-btn" class="control-btn" onclick="toggleVRMode()"><span>VER EN VR</span></button>
         <button class="control-btn" onclick="openAboutModal()"><span>NOSOTROS</span></button>
     </div>
 
-    <div id="instruction">Arrastra para explorar o presiona para ingresar al universo MS3</div>
+    <div id="instruction">Toca la pantalla o arrastra para ingresar al universo MS3</div>
 
     <div id="vr-view-container">
         <!-- OJO IZQUIERDO -->
@@ -212,7 +202,6 @@
         </div>
     </div>
 
-    <!-- Modales -->
     <div id="video-modal">
         <video id="active-video" controls autoplay playsinline></video>
         <button class="modal-close-btn" onclick="closeVideo()">Cerrar Reproductor</button>
@@ -231,16 +220,14 @@
         let planet, textGroup, planetGroup, universeSphere, starField, backgroundRingGroup;
         let isSystemActive = false, isGyroActive = false, isVRMode = false, mobileMenuOpen = false;
 
-        // Variables de Rotación y Arrastre Táctil / Mouse
         let isDragging = false;
         let previousMousePosition = { x: 0, y: 0 };
         let targetRotationX = 0, targetRotationY = 0;
         let currentRotationX = 0, currentRotationY = 0;
         let dragDistance = 0;
 
-        // Quaternions para orientación inmersiva 360 en VR
         let deviceQuaternion = new THREE.Quaternion();
-        const eyeSeparation = 0.064; // Distancia interocular aproximada
+        const eyeSeparation = 0.064;
 
         const containerLeft = document.getElementById('canvas-container-left');
         const containerRight = document.getElementById('canvas-container-right');
@@ -250,7 +237,6 @@
 
         scene = new THREE.Scene();
 
-        // Contenedor / Rig de Cámara
         cameraRig = new THREE.Object3D();
         scene.add(cameraRig);
 
@@ -274,18 +260,15 @@
         rendererRight.setSize(window.innerWidth, window.innerHeight);
         containerRight.appendChild(rendererRight.domElement);
 
-        // Iluminación
         scene.add(new THREE.AmbientLight(0x3a1050, 1.5));
         const pLightCyan = new THREE.PointLight(0x00f0ff, 4, 80); pLightCyan.position.set(-8, 8, 8); scene.add(pLightCyan);
         const pLightPink = new THREE.PointLight(0xf000ff, 4, 80); pLightPink.position.set(8, -8, 8); scene.add(pLightPink);
         const pLightViolet = new THREE.PointLight(0x8a2be2, 3, 80); pLightViolet.position.set(0, 0, -10); scene.add(pLightViolet);
 
-        // Fondo Universo
         const universeGeo = new THREE.SphereGeometry(70, 32, 32);
         universeSphere = new THREE.Mesh(universeGeo, new THREE.MeshBasicMaterial({ color: 0x070216, side: THREE.BackSide }));
         scene.add(universeSphere);
 
-        // Estrellas 3D Animadas
         const starsGeometry = new THREE.BufferGeometry();
         const starCount = 2500;
         const starPositions = new Float32Array(starCount * 3);
@@ -320,7 +303,6 @@
         starField = new THREE.Points(starsGeometry, starsMaterial);
         scene.add(starField);
 
-        // Anillos neón
         backgroundRingGroup = new THREE.Group();
         const ringGeo1 = new THREE.TorusGeometry(12, 0.05, 16, 100);
         const ringMat1 = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.35 });
@@ -336,7 +318,6 @@
         backgroundRingGroup.add(ring2);
         scene.add(backgroundRingGroup);
 
-        // Esfera neón inferior
         planetGroup = new THREE.Group();
         const planetMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.9 });
         planet = new THREE.Mesh(new THREE.IcosahedronGeometry(1.4, 4), planetMaterial);
@@ -344,7 +325,6 @@
         planetGroup.add(planet);
         scene.add(planetGroup);
 
-        // Logo MS3
         textGroup = new THREE.Group();
         textGroup.position.y = 0.8;
 
@@ -370,7 +350,7 @@
         });
         scene.add(textGroup);
 
-        // Control Táctil / Mouse
+        // --- SISTEMA TÁCTIL Y DE INTERACCIÓN iOS Y DESKTOP ---
         function onPointerDown(e) {
             if (e.target.closest('#top-controls') || e.target.closest('#mobile-drawer') || e.target.closest('#mobile-menu-toggle') || e.target.closest('.ui-interface') || e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
             
@@ -400,7 +380,14 @@
             previousMousePosition = { x, y };
         }
 
-        function onPointerUp() { isDragging = false; }
+        function onPointerUp(e) {
+            if (isDragging && dragDistance < 12) {
+                if (!isSystemActive && !e.target.closest('#top-controls') && !e.target.closest('#mobile-drawer') && !e.target.closest('#mobile-menu-toggle')) {
+                    enterMultiverse();
+                }
+            }
+            isDragging = false;
+        }
 
         window.addEventListener('mousedown', onPointerDown);
         window.addEventListener('mousemove', onPointerMove);
@@ -408,9 +395,25 @@
 
         window.addEventListener('touchstart', onPointerDown, { passive: true });
         window.addEventListener('touchmove', onPointerMove, { passive: true });
-        window.addEventListener('touchend', onPointerUp);
+        window.addEventListener('touchend', onPointerUp, { passive: true });
 
-        // Giroscopio Inmersivo 360 Grados
+        // --- PERMISOS Y MANEJO DE GIROSCÓPIO iOS SAFARI ---
+        function requestIOSPermissions() {
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(response => {
+                        if (response === 'granted') {
+                            setGyro(!isGyroActive);
+                        } else {
+                            alert('Permiso de acelerómetro denegado en iOS');
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                setGyro(!isGyroActive);
+            }
+        }
+
         function handleOrientation(e) {
             if (!isGyroActive) return;
 
@@ -421,18 +424,9 @@
             const euler = new THREE.Euler(beta, alpha, -gamma, 'YXZ');
             deviceQuaternion.setFromEuler(euler);
 
-            // Ajuste para sostener el dispositivo en orientación horizontal (VR Landscape)
             const orientFix = new THREE.Quaternion();
             orientFix.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -Math.PI / 2);
             deviceQuaternion.multiply(orientFix);
-        }
-
-        function toggleGyroscope() {
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission().then(state => {
-                    if (state === 'granted') setGyro(!isGyroActive);
-                });
-            } else setGyro(!isGyroActive);
         }
 
         function setGyro(enable) {
@@ -463,7 +457,7 @@
             });
 
             if (isVRMode && !isGyroActive) {
-                setGyro(true);
+                requestIOSPermissions();
             }
             onWindowResize();
         }
@@ -498,7 +492,6 @@
         }
         animate();
 
-        // Entrar al Multiverso
         function enterMultiverse() {
             if (isSystemActive) return;
             isSystemActive = true;
@@ -515,7 +508,6 @@
             }});
         }
 
-        // Volver a la sección anterior
         function exitMultiverse(event) {
             if (event) event.stopPropagation();
             if (!isSystemActive) return;
@@ -536,13 +528,6 @@
                 instruction.style.opacity = '1';
             }});
         }
-
-        window.addEventListener('click', (e) => {
-            if (dragDistance > 10) return;
-            if (!isSystemActive && !e.target.closest('#top-controls') && !e.target.closest('#mobile-drawer') && !e.target.closest('#mobile-menu-toggle')) {
-                enterMultiverse();
-            }
-        });
 
         function toggleMobileMenu() {
             mobileMenuOpen = !mobileMenuOpen;
