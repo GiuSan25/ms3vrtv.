@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MS3 - Universo 360 VR Inmersivo & Gear 360 Persistente</title>
+    <title>MS3 - Universo 360 VR Inmersivo Universal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS3DRenderer.js"></script>
@@ -41,13 +41,11 @@
         
         .css3d-container { z-index: 10; }
 
-        /* MENÚ EN LA ESQUINA SUPERIOR DERECHA (UI 2D) */
         #top-ui-container {
             position: fixed; top: 20px; right: 20px; z-index: 1000;
             display: flex; flex-direction: column; align-items: flex-end; pointer-events: auto;
         }
 
-        /* PUNTERO DE MIRADA (GAZE RETICLE) */
         .gaze-reticle {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 32px; height: 32px; border-radius: 50%;
@@ -103,9 +101,6 @@
 </head>
 <body>
 
-    <!-- Selector de archivo local oculto -->
-    <input type="file" id="gear360-input" accept="video/mp4,video/mkv,video/webm" style="display: none;" onchange="handleFileSelect(event)">
-
     <!-- MENÚ FLOTANTE EN LA ESQUINA SUPERIOR DERECHA -->
     <div id="top-ui-container">
         <button id="menu-toggle-btn" class="interactive-btn control-btn" onclick="toggleTopMenu(event)">
@@ -122,14 +117,11 @@
     <div id="instruction">Arrastra con el dedo/mouse en 360° | Toca la esfera MS3 para entrar</div>
 
     <div id="vr-view-container">
-        <!-- OJO IZQUIERDO -->
         <div class="vr-eye" id="eye-left">
             <div class="gaze-reticle" id="reticle-left"><div class="gaze-dot"></div><div class="gaze-progress"></div></div>
             <div class="webgl-canvas-container" id="canvas-container-left"></div>
             <div class="css3d-container" id="css3d-container-left"></div>
         </div>
-
-        <!-- OJO DERECHO -->
         <div class="vr-eye" id="eye-right">
             <div class="gaze-reticle" id="reticle-right"><div class="gaze-dot"></div><div class="gaze-progress"></div></div>
             <div class="webgl-canvas-container" id="canvas-container-right"></div>
@@ -153,8 +145,6 @@
         let isTopMenuOpen = false;
 
         let isSystemActive = false, isGyroActive = false, isVRMode = false, is360Mode = false;
-        let videoLoaded = false;
-        let db = null;
 
         let isDragging = false;
         let previousMousePosition = { x: 0, y: 0 };
@@ -170,8 +160,15 @@
         let gazeTimer = null;
         const GAZE_TIME = 3000;
 
-        // Elemento Video para Gear 360
+        // ==========================================
+        // CONFIGURACIÓN GLOBAL DEL VIDEO Y VISTA PREVIA
+        // ==========================================
+        // Coloca aquí el enlace directo a tu video 360 y la imagen de miniatura (poster)
+        const FIXED_VIDEO_URL = "https://tu-servidor.com/tu-video-gear360.mp4"; 
+        const FIXED_THUMBNAIL_URL = "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=800&auto=format&fit=crop";
+
         const videoElement = document.createElement('video');
+        videoElement.src = FIXED_VIDEO_URL;
         videoElement.loop = true;
         videoElement.playsInline = true;
         videoElement.crossOrigin = 'anonymous';
@@ -185,60 +182,6 @@
         const cssContainerLeft = document.getElementById('css3d-container-left');
         const cssContainerRight = document.getElementById('css3d-container-right');
         const instruction = document.getElementById('instruction');
-
-        // Inicializar Base de Datos Local Permanente (IndexedDB)
-        function initDB() {
-            const request = indexedDB.OpenDBRequest ? indexedDB.open("MS3_PersistentVR", 1) : indexedDB.open("MS3_PersistentVR", 1);
-            
-            request.onerror = (event) => console.error("Error al abrir IndexedDB", event);
-            
-            request.onupgradeneeded = (event) => {
-                db = event.target.result;
-                if (!db.objectStoreNames.contains("videos")) {
-                    db.createObjectStore("videos");
-                }
-            };
-
-            request.onsuccess = (event) => {
-                db = event.target.result;
-                checkStoredVideo();
-            };
-        }
-
-        function saveVideoToDB(fileBlob) {
-            if (!db) return;
-            const transaction = db.transaction(["videos"], "readwrite");
-            const store = transaction.objectStore("videos");
-            store.put(fileBlob, "gear360_permanent_video");
-
-            transaction.oncomplete = () => {
-                videoLoaded = true;
-                playBlobVideo(fileBlob);
-                if (isSystemActive) createMultiverseHUD();
-            };
-        }
-
-        function checkStoredVideo() {
-            if (!db) return;
-            const transaction = db.transaction(["videos"], "readonly");
-            const store = transaction.objectStore("videos");
-            const request = store.get("gear360_permanent_video");
-
-            request.onsuccess = (event) => {
-                if (event.target.result) {
-                    const videoBlob = event.target.result;
-                    videoLoaded = true;
-                    playBlobVideo(videoBlob);
-                }
-            };
-        }
-
-        function playBlobVideo(blob) {
-            const videoURL = URL.createObjectURL(blob);
-            videoElement.src = videoURL;
-        }
-
-        initDB();
 
         // Escenas 3D
         scene = new THREE.Scene();
@@ -259,7 +202,6 @@
         cameraRig.add(cameraRight);
         cameraRig.position.set(0, 0, 5);
 
-        // Renderizadores WebGL
         rendererLeft = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         rendererLeft.setSize(window.innerWidth, window.innerHeight);
         containerLeft.appendChild(rendererLeft.domElement);
@@ -268,7 +210,6 @@
         rendererRight.setSize(window.innerWidth, window.innerHeight);
         containerRight.appendChild(rendererRight.domElement);
 
-        // Renderizadores CSS3D
         cssRendererLeft = new THREE.CSS3DRenderer();
         cssRendererLeft.setSize(window.innerWidth, window.innerHeight);
         cssContainerLeft.appendChild(cssRendererLeft.domElement);
@@ -277,17 +218,14 @@
         cssRendererRight.setSize(window.innerWidth / 2, window.innerHeight);
         cssContainerRight.appendChild(cssRendererRight.domElement);
 
-        // Luces
         scene.add(new THREE.AmbientLight(0x3a1050, 1.5));
         const pLightCyan = new THREE.PointLight(0x00f0ff, 4, 80); pLightCyan.position.set(-8, 8, 8); scene.add(pLightCyan);
         const pLightPink = new THREE.PointLight(0xf000ff, 4, 80); pLightPink.position.set(8, -8, 8); scene.add(pLightPink);
 
-        // Fondo Universo 360°
         const universeGeo = new THREE.SphereGeometry(70, 32, 32);
         universeSphere = new THREE.Mesh(universeGeo, new THREE.MeshBasicMaterial({ color: 0x070216, side: THREE.BackSide }));
         scene.add(universeSphere);
 
-        // Domo 360 Inmersivo (Samsung Gear 360)
         const domeGeo = new THREE.SphereGeometry(500, 60, 40);
         domeGeo.scale(-1, 1, 1);
         const domeMat = new THREE.MeshBasicMaterial({ map: videoTexture });
@@ -295,7 +233,6 @@
         domeMesh.visible = false;
         scene.add(domeMesh);
 
-        // Estrellas
         const starsGeometry = new THREE.BufferGeometry();
         const starCount = 3000;
         const starPositions = new Float32Array(starCount * 3);
@@ -318,7 +255,6 @@
         starField = new THREE.Points(starsGeometry, new THREE.PointsMaterial({ size: 0.25, vertexColors: true, transparent: true, opacity: 0.9 }));
         scene.add(starField);
 
-        // INICIO: Esfera + Texto MS3
         planetGroup = new THREE.Group();
         planet = new THREE.Mesh(new THREE.IcosahedronGeometry(1.4, 4), new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.9 }));
         planet.position.y = -1.5;
@@ -354,25 +290,12 @@
             }
         }
 
-        // PANTALLA MULTIVERSO ADAPTADA CON PERSISTENCIA PERMANENTE
+        // PANTALLA MULTIVERSO CON VISTA PREVIA INTEGRADA EN HTML
         function createMultiverseHUD() {
             if (hudGroup) cssScene.remove(hudGroup);
 
             const mainContainer = document.createElement('div');
             mainContainer.className = "w-[1600px] flex flex-col gap-10 floating-card";
-            
-            const buttonHtml = videoLoaded ? 
-                `<button onclick="start360Video()" class="interactive-btn bg-cyan-400 text-black px-12 py-5 rounded-2xl font-black text-2xl shadow-[0_0_35px_#00f0ff] hover:scale-105 transition-transform flex items-center gap-4">
-                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    <span>ABRIR EXPERIENCIA 360°</span>
-                 </button>` :
-                `<button onclick="document.getElementById('gear360-input').click()" class="interactive-btn bg-cyan-400 text-black px-12 py-5 rounded-2xl font-black text-2xl shadow-[0_0_35px_#00f0ff] hover:scale-105 transition-transform">
-                    VINCULAR VIDEO GEAR 360 PERMANENTE
-                 </button>`;
-
-            const statusText = videoLoaded ? 
-                `<span class="text-green-400 font-bold text-xl flex items-center gap-2"><span class="w-3 h-3 bg-green-400 rounded-full animate-ping"></span> VIDEO GUARDADO PARA SIEMPRE EN ESTE NAVEGADOR</span>` : 
-                `<span class="text-gray-400 text-xl">Ningún video vinculado todavía</span>`;
 
             mainContainer.innerHTML = `
                 <button class="interactive-btn self-start bg-black/95 border-6 border-fuchsia-500 text-fuchsia-300 px-14 py-7 rounded-full font-black text-3xl flex items-center gap-6 shadow-[0_0_50px_rgba(240,0,255,0.9)] tracking-widest" onclick="exitMultiverse(event)">
@@ -380,14 +303,31 @@
                     <span>VOLVER AL INICIO</span>
                 </button>
 
-                <div class="w-full neon-box-cyan p-12 flex flex-col justify-between h-[580px] rounded-3xl" style="background-image: linear-gradient(to right, rgba(10,6,24,0.95), rgba(10,6,24,0.6)), url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=1600&auto=format&fit=crop'); background-size: cover;">
-                    <div>
-                        <div class="mb-2">${statusText}</div>
-                        <h1 class="text-7xl font-black text-white mt-4 drop-shadow-[0_0_20px_#00f0ff]">PANTALLA MULTIVERSO GEAR 360</h1>
-                        <p class="text-gray-200 text-2xl mt-4 max-w-2xl leading-relaxed">El video seleccionado se graba de forma permanente en la memoria de tu dispositivo. Aunque recargues la página, ya no volverá a pedírtelo.</p>
+                <div class="w-full neon-box-cyan p-10 flex gap-10 items-center rounded-3xl" style="background: rgba(10, 6, 24, 0.95);">
+                    <!-- VISTA PREVIA (THUMBNAIL) DEL VIDEO -->
+                    <div class="relative w-[500px] h-[300px] rounded-2xl overflow-hidden border-4 border-cyan-400 shadow-[0_0_25px_rgba(0,240,255,0.5)] flex-shrink-0">
+                        <img src="${FIXED_THUMBNAIL_URL}" alt="Vista Previa 360" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <div class="w-16 h-16 bg-cyan-400/80 rounded-full flex items-center justify-center shadow-[0_0_20px_#00f0ff]">
+                                <svg class="w-8 h-8 text-black translate-x-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            </div>
+                        </div>
+                        <span class="absolute bottom-3 left-3 bg-black/80 text-cyan-300 px-3 py-1 rounded-md text-sm font-bold tracking-wider">VISTA PREVIA 360°</span>
                     </div>
-                    <div class="flex gap-6">
-                        ${buttonHtml}
+
+                    <!-- INFORMACIÓN Y BOTÓN FIJO -->
+                    <div class="flex flex-col justify-between h-[300px] flex-grow">
+                        <div>
+                            <span class="text-green-400 font-bold text-lg flex items-center gap-2"><span class="w-3 h-3 bg-green-400 rounded-full animate-ping"></span> CONTENIDO OFICIAL FIJO PARA TODOS</span>
+                            <h1 class="text-5xl font-black text-white mt-2 drop-shadow-[0_0_15px_#00f0ff]">EXPERIENCIA GEAR 360</h1>
+                            <p class="text-gray-300 text-xl mt-3 leading-relaxed">Este video se encuentra preconfigurado en el código fuente. Cualquier usuario que abra este enlace en cualquier dispositivo visualizará exactamente esta experiencia.</p>
+                        </div>
+                        <div>
+                            <button onclick="start360Video()" class="interactive-btn bg-cyan-400 text-black px-10 py-4 rounded-2xl font-black text-2xl shadow-[0_0_35px_#00f0ff] hover:scale-105 transition-transform flex items-center gap-4">
+                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                <span>INICIAR EXPERIENCIA 360°</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -400,20 +340,11 @@
             cssScene.add(hudGroup);
         }
 
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (file && !videoLoaded) {
-                saveVideoToDB(file);
-            }
-        }
-
         function start360Video() {
-            if (!videoLoaded) return;
             videoElement.play();
             enter360Immersion();
         }
 
-        // Entra al modo inmersivo total
         function enter360Immersion() {
             is360Mode = true;
             if (hudGroup) hudGroup.visible = false;
@@ -461,7 +392,6 @@
             if (hudGroup) { cssScene.remove(hudGroup); hudGroup = null; }
         }
 
-        // Interacción por Mirada (Gaze)
         function checkGazePointer() {
             let elementToTrigger = null;
 
@@ -508,7 +438,6 @@
             else if (target && typeof target.click === 'function') target.click();
         }
 
-        // Navegación Táctil / Mouse 360°
         function onPointerDown(e) {
             if (e.target.closest('#top-ui-container') || e.target.closest('#about-modal')) return;
             isDragging = true;
@@ -599,7 +528,6 @@
             onWindowResize();
         }
 
-        // Bucle de Animación
         function animate() {
             requestAnimationFrame(animate);
 
@@ -637,6 +565,7 @@
 
             gsap.to(planetGroup.scale, { x: 0, y: 0, z: 0, duration: 0.8 });
             gsap.to(textGroup.scale, { x: 0, y: 0, z: 0, duration: 0.8, onComplete: () => {
+                planetGroup.visible.false;
                 planetGroup.visible = false;
                 textGroup.visible = false;
                 
