@@ -41,6 +41,12 @@
         
         .css3d-container { z-index: 10; }
 
+        /* MENÚ EN LA ESQUINA SUPERIOR DERECHA (UI 2D) */
+        #top-ui-container {
+            position: fixed; top: 20px; right: 20px; z-index: 1000;
+            display: flex; flex-direction: column; align-items: flex-end; pointer-events: auto;
+        }
+
         /* PUNTERO DE MIRADA (GAZE RETICLE) */
         .gaze-reticle {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -68,12 +74,11 @@
 
         .control-btn {
             background: rgba(10, 6, 24, 0.85); border: 2px solid #00f0ff; color: #00f0ff; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
-            backdrop-filter: blur(8px); padding: 12px 24px; border-radius: 9999px; font-weight: 700; font-size: 1rem; cursor: pointer;
+            backdrop-filter: blur(8px); padding: 12px 24px; border-radius: 9999px; font-weight: 700; font-size: 0.95rem; cursor: pointer;
             display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; white-space: nowrap; pointer-events: auto;
         }
 
         .control-btn:hover { background: rgba(0, 240, 255, 0.2); box-shadow: 0 0 25px rgba(0, 240, 255, 0.8); transform: scale(1.05); }
-        .control-btn.active { border-color: #f000ff; color: #f000ff; box-shadow: 0 0 20px rgba(240, 0, 255, 0.6); }
 
         #instruction { 
             position: fixed; bottom: 35px; width: 100%; text-align: center; color: #fff; z-index: 100; 
@@ -103,6 +108,19 @@
     </style>
 </head>
 <body>
+
+    <!-- MENÚ FLOTANTE EN LA ESQUINA SUPERIOR DERECHA -->
+    <div id="top-ui-container">
+        <button id="menu-toggle-btn" class="interactive-btn control-btn" onclick="toggleTopMenu(event)">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            <span>MENÚ</span>
+        </button>
+        <div id="dropdown-menu" class="hidden mt-3 w-64 neon-box-cyan p-4 flex flex-col gap-3 transition-all duration-300 transform scale-95 opacity-0">
+            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="requestIOSPermissions()"><span id="gyro-btn-text">GIROSCOPIO: OFF</span></button>
+            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="toggleVRMode()"><span id="vr-btn-text">VER EN VR</span></button>
+            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="openAboutModal()"><span>NOSOTROS</span></button>
+        </div>
+    </div>
 
     <div id="instruction">Arrastra con el dedo/mouse en 360° | Toca la esfera MS3 para entrar</div>
 
@@ -139,8 +157,8 @@
         let scene, cssScene, camera, cameraLeft, cameraRight, cameraRig;
         let rendererLeft, rendererRight, cssRendererLeft, cssRendererRight;
         let planet, textGroup, planetGroup, universeSphere, starField;
-        let hudGroup = null, menuTriggerGroup = null;
-        let isMenuOpen = false;
+        let hudGroup = null;
+        let isTopMenuOpen = false;
 
         let isSystemActive = false, isGyroActive = false, isVRMode = false;
 
@@ -252,54 +270,24 @@
         });
         scene.add(textGroup);
 
-        // MENÚ DESPLEGABLE 3D (Mucho más grande)
-        function create3DMenuTrigger() {
-            const triggerDiv = document.createElement('div');
-            triggerDiv.className = "flex flex-col items-end pointer-events-auto";
-            triggerDiv.innerHTML = `
-                <button id="menu-toggle-btn" class="interactive-btn bg-black/90 border-4 border-cyan-400 text-cyan-300 px-10 py-6 rounded-full shadow-[0_0_35px_#00f0ff] flex items-center justify-center gap-4 font-black text-2xl tracking-wider" onclick="toggle3DMenu(event)">
-                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                    <span>MENÚ</span>
-                </button>
-                <div id="dropdown-panel-3d" class="hidden mt-6 w-[360px] neon-box-cyan p-6 flex flex-col gap-5 floating-card transition-all duration-300 transform scale-95 opacity-0">
-                    <button class="interactive-btn control-btn justify-start w-full text-lg py-4" onclick="requestIOSPermissions()"><span id="gyro-btn-text">GIROSCOPIO: OFF</span></button>
-                    <button class="interactive-btn control-btn justify-start w-full text-lg py-4" onclick="toggleVRMode()"><span id="vr-btn-text">VER EN VR</span></button>
-                    <button class="interactive-btn control-btn justify-start w-full text-lg py-4" onclick="openAboutModal()"><span>NOSOTROS</span></button>
-                </div>
-            `;
-
-            menuTriggerGroup = new THREE.Group();
-            const cssObject = new THREE.CSS3DObject(triggerDiv);
-            // Escala significativamente aumentada
-            cssObject.scale.set(0.005, 0.005, 0.005);
-            menuTriggerGroup.add(cssObject);
-            
-            // Ubicación en la escena 3D
-            menuTriggerGroup.position.set(3.8, 1.4, -1.2);
-            menuTriggerGroup.rotation.y = -Math.PI / 4.5;
-            cssScene.add(menuTriggerGroup);
-        }
-
-        function toggle3DMenu(e) {
+        // MENÚ FLOTANTE 2D (ESQUINA SUPERIOR DERECHA)
+        function toggleTopMenu(e) {
             if (e) e.stopPropagation();
-            const panel = document.getElementById('dropdown-panel-3d');
-            if (!panel) return;
+            const dropdown = document.getElementById('dropdown-menu');
+            isTopMenuOpen = !isTopMenuOpen;
 
-            isMenuOpen = !isMenuOpen;
-            if (isMenuOpen) {
-                panel.classList.remove('hidden');
+            if (isTopMenuOpen) {
+                dropdown.classList.remove('hidden');
                 setTimeout(() => {
-                    panel.classList.remove('scale-95', 'opacity-0');
-                    panel.classList.add('scale-100', 'opacity-100');
+                    dropdown.classList.remove('scale-95', 'opacity-0');
+                    dropdown.classList.add('scale-100', 'opacity-100');
                 }, 10);
             } else {
-                panel.classList.remove('scale-100', 'opacity-100');
-                panel.classList.add('scale-95', 'opacity-0');
-                setTimeout(() => panel.classList.add('hidden'), 300);
+                dropdown.classList.remove('scale-100', 'opacity-100');
+                dropdown.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => dropdown.classList.add('hidden'), 300);
             }
         }
-
-        create3DMenuTrigger();
 
         // PANTALLA MULTIVERSO
         function createMultiverseHUD() {
@@ -390,7 +378,7 @@
 
         // Navegación Táctil / Mouse 360°
         function onPointerDown(e) {
-            if (e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
+            if (e.target.closest('#top-ui-container') || e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
             isDragging = true;
             dragDistance = 0;
             const x = e.touches ? e.touches[0].clientX : e.clientX;
@@ -417,7 +405,7 @@
 
         function onPointerUp(e) {
             if (isDragging && dragDistance < 10 && !isSystemActive) {
-                if (!e.target.closest('#menu-toggle-btn') && !e.target.closest('#dropdown-panel-3d')) {
+                if (!e.target.closest('#top-ui-container')) {
                     enterMultiverse();
                 }
             }
@@ -516,12 +504,10 @@
             isSystemActive = true;
             instruction.style.opacity = '0';
 
-            gsap.to(menuTriggerGroup.scale, { x: 0, y: 0, z: 0, duration: 0.5 });
             gsap.to(planetGroup.scale, { x: 0, y: 0, z: 0, duration: 0.8 });
             gsap.to(textGroup.scale, { x: 0, y: 0, z: 0, duration: 0.8, onComplete: () => {
                 planetGroup.visible = false;
                 textGroup.visible = false;
-                menuTriggerGroup.visible = false;
                 
                 createMultiverseHUD();
                 gsap.fromTo(hudGroup.scale, { x: 0.01, y: 0.01, z: 0.01 }, { x: 1, y: 1, z: 1, duration: 1, ease: "back.out(1.4)" });
@@ -538,11 +524,9 @@
                 
                 planetGroup.visible = true;
                 textGroup.visible = true;
-                menuTriggerGroup.visible = true;
 
                 gsap.to(planetGroup.scale, { x: 1, y: 1, z: 1, duration: 0.8 });
                 gsap.to(textGroup.scale, { x: 1, y: 1, z: 1, duration: 0.8 });
-                gsap.to(menuTriggerGroup.scale, { x: 0.005, y: 0.005, z: 0.005, duration: 0.8 });
 
                 isSystemActive = false;
                 instruction.style.opacity = '1';
