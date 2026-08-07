@@ -11,7 +11,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
         body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; width: 100vw; height: 100vh; }
         
-        /* Modos VR SBS (Side-by-Side) */
+        /* Contenedor Vista VR Dividida */
         #vr-view-container {
             display: flex;
             width: 100vw;
@@ -171,7 +171,7 @@
             </div>
         </div>
 
-        <!-- OJO DERECHO (CLON) -->
+        <!-- OJO DERECHO -->
         <div class="vr-eye" id="eye-right">
             <div class="webgl-canvas-container" id="canvas-container-right"></div>
             <div class="ui-interface" id="ui-right">
@@ -231,28 +231,28 @@
         rendererRight.setSize(window.innerWidth, window.innerHeight);
         containerRight.appendChild(rendererRight.domElement);
 
-        // Iluminación Neón Tridimensional (Rosa, Violeta y Celeste)
+        // Luces neón en tres dimensiones
         scene.add(new THREE.AmbientLight(0x3a1050, 1.5));
         const pLightCyan = new THREE.PointLight(0x00f0ff, 4, 80); pLightCyan.position.set(-8, 8, 8); scene.add(pLightCyan);
         const pLightPink = new THREE.PointLight(0xf000ff, 4, 80); pLightPink.position.set(8, -8, 8); scene.add(pLightPink);
         const pLightViolet = new THREE.PointLight(0x8a2be2, 3, 80); pLightViolet.position.set(0, 0, -10); scene.add(pLightViolet);
 
-        // Universo 360 con degradado espacial violeta
+        // Fondo espacial
         const universeGeo = new THREE.SphereGeometry(70, 32, 32);
         universeSphere = new THREE.Mesh(universeGeo, new THREE.MeshBasicMaterial({ color: 0x070216, side: THREE.BackSide }));
         scene.add(universeSphere);
 
-        // FONDO TRIDIMENSIONAL ESTRELLADO ANIMADO CON CELESTE, ROSA Y VIOLETA
+        // Fondo 3D Estrellado Animado (Rosa, Violeta y Celeste)
         const starsGeometry = new THREE.BufferGeometry();
-        const starCount = 3000;
+        const starCount = 2500;
         const starPositions = new Float32Array(starCount * 3);
         const starColors = new Float32Array(starCount * 3);
 
         const palette = [
-            new THREE.Color(0x00f0ff), // Celeste / Cian
-            new THREE.Color(0xf000ff), // Rosa / Magenta
+            new THREE.Color(0x00f0ff), // Celeste
+            new THREE.Color(0xf000ff), // Rosa
             new THREE.Color(0x9d4edd), // Violeta
-            new THREE.Color(0xffffff)  # Blanco brillante
+            new THREE.Color(0xffffff)  // Blanco
         ];
 
         for (let i = 0; i < starCount; i++) {
@@ -283,7 +283,7 @@
         starField = new THREE.Points(starsGeometry, starsMaterial);
         scene.add(starField);
 
-        // Anillos Cósmicos Neón en 3D
+        // Anillos neón
         backgroundRingGroup = new THREE.Group();
         const ringGeo1 = new THREE.TorusGeometry(12, 0.05, 16, 100);
         const ringMat1 = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.35 });
@@ -299,7 +299,7 @@
         backgroundRingGroup.add(ring2);
         scene.add(backgroundRingGroup);
 
-        // Esfera neón cian central
+        // Esfera neón inferior
         planetGroup = new THREE.Group();
         const planetMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.9 });
         planet = new THREE.Mesh(new THREE.IcosahedronGeometry(1.4, 4), planetMaterial);
@@ -334,7 +334,7 @@
         scene.add(textGroup);
         camera.position.z = 5;
 
-        // Giroscopio SBS
+        // Lógica de Giroscopio y VR
         function handleOrientation(e) {
             if (!isGyroActive) return;
             const beta = e.beta ? THREE.MathUtils.degToRad(e.beta) : 0;
@@ -384,7 +384,6 @@
             planet.rotation.y += 0.008;
             textGroup.rotation.y += 0.006;
 
-            // Animación del Fondo 3D
             starField.rotation.y += 0.0006;
             starField.rotation.x += 0.0003;
             backgroundRingGroup.rotation.y += 0.002;
