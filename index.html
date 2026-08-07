@@ -9,7 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-        body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; width: 100vw; height: 100vh; }
+        body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; width: 100vw; height: 100vh; user-select: none; }
         
         /* Contenedor Vista VR Dividida */
         #vr-view-container {
@@ -20,6 +20,11 @@
             top: 0;
             left: 0;
             z-index: 2;
+            cursor: grab;
+        }
+
+        #vr-view-container:active {
+            cursor: grabbing;
         }
 
         .vr-eye {
@@ -171,7 +176,7 @@
         <button class="control-btn" onclick="openAboutModal()"><span>NOSOTROS</span></button>
     </div>
 
-    <div id="instruction">Presiona para ingresar al universo 360 MS3</div>
+    <div id="instruction">Arrastra para explorar o presiona para ingresar al universo MS3</div>
 
     <div id="vr-view-container">
         <!-- OJO IZQUIERDO -->
@@ -179,7 +184,6 @@
             <div class="webgl-canvas-container" id="canvas-container-left"></div>
             <div class="ui-interface" id="ui-left">
                 <div class="desktop-canvas-frame">
-                    <!-- Botón Flotante Volver -->
                     <button class="back-btn-floating" onclick="exitMultiverse(event)">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                         <span>VOLVER A MS3</span>
@@ -208,7 +212,6 @@
             <div class="webgl-canvas-container" id="canvas-container-right"></div>
             <div class="ui-interface" id="ui-right">
                 <div class="desktop-canvas-frame">
-                    <!-- Botón Flotante Volver -->
                     <button class="back-btn-floating" onclick="exitMultiverse(event)">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                         <span>VOLVER A MS3</span>
@@ -252,6 +255,13 @@
         let planet, textGroup, planetGroup, universeSphere, starField, backgroundRingGroup;
         let isSystemActive = false, isGyroActive = false, isVRMode = false, mobileMenuOpen = false;
 
+        // Variables de Rotación 360° mediante Mouse / Táctil
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let targetRotationX = 0, targetRotationY = 0;
+        let currentRotationX = 0, currentRotationY = 0;
+        let dragDistance = 0;
+
         const containerLeft = document.getElementById('canvas-container-left');
         const containerRight = document.getElementById('canvas-container-right');
         const uiLeft = document.getElementById('ui-left');
@@ -280,17 +290,17 @@
         universeSphere = new THREE.Mesh(universeGeo, new THREE.MeshBasicMaterial({ color: 0x070216, side: THREE.BackSide }));
         scene.add(universeSphere);
 
-        // Fondo 3D Estrellado Animado (Rosa, Violeta y Celeste)
+        // Fondo 3D Estrellado Animado
         const starsGeometry = new THREE.BufferGeometry();
         const starCount = 2500;
         const starPositions = new Float32Array(starCount * 3);
         const starColors = new Float32Array(starCount * 3);
 
         const palette = [
-            new THREE.Color(0x00f0ff), // Celeste
-            new THREE.Color(0xf000ff), // Rosa
-            new THREE.Color(0x9d4edd), // Violeta
-            new THREE.Color(0xffffff)  // Blanco
+            new THREE.Color(0x00f0ff),
+            new THREE.Color(0xf000ff),
+            new THREE.Color(0x9d4edd),
+            new THREE.Color(0xffffff)
         ];
 
         for (let i = 0; i < starCount; i++) {
@@ -372,14 +382,57 @@
         scene.add(textGroup);
         camera.position.z = 5;
 
-        // Lógica de Giroscopio y VR
+        // --- SISTEMA DE NAVEGACIÓN TOUCH / DRAG 360° ---
+        function onPointerDown(e) {
+            if (e.target.closest('#top-controls') || e.target.closest('#mobile-drawer') || e.target.closest('#mobile-menu-toggle') || e.target.closest('.ui-interface') || e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
+            
+            isDragging = true;
+            dragDistance = 0;
+            const x = e.touches ? e.touches[0].clientX : e.clientX;
+            const y = e.touches ? e.touches[0].clientY : e.clientY;
+            previousMousePosition = { x, y };
+        }
+
+        function onPointerMove(e) {
+            if (!isDragging) return;
+
+            const x = e.touches ? e.touches[0].clientX : e.clientX;
+            const y = e.touches ? e.touches[0].clientY : e.clientY;
+
+            const deltaX = x - previousMousePosition.x;
+            const deltaY = y - previousMousePosition.y;
+
+            dragDistance += Math.abs(deltaX) + Math.abs(deltaY);
+
+            targetRotationY += deltaX * 0.005;
+            targetRotationX += deltaY * 0.005;
+
+            // Limitar la rotación vertical para evitar inversión brusca
+            targetRotationX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, targetRotationX));
+
+            previousMousePosition = { x, y };
+        }
+
+        function onPointerUp() {
+            isDragging = false;
+        }
+
+        window.addEventListener('mousedown', onPointerDown);
+        window.addEventListener('mousemove', onPointerMove);
+        window.addEventListener('mouseup', onPointerUp);
+
+        window.addEventListener('touchstart', onPointerDown, { passive: true });
+        window.addEventListener('touchmove', onPointerMove, { passive: true });
+        window.addEventListener('touchend', onPointerUp);
+
+        // Giroscopio integrado
         function handleOrientation(e) {
             if (!isGyroActive) return;
             const beta = e.beta ? THREE.MathUtils.degToRad(e.beta) : 0;
             const gamma = e.gamma ? THREE.MathUtils.degToRad(e.gamma) : 0;
 
-            camera.rotation.x = beta * 0.4;
-            camera.rotation.y = gamma * 0.4;
+            targetRotationX = beta * 0.5;
+            targetRotationY = gamma * 0.5;
         }
 
         function toggleGyroscope() {
@@ -403,7 +456,8 @@
                 if (!isVRMode) toggleVRMode();
             } else {
                 window.removeEventListener('deviceorientation', handleOrientation);
-                camera.rotation.set(0, 0, 0);
+                targetRotationX = 0;
+                targetRotationY = 0;
             }
         }
 
@@ -419,6 +473,14 @@
 
         function animate() {
             requestAnimationFrame(animate);
+
+            // Suavizado dinámico de la rotación de cámara
+            currentRotationX += (targetRotationX - currentRotationX) * 0.08;
+            currentRotationY += (targetRotationY - currentRotationY) * 0.08;
+
+            camera.rotation.x = currentRotationX;
+            camera.rotation.y = currentRotationY;
+
             planet.rotation.y += 0.008;
             textGroup.rotation.y += 0.006;
 
@@ -464,13 +526,19 @@
             planetGroup.visible = true;
             textGroup.visible = true;
 
+            // Restablecer ángulo de la cámara al volver
+            targetRotationX = 0;
+            targetRotationY = 0;
+
             gsap.to(camera.position, { z: 5, duration: 1.5, onComplete: () => {
                 isSystemActive = false;
                 instruction.style.opacity = '1';
             }});
         }
 
+        // Click para entrar solo si no se estuvo arrastrando la pantalla
         window.addEventListener('click', (e) => {
+            if (dragDistance > 10) return; // Evita activar el clic si fue un arrastre de pantalla
             if (!isSystemActive && !e.target.closest('#top-controls') && !e.target.closest('#mobile-drawer') && !e.target.closest('#mobile-menu-toggle')) {
                 enterMultiverse();
             }
