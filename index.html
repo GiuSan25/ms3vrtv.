@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MS3 - Universo 360 VR Inmersivo & Gear 360</title>
+    <title>MS3 - Universo 360 VR Inmersivo & Gear 360 Persistente</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS3DRenderer.js"></script>
@@ -94,11 +94,6 @@
             border-radius: 24px; background: rgba(10, 6, 24, 0.92); backdrop-filter: blur(16px);
         }
 
-        .neon-box-magenta {
-            border: 3px solid #f000ff; box-shadow: 0 0 35px rgba(240, 0, 255, 0.6), inset 0 0 30px rgba(240, 0, 255, 0.3);
-            border-radius: 24px; background: rgba(10, 6, 24, 0.92); backdrop-filter: blur(16px);
-        }
-
         #about-modal {
             position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 2000;
             display: none; justify-content: center; align-items: center; flex-direction: column; padding: 20px; pointer-events: auto;
@@ -108,8 +103,8 @@
 </head>
 <body>
 
-    <!-- Selector de archivo local oculto (Se usa una única vez) -->
-    <input type="file" id="gear360-input" accept="video/mp4,video/mkv,video/webm" style="display: none;" onchange="loadLocal360Video(event)">
+    <!-- Selector de archivo local oculto -->
+    <input type="file" id="gear360-input" accept="video/mp4,video/mkv,video/webm" style="display: none;" onchange="handleFileSelect(event)">
 
     <!-- MENÚ FLOTANTE EN LA ESQUINA SUPERIOR DERECHA -->
     <div id="top-ui-container">
@@ -158,8 +153,8 @@
         let isTopMenuOpen = false;
 
         let isSystemActive = false, isGyroActive = false, isVRMode = false, is360Mode = false;
-        let loadedVideoURL = null;
         let videoLoaded = false;
+        let db = null;
 
         let isDragging = false;
         let previousMousePosition = { x: 0, y: 0 };
@@ -190,6 +185,60 @@
         const cssContainerLeft = document.getElementById('css3d-container-left');
         const cssContainerRight = document.getElementById('css3d-container-right');
         const instruction = document.getElementById('instruction');
+
+        // Inicializar Base de Datos Local Permanente (IndexedDB)
+        function initDB() {
+            const request = indexedDB.OpenDBRequest ? indexedDB.open("MS3_PersistentVR", 1) : indexedDB.open("MS3_PersistentVR", 1);
+            
+            request.onerror = (event) => console.error("Error al abrir IndexedDB", event);
+            
+            request.onupgradeneeded = (event) => {
+                db = event.target.result;
+                if (!db.objectStoreNames.contains("videos")) {
+                    db.createObjectStore("videos");
+                }
+            };
+
+            request.onsuccess = (event) => {
+                db = event.target.result;
+                checkStoredVideo();
+            };
+        }
+
+        function saveVideoToDB(fileBlob) {
+            if (!db) return;
+            const transaction = db.transaction(["videos"], "readwrite");
+            const store = transaction.objectStore("videos");
+            store.put(fileBlob, "gear360_permanent_video");
+
+            transaction.oncomplete = () => {
+                videoLoaded = true;
+                playBlobVideo(fileBlob);
+                if (isSystemActive) createMultiverseHUD();
+            };
+        }
+
+        function checkStoredVideo() {
+            if (!db) return;
+            const transaction = db.transaction(["videos"], "readonly");
+            const store = transaction.objectStore("videos");
+            const request = store.get("gear360_permanent_video");
+
+            request.onsuccess = (event) => {
+                if (event.target.result) {
+                    const videoBlob = event.target.result;
+                    videoLoaded = true;
+                    playBlobVideo(videoBlob);
+                }
+            };
+        }
+
+        function playBlobVideo(blob) {
+            const videoURL = URL.createObjectURL(blob);
+            videoElement.src = videoURL;
+        }
+
+        initDB();
 
         // Escenas 3D
         scene = new THREE.Scene();
@@ -305,7 +354,7 @@
             }
         }
 
-        // PANTALLA MULTIVERSO ADAPTADA (SI YA SE CARGó VIDEO, SOLO MUESTRA EL BOTÓN DE ABRIR)
+        // PANTALLA MULTIVERSO ADAPTADA CON PERSISTENCIA PERMANENTE
         function createMultiverseHUD() {
             if (hudGroup) cssScene.remove(hudGroup);
 
@@ -318,12 +367,12 @@
                     <span>ABRIR EXPERIENCIA 360°</span>
                  </button>` :
                 `<button onclick="document.getElementById('gear360-input').click()" class="interactive-btn bg-cyan-400 text-black px-12 py-5 rounded-2xl font-black text-2xl shadow-[0_0_35px_#00f0ff] hover:scale-105 transition-transform">
-                    VINCULAR VIDEO GEAR 360 ÚNICO
+                    VINCULAR VIDEO GEAR 360 PERMANENTE
                  </button>`;
 
             const statusText = videoLoaded ? 
-                `<span class="text-green-400 font-bold text-xl flex items-center gap-2"><span class="w-3 h-3 bg-green-400 rounded-full animate-ping"></span> VIDEO FIJADO PERMANENTEMENTE</span>` : 
-                `<span class="text-gray-400 text-xl">Ningún archivo asignado (Solo se permite 1 video)</span>`;
+                `<span class="text-green-400 font-bold text-xl flex items-center gap-2"><span class="w-3 h-3 bg-green-400 rounded-full animate-ping"></span> VIDEO GUARDADO PARA SIEMPRE EN ESTE NAVEGADOR</span>` : 
+                `<span class="text-gray-400 text-xl">Ningún video vinculado todavía</span>`;
 
             mainContainer.innerHTML = `
                 <button class="interactive-btn self-start bg-black/95 border-6 border-fuchsia-500 text-fuchsia-300 px-14 py-7 rounded-full font-black text-3xl flex items-center gap-6 shadow-[0_0_50px_rgba(240,0,255,0.9)] tracking-widest" onclick="exitMultiverse(event)">
@@ -335,7 +384,7 @@
                     <div>
                         <div class="mb-2">${statusText}</div>
                         <h1 class="text-7xl font-black text-white mt-4 drop-shadow-[0_0_20px_#00f0ff]">PANTALLA MULTIVERSO GEAR 360</h1>
-                        <p class="text-gray-200 text-2xl mt-4 max-w-2xl leading-relaxed">Una vez seleccionado el video, queda bloqueado de forma fija en esta pantalla sin posibilidad de ser reemplazado.</p>
+                        <p class="text-gray-200 text-2xl mt-4 max-w-2xl leading-relaxed">El video seleccionado se graba de forma permanente en la memoria de tu dispositivo. Aunque recargues la página, ya no volverá a pedírtelo.</p>
                     </div>
                     <div class="flex gap-6">
                         ${buttonHtml}
@@ -351,14 +400,10 @@
             cssScene.add(hudGroup);
         }
 
-        function loadLocal360Video(event) {
+        function handleFileSelect(event) {
             const file = event.target.files[0];
             if (file && !videoLoaded) {
-                loadedVideoURL = URL.createObjectURL(file);
-                videoElement.src = loadedVideoURL;
-                videoLoaded = true;
-                // Actualiza la pantalla para remover el selector y dejar fijo el botón de abrir
-                createMultiverseHUD();
+                saveVideoToDB(file);
             }
         }
 
