@@ -15,8 +15,7 @@
         body, html { 
             margin: 0; padding: 0; overflow: hidden; background-color: #000; 
             font-family: 'Inter', sans-serif; width: 100vw; height: 100dvh; 
-            user-select: none; -webkit-user-select: none;
-            touch-action: none;
+            user-select: none; -webkit-user-select: none; touch-action: none;
         }
         
         #vr-view-container {
@@ -41,6 +40,38 @@
 
         .webgl-canvas-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
+        }
+
+        /* PUNTERO DE MIRADA (GAZE RETICLE) */
+        .gaze-reticle {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 30px; height: 30px; border-radius: 50%;
+            border: 2px solid rgba(0, 240, 255, 0.5); z-index: 999; pointer-events: none;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5); display: flex; align-items: center; justify-content: center;
+        }
+
+        .gaze-dot {
+            width: 6px; height: 6px; background: #00f0ff; border-radius: 50%;
+            box-shadow: 0 0 8px #00f0ff;
+        }
+
+        .gaze-progress {
+            position: absolute; top: -4px; left: -4px; width: 34px; height: 34px;
+            border-radius: 50%; border: 3px solid transparent; border-top-color: #f000ff;
+            opacity: 0; transform: rotate(0deg); transition: opacity 0.2s ease;
+        }
+
+        .gaze-reticle.active .gaze-progress {
+            opacity: 1;
+            animation: gazeFill 3s linear forwards;
+        }
+
+        @keyframes gazeFill {
+            0% { transform: rotate(0deg); border-top-color: #00f0ff; border-right-color: transparent; border-bottom-color: transparent; border-left-color: transparent; }
+            25% { border-right-color: #00f0ff; }
+            50% { border-bottom-color: #f000ff; }
+            75% { border-left-color: #f000ff; }
+            100% { transform: rotate(360deg); border-color: #f000ff; }
         }
 
         #top-controls {
@@ -84,21 +115,20 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        body.vr-mode .desktop-canvas-frame {
-            transform: scale(0.65); transform-origin: top center;
-        }
+        body.vr-mode .desktop-canvas-frame { transform: scale(0.65); transform-origin: top center; }
 
         .desktop-canvas-frame {
             width: 100%; max-width: 1000px; display: flex; flex-direction: column; align-items: center; gap: 20px; transition: transform 0.3s ease;
         }
+
+        .interactive-btn { transition: transform 0.2s ease, border-color 0.2s ease; }
+        .interactive-btn.gaze-hover { transform: scale(1.08); border-color: #f000ff !important; }
 
         .back-btn-floating {
             background: rgba(10, 6, 24, 0.9); border: 2px solid #f000ff; color: #f000ff; box-shadow: 0 0 15px rgba(240, 0, 255, 0.5);
             backdrop-filter: blur(8px); padding: 8px 18px; border-radius: 9999px; font-weight: 800; font-size: 0.85rem; cursor: pointer;
             transition: all 0.3s ease; display: flex; align-items: center; gap: 6px; align-self: flex-start; margin-bottom: -10px;
         }
-
-        .back-btn-floating:hover { background: rgba(240, 0, 255, 0.2); box-shadow: 0 0 25px rgba(240, 0, 255, 0.8); transform: scale(1.05); }
 
         .neon-box-cyan {
             border: 2px solid #00f0ff; box-shadow: 0 0 25px rgba(0, 240, 255, 0.5), inset 0 0 20px rgba(0, 240, 255, 0.25);
@@ -142,15 +172,16 @@
         <button class="control-btn" onclick="openAboutModal()"><span>NOSOTROS</span></button>
     </div>
 
-    <div id="instruction">Toca la pantalla o arrastra para ingresar al universo MS3</div>
+    <div id="instruction">Fija la mirada 3 seg sobre los elementos para interactuar</div>
 
     <div id="vr-view-container">
         <!-- OJO IZQUIERDO -->
         <div class="vr-eye" id="eye-left">
+            <div class="gaze-reticle" id="reticle-left"><div class="gaze-dot"></div><div class="gaze-progress"></div></div>
             <div class="webgl-canvas-container" id="canvas-container-left"></div>
             <div class="ui-interface" id="ui-left">
                 <div class="desktop-canvas-frame">
-                    <button class="back-btn-floating" onclick="exitMultiverse(event)">
+                    <button class="back-btn-floating interactive-btn" onclick="exitMultiverse(event)">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                         <span>VOLVER A MS3</span>
                     </button>
@@ -161,13 +192,13 @@
                             <h1 class="text-3xl font-extrabold text-white mt-2">EL CONCIERTO DEL SIGLO</h1>
                         </div>
                         <div class="flex gap-4">
-                            <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="bg-white text-black px-6 py-2.5 rounded-xl font-bold">VER AHORA</button>
+                            <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="interactive-btn bg-white text-black px-6 py-2.5 rounded-xl font-bold">VER AHORA</button>
                         </div>
                     </div>
                     <div class="w-full grid grid-cols-3 gap-4">
-                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')" class="pill-btn neon-box-cyan py-3 text-cyan-400">PROGRAMAS VR</button>
-                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="pill-btn neon-box-magenta py-3 text-fuchsia-400">PROGRAMAS 2D</button>
-                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')" class="pill-btn neon-box-cyan py-3 text-cyan-400">EN VIVO</button>
+                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')" class="interactive-btn pill-btn neon-box-cyan py-3 text-cyan-400">PROGRAMAS VR</button>
+                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="interactive-btn pill-btn neon-box-magenta py-3 text-fuchsia-400">PROGRAMAS 2D</button>
+                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')" class="interactive-btn pill-btn neon-box-cyan py-3 text-cyan-400">EN VIVO</button>
                     </div>
                 </div>
             </div>
@@ -175,10 +206,11 @@
 
         <!-- OJO DERECHO -->
         <div class="vr-eye" id="eye-right">
+            <div class="gaze-reticle" id="reticle-right"><div class="gaze-dot"></div><div class="gaze-progress"></div></div>
             <div class="webgl-canvas-container" id="canvas-container-right"></div>
             <div class="ui-interface" id="ui-right">
                 <div class="desktop-canvas-frame">
-                    <button class="back-btn-floating" onclick="exitMultiverse(event)">
+                    <button class="back-btn-floating interactive-btn" onclick="exitMultiverse(event)">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                         <span>VOLVER A MS3</span>
                     </button>
@@ -189,13 +221,13 @@
                             <h1 class="text-3xl font-extrabold text-white mt-2">EL CONCIERTO DEL SIGLO</h1>
                         </div>
                         <div class="flex gap-4">
-                            <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="bg-white text-black px-6 py-2.5 rounded-xl font-bold">VER AHORA</button>
+                            <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="interactive-btn bg-white text-black px-6 py-2.5 rounded-xl font-bold">VER AHORA</button>
                         </div>
                     </div>
                     <div class="w-full grid grid-cols-3 gap-4">
-                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')" class="pill-btn neon-box-cyan py-3 text-cyan-400">PROGRAMAS VR</button>
-                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="pill-btn neon-box-magenta py-3 text-fuchsia-400">PROGRAMAS 2D</button>
-                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')" class="pill-btn neon-box-cyan py-3 text-cyan-400">EN VIVO</button>
+                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')" class="interactive-btn pill-btn neon-box-cyan py-3 text-cyan-400">PROGRAMAS VR</button>
+                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="interactive-btn pill-btn neon-box-magenta py-3 text-fuchsia-400">PROGRAMAS 2D</button>
+                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')" class="interactive-btn pill-btn neon-box-cyan py-3 text-cyan-400">EN VIVO</button>
                     </div>
                 </div>
             </div>
@@ -204,14 +236,14 @@
 
     <div id="video-modal">
         <video id="active-video" controls autoplay playsinline></video>
-        <button class="modal-close-btn" onclick="closeVideo()">Cerrar Reproductor</button>
+        <button class="modal-close-btn interactive-btn" onclick="closeVideo()">Cerrar Reproductor</button>
     </div>
 
     <div id="about-modal">
         <div class="neon-box-cyan p-8 max-w-md text-center">
             <h2 class="text-3xl font-bold text-cyan-400 mb-4">SOBRE NOSOTROS</h2>
             <p class="text-gray-300 mb-6">Plataforma inmersiva 360° diseñada para experiencias interactivas y realidad virtual.</p>
-            <button class="modal-close-btn" onclick="closeAboutModal()">CERRAR</button>
+            <button class="modal-close-btn interactive-btn" onclick="closeAboutModal()">CERRAR</button>
         </div>
     </div>
 
@@ -228,6 +260,12 @@
 
         let deviceQuaternion = new THREE.Quaternion();
         const eyeSeparation = 0.064;
+
+        // Variables de Raycaster para el Puntero de Mirada (Gaze)
+        let raycaster = new THREE.Raycaster();
+        let gazeTarget = null;
+        let gazeTimer = null;
+        const GAZE_TIME = 3000; // 3 segundos
 
         const containerLeft = document.getElementById('canvas-container-left');
         const containerRight = document.getElementById('canvas-container-right');
@@ -274,12 +312,7 @@
         const starPositions = new Float32Array(starCount * 3);
         const starColors = new Float32Array(starCount * 3);
 
-        const palette = [
-            new THREE.Color(0x00f0ff),
-            new THREE.Color(0xf000ff),
-            new THREE.Color(0x9d4edd),
-            new THREE.Color(0xffffff)
-        ];
+        const palette = [new THREE.Color(0x00f0ff), new THREE.Color(0xf000ff), new THREE.Color(0x9d4edd), new THREE.Color(0xffffff)];
 
         for (let i = 0; i < starCount; i++) {
             const radius = 15 + Math.random() * 45;
@@ -291,9 +324,7 @@
             starPositions[i * 3 + 2] = radius * Math.cos(phi);
 
             const color = palette[Math.floor(Math.random() * palette.length)];
-            starColors[i * 3] = color.r;
-            starColors[i * 3 + 1] = color.g;
-            starColors[i * 3 + 2] = color.b;
+            starColors[i * 3] = color.r; starColors[i * 3 + 1] = color.g; starColors[i * 3 + 2] = color.b;
         }
 
         starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
@@ -306,17 +337,13 @@
         backgroundRingGroup = new THREE.Group();
         const ringGeo1 = new THREE.TorusGeometry(12, 0.05, 16, 100);
         const ringMat1 = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.35 });
-        const ring1 = new THREE.Mesh(ringGeo1, ringMat1);
-        ring1.rotation.x = Math.PI / 3;
+        const ring1 = new THREE.Mesh(ringGeo1, ringMat1); ring1.rotation.x = Math.PI / 3;
 
         const ringGeo2 = new THREE.TorusGeometry(16, 0.05, 16, 100);
         const ringMat2 = new THREE.MeshBasicMaterial({ color: 0xf000ff, wireframe: true, transparent: true, opacity: 0.3 });
-        const ring2 = new THREE.Mesh(ringGeo2, ringMat2);
-        ring2.rotation.y = Math.PI / 4;
+        const ring2 = new THREE.Mesh(ringGeo2, ringMat2); ring2.rotation.y = Math.PI / 4;
 
-        backgroundRingGroup.add(ring1);
-        backgroundRingGroup.add(ring2);
-        scene.add(backgroundRingGroup);
+        backgroundRingGroup.add(ring1); backgroundRingGroup.add(ring2); scene.add(backgroundRingGroup);
 
         planetGroup = new THREE.Group();
         const planetMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.9 });
@@ -325,32 +352,76 @@
         planetGroup.add(planet);
         scene.add(planetGroup);
 
-        textGroup = new THREE.Group();
-        textGroup.position.y = 0.8;
+        textGroup = new THREE.Group(); textGroup.position.y = 0.8;
 
         const loader = new THREE.FontLoader();
         loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
-            const textGeo = new THREE.TextGeometry('MS3', {
-                font: font, size: 1.2, height: 0.4, curveSegments: 12,
-                bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.05, bevelOffset: 0, bevelSegments: 5
-            });
+            const textGeo = new THREE.TextGeometry('MS3', { font: font, size: 1.2, height: 0.4, curveSegments: 12, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.05, bevelOffset: 0, bevelSegments: 5 });
             textGeo.computeBoundingBox();
             const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
             
             const mirrorMaterial = new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0.9, roughness: 0.05, clearcoat: 1.0, reflectivity: 1.0 });
-            const textMesh = new THREE.Mesh(textGeo, mirrorMaterial);
-            textMesh.position.x = centerOffset;
-            textGroup.add(textMesh);
+            const textMesh = new THREE.Mesh(textGeo, mirrorMaterial); textMesh.position.x = centerOffset; textGroup.add(textMesh);
 
             const neonBorderMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.7 });
-            const borderMesh = new THREE.Mesh(textGeo, neonBorderMaterial);
-            borderMesh.position.x = centerOffset;
-            borderMesh.scale.set(1.02, 1.02, 1.02);
-            textGroup.add(borderMesh);
+            const borderMesh = new THREE.Mesh(textGeo, neonBorderMaterial); borderMesh.position.x = centerOffset; borderMesh.scale.set(1.02, 1.02, 1.02); textGroup.add(borderMesh);
         });
         scene.add(textGroup);
 
-        // --- SISTEMA TÁCTIL Y DE INTERACCIÓN iOS Y DESKTOP ---
+        // --- SISTEMA DE SELECCIÓN POR MIRADA (GAZE SELECTION 3 SEGUNDOS) ---
+        function checkGazePointer() {
+            let elementToTrigger = null;
+
+            if (!isSystemActive) {
+                // Raycast a la Esfera Central en el Universo
+                raycaster.setFromCamera(new THREE.Vector2(0, 0), isVRMode ? cameraLeft : camera);
+                const intersects = raycaster.intersectObjects([planet]);
+                if (intersects.length > 0) {
+                    elementToTrigger = planet;
+                }
+            } else {
+                // Raycast DOM desde la mirada central
+                const centerElement = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2);
+                if (centerElement && centerElement.closest('.interactive-btn')) {
+                    elementToTrigger = centerElement.closest('.interactive-btn');
+                }
+            }
+
+            if (elementToTrigger) {
+                if (gazeTarget !== elementToTrigger) {
+                    resetGazeTimer();
+                    gazeTarget = elementToTrigger;
+                    
+                    document.querySelectorAll('.gaze-reticle').forEach(r => r.classList.add('active'));
+                    if (gazeTarget.classList) gazeTarget.classList.add('gaze-hover');
+
+                    gazeTimer = setTimeout(() => {
+                        triggerGazeAction(gazeTarget);
+                        resetGazeTimer();
+                    }, GAZE_TIME);
+                }
+            } else {
+                resetGazeTimer();
+            }
+        }
+
+        function resetGazeTimer() {
+            if (gazeTimer) clearTimeout(gazeTimer);
+            if (gazeTarget && gazeTarget.classList) gazeTarget.classList.remove('gaze-hover');
+            gazeTarget = null;
+            gazeTimer = null;
+            document.querySelectorAll('.gaze-reticle').forEach(r => r.classList.remove('active'));
+        }
+
+        function triggerGazeAction(target) {
+            if (target === planet) {
+                enterMultiverse();
+            } else if (target && typeof target.click === 'function') {
+                target.click();
+            }
+        }
+
+        // Interacción Táctil y Mouse
         function onPointerDown(e) {
             if (e.target.closest('#top-controls') || e.target.closest('#mobile-drawer') || e.target.closest('#mobile-menu-toggle') || e.target.closest('.ui-interface') || e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
             
@@ -397,21 +468,12 @@
         window.addEventListener('touchmove', onPointerMove, { passive: true });
         window.addEventListener('touchend', onPointerUp, { passive: true });
 
-        // --- PERMISOS Y MANEJO DE GIROSCÓPIO iOS SAFARI ---
         function requestIOSPermissions() {
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission()
-                    .then(response => {
-                        if (response === 'granted') {
-                            setGyro(!isGyroActive);
-                        } else {
-                            alert('Permiso de acelerómetro denegado en iOS');
-                        }
-                    })
-                    .catch(console.error);
-            } else {
-                setGyro(!isGyroActive);
-            }
+                DeviceOrientationEvent.requestPermission().then(response => {
+                    if (response === 'granted') setGyro(!isGyroActive);
+                }).catch(console.error);
+            } else setGyro(!isGyroActive);
         }
 
         function handleOrientation(e) {
@@ -443,8 +505,7 @@
             } else {
                 window.removeEventListener('deviceorientation', handleOrientation, true);
                 cameraRig.quaternion.set(0, 0, 0, 1);
-                targetRotationX = 0;
-                targetRotationY = 0;
+                targetRotationX = 0; targetRotationY = 0;
             }
         }
 
@@ -456,9 +517,7 @@
                 b.querySelector('span').innerText = isVRMode ? 'SALIR DE VR' : 'VER EN VR';
             });
 
-            if (isVRMode && !isGyroActive) {
-                requestIOSPermissions();
-            }
+            if (isVRMode && !isGyroActive) requestIOSPermissions();
             onWindowResize();
         }
 
@@ -482,6 +541,8 @@
             starField.rotation.x += 0.0003;
             backgroundRingGroup.rotation.y += 0.002;
             backgroundRingGroup.rotation.z += 0.001;
+
+            checkGazePointer();
 
             if (isVRMode) {
                 rendererLeft.render(scene, cameraLeft);
@@ -520,8 +581,7 @@
             planetGroup.visible = true;
             textGroup.visible = true;
 
-            targetRotationX = 0;
-            targetRotationY = 0;
+            targetRotationX = 0; targetRotationY = 0;
 
             gsap.to(cameraRig.position, { z: 5, duration: 1.5, onComplete: () => {
                 isSystemActive = false;
