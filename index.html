@@ -93,7 +93,6 @@
             pointer-events: auto; display: flex; flex-direction: column; backdrop-filter: blur(12px);
         }
 
-        /* Estilo para la súper pantalla de cine curva inmersiva */
         .cinema-screen-container {
             width: 900px;
             background: rgba(5, 3, 12, 0.98);
@@ -107,7 +106,6 @@
             pointer-events: auto;
         }
 
-        /* Modo Pantalla Completa nativo dentro del entorno */
         .cinema-screen-container.fullscreen-mode {
             position: fixed !important;
             top: 0 !important; left: 0 !important;
@@ -369,18 +367,7 @@
                     <div>
                         <span class="text-xs font-extrabold tracking-widest text-cyan-300 uppercase">MS3 Multiverse Master</span>
                         <h1 class="text-2xl font-black text-white mt-1 drop-shadow-[0_0_10px_#00f0ff]">EL CONCIERTO DEL SIGLO</h1>
-                        <p class="text-gray-300 text-xs mt-2 leading-relaxed">Explora pantallas multimedia flotantes y transmisiones en vivo adaptadas para tu dispositivo.</p>
-                    </div>
-                    <div class="w-full neon-box-cyan p-3 flex flex-col gap-2 rounded-xl bg-black/80">
-                        <div class="flex justify-between items-center text-cyan-300 font-bold text-xs">
-                            <span>TOUR DE SANGUCHERÍAS TUCUMANAS 🥪</span>
-                        </div>
-                        <div class="relative w-full pb-[56.25%] h-0 rounded-lg overflow-hidden border border-cyan-500/50">
-                            <iframe class="absolute top-0 left-0 w-full h-full pointer-events-auto" src="https://www.youtube.com/embed/_P7bMsIi2hU" title="Recorrimos 3 sangucherías tucumanas en Buenos Aires" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                        </div>
-                        <button onclick="openSuperCinema('https://www.youtube.com/embed/_P7bMsIi2hU?autoplay=1', 'TOUR DE SANGUCHERÍAS TUCUMANAS 🥪🔥')" class="interactive-btn w-full bg-gradient-to-r from-cyan-500 to-fuchsia-600 text-white font-black py-3 rounded-xl text-center text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(0,240,255,0.6)] mt-1">
-                            🎬 ABRIR EN SUPER CINE CURVO 2D
-                        </button>
+                        <p class="text-gray-300 text-xs mt-2 leading-relaxed">Selecciona las estaciones espaciales flotantes para ver transmisiones en pantallas secundarias.</p>
                     </div>
                 </div>
 
@@ -393,12 +380,6 @@
                         <button onclick="changeEnvironment('gaming')" class="interactive-btn neon-box-cyan p-3 text-cyan-300 font-bold text-xs text-center rounded-xl">Sala RGB</button>
                         <button onclick="changeEnvironment('space')" class="interactive-btn neon-box-cyan p-3 text-cyan-300 font-bold text-xs text-center rounded-xl col-span-2">Abismo Espacial</button>
                     </div>
-                </div>
-
-                <div class="w-full grid grid-cols-3 gap-2">
-                    <button onclick="openSuperCinema('https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1', 'PROGRAMAS VR 2D')" class="interactive-btn neon-box-cyan py-3 text-cyan-300 font-bold text-xs text-center rounded-xl">VR CINE</button>
-                    <button onclick="openSuperCinema('https://www.youtube.com/embed/_P7bMsIi2hU?autoplay=1', 'PROGRAMAS 2D CURVOS')" class="interactive-btn neon-box-magenta py-3 text-fuchsia-300 font-bold text-xs text-center rounded-xl">2D CINE</button>
-                    <button onclick="openSuperCinema('https://www.youtube.com/embed/_P7bMsIi2hU?autoplay=1', 'CANAL EN VIVO')" class="interactive-btn neon-box-cyan py-3 text-cyan-300 font-bold text-xs text-center rounded-xl">VIVO CINE</button>
                 </div>
             `;
 
@@ -416,28 +397,57 @@
             surroundingScreensGroup = new THREE.Group();
             
             const screensData = [
-                { title: 'Tears of Steel', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', x: -4.5, y: 1.8, z: -1.0 },
-                { title: 'Big Buck Bunny', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', x: 4.5, y: 1.8, z: -1.0 },
-                { title: 'Elephants Dream', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', x: -4.5, y: -1.5, z: 2.0 },
-                { title: 'Sintel Fantasy', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', x: 4.5, y: -1.5, z: 2.0 }
+                { 
+                    title: 'TOUR DE SANGUCHERÍAS 🥪', 
+                    type: 'iframe', 
+                    url: 'https://www.youtube.com/embed/_P7bMsIi2hU', 
+                    x: -4.5, y: 1.8, z: -1.0 
+                },
+                { 
+                    title: 'Big Buck Bunny', 
+                    type: 'video', 
+                    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', 
+                    x: 4.5, y: 1.8, z: -1.0 
+                },
+                { 
+                    title: 'Elephants Dream', 
+                    type: 'video', 
+                    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', 
+                    x: -4.5, y: -1.5, z: 2.0 
+                },
+                { 
+                    title: 'Sintel Fantasy', 
+                    type: 'video', 
+                    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', 
+                    x: 4.5, y: -1.5, z: 2.0 
+                }
             ];
 
             screensData.forEach((data, i) => {
                 const screenDiv = document.createElement('div');
-                screenDiv.className = 'universe-screen-card interactive-btn p-3 flex flex-col gap-2 w-[260px]';
+                screenDiv.className = 'universe-screen-card interactive-btn p-3 flex flex-col gap-2 w-[280px]';
+                
+                let mediaContent = '';
+                if (data.type === 'iframe') {
+                    mediaContent = `<div class="relative w-full pb-[56.25%] h-0 rounded-lg overflow-hidden bg-black border border-cyan-500/50">
+                        <iframe class="absolute top-0 left-0 w-full h-full pointer-events-auto" src="${data.url}" title="${data.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                    </div>`;
+                } else {
+                    mediaContent = `<div class="relative rounded-lg overflow-hidden bg-black border border-cyan-500/50">
+                        <video src="${data.url}" controls playsinline class="w-full h-[140px] object-cover pointer-events-auto"></video>
+                    </div>`;
+                }
+
                 screenDiv.innerHTML = `
-                    <div class="text-xs text-cyan-300 font-bold uppercase">ESTACIÓN #${i + 1}</div>
-                    <div class="relative rounded-lg overflow-hidden bg-black border border-cyan-500/50">
-                        <video src="${data.url}" muted loop playsinline class="w-full h-[120px] object-cover"></video>
+                    <div class="flex justify-between items-center text-xs text-cyan-300 font-bold uppercase">
+                        <span>ESTACIÓN #${i + 1}</span>
                     </div>
+                    ${mediaContent}
                     <span class="text-white font-bold text-sm truncate">${data.title}</span>
-                    <button onclick="openSuperCinemaFromVideo('${data.url}', '${data.title}')" class="interactive-btn w-full bg-cyan-500 text-black font-black py-2 rounded-xl text-center text-xs uppercase">
-                        🎬 SUPER CINE
+                    <button onclick="openSuperCinemaFromCard('${data.url}', '${data.title}', '${data.type}')" class="interactive-btn w-full bg-cyan-500 text-black font-black py-2 rounded-xl text-center text-xs uppercase shadow-[0_0_15px_rgba(0,240,255,0.6)]">
+                        🎬 EXPANDIR A CINE CURVO
                     </button>
                 `;
-
-                const videoEl = screenDiv.querySelector('video');
-                screenDiv.addEventListener('click', () => videoEl.play().catch(() => {}));
 
                 const cssObj = new THREE.CSS3DObject(screenDiv);
                 cssObj.scale.set(0.0022, 0.0022, 0.0022);
@@ -450,8 +460,7 @@
             cssScene.add(surroundingScreensGroup);
         }
 
-        // Función para abrir la Súper Pantalla de Cine Curva en 3D con opción de Pantalla Completa
-        function openSuperCinema(embedUrl, titleText) {
+        function openSuperCinemaFromCard(url, titleText, type) {
             playClickSound();
             if (cinemaScreenGroup) {
                 cssScene.remove(cinemaScreenGroup);
@@ -461,6 +470,14 @@
             const cinemaDiv = document.createElement('div');
             cinemaDiv.className = 'cinema-screen-container';
             cinemaDiv.id = 'active-cinema-container';
+            
+            let innerMedia = '';
+            if (type === 'iframe') {
+                innerMedia = `<iframe class="absolute top-0 left-0 w-full h-full pointer-events-auto" src="${url}?autoplay=1" title="${titleText}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+            } else {
+                innerMedia = `<video src="${url}" controls autoplay playsinline class="w-full max-h-[400px] object-contain"></video>`;
+            }
+
             cinemaDiv.innerHTML = `
                 <div class="flex justify-between items-center border-b border-cyan-500/40 pb-3">
                     <span class="text-cyan-400 font-black text-xl tracking-wider uppercase">${titleText}</span>
@@ -473,8 +490,8 @@
                         </button>
                     </div>
                 </div>
-                <div class="video-wrapper-box relative w-full pb-[56.25%] h-0 rounded-2xl overflow-hidden border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,240,255,0.4)] bg-black">
-                    <iframe class="absolute top-0 left-0 w-full h-full pointer-events-auto" src="${embedUrl}" title="${titleText}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                <div class="video-wrapper-box relative w-full pb-[56.25%] h-0 rounded-2xl overflow-hidden border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,240,255,0.4)] bg-black flex justify-center items-center">
+                    ${innerMedia}
                 </div>
             `;
 
@@ -488,44 +505,6 @@
             if (hudGroup) hudGroup.visible = false;
         }
 
-        function openSuperCinemaFromVideo(mp4Url, titleText) {
-            playClickSound();
-            if (cinemaScreenGroup) {
-                cssScene.remove(cinemaScreenGroup);
-                cinemaScreenGroup = null;
-            }
-
-            const cinemaDiv = document.createElement('div');
-            cinemaDiv.className = 'cinema-screen-container';
-            cinemaDiv.id = 'active-cinema-container';
-            cinemaDiv.innerHTML = `
-                <div class="flex justify-between items-center border-b border-cyan-500/40 pb-3">
-                    <span class="text-cyan-400 font-black text-xl tracking-wider uppercase">${titleText}</span>
-                    <div class="flex gap-2">
-                        <button onclick="toggleCinemaFullscreen()" class="interactive-btn bg-cyan-500 text-black font-black px-4 py-2 rounded-xl text-xs shadow-[0_0_15px_rgba(0,240,255,0.8)]" id="fullscreen-btn-text">
-                            ⛶ PANTALLA COMPLETA
-                        </button>
-                        <button onclick="closeSuperCinema()" class="interactive-btn bg-fuchsia-600 text-white font-black px-4 py-2 rounded-xl text-xs shadow-[0_0_15px_rgba(240,0,255,0.8)]">
-                            ✕ CERRAR
-                        </button>
-                    </div>
-                </div>
-                <div class="video-wrapper-box relative w-full rounded-2xl overflow-hidden border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,240,255,0.4)] bg-black flex justify-center items-center">
-                    <video src="${mp4Url}" controls autoplay playsinline class="w-full max-h-[400px] object-contain"></video>
-                </div>
-            `;
-
-            cinemaScreenGroup = new THREE.Group();
-            const cssObj = new THREE.CSS3DObject(cinemaDiv);
-            cssObj.scale.set(0.003, 0.003, 0.003);
-            cssObj.position.set(0, 0.5, -2.5);
-            cinemaScreenGroup.add(cssObj);
-            cssScene.add(cinemaScreenGroup);
-
-            if (hudGroup) hudGroup.visible = false;
-        }
-
-        // Alternar el modo Pantalla Completa del Cine Curvo en la interfaz móvil
         function toggleCinemaFullscreen() {
             playClickSound();
             const container = document.getElementById('active-cinema-container');
