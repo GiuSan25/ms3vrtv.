@@ -111,7 +111,7 @@
         .modal-close-btn { margin-top: 20px; padding: 10px 25px; background: #0ff; color: #000; font-weight: bold; border-radius: 8px; cursor: pointer; }
 
         .floating-video-card {
-            width: 320px; height: 190px; border-radius: 16px; overflow: hidden;
+            border-radius: 16px; overflow: hidden;
             background: #000; border: 3px solid #00f0ff; box-shadow: 0 0 25px rgba(0,240,255,0.5);
             pointer-events: auto; display: flex; flex-direction: column;
         }
@@ -407,46 +407,37 @@
         function createSurroundingScreens() {
             surroundingScreensGroup = new THREE.Group();
             
-            const videoUrls = [
-                'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-                'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-                'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-                'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
-                'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4',
-                'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4'
+            const screensData = [
+                { url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', x: -3.5, y: 1.8, z: -2.5, scale: 0.0032, width: '420px', height: '240px' },
+                { url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', x: 3.8, y: -1.2, z: -2.0, scale: 0.0028, width: '360px', height: '200px' },
+                { url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', x: -4.5, y: -1.5, z: 1.5, scale: 0.0035, width: '480px', height: '270px' },
+                { url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', x: 4.2, y: 2.0, z: 1.0, scale: 0.003, width: '400px', height: '225px' },
+                { url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4', x: 0, y: 3.2, z: -3.5, scale: 0.004, width: '520px', height: '300px' },
+                { url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4', x: 0, y: -2.8, z: 3.2, scale: 0.0035, width: '450px', height: '250px' }
             ];
 
-            const radius = 4.2;
-            const count = videoUrls.length;
-
-            for (let i = 0; i < count; i++) {
-                // Distribuimos las pantallas a los costados y atrás (evitando el frente directo z < 0 en ángulo cercano a 0)
-                const angle = (i / count) * Math.PI * 2 + (Math.PI / 6);
-                
-                // Evitamos la zona frontal exacta (-0.6 a 0.6 radianes aprox) para no tapar el panel principal
-                let x = Math.sin(angle) * radius;
-                let z = Math.cos(angle) * radius;
-                let y = (i % 2 === 0) ? 0.8 : -0.6; // Alturas alternadas para dinamismo sin tapar la visual
-
+            screensData.forEach((data, i) => {
                 const screenDiv = document.createElement('div');
                 screenDiv.className = 'floating-video-card interactive-btn';
+                screenDiv.style.width = data.width;
+                screenDiv.style.height = data.height;
                 screenDiv.innerHTML = `
                     <div class="bg-black/80 px-4 py-2 border-b border-cyan-500/50 flex justify-between items-center text-xs text-cyan-300 font-bold">
-                        <span>MULTIVERSE FEED #${i + 1}</span>
-                        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                        <span>SECTOR ESTELAR #${i + 1}</span>
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
                     </div>
-                    <video src="${videoUrls[i]}" autoplay muted loop playsinline></video>
+                    <video src="${data.url}" autoplay muted loop playsinline></video>
                 `;
 
-                screenDiv.onclick = () => openVideo(videoUrls[i]);
+                screenDiv.onclick = () => openVideo(data.url);
 
                 const cssObj = new THREE.CSS3DObject(screenDiv);
-                cssObj.scale.set(0.003, 0.003, 0.003);
-                cssObj.position.set(x, y, z);
-                cssObj.lookAt(0, y, 0);
+                cssObj.scale.set(data.scale, data.scale, data.scale);
+                cssObj.position.set(data.x, data.y, data.z);
+                cssObj.lookAt(0, 0, 0);
 
                 surroundingScreensGroup.add(cssObj);
-            }
+            });
 
             cssScene.add(surroundingScreensGroup);
         }
