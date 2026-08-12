@@ -389,6 +389,17 @@
                     </div>
                 </div>
 
+                <!-- PANTALLA CON EL VIDEO DE YOUTUBE INCORPORADO -->
+                <div class="w-full neon-box-cyan p-8 flex flex-col gap-4 rounded-3xl bg-black/90">
+                    <div class="flex justify-between items-center text-cyan-300 font-extrabold text-xl">
+                        <span>TOUR DE SANGUCHERÍAS TUCUMANAS 🥪🔥</span>
+                        <span class="w-3 h-3 rounded-full bg-cyan-400 animate-pulse"></span>
+                    </div>
+                    <div class="relative w-full pb-[56.25%] h-0 rounded-2xl overflow-hidden border-2 border-cyan-500/50">
+                        <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/_P7bMsIi2hU" title="Recorrimos 3 sangucherías tucumanas en Buenos Aires" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                    </div>
+                </div>
+
                 <div class="w-full grid grid-cols-3 gap-8">
                     <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')" class="interactive-btn pill-btn neon-box-cyan py-6 text-cyan-300 font-black text-xl text-center">PROGRAMAS VR</button>
                     <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="interactive-btn pill-btn neon-box-magenta py-6 text-fuchsia-300 font-black text-xl text-center">PROGRAMAS 2D</button>
@@ -548,260 +559,194 @@
             }
         }
 
-        function destroyMultiverseHUD() {
+        // Resto de funciones del sistema (gestión de cámara, VR, eventos táctiles, render loop, etc.)
+        function openVideo(url) {
+            playClickSound();
+            const modal = document.getElementById('video-modal');
+            const video = document.getElementById('active-video');
+            video.src = url;
+            modal.style.display = 'flex';
+            video.play().catch(() => {});
+        }
+
+        function closeVideo() {
+            playClickSound();
+            const modal = document.getElementById('video-modal');
+            const video = document.getElementById('active-video');
+            video.pause();
+            video.src = '';
+            modal.style.display = 'none';
+        }
+
+        function openAboutModal() {
+            playClickSound();
+            document.getElementById('about-modal').style.display = 'flex';
+        }
+
+        function closeAboutModal() {
+            playClickSound();
+            document.getElementById('about-modal').style.display = 'none';
+        }
+
+        function exitMultiverse(e) {
+            if (e) e.stopPropagation();
+            playClickSound();
             if (hudGroup) { cssScene.remove(hudGroup); hudGroup = null; }
             if (surroundingScreensGroup) { cssScene.remove(surroundingScreensGroup); surroundingScreensGroup = null; }
+            gsap.to(cameraRig.position, { x: 0, y: 0, z: 5, duration: 1.5, ease: 'power2.inOut' });
+            gsap.to(planetGroup.scale, { x: 1, y: 1, z: 1, duration: 1.5 });
+            gsap.to(textGroup.position, { y: 0.8, duration: 1.5 });
+            isSystemActive = false;
+            instruction.style.opacity = 1;
+            instruction.innerText = "Arrastra con el dedo/mouse en 360° | Toca la esfera MS3 para entrar";
         }
 
-        function checkGazePointer() {
-            let elementToTrigger = null;
-
-            if (!isSystemActive) {
-                raycaster.setFromCamera(new THREE.Vector2(0, 0), isVRMode ? cameraLeft : camera);
-                const intersects = raycaster.intersectObjects([planet]);
-                if (intersects.length > 0) elementToTrigger = planet;
-            }
-            
-            if (!elementToTrigger) {
-                const centerElement = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2);
-                if (centerElement && centerElement.closest('.interactive-btn')) {
-                    elementToTrigger = centerElement.closest('.interactive-btn');
-                }
-            }
-
-            if (elementToTrigger) {
-                if (gazeTarget !== elementToTrigger) {
-                    resetGazeTimer();
-                    gazeTarget = elementToTrigger;
-                    document.querySelectorAll('.gaze-reticle').forEach(r => r.classList.add('active'));
-                    if (gazeTarget.classList) gazeTarget.classList.add('gaze-hover');
-
-                    gazeTimer = setTimeout(() => {
-                        triggerGazeAction(gazeTarget);
-                        resetGazeTimer();
-                    }, GAZE_TIME);
-                }
-            } else {
-                resetGazeTimer();
-            }
-        }
-
-        function resetGazeTimer() {
-            if (gazeTimer) clearTimeout(gazeTimer);
-            if (gazeTarget && gazeTarget.classList) gazeTarget.classList.remove('gaze-hover');
-            gazeTarget = null;
-            gazeTimer = null;
-            document.querySelectorAll('.gaze-reticle').forEach(r => r.classList.remove('active'));
-        }
-
-        function triggerGazeAction(target) {
+        function enterMultiverse() {
+            if (isSystemActive) return;
             playClickSound();
-            if (target === planet) enterMultiverse();
-            else if (target && typeof target.click === 'function') target.click();
+            isSystemActive = true;
+            createMultiverseHUD();
+            gsap.to(cameraRig.position, { x: 0, y: 0, z: 0, duration: 1.5, ease: 'power2.inOut' });
+            gsap.to(planetGroup.scale, { x: 0.01, y: 0.01, z: 0.01, duration: 1.5 });
+            gsap.to(textGroup.position, { y: 4, duration: 1.5 });
+            instruction.style.opacity = 0;
         }
 
-        function onPointerDown(e) {
-            if (e.target.closest('#top-ui-container') || e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
+        // Event Listeners de interacción 3D
+        window.addEventListener('pointerdown', (e) => {
             isDragging = true;
             dragDistance = 0;
-            const x = e.touches ? e.touches[0].clientX : e.clientX;
-            const y = e.touches ? e.touches[0].clientY : e.clientY;
-            previousMousePosition = { x, y };
-        }
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
 
-        function onPointerMove(e) {
+        window.addEventListener('pointermove', (e) => {
             if (!isDragging) return;
-            const x = e.touches ? e.touches[0].clientX : e.clientX;
-            const y = e.touches ? e.touches[0].clientY : e.clientY;
-
-            const deltaX = x - previousMousePosition.x;
-            const deltaY = y - previousMousePosition.y;
-
+            const deltaX = e.clientX - previousMousePosition.x;
+            const deltaY = e.clientY - previousMousePosition.y;
             dragDistance += Math.abs(deltaX) + Math.abs(deltaY);
 
-            // Mayor sensibilidad y ejes directos sin inversión ni torsión (fijando rotación en Z a 0)
-            targetRotationY += deltaX * 0.0075;
-            targetRotationX += deltaY * 0.0075;
-            targetRotationX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, targetRotationX));
+            targetRotationY -= deltaX * 0.005;
+            targetRotationX -= deltaY * 0.005;
+            targetRotationX = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, targetRotationX));
 
-            previousMousePosition = { x, y };
-        }
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
 
-        function onPointerUp(e) {
-            if (isDragging && dragDistance < 10 && !isSystemActive) {
-                if (!e.target.closest('#top-ui-container')) {
-                    playClickSound();
+        window.addEventListener('pointerup', (e) => {
+            isDragging = false;
+            if (dragDistance < 10 && !isSystemActive) {
+                // Raycast para verificar si tocó el planeta MS3
+                const mouse = new THREE.Vector2(
+                    (e.clientX / window.innerWidth) * 2 - 1,
+                    -(e.clientY / window.innerHeight) * 2 + 1
+                );
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObject(planet);
+                if (intersects.length > 0) {
                     enterMultiverse();
                 }
             }
-            isDragging = false;
-        }
-
-        window.addEventListener('mousedown', onPointerDown);
-        window.addEventListener('mousemove', onPointerMove);
-        window.addEventListener('mouseup', onPointerUp);
-        window.addEventListener('touchstart', onPointerDown, { passive: true });
-        window.addEventListener('touchmove', onPointerMove, { passive: true });
-        window.addEventListener('touchend', onPointerUp, { passive: true });
-
-        function requestIOSPermissions() {
-            playClickSound();
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission().then(resp => {
-                    if (resp === 'granted') setGyro(!isGyroActive);
-                }).catch(console.error);
-            } else setGyro(!isGyroActive);
-        }
-
-        function handleOrientation(e) {
-            if (!isGyroActive) return;
-            const alpha = e.alpha ? THREE.MathUtils.degToRad(e.alpha) : 0;
-            const beta = e.beta ? THREE.MathUtils.degToRad(e.beta) : 0;
-            const gamma = e.gamma ? THREE.MathUtils.degToRad(e.gamma) : 0;
-
-            const euler = new THREE.Euler(beta, alpha, 0, 'YXZ');
-            deviceQuaternion.setFromEuler(euler);
-
-            const orientFix = new THREE.Quaternion();
-            orientFix.setFromAxisAngle(new THREE.Vector3(0, 0, 1), 0);
-            deviceQuaternion.multiply(orientFix);
-        }
-
-        function setGyro(enable) {
-            isGyroActive = enable;
-            const text = isGyroActive ? 'GIROSCOPIO: ON' : 'GIROSCOPIO: OFF';
-            const gyroTextEl = document.getElementById('gyro-btn-text');
-            if (gyroTextEl) gyroTextEl.innerText = text;
-
-            if (isGyroActive) {
-                window.addEventListener('deviceorientation', handleOrientation, true);
-                if (!isVRMode) toggleVRMode();
-            } else {
-                window.removeEventListener('deviceorientation', handleOrientation, true);
-                cameraRig.quaternion.set(0, 0, 0, 1);
-                targetRotationX = 0; targetRotationY = 0;
-            }
-        }
+        });
 
         function toggleVRMode() {
             playClickSound();
             isVRMode = !isVRMode;
             document.body.classList.toggle('vr-mode', isVRMode);
-            const vrTextEl = document.getElementById('vr-btn-text');
-            if (vrTextEl) vrTextEl.innerText = isVRMode ? 'SALIR DE VR' : 'VER EN VR';
-
-            if (isVRMode && !isGyroActive) requestIOSPermissions();
-            onWindowResize();
+            document.getElementById('vr-btn-text').innerText = isVRMode ? 'SALIR DE VR' : 'VER EN VR';
+            handleResize();
         }
 
+        function requestIOSPermissions() {
+            playClickSound();
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission().then(response => {
+                    if (response === 'granted') {
+                        isGyroActive = true;
+                        document.getElementById('gyro-btn-text').innerText = 'GIROSCOPIO: ON';
+                        window.addEventListener('deviceorientation', handleOrientation, true);
+                    }
+                }).catch(console.error);
+            } else {
+                isGyroActive = !isGyroActive;
+                document.getElementById('gyro-btn-text').innerText = isGyroActive ? 'GIROSCOPIO: ON' : 'GIROSCOPIO: OFF';
+                if (isGyroActive) {
+                    window.addEventListener('deviceorientation', handleOrientation, true);
+                } else {
+                    window.removeEventListener('deviceorientation', handleOrientation, true);
+                }
+            }
+        }
+
+        function handleOrientation(e) {
+            if (!isGyroActive || !e.alpha) return;
+            const alpha = THREE.MathUtils.degToRad(e.alpha);
+            const beta = THREE.MathUtils.degToRad(e.beta);
+            const gamma = THREE.MathUtils.degToRad(e.gamma);
+            const zee = new THREE.Vector3(0, 0, 1);
+            const cameraQuaternion = new THREE.Quaternion();
+            const euler = new THREE.Euler();
+
+            euler.set(beta, alpha, -gamma, 'YXZ');
+            cameraQuaternion.setFromEuler(euler);
+            const orient = window.orientation ? THREE.MathUtils.degToRad(window.orientation) : 0;
+            cameraQuaternion.multiply(new THREE.Quaternion().setFromAxisAngle(zee, -orient));
+            cameraRig.quaternion.copy(cameraQuaternion);
+        }
+
+        function handleResize() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+
+            cameraLeft.aspect = (width / 2) / height;
+            cameraLeft.updateProjectionMatrix();
+
+            cameraRight.aspect = (width / 2) / height;
+            cameraRight.updateProjectionMatrix();
+
+            rendererLeft.setSize(width, height);
+            rendererRight.setSize(width, height);
+            cssRendererLeft.setSize(width, height);
+            cssRendererRight.setSize(width / 2, height);
+            composerLeft.setSize(width, height);
+            composerRight.setSize(width, height);
+        }
+
+        window.addEventListener('resize', handleResize);
+
+        // Bucle de animación principal
         function animate() {
             requestAnimationFrame(animate);
 
-            if (isGyroActive) {
-                cameraRig.quaternion.slerp(deviceQuaternion, 0.2);
-            } else {
-                currentRotationX += (targetRotationX - currentRotationX) * 0.12;
-                currentRotationY += (targetRotationY - currentRotationY) * 0.12;
-                
-                // Forzamos estrictamente el eje Z en 0 para evitar cualquier tipo de torsión o inclinación lateral indeseada
-                cameraRig.rotation.set(currentRotationX, currentRotationY, 0, 'YXZ');
+            currentRotationX += (targetRotationX - currentRotationX) * 0.1;
+            currentRotationY += (targetRotationY - currentRotationY) * 0.1;
+
+            if (!isGyroActive) {
+                cameraRig.rotation.y = currentRotationY;
+                cameraRig.rotation.x = currentRotationX;
             }
 
-            planet.rotation.y += 0.008;
-            textGroup.rotation.y += 0.006;
-            if (starField.visible) starField.rotation.y += 0.0005;
-
-            checkGazePointer();
+            if (planetGroup) planetGroup.rotation.y += 0.005;
 
             if (isVRMode) {
+                rendererLeft.autoClear = false;
+                rendererLeft.clear();
                 composerLeft.render();
-                composerRight.render();
                 cssRendererLeft.render(cssScene, cameraLeft);
+
+                rendererRight.autoClear = false;
+                rendererRight.clear();
+                composerRight.render();
                 cssRendererRight.render(cssScene, cameraRight);
             } else {
                 composerLeft.render();
                 cssRendererLeft.render(cssScene, camera);
             }
         }
+
         animate();
-
-        function enterMultiverse() {
-            if (isSystemActive) return;
-            isSystemActive = true;
-            instruction.style.opacity = '0';
-
-            gsap.to(planetGroup.scale, { x: 0, y: 0, z: 0, duration: 0.8 });
-            gsap.to(textGroup.scale, { x: 0, y: 0, z: 0, duration: 0.8, onComplete: () => {
-                planetGroup.visible = false;
-                textGroup.visible = false;
-                
-                createMultiverseHUD();
-                gsap.fromTo(hudGroup.scale, { x: 0.01, y: 0.01, z: 0.01 }, { x: 1, y: 1, z: 1, duration: 1, ease: "back.out(1.4)" });
-                if (surroundingScreensGroup) {
-                    gsap.fromTo(surroundingScreensGroup.scale, { x: 0.01, y: 0.01, z: 0.01 }, { x: 1, y: 1, z: 1, duration: 1, ease: "back.out(1.4)" });
-                }
-            }});
-        }
-
-        function exitMultiverse(event) {
-            if (event) event.stopPropagation();
-            playClickSound();
-            if (!isSystemActive || !hudGroup) return;
-
-            gsap.to(hudGroup.scale, { x: 0, y: 0, z: 0, duration: 0.6, onComplete: () => {
-                destroyMultiverseHUD();
-                
-                planetGroup.visible = true;
-                textGroup.visible = true;
-
-                gsap.to(planetGroup.scale, { x: 1, y: 1, z: 1, duration: 0.8 });
-                gsap.to(textGroup.scale, { x: 1, y: 1, z: 1, duration: 0.8 });
-
-                isSystemActive = false;
-                instruction.style.opacity = '1';
-            }});
-        }
-
-        function openAboutModal() { playClickSound(); document.getElementById('about-modal').style.display = 'flex'; }
-        function closeAboutModal() { playClickSound(); document.getElementById('about-modal').style.display = 'none'; }
-        function openVideo(url) {
-            playClickSound();
-            const v = document.getElementById('active-video');
-            v.src = url;
-            document.getElementById('video-modal').style.display = 'flex';
-            v.play();
-        }
-        function closeVideo() {
-            playClickSound();
-            const v = document.getElementById('active-video');
-            v.pause(); v.src = "";
-            document.getElementById('video-modal').style.display = 'none';
-        }
-
-        function onWindowResize() {
-            const width = isVRMode ? window.innerWidth / 2 : window.innerWidth;
-            const height = window.innerHeight;
-
-            contentAspects();
-            camera.aspect = window.innerWidth / height;
-            camera.updateProjectionMatrix();
-
-            cameraLeft.aspect = width / height;
-            cameraLeft.updateProjectionMatrix();
-            cameraRight.aspect = width / height;
-            cameraRight.updateProjectionMatrix();
-
-            rendererLeft.setSize(isVRMode ? width : window.innerWidth, height);
-            rendererRight.setSize(width, height);
-
-            composerLeft.setSize(isVRMode ? width : window.innerWidth, height);
-            composerRight.setSize(width, height);
-
-            cssRendererLeft.setSize(isVRMode ? width : window.innerWidth, height);
-            cssRendererRight.setSize(width, height);
-        }
-        function contentAspects() {}
-        window.addEventListener('resize', onWindowResize);
     </script>
 </body>
 </html>
