@@ -17,7 +17,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
         
-        * { -webkit-tap-highlight-color: transparent; }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
         
         body, html { 
             margin: 0; padding: 0; overflow: hidden; background-color: #000; 
@@ -45,121 +45,123 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
         }
         
-        .css3d-container { z-index: 10; }
+        .css3d-container { z-index: 10; overflow: hidden; }
 
         #top-ui-container {
-            position: fixed; top: 20px; right: 20px; z-index: 1000;
+            position: fixed; top: 15px; right: 15px; z-index: 1000;
             display: flex; flex-direction: column; align-items: flex-end; pointer-events: auto;
         }
 
-        .gaze-reticle {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 32px; height: 32px; border-radius: 50%;
-            border: 2px solid rgba(0, 240, 255, 0.6); z-index: 999; pointer-events: none;
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5); display: flex; align-items: center; justify-content: center;
-        }
-
-        .gaze-dot { width: 6px; height: 6px; background: #00f0ff; border-radius: 50%; box-shadow: 0 0 8px #00f0ff; }
-
-        .gaze-progress {
-            position: absolute; top: -4px; left: -4px; width: 36px; height: 36px;
-            border-radius: 50%; border: 3px solid transparent; opacity: 0; transition: opacity 0.2s ease;
-        }
-
-        .gaze-reticle.active .gaze-progress {
-            opacity: 1; animation: gazeFill 3s linear forwards;
-        }
-
-        @keyframes gazeFill {
-            0% { transform: rotate(0deg); border-top-color: #00f0ff; }
-            50% { border-right-color: #f000ff; border-bottom-color: #f000ff; }
-            100% { transform: rotate(360deg); border-color: #f000ff; }
-        }
-
         .control-btn {
-            background: rgba(10, 6, 24, 0.85); border: 2px solid #00f0ff; color: #00f0ff; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
-            backdrop-filter: blur(8px); padding: 12px 24px; border-radius: 9999px; font-weight: 700; font-size: 0.95rem; cursor: pointer;
-            display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; white-space: nowrap; pointer-events: auto;
+            background: rgba(10, 6, 24, 0.9); border: 2px solid #00f0ff; color: #00f0ff; 
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); backdrop-filter: blur(12px); 
+            padding: 10px 20px; border-radius: 9999px; font-weight: 700; font-size: 0.9rem; 
+            cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; 
+            white-space: nowrap; pointer-events: auto;
         }
 
-        .control-btn:hover { background: rgba(0, 240, 255, 0.2); box-shadow: 0 0 25px rgba(0, 240, 255, 0.8); transform: scale(1.05); }
+        .control-btn:active { transform: scale(0.95); }
 
         #instruction { 
-            position: fixed; bottom: 35px; width: 100%; text-align: center; color: #fff; z-index: 100; 
-            font-size: 1.1rem; pointer-events: none; text-shadow: 0 0 10px #0ff, 0 0 20px #f0f; font-weight: 600; transition: opacity 0.5s ease;
+            position: fixed; bottom: 25px; width: 100%; text-align: center; color: #fff; z-index: 100; 
+            font-size: 0.95rem; padding: 0 15px; pointer-events: none; 
+            text-shadow: 0 0 10px #0ff, 0 0 20px #f0f; font-weight: 600; transition: opacity 0.5s ease;
         }
 
-        .floating-card { pointer-events: auto; user-select: none; }
-        .interactive-btn { pointer-events: auto; transition: transform 0.2s ease, border-color 0.2s ease; cursor: pointer; }
-        .interactive-btn.gaze-hover, .floating-card.gaze-hover { transform: scale(1.06); border-color: #f000ff !important; }
+        .floating-card { pointer-events: auto; user-select: none; max-width: 92vw; }
+        .interactive-btn { pointer-events: auto; cursor: pointer; }
 
         .neon-box-cyan {
-            border: 3px solid #00f0ff; box-shadow: 0 0 35px rgba(0, 240, 255, 0.6), inset 0 0 30px rgba(0, 240, 255, 0.3);
-            border-radius: 24px; background: rgba(10, 6, 24, 0.92); backdrop-filter: blur(16px);
+            border: 2px solid #00f0ff; box-shadow: 0 0 25px rgba(0, 240, 255, 0.5), inset 0 0 20px rgba(0, 240, 255, 0.2);
+            border-radius: 20px; background: rgba(10, 6, 24, 0.95); backdrop-filter: blur(16px);
         }
 
         .neon-box-magenta {
-            border: 3px solid #f000ff; box-shadow: 0 0 35px rgba(240, 0, 255, 0.6), inset 0 0 30px rgba(240, 0, 255, 0.3);
-            border-radius: 24px; background: rgba(10, 6, 24, 0.92); backdrop-filter: blur(16px);
+            border: 2px solid #f000ff; box-shadow: 0 0 25px rgba(240, 0, 255, 0.5), inset 0 0 20px rgba(240, 0, 255, 0.2);
+            border-radius: 20px; background: rgba(10, 6, 24, 0.95); backdrop-filter: blur(16px);
         }
 
-        #video-modal, #about-modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 2000;
+        #about-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000;
             display: none; justify-content: center; align-items: center; flex-direction: column; padding: 20px; pointer-events: auto;
         }
-        #video-modal video { width: 100%; max-width: 900px; border-radius: 12px; box-shadow: 0 0 30px #0ff; }
-        .modal-close-btn { margin-top: 20px; padding: 10px 25px; background: #0ff; color: #000; font-weight: bold; border-radius: 8px; cursor: pointer; }
+        .modal-close-btn { margin-top: 20px; padding: 12px 30px; background: #0ff; color: #000; font-weight: bold; border-radius: 10px; cursor: pointer; font-size: 1rem; }
 
         .universe-screen-card {
-            border-radius: 24px; overflow: hidden;
-            background: rgba(10, 6, 24, 0.95); border: 3px solid #00f0ff; box-shadow: 0 0 35px rgba(0,240,255,0.4);
+            border-radius: 20px; overflow: hidden;
+            background: rgba(10, 6, 24, 0.95); border: 2px solid #00f0ff; box-shadow: 0 0 25px rgba(0,240,255,0.4);
             pointer-events: auto; display: flex; flex-direction: column; backdrop-filter: blur(12px);
-            transition: all 0.3s ease;
         }
-        .universe-screen-card:hover { border-color: #f000ff; box-shadow: 0 0 45px rgba(240,0,255,0.8); }
-        .universe-screen-card video { width: 100%; height: 210px; object-fit: cover; border-bottom: 2px solid rgba(0,240,255,0.3); }
+
+        /* Estilo para la súper pantalla de cine curva inmersiva */
+        .cinema-screen-container {
+            width: 900px;
+            background: rgba(5, 3, 12, 0.98);
+            border: 4px solid #00f0ff;
+            box-shadow: 0 0 60px rgba(0, 240, 255, 0.8), inset 0 0 40px rgba(0, 240, 255, 0.4);
+            border-radius: 30px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            pointer-events: auto;
+        }
+
+        /* Modo Pantalla Completa nativo dentro del entorno */
+        .cinema-screen-container.fullscreen-mode {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            max-width: none !important; border-radius: 0 !important;
+            z-index: 9999 !important; padding: 15px !important;
+            justify-content: center !important;
+        }
+        .cinema-screen-container.fullscreen-mode .video-wrapper-box {
+            flex-grow: 1 !important;
+            height: auto !important;
+            padding-bottom: 0 !important;
+        }
+        .cinema-screen-container.fullscreen-mode iframe,
+        .cinema-screen-container.fullscreen-mode video {
+            position: absolute !important;
+            top: 0 !important; left: 0 !important;
+            width: 100% !important; height: 100% !important;
+        }
     </style>
 </head>
 <body>
 
     <div id="top-ui-container">
         <button id="menu-toggle-btn" class="interactive-btn control-btn" onclick="toggleTopMenu(event)">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             <span>MENÚ</span>
         </button>
-        <div id="dropdown-menu" class="hidden mt-3 w-64 neon-box-cyan p-4 flex flex-col gap-3 transition-all duration-300 transform scale-95 opacity-0">
-            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="requestIOSPermissions()"><span id="gyro-btn-text">GIROSCOPIO: OFF</span></button>
-            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="toggleVRMode()"><span id="vr-btn-text">VER EN VR</span></button>
-            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="toggleAudio()"><span id="audio-btn-text">AUDIO: OFF</span></button>
-            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="openAboutModal()"><span>NOSOTROS</span></button>
+        <div id="dropdown-menu" class="hidden mt-3 w-60 neon-box-cyan p-3 flex flex-col gap-2.5 transition-all duration-300 transform scale-95 opacity-0">
+            <button class="interactive-btn control-btn justify-start w-full text-xs py-2.5" onclick="requestIOSPermissions()"><span id="gyro-btn-text">GIROSCOPIO: OFF</span></button>
+            <button class="interactive-btn control-btn justify-start w-full text-xs py-2.5" onclick="toggleVRMode()"><span id="vr-btn-text">VER EN VR</span></button>
+            <button class="interactive-btn control-btn justify-start w-full text-xs py-2.5" onclick="toggleAudio()"><span id="audio-btn-text">AUDIO: OFF</span></button>
+            <button class="interactive-btn control-btn justify-start w-full text-xs py-2.5" onclick="openAboutModal()"><span>NOSOTROS</span></button>
         </div>
     </div>
 
-    <div id="instruction">Arrastra con el dedo/mouse en 360° | Toca la esfera MS3 para entrar</div>
+    <div id="instruction">Arrastra con el dedo en 360° | Toca la esfera MS3 para entrar</div>
 
     <div id="vr-view-container">
         <div class="vr-eye" id="eye-left">
-            <div class="gaze-reticle" id="reticle-left"><div class="gaze-dot"></div><div class="gaze-progress"></div></div>
             <div class="webgl-canvas-container" id="canvas-container-left"></div>
             <div class="css3d-container" id="css3d-container-left"></div>
         </div>
 
         <div class="vr-eye" id="eye-right">
-            <div class="gaze-reticle" id="reticle-right"><div class="gaze-dot"></div><div class="gaze-progress"></div></div>
             <div class="webgl-canvas-container" id="canvas-container-right"></div>
             <div class="css3d-container" id="css3d-container-right"></div>
         </div>
     </div>
 
-    <div id="video-modal">
-        <video id="active-video" controls autoplay playsinline></video>
-        <button class="modal-close-btn interactive-btn" onclick="closeVideo()">Cerrar Reproductor</button>
-    </div>
-
     <div id="about-modal">
-        <div class="neon-box-cyan p-8 max-w-md text-center">
-            <h2 class="text-3xl font-bold text-cyan-400 mb-4">SOBRE NOSOTROS</h2>
-            <p class="text-gray-300 mb-6">Plataforma inmersiva 360° con galerías de entornos fotográficos reales y virtuales de alta calidad.</p>
+        <div class="neon-box-cyan p-6 max-w-sm text-center mx-4">
+            <h2 class="text-2xl font-bold text-cyan-400 mb-3">SOBRE NOSOTROS</h2>
+            <p class="text-gray-300 text-sm mb-5 leading-relaxed">Plataforma inmersiva 360° con galerías de entornos fotográficos reales y virtuales optimizada para dispositivos móviles.</p>
             <button class="modal-close-btn interactive-btn" onclick="closeAboutModal()">CERRAR</button>
         </div>
     </div>
@@ -169,7 +171,7 @@
         let rendererLeft, rendererRight, cssRendererLeft, cssRendererRight;
         let composerLeft, composerRight;
         let planet, textGroup, planetGroup, universeSphere, starField;
-        let hudGroup = null, surroundingScreensGroup = null;
+        let hudGroup = null, surroundingScreensGroup = null, cinemaScreenGroup = null;
         let isTopMenuOpen = false;
 
         let isSystemActive = false, isGyroActive = false, isVRMode = false, isAudioActive = false;
@@ -181,13 +183,8 @@
         let currentRotationX = 0, currentRotationY = 0;
         let dragDistance = 0;
 
-        let deviceQuaternion = new THREE.Quaternion();
         const eyeSeparation = 0.064;
-
         let raycaster = new THREE.Raycaster();
-        let gazeTarget = null;
-        let gazeTimer = null;
-        const GAZE_TIME = 3000;
 
         const containerLeft = document.getElementById('canvas-container-left');
         const containerRight = document.getElementById('canvas-container-right');
@@ -211,14 +208,16 @@
         cameraRig.add(camera);
         cameraRig.add(cameraLeft);
         cameraRig.add(cameraRight);
-        cameraRig.position.set(0, 0, 5);
+        cameraRig.position.set(0, 0, 4.5);
 
-        rendererLeft = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        rendererLeft = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
         rendererLeft.setSize(window.innerWidth, window.innerHeight);
+        rendererLeft.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         containerLeft.appendChild(rendererLeft.domElement);
 
-        rendererRight = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        rendererRight = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
         rendererRight.setSize(window.innerWidth, window.innerHeight);
+        rendererRight.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         containerRight.appendChild(rendererRight.domElement);
 
         cssRendererLeft = new THREE.CSS3DRenderer();
@@ -233,7 +232,7 @@
         const renderSceneRight = new THREE.RenderPass(scene, cameraRight);
         const renderSceneMono = new THREE.RenderPass(scene, camera);
 
-        const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.2, 0.4, 0.85);
+        const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.0, 0.4, 0.85);
 
         composerLeft = new THREE.EffectComposer(rendererLeft);
         composerLeft.addPass(renderSceneMono);
@@ -254,7 +253,7 @@
         scene.add(universeSphere);
 
         const starsGeometry = new THREE.BufferGeometry();
-        const starCount = 3000;
+        const starCount = 1500;
         const starPositions = new Float32Array(starCount * 3);
         const starColors = new Float32Array(starCount * 3);
         const palette = [new THREE.Color(0x00f0ff), new THREE.Color(0xf000ff), new THREE.Color(0x9d4edd), new THREE.Color(0xffffff)];
@@ -272,19 +271,19 @@
 
         starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
         starsGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
-        starField = new THREE.Points(starsGeometry, new THREE.PointsMaterial({ size: 0.25, vertexColors: true, transparent: true, opacity: 0.9 }));
+        starField = new THREE.Points(starsGeometry, new THREE.PointsMaterial({ size: 0.3, vertexColors: true, transparent: true, opacity: 0.9 }));
         scene.add(starField);
 
         planetGroup = new THREE.Group();
-        planet = new THREE.Mesh(new THREE.IcosahedronGeometry(1.4, 4), new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.9 }));
-        planet.position.y = -1.5;
+        planet = new THREE.Mesh(new THREE.IcosahedronGeometry(1.2, 3), new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.9 }));
+        planet.position.y = -1.2;
         planetGroup.add(planet);
         scene.add(planetGroup);
 
         textGroup = new THREE.Group(); textGroup.position.y = 0.8;
         const fontLoader = new THREE.FontLoader();
         fontLoader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
-            const textGeo = new THREE.TextGeometry('MS3', { font: font, size: 1.2, height: 0.4, curveSegments: 12, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.05 });
+            const textGeo = new THREE.TextGeometry('MS3', { font: font, size: 1.0, height: 0.3, curveSegments: 8, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.03 });
             textGeo.computeBoundingBox();
             const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
             const textMesh = new THREE.Mesh(textGeo, new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0.9, roughness: 0.05, clearcoat: 1.0 }));
@@ -353,65 +352,61 @@
 
         function createMultiverseHUD() {
             const mainContainer = document.createElement('div');
-            mainContainer.className = "w-[1600px] flex flex-col gap-8 floating-card";
+            mainContainer.className = "w-[95vw] max-w-[650px] flex flex-col gap-4 floating-card p-4";
             mainContainer.innerHTML = `
                 <div class="flex justify-between items-center">
-                    <button class="interactive-btn bg-black/95 border-4 border-fuchsia-500 text-fuchsia-300 px-10 py-5 rounded-full font-black text-2xl flex items-center gap-4 shadow-[0_0_40px_rgba(240,0,255,0.8)] tracking-widest" onclick="exitMultiverse(event)">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                        <span>VOLVER AL INICIO</span>
+                    <button class="interactive-btn bg-black/90 border-2 border-fuchsia-500 text-fuchsia-300 px-5 py-2.5 rounded-2xl font-black text-sm flex items-center gap-2 shadow-[0_0_20px_rgba(240,0,255,0.6)]" onclick="exitMultiverse(event)">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        <span>VOLVER</span>
                     </button>
-                    <div class="flex gap-4">
-                        <button onclick="switchTab('home')" class="interactive-btn control-btn px-8 py-4 text-xl">PRINCIPAL</button>
-                        <button onclick="switchTab('gallery')" class="interactive-btn control-btn px-8 py-4 text-xl">GALERÍA 360°</button>
+                    <div class="flex gap-2">
+                        <button onclick="switchTab('home')" class="interactive-btn control-btn px-4 py-2 text-xs">INICIO</button>
+                        <button onclick="switchTab('gallery')" class="interactive-btn control-btn px-4 py-2 text-xs">360°</button>
                     </div>
                 </div>
 
-                <div id="tab-home" class="w-full neon-box-cyan p-12 flex flex-col justify-between h-[520px] rounded-3xl" style="background-image: linear-gradient(to right, rgba(10,6,24,0.95), rgba(10,6,24,0.6)), url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=1600&auto=format&fit=crop'); background-size: cover;">
+                <div id="tab-home" class="w-full neon-box-cyan p-5 flex flex-col gap-4 rounded-2xl">
                     <div>
-                        <span class="text-xl font-extrabold tracking-widest text-cyan-300 uppercase">MS3 Multiverse Master</span>
-                        <h1 class="text-6xl font-black text-white mt-4 drop-shadow-[0_0_20px_#00f0ff]">EL CONCIERTO DEL SIGLO</h1>
-                        <p class="text-gray-200 text-2xl mt-4 max-w-2xl leading-relaxed">Explora el espacio tridimensional y descubre múltiples pantallas multimedia flotantes con trailers y transmisiones.</p>
+                        <span class="text-xs font-extrabold tracking-widest text-cyan-300 uppercase">MS3 Multiverse Master</span>
+                        <h1 class="text-2xl font-black text-white mt-1 drop-shadow-[0_0_10px_#00f0ff]">EL CONCIERTO DEL SIGLO</h1>
+                        <p class="text-gray-300 text-xs mt-2 leading-relaxed">Explora pantallas multimedia flotantes y transmisiones en vivo adaptadas para tu dispositivo.</p>
                     </div>
-                    <div class="flex gap-6">
-                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="interactive-btn bg-white text-black px-10 py-5 rounded-2xl font-black text-2xl shadow-[0_0_30px_#fff]">REPRODUCIR AHORA</button>
-                    </div>
-                </div>
-
-                <div id="tab-gallery" class="w-full neon-box-magenta p-10 hidden flex-col justify-center gap-6 h-[520px] rounded-3xl">
-                    <h2 class="text-4xl font-black text-fuchsia-300 text-center mb-2">SELECCIONAR ENTORNO 360°</h2>
-                    <div class="grid grid-cols-3 gap-6">
-                        <button onclick="changeEnvironment('ny')" class="interactive-btn neon-box-cyan p-6 text-cyan-300 font-bold text-xl text-center">Depto NY de Noche</button>
-                        <button onclick="changeEnvironment('carlospaz')" class="interactive-btn neon-box-cyan p-6 text-cyan-300 font-bold text-xl text-center">Villa Carlos Paz (Cerro de la Cruz)</button>
-                        <button onclick="changeEnvironment('futurist')" class="interactive-btn neon-box-cyan p-6 text-cyan-300 font-bold text-xl text-center">Sala Futurista</button>
-                        <button onclick="changeEnvironment('gaming')" class="interactive-btn neon-box-cyan p-6 text-cyan-300 font-bold text-xl text-center">Sala de Juegos (RGB)</button>
-                        <button onclick="changeEnvironment('graffiti')" class="interactive-btn neon-box-cyan p-6 text-cyan-300 font-bold text-xl text-center">Sala con Graffitis</button>
-                        <button onclick="changeEnvironment('space')" class="interactive-btn neon-box-cyan p-6 text-cyan-300 font-bold text-xl text-center">Abismo Espacial (Default)</button>
+                    <div class="w-full neon-box-cyan p-3 flex flex-col gap-2 rounded-xl bg-black/80">
+                        <div class="flex justify-between items-center text-cyan-300 font-bold text-xs">
+                            <span>TOUR DE SANGUCHERÍAS TUCUMANAS 🥪</span>
+                        </div>
+                        <div class="relative w-full pb-[56.25%] h-0 rounded-lg overflow-hidden border border-cyan-500/50">
+                            <iframe class="absolute top-0 left-0 w-full h-full pointer-events-auto" src="https://www.youtube.com/embed/_P7bMsIi2hU" title="Recorrimos 3 sangucherías tucumanas en Buenos Aires" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        </div>
+                        <button onclick="openSuperCinema('https://www.youtube.com/embed/_P7bMsIi2hU?autoplay=1', 'TOUR DE SANGUCHERÍAS TUCUMANAS 🥪🔥')" class="interactive-btn w-full bg-gradient-to-r from-cyan-500 to-fuchsia-600 text-white font-black py-3 rounded-xl text-center text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(0,240,255,0.6)] mt-1">
+                            🎬 ABRIR EN SUPER CINE CURVO 2D
+                        </button>
                     </div>
                 </div>
 
-                <!-- PANTALLA CON EL VIDEO DE YOUTUBE INCORPORADO -->
-                <div class="w-full neon-box-cyan p-8 flex flex-col gap-4 rounded-3xl bg-black/90">
-                    <div class="flex justify-between items-center text-cyan-300 font-extrabold text-xl">
-                        <span>TOUR DE SANGUCHERÍAS TUCUMANAS 🥪🔥</span>
-                        <span class="w-3 h-3 rounded-full bg-cyan-400 animate-pulse"></span>
-                    </div>
-                    <div class="relative w-full pb-[56.25%] h-0 rounded-2xl overflow-hidden border-2 border-cyan-500/50">
-                        <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/_P7bMsIi2hU" title="Recorrimos 3 sangucherías tucumanas en Buenos Aires" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                <div id="tab-gallery" class="w-full neon-box-magenta p-5 hidden flex-col gap-3 rounded-2xl">
+                    <h2 class="text-lg font-black text-fuchsia-300 text-center">ENTORNO 360°</h2>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <button onclick="changeEnvironment('ny')" class="interactive-btn neon-box-cyan p-3 text-cyan-300 font-bold text-xs text-center rounded-xl">Depto NY</button>
+                        <button onclick="changeEnvironment('carlospaz')" class="interactive-btn neon-box-cyan p-3 text-cyan-300 font-bold text-xs text-center rounded-xl">Villa Carlos Paz</button>
+                        <button onclick="changeEnvironment('futurist')" class="interactive-btn neon-box-cyan p-3 text-cyan-300 font-bold text-xs text-center rounded-xl">Sala Futurista</button>
+                        <button onclick="changeEnvironment('gaming')" class="interactive-btn neon-box-cyan p-3 text-cyan-300 font-bold text-xs text-center rounded-xl">Sala RGB</button>
+                        <button onclick="changeEnvironment('space')" class="interactive-btn neon-box-cyan p-3 text-cyan-300 font-bold text-xs text-center rounded-xl col-span-2">Abismo Espacial</button>
                     </div>
                 </div>
 
-                <div class="w-full grid grid-cols-3 gap-8">
-                    <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')" class="interactive-btn pill-btn neon-box-cyan py-6 text-cyan-300 font-black text-xl text-center">PROGRAMAS VR</button>
-                    <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="interactive-btn pill-btn neon-box-magenta py-6 text-fuchsia-300 font-black text-xl text-center">PROGRAMAS 2D</button>
-                    <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')" class="interactive-btn pill-btn neon-box-cyan py-6 text-cyan-300 font-black text-xl text-center">CANAL EN VIVO</button>
+                <div class="w-full grid grid-cols-3 gap-2">
+                    <button onclick="openSuperCinema('https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1', 'PROGRAMAS VR 2D')" class="interactive-btn neon-box-cyan py-3 text-cyan-300 font-bold text-xs text-center rounded-xl">VR CINE</button>
+                    <button onclick="openSuperCinema('https://www.youtube.com/embed/_P7bMsIi2hU?autoplay=1', 'PROGRAMAS 2D CURVOS')" class="interactive-btn neon-box-magenta py-3 text-fuchsia-300 font-bold text-xs text-center rounded-xl">2D CINE</button>
+                    <button onclick="openSuperCinema('https://www.youtube.com/embed/_P7bMsIi2hU?autoplay=1', 'CANAL EN VIVO')" class="interactive-btn neon-box-cyan py-3 text-cyan-300 font-bold text-xs text-center rounded-xl">VIVO CINE</button>
                 </div>
             `;
 
             hudGroup = new THREE.Group();
             const cssObject = new THREE.CSS3DObject(mainContainer);
-            cssObject.scale.set(0.0055, 0.0055, 0.0055);
+            cssObject.scale.set(0.002, 0.002, 0.002);
             hudGroup.add(cssObject);
-            hudGroup.position.set(0, 0, -1.6);
+            hudGroup.position.set(0, 0, -2.0);
             cssScene.add(hudGroup);
 
             createSurroundingScreens();
@@ -421,95 +416,31 @@
             surroundingScreensGroup = new THREE.Group();
             
             const screensData = [
-                { 
-                    title: 'Tears of Steel', 
-                    desc: 'Ciber-thriller épico ambientado en una Ámsterdam post-apocalíptica.', 
-                    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', 
-                    x: -7.5, y: 3.0, z: -1.5, scale: 0.005, width: '560px' 
-                },
-                { 
-                    title: 'For Bigger Blazes', 
-                    desc: 'Demostración visual dinámica de efectos cinemáticos de alta definición.', 
-                    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', 
-                    x: -8.0, y: -2.2, z: 0.5, scale: 0.0048, width: '540px' 
-                },
-                { 
-                    title: 'Big Buck Bunny', 
-                    desc: 'Animación 3D de una gigantesca y tierna criatura del bosque.', 
-                    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', 
-                    x: 7.5, y: 3.2, z: -1.2, scale: 0.005, width: '560px' 
-                },
-                { 
-                    title: 'Subaru Outback', 
-                    desc: 'Rutas dinámicas y tecnología todoterreno avanzada en acción.', 
-                    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4', 
-                    x: 8.0, y: -2.0, z: 0.8, scale: 0.0048, width: '540px' 
-                },
-                { 
-                    title: 'Elephants Dream', 
-                    desc: 'Viaje surrealista y tecnológico a través de una maquinaria infinita.', 
-                    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', 
-                    x: -5.5, y: 1.0, z: 6.5, scale: 0.0052, width: '580px' 
-                },
-                { 
-                    title: 'Sintel Fantasy', 
-                    desc: 'Aventura mítica de una valiente guerrera en busca de su querido dragón.', 
-                    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', 
-                    x: 5.5, y: 1.2, z: 6.5, scale: 0.0052, width: '580px' 
-                },
-                { 
-                    title: 'Subaru Expedition', 
-                    desc: 'Documental inmersivo de exploración extrema por naturaleza indómita.', 
-                    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4', 
-                    x: 0, y: 6.5, z: -2.0, scale: 0.0055, width: '600px' 
-                },
-                { 
-                    title: 'Bullrun Racing', 
-                    desc: 'Velocidad pura y adrenalina en carreteras interestelares abiertas.', 
-                    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4', 
-                    x: 0, y: -5.5, z: 3.5, scale: 0.0052, width: '580px' 
-                },
-                { 
-                    title: 'Cosmic Odyssey', 
-                    desc: 'Travesía cósmica a través de nebulosas estelares y cúmulos galácticos.', 
-                    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', 
-                    x: -7.0, y: -1.0, z: 4.5, scale: 0.0048, width: '540px' 
-                },
-                { 
-                    title: 'Neon Horizon', 
-                    desc: 'Paisajes urbanos futuristas bañados en luces láser y neón.', 
-                    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', 
-                    x: 7.0, y: -1.2, z: 4.5, scale: 0.0048, width: '540px' 
-                }
+                { title: 'Tears of Steel', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', x: -4.5, y: 1.8, z: -1.0 },
+                { title: 'Big Buck Bunny', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', x: 4.5, y: 1.8, z: -1.0 },
+                { title: 'Elephants Dream', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', x: -4.5, y: -1.5, z: 2.0 },
+                { title: 'Sintel Fantasy', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', x: 4.5, y: -1.5, z: 2.0 }
             ];
 
             screensData.forEach((data, i) => {
                 const screenDiv = document.createElement('div');
-                screenDiv.className = 'universe-screen-card interactive-btn p-5 flex flex-col gap-4';
-                screenDiv.style.width = data.width;
+                screenDiv.className = 'universe-screen-card interactive-btn p-3 flex flex-col gap-2 w-[260px]';
                 screenDiv.innerHTML = `
-                    <div class="flex justify-between items-center text-sm text-cyan-300 font-extrabold uppercase tracking-wider">
-                        <span>ESTACIÓN #${i + 1}</span>
-                        <span class="w-3 h-3 rounded-full bg-fuchsia-400 animate-pulse"></span>
+                    <div class="text-xs text-cyan-300 font-bold uppercase">ESTACIÓN #${i + 1}</div>
+                    <div class="relative rounded-lg overflow-hidden bg-black border border-cyan-500/50">
+                        <video src="${data.url}" muted loop playsinline class="w-full h-[120px] object-cover"></video>
                     </div>
-                    <div class="relative rounded-2xl overflow-hidden bg-black border-2 border-cyan-500/50">
-                        <video src="${data.url}" muted loop playsinline></video>
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent flex items-end p-4">
-                            <span class="text-white font-black text-xl drop-shadow-md">${data.title}</span>
-                        </div>
-                    </div>
-                    <p class="text-gray-200 text-base leading-relaxed line-clamp-2">${data.desc}</p>
-                    <button onclick="openVideo('${data.url}')" class="interactive-btn w-full bg-gradient-to-r from-cyan-500 to-fuchsia-600 text-white font-black py-4 rounded-2xl text-center shadow-[0_0_20px_rgba(0,240,255,0.5)] uppercase tracking-widest text-base">
-                        REPRODUCIR
+                    <span class="text-white font-bold text-sm truncate">${data.title}</span>
+                    <button onclick="openSuperCinemaFromVideo('${data.url}', '${data.title}')" class="interactive-btn w-full bg-cyan-500 text-black font-black py-2 rounded-xl text-center text-xs uppercase">
+                        🎬 SUPER CINE
                     </button>
                 `;
 
                 const videoEl = screenDiv.querySelector('video');
-                screenDiv.addEventListener('mouseenter', () => videoEl.play().catch(() => {}));
-                screenDiv.addEventListener('mouseleave', () => { videoEl.pause(); videoEl.currentTime = 0; });
+                screenDiv.addEventListener('click', () => videoEl.play().catch(() => {}));
 
                 const cssObj = new THREE.CSS3DObject(screenDiv);
-                cssObj.scale.set(data.scale, data.scale, data.scale);
+                cssObj.scale.set(0.0022, 0.0022, 0.0022);
                 cssObj.position.set(data.x, data.y, data.z);
                 cssObj.lookAt(0, 0, 0);
 
@@ -517,6 +448,102 @@
             });
 
             cssScene.add(surroundingScreensGroup);
+        }
+
+        // Función para abrir la Súper Pantalla de Cine Curva en 3D con opción de Pantalla Completa
+        function openSuperCinema(embedUrl, titleText) {
+            playClickSound();
+            if (cinemaScreenGroup) {
+                cssScene.remove(cinemaScreenGroup);
+                cinemaScreenGroup = null;
+            }
+
+            const cinemaDiv = document.createElement('div');
+            cinemaDiv.className = 'cinema-screen-container';
+            cinemaDiv.id = 'active-cinema-container';
+            cinemaDiv.innerHTML = `
+                <div class="flex justify-between items-center border-b border-cyan-500/40 pb-3">
+                    <span class="text-cyan-400 font-black text-xl tracking-wider uppercase">${titleText}</span>
+                    <div class="flex gap-2">
+                        <button onclick="toggleCinemaFullscreen()" class="interactive-btn bg-cyan-500 text-black font-black px-4 py-2 rounded-xl text-xs shadow-[0_0_15px_rgba(0,240,255,0.8)]" id="fullscreen-btn-text">
+                            ⛶ PANTALLA COMPLETA
+                        </button>
+                        <button onclick="closeSuperCinema()" class="interactive-btn bg-fuchsia-600 text-white font-black px-4 py-2 rounded-xl text-xs shadow-[0_0_15px_rgba(240,0,255,0.8)]">
+                            ✕ CERRAR
+                        </button>
+                    </div>
+                </div>
+                <div class="video-wrapper-box relative w-full pb-[56.25%] h-0 rounded-2xl overflow-hidden border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,240,255,0.4)] bg-black">
+                    <iframe class="absolute top-0 left-0 w-full h-full pointer-events-auto" src="${embedUrl}" title="${titleText}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+            `;
+
+            cinemaScreenGroup = new THREE.Group();
+            const cssObj = new THREE.CSS3DObject(cinemaDiv);
+            cssObj.scale.set(0.003, 0.003, 0.003);
+            cssObj.position.set(0, 0.5, -2.5);
+            cinemaScreenGroup.add(cssObj);
+            cssScene.add(cinemaScreenGroup);
+
+            if (hudGroup) hudGroup.visible = false;
+        }
+
+        function openSuperCinemaFromVideo(mp4Url, titleText) {
+            playClickSound();
+            if (cinemaScreenGroup) {
+                cssScene.remove(cinemaScreenGroup);
+                cinemaScreenGroup = null;
+            }
+
+            const cinemaDiv = document.createElement('div');
+            cinemaDiv.className = 'cinema-screen-container';
+            cinemaDiv.id = 'active-cinema-container';
+            cinemaDiv.innerHTML = `
+                <div class="flex justify-between items-center border-b border-cyan-500/40 pb-3">
+                    <span class="text-cyan-400 font-black text-xl tracking-wider uppercase">${titleText}</span>
+                    <div class="flex gap-2">
+                        <button onclick="toggleCinemaFullscreen()" class="interactive-btn bg-cyan-500 text-black font-black px-4 py-2 rounded-xl text-xs shadow-[0_0_15px_rgba(0,240,255,0.8)]" id="fullscreen-btn-text">
+                            ⛶ PANTALLA COMPLETA
+                        </button>
+                        <button onclick="closeSuperCinema()" class="interactive-btn bg-fuchsia-600 text-white font-black px-4 py-2 rounded-xl text-xs shadow-[0_0_15px_rgba(240,0,255,0.8)]">
+                            ✕ CERRAR
+                        </button>
+                    </div>
+                </div>
+                <div class="video-wrapper-box relative w-full rounded-2xl overflow-hidden border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,240,255,0.4)] bg-black flex justify-center items-center">
+                    <video src="${mp4Url}" controls autoplay playsinline class="w-full max-h-[400px] object-contain"></video>
+                </div>
+            `;
+
+            cinemaScreenGroup = new THREE.Group();
+            const cssObj = new THREE.CSS3DObject(cinemaDiv);
+            cssObj.scale.set(0.003, 0.003, 0.003);
+            cssObj.position.set(0, 0.5, -2.5);
+            cinemaScreenGroup.add(cssObj);
+            cssScene.add(cinemaScreenGroup);
+
+            if (hudGroup) hudGroup.visible = false;
+        }
+
+        // Alternar el modo Pantalla Completa del Cine Curvo en la interfaz móvil
+        function toggleCinemaFullscreen() {
+            playClickSound();
+            const container = document.getElementById('active-cinema-container');
+            const btnText = document.getElementById('fullscreen-btn-text');
+            if (!container) return;
+
+            container.classList.toggle('fullscreen-mode');
+            const isFull = container.classList.contains('fullscreen-mode');
+            btnText.innerText = isFull ? '🗗 SALIR' : '⛶ PANTALLA COMPLETA';
+        }
+
+        function closeSuperCinema() {
+            playClickSound();
+            if (cinemaScreenGroup) {
+                cssScene.remove(cinemaScreenGroup);
+                cinemaScreenGroup = null;
+            }
+            if (hudGroup) hudGroup.visible = true;
         }
 
         function switchTab(tab) {
@@ -535,11 +562,10 @@
         function changeEnvironment(type) {
             playClickSound();
             let urls = {
-                'ny': 'https://images.unsplash.com/photo-1514565131-fce0801e5785?q=80&w=2000&auto=format&fit=crop',
-                'carlospaz': 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop',
-                'futurist': 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop',
-                'gaming': 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2000&auto=format&fit=crop',
-                'graffiti': 'https://images.unsplash.com/photo-1561214115-f2f134cc4912?q=80&w=2000&auto=format&fit=crop'
+                'ny': 'https://images.unsplash.com/photo-1514565131-fce0801e5785?q=80&w=1200&auto=format&fit=crop',
+                'carlospaz': 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop',
+                'futurist': 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop',
+                'gaming': 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1200&auto=format&fit=crop'
             };
 
             if (type === 'space') {
@@ -559,25 +585,6 @@
             }
         }
 
-        // Resto de funciones del sistema (gestión de cámara, VR, eventos táctiles, render loop, etc.)
-        function openVideo(url) {
-            playClickSound();
-            const modal = document.getElementById('video-modal');
-            const video = document.getElementById('active-video');
-            video.src = url;
-            modal.style.display = 'flex';
-            video.play().catch(() => {});
-        }
-
-        function closeVideo() {
-            playClickSound();
-            const modal = document.getElementById('video-modal');
-            const video = document.getElementById('active-video');
-            video.pause();
-            video.src = '';
-            modal.style.display = 'none';
-        }
-
         function openAboutModal() {
             playClickSound();
             document.getElementById('about-modal').style.display = 'flex';
@@ -593,12 +600,13 @@
             playClickSound();
             if (hudGroup) { cssScene.remove(hudGroup); hudGroup = null; }
             if (surroundingScreensGroup) { cssScene.remove(surroundingScreensGroup); surroundingScreensGroup = null; }
-            gsap.to(cameraRig.position, { x: 0, y: 0, z: 5, duration: 1.5, ease: 'power2.inOut' });
-            gsap.to(planetGroup.scale, { x: 1, y: 1, z: 1, duration: 1.5 });
-            gsap.to(textGroup.position, { y: 0.8, duration: 1.5 });
+            if (cinemaScreenGroup) { cssScene.remove(cinemaScreenGroup); cinemaScreenGroup = null; }
+            gsap.to(cameraRig.position, { x: 0, y: 0, z: 4.5, duration: 1.2, ease: 'power2.inOut' });
+            gsap.to(planetGroup.scale, { x: 1, y: 1, z: 1, duration: 1.2 });
+            gsap.to(textGroup.position, { y: 0.8, duration: 1.2 });
             isSystemActive = false;
             instruction.style.opacity = 1;
-            instruction.innerText = "Arrastra con el dedo/mouse en 360° | Toca la esfera MS3 para entrar";
+            instruction.innerText = "Arrastra con el dedo en 360° | Toca la esfera MS3 para entrar";
         }
 
         function enterMultiverse() {
@@ -606,13 +614,12 @@
             playClickSound();
             isSystemActive = true;
             createMultiverseHUD();
-            gsap.to(cameraRig.position, { x: 0, y: 0, z: 0, duration: 1.5, ease: 'power2.inOut' });
-            gsap.to(planetGroup.scale, { x: 0.01, y: 0.01, z: 0.01, duration: 1.5 });
-            gsap.to(textGroup.position, { y: 4, duration: 1.5 });
+            gsap.to(cameraRig.position, { x: 0, y: 0, z: 0, duration: 1.2, ease: 'power2.inOut' });
+            gsap.to(planetGroup.scale, { x: 0.01, y: 0.01, z: 0.01, duration: 1.2 });
+            gsap.to(textGroup.position, { y: 3.5, duration: 1.2 });
             instruction.style.opacity = 0;
         }
 
-        // Event Listeners de interacción 3D
         window.addEventListener('pointerdown', (e) => {
             isDragging = true;
             dragDistance = 0;
@@ -635,7 +642,6 @@
         window.addEventListener('pointerup', (e) => {
             isDragging = false;
             if (dragDistance < 10 && !isSystemActive) {
-                // Raycast para verificar si tocó el planeta MS3
                 const mouse = new THREE.Vector2(
                     (e.clientX / window.innerWidth) * 2 - 1,
                     -(e.clientY / window.innerHeight) * 2 + 1
@@ -716,7 +722,6 @@
 
         window.addEventListener('resize', handleResize);
 
-        // Bucle de animación principal
         function animate() {
             requestAnimationFrame(animate);
 
