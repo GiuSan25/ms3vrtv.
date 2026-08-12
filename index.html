@@ -94,15 +94,15 @@
         }
 
         .cinema-screen-container {
-            width: 900px;
+            width: 900px; max-width: 95vw;
             background: rgba(5, 3, 12, 0.98);
             border: 4px solid #00f0ff;
             box-shadow: 0 0 60px rgba(0, 240, 255, 0.8), inset 0 0 40px rgba(0, 240, 255, 0.4);
             border-radius: 30px;
-            padding: 30px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
             pointer-events: auto;
         }
 
@@ -111,7 +111,7 @@
             top: 0 !important; left: 0 !important;
             width: 100vw !important; height: 100vh !important;
             max-width: none !important; border-radius: 0 !important;
-            z-index: 9999 !important; padding: 15px !important;
+            z-index: 9999 !important; padding: 10px !important;
             justify-content: center !important;
         }
         .cinema-screen-container.fullscreen-mode .video-wrapper-box {
@@ -124,6 +124,13 @@
             position: absolute !important;
             top: 0 !important; left: 0 !important;
             width: 100% !important; height: 100% !important;
+        }
+
+        /* Contenedor móvil adaptable en 2D */
+        #mobile-bottom-dock {
+            position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
+            width: 92vw; max-width: 450px; z-index: 900; display: none;
+            flex-direction: column; gap: 8px; pointer-events: auto;
         }
     </style>
 </head>
@@ -143,6 +150,20 @@
     </div>
 
     <div id="instruction">Arrastra con el dedo en 360° | Toca la esfera MS3 para entrar</div>
+
+    <!-- Dock móvil inferior para visualización directa en pantallas pequeñas -->
+    <div id="mobile-bottom-dock" class="neon-box-cyan p-3">
+        <div class="flex justify-between items-center text-xs font-bold text-cyan-300">
+            <span>📺 ESTACIÓN MÓVIL: TOUR TUCUMANO</span>
+            <button onclick="exitMultiverse()" class="text-fuchsia-400 font-black">✕ SALIR</button>
+        </div>
+        <div class="relative w-full pb-[56.25%] h-0 rounded-xl overflow-hidden border border-cyan-400/60 bg-black mt-2">
+            <iframe class="absolute top-0 left-0 w-full h-full pointer-events-auto" src="https://www.youtube.com/embed/_P7bMsIi2hU" title="TOUR DE SANGUCHERÍAS 🥪" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
+        <button onclick="openSuperCinemaFromCard('https://www.youtube.com/embed/_P7bMsIi2hU', 'TOUR DE SANGUCHERÍAS 🥪', 'iframe')" class="interactive-btn w-full bg-cyan-500 text-black font-black py-2.5 rounded-xl text-center text-xs uppercase shadow-[0_0_15px_rgba(0,240,255,0.6)] mt-2">
+            ⛶ EXPANDIR A SUPER CINE CURVO
+        </button>
+    </div>
 
     <div id="vr-view-container">
         <div class="vr-eye" id="eye-left">
@@ -367,7 +388,7 @@
                     <div>
                         <span class="text-xs font-extrabold tracking-widest text-cyan-300 uppercase">MS3 Multiverse Master</span>
                         <h1 class="text-2xl font-black text-white mt-1 drop-shadow-[0_0_10px_#00f0ff]">EL CONCIERTO DEL SIGLO</h1>
-                        <p class="text-gray-300 text-xs mt-2 leading-relaxed">Selecciona las estaciones espaciales flotantes para ver transmisiones en pantallas secundarias.</p>
+                        <p class="text-gray-300 text-xs mt-2 leading-relaxed">Explora las estaciones espaciales 3D flotantes o interactúa con el dock inferior en tu móvil.</p>
                     </div>
                 </div>
 
@@ -391,6 +412,9 @@
             cssScene.add(hudGroup);
 
             createSurroundingScreens();
+            
+            // Mostrar también el dock adaptable inferior en móvil
+            document.getElementById('mobile-bottom-dock').style.display = 'flex';
         }
 
         function createSurroundingScreens() {
@@ -480,12 +504,12 @@
 
             cinemaDiv.innerHTML = `
                 <div class="flex justify-between items-center border-b border-cyan-500/40 pb-3">
-                    <span class="text-cyan-400 font-black text-xl tracking-wider uppercase">${titleText}</span>
+                    <span class="text-cyan-400 font-black text-sm md:text-xl tracking-wider uppercase truncate max-w-[60%]">${titleText}</span>
                     <div class="flex gap-2">
-                        <button onclick="toggleCinemaFullscreen()" class="interactive-btn bg-cyan-500 text-black font-black px-4 py-2 rounded-xl text-xs shadow-[0_0_15px_rgba(0,240,255,0.8)]" id="fullscreen-btn-text">
+                        <button onclick="toggleCinemaFullscreen()" class="interactive-btn bg-cyan-500 text-black font-black px-3 py-1.5 rounded-xl text-[10px] md:text-xs shadow-[0_0_15px_rgba(0,240,255,0.8)]" id="fullscreen-btn-text">
                             ⛶ PANTALLA COMPLETA
                         </button>
-                        <button onclick="closeSuperCinema()" class="interactive-btn bg-fuchsia-600 text-white font-black px-4 py-2 rounded-xl text-xs shadow-[0_0_15px_rgba(240,0,255,0.8)]">
+                        <button onclick="closeSuperCinema()" class="interactive-btn bg-fuchsia-600 text-white font-black px-3 py-1.5 rounded-xl text-[10px] md:text-xs shadow-[0_0_15px_rgba(240,0,255,0.8)]">
                             ✕ CERRAR
                         </button>
                     </div>
@@ -580,6 +604,10 @@
             if (hudGroup) { cssScene.remove(hudGroup); hudGroup = null; }
             if (surroundingScreensGroup) { cssScene.remove(surroundingScreensGroup); surroundingScreensGroup = null; }
             if (cinemaScreenGroup) { cssScene.remove(cinemaScreenGroup); cinemaScreenGroup = null; }
+            
+            // Ocultar dock móvil inferior
+            document.getElementById('mobile-bottom-dock').style.display = 'none';
+
             gsap.to(cameraRig.position, { x: 0, y: 0, z: 4.5, duration: 1.2, ease: 'power2.inOut' });
             gsap.to(planetGroup.scale, { x: 1, y: 1, z: 1, duration: 1.2 });
             gsap.to(textGroup.position, { y: 0.8, duration: 1.2 });
