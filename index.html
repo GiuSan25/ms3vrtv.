@@ -409,9 +409,7 @@
         function createSurroundingScreens() {
             surroundingScreensGroup = new THREE.Group();
             
-            // Pantallas distribuidas uniformemente alrededor (evitando el frente directo z < 0 y x cerca de 0 donde está la pantalla principal)
             const screensData = [
-                // Flanco izquierdo
                 { 
                     title: 'Tears of Steel', 
                     desc: 'Ciber-thriller épico ambientado en una Ámsterdam post-apocalíptica.', 
@@ -424,7 +422,6 @@
                     url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', 
                     x: -8.0, y: -2.2, z: 0.5, scale: 0.0048, width: '540px' 
                 },
-                // Flanco derecho
                 { 
                     title: 'Big Buck Bunny', 
                     desc: 'Animación 3D de una gigantesca y tierna criatura del bosque.', 
@@ -437,7 +434,6 @@
                     url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4', 
                     x: 8.0, y: -2.0, z: 0.8, scale: 0.0048, width: '540px' 
                 },
-                // Zona posterior izquierda y derecha
                 { 
                     title: 'Elephants Dream', 
                     desc: 'Viaje surrealista y tecnológico a través de una maquinaria infinita.', 
@@ -450,7 +446,6 @@
                     url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', 
                     x: 5.5, y: 1.2, z: 6.5, scale: 0.0052, width: '580px' 
                 },
-                // Superiores e inferiores seguros (sin tapar el menú central)
                 { 
                     title: 'Subaru Expedition', 
                     desc: 'Documental inmersivo de exploración extrema por naturaleza indómita.', 
@@ -463,7 +458,6 @@
                     url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4', 
                     x: 0, y: -5.5, z: 3.5, scale: 0.0052, width: '580px' 
                 },
-                // Laterales traseros adicionales
                 { 
                     title: 'Cosmic Odyssey', 
                     desc: 'Travesía cósmica a través de nebulosas estelares y cúmulos galácticos.', 
@@ -625,8 +619,9 @@
 
             dragDistance += Math.abs(deltaX) + Math.abs(deltaY);
 
-            targetRotationY += deltaX * 0.004;
-            targetRotationX += deltaY * 0.004;
+            // Mayor sensibilidad y ejes directos sin inversión ni torsión (fijando rotación en Z a 0)
+            targetRotationY += deltaX * 0.0075;
+            targetRotationX += deltaY * 0.0075;
             targetRotationX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, targetRotationX));
 
             previousMousePosition = { x, y };
@@ -664,11 +659,11 @@
             const beta = e.beta ? THREE.MathUtils.degToRad(e.beta) : 0;
             const gamma = e.gamma ? THREE.MathUtils.degToRad(e.gamma) : 0;
 
-            const euler = new THREE.Euler(beta, alpha, -gamma, 'YXZ');
+            const euler = new THREE.Euler(beta, alpha, 0, 'YXZ');
             deviceQuaternion.setFromEuler(euler);
 
             const orientFix = new THREE.Quaternion();
-            orientFix.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -Math.PI / 2);
+            orientFix.setFromAxisAngle(new THREE.Vector3(0, 0, 1), 0);
             deviceQuaternion.multiply(orientFix);
         }
 
@@ -705,10 +700,11 @@
             if (isGyroActive) {
                 cameraRig.quaternion.slerp(deviceQuaternion, 0.2);
             } else {
-                currentRotationX += (targetRotationX - currentRotationX) * 0.08;
-                currentRotationY += (targetRotationY - currentRotationY) * 0.08;
-                cameraRig.rotation.x = currentRotationX;
-                cameraRig.rotation.y = currentRotationY;
+                currentRotationX += (targetRotationX - currentRotationX) * 0.12;
+                currentRotationY += (targetRotationY - currentRotationY) * 0.12;
+                
+                // Forzamos estrictamente el eje Z en 0 para evitar cualquier tipo de torsión o inclinación lateral indeseada
+                cameraRig.rotation.set(currentRotationX, currentRotationY, 0, 'YXZ');
             }
 
             planet.rotation.y += 0.008;
