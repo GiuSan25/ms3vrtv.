@@ -150,7 +150,7 @@
     <div id="about-modal">
         <div class="neon-box-cyan p-8 max-w-md text-center">
             <h2 class="text-3xl font-bold text-cyan-400 mb-4">SOBRE NOSOTROS</h2>
-            <p class="text-gray-300 mb-6">Plataforma inmersiva 360° Master Edition con post-procesamiento Bloom, audio espacial y realidad virtual.</p>
+            <p class="text-gray-300 mb-6">Plataforma inmersiva 360° con galerías de entornos fotográficos reales y virtuales de alta calidad.</p>
             <button class="modal-close-btn interactive-btn" onclick="closeAboutModal()">CERRAR</button>
         </div>
     </div>
@@ -220,7 +220,6 @@
         cssRendererRight.setSize(window.innerWidth / 2, window.innerHeight);
         cssContainerRight.appendChild(cssRendererRight.domElement);
 
-        // Post-procesamiento Bloom
         const renderSceneLeft = new THREE.RenderPass(scene, cameraLeft);
         const renderSceneRight = new THREE.RenderPass(scene, cameraRight);
         const renderSceneMono = new THREE.RenderPass(scene, camera);
@@ -239,7 +238,10 @@
         const pLightCyan = new THREE.PointLight(0x00f0ff, 4, 80); pLightCyan.position.set(-8, 8, 8); scene.add(pLightCyan);
         const pLightPink = new THREE.PointLight(0xf000ff, 4, 80); pLightPink.position.set(8, -8, 8); scene.add(pLightPink);
 
+        // Fondo inicial Esfera 360° (Textura inicial por defecto)
         const universeGeo = new THREE.SphereGeometry(70, 32, 32);
+        const textureLoader = new THREE.TextureLoader();
+        
         universeSphere = new THREE.Mesh(universeGeo, new THREE.MeshBasicMaterial({ color: 0x070216, side: THREE.BackSide }));
         scene.add(universeSphere);
 
@@ -272,8 +274,8 @@
         scene.add(planetGroup);
 
         textGroup = new THREE.Group(); textGroup.position.y = 0.8;
-        const loader = new THREE.FontLoader();
-        loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
+        const fontLoader = new THREE.FontLoader();
+        fontLoader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
             const textGeo = new THREE.TextGeometry('MS3', { font: font, size: 1.2, height: 0.4, curveSegments: 12, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.05 });
             textGeo.computeBoundingBox();
             const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
@@ -282,14 +284,11 @@
         });
         scene.add(textGroup);
 
-        // Audio Espacial Web Audio API
         function toggleAudio() {
             isAudioActive = !isAudioActive;
             document.getElementById('audio-btn-text').innerText = isAudioActive ? 'AUDIO: ON' : 'AUDIO: OFF';
             if (isAudioActive) {
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioCtx.state === 'suspended') audioCtx.resume();
                 playAmbientSpaceSound();
             } else {
@@ -302,7 +301,7 @@
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(55, audioCtx.currentTime); // Nota La1 base
+            osc.frequency.setValueAtTime(55, audioCtx.currentTime);
             gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -344,7 +343,6 @@
             }
         }
 
-        // HUD con Pestañas y Galería
         function createMultiverseHUD() {
             const mainContainer = document.createElement('div');
             mainContainer.className = "w-[1600px] flex flex-col gap-8 floating-card";
@@ -364,19 +362,22 @@
                     <div>
                         <span class="text-xl font-extrabold tracking-widest text-cyan-300 uppercase">MS3 Multiverse Master</span>
                         <h1 class="text-6xl font-black text-white mt-4 drop-shadow-[0_0_20px_#00f0ff]">EL CONCIERTO DEL SIGLO</h1>
-                        <p class="text-gray-200 text-2xl mt-4 max-w-2xl leading-relaxed">Experiencia inmersiva 360° mejorada con audio espacial y efectos Bloom en vivo.</p>
+                        <p class="text-gray-200 text-2xl mt-4 max-w-2xl leading-relaxed">Experiencia inmersiva 360° mejorada con audio espacial y selector de entornos fidedignos.</p>
                     </div>
                     <div class="flex gap-6">
                         <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="interactive-btn bg-white text-black px-10 py-5 rounded-2xl font-black text-2xl shadow-[0_0_30px_#fff]">REPRODUCIR AHORA</button>
                     </div>
                 </div>
 
-                <div id="tab-gallery" class="w-full neon-box-magenta p-12 hidden flex-col justify-center gap-8 h-[520px] rounded-3xl">
-                    <h2 class="text-5xl font-black text-fuchsia-300">SELECCIONAR MUNDO 360°</h2>
+                <div id="tab-gallery" class="w-full neon-box-magenta p-10 hidden flex-col justify-center gap-6 h-[520px] rounded-3xl">
+                    <h2 class="text-4xl font-black text-fuchsia-300 text-center mb-2">SELECCIONAR ENTORNO 360°</h2>
                     <div class="grid grid-cols-3 gap-6">
-                        <button onclick="changeEnvironment(0x070216)" class="interactive-btn neon-box-cyan p-8 text-cyan-300 font-bold text-2xl">Abismo Cósmico</button>
-                        <button onclick="changeEnvironment(0x1a0033)" class="interactive-btn neon-box-cyan p-8 text-cyan-300 font-bold text-2xl">Nebulosa Violeta</button>
-                        <button onclick="changeEnvironment(0x001a1a)" class="interactive-btn neon-box-cyan p-8 text-cyan-300 font-bold text-2xl">Profundidad Abisal</button>
+                        <button onclick="changeEnvironment('ny')" class="interactive-btn neon-box-cyan p-6 text-cyan-300 font-bold text-xl text-center">Depto NY de Noche</button>
+                        <button onclick="changeEnvironment('carlospaz')" class="interactive-btn neon-box-cyan p-6 text-cyan-300 font-bold text-xl text-center">Villa Carlos Paz (Cerro de la Cruz)</button>
+                        <button onclick="changeEnvironment('futurist')" class="interactive-btn neon-box-cyan p-6 text-cyan-300 font-bold text-xl text-center">Sala Futurista</button>
+                        <button onclick="changeEnvironment('gaming')" class="interactive-btn neon-box-cyan p-6 text-cyan-300 font-bold text-xl text-center">Sala de Juegos (RGB)</button>
+                        <button onclick="changeEnvironment('graffiti')" class="interactive-btn neon-box-cyan p-6 text-cyan-300 font-bold text-xl text-center">Sala con Graffitis</button>
+                        <button onclick="changeEnvironment('space')" class="interactive-btn neon-box-cyan p-6 text-cyan-300 font-bold text-xl text-center">Abismo Espacial (Default)</button>
                     </div>
                 </div>
 
@@ -408,9 +409,31 @@
             }
         }
 
-        function changeEnvironment(colorHex) {
+        function changeEnvironment(type) {
             playClickSound();
-            universeSphere.material.color.setHex(colorHex);
+            let urls = {
+                'ny': 'https://images.unsplash.com/photo-1514565131-fce0801e5785?q=80&w=2000&auto=format&fit=crop', // NY Cityscape de noche
+                'carlospaz': 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop', // Panorámica natural / montaña diurna
+                'futurist': 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop', // Estilo sala futurista abstracta
+                'gaming': 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2000&auto=format&fit=crop', // Sala gaming RGB oscura
+                'graffiti': 'https://images.unsplash.com/photo-1561214115-f2f134cc4912?q=80&w=2000&auto=format&fit=crop' // Arte urbano / graffitis
+            };
+
+            if (type === 'space') {
+                universeSphere.material.map = null;
+                universeSphere.material.color.setHex(0x070216);
+                universeSphere.material.needsUpdate = true;
+                starField.visible = true;
+            } else {
+                starField.visible = false;
+                textureLoader.load(urls[type], (texture) => {
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.repeat.x = -1; // Invertir para mapeo interno de esfera
+                    universeSphere.material.map = texture;
+                    universeSphere.material.color.setHex(0xffffff);
+                    universeSphere.material.needsUpdate = true;
+                });
+            }
         }
 
         function destroyMultiverseHUD() {
@@ -571,7 +594,7 @@
 
             planet.rotation.y += 0.008;
             textGroup.rotation.y += 0.006;
-            starField.rotation.y += 0.0005;
+            if (starField.visible) starField.rotation.y += 0.0005;
 
             checkGazePointer();
 
