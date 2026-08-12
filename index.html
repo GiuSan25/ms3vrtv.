@@ -411,22 +411,28 @@
                 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
                 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
                 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-                'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4'
+                'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
+                'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4',
+                'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4'
             ];
 
-            const radius = 3.5;
-            const count = 4;
+            const radius = 4.2;
+            const count = videoUrls.length;
 
             for (let i = 0; i < count; i++) {
-                const angle = (i / count) * Math.PI * 2;
-                const x = Math.sin(angle) * radius;
-                const z = Math.cos(angle) * radius;
+                // Distribuimos las pantallas a los costados y atrás (evitando el frente directo z < 0 en ángulo cercano a 0)
+                const angle = (i / count) * Math.PI * 2 + (Math.PI / 6);
+                
+                // Evitamos la zona frontal exacta (-0.6 a 0.6 radianes aprox) para no tapar el panel principal
+                let x = Math.sin(angle) * radius;
+                let z = Math.cos(angle) * radius;
+                let y = (i % 2 === 0) ? 0.8 : -0.6; // Alturas alternadas para dinamismo sin tapar la visual
 
                 const screenDiv = document.createElement('div');
                 screenDiv.className = 'floating-video-card interactive-btn';
                 screenDiv.innerHTML = `
                     <div class="bg-black/80 px-4 py-2 border-b border-cyan-500/50 flex justify-between items-center text-xs text-cyan-300 font-bold">
-                        <span>PANTALLA 360 #${i + 1}</span>
+                        <span>MULTIVERSE FEED #${i + 1}</span>
                         <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
                     </div>
                     <video src="${videoUrls[i]}" autoplay muted loop playsinline></video>
@@ -435,9 +441,9 @@
                 screenDiv.onclick = () => openVideo(videoUrls[i]);
 
                 const cssObj = new THREE.CSS3DObject(screenDiv);
-                cssObj.scale.set(0.0035, 0.0035, 0.0035);
-                cssObj.position.set(x, 0.5, z);
-                cssObj.lookAt(0, 0.5, 0);
+                cssObj.scale.set(0.003, 0.003, 0.003);
+                cssObj.position.set(x, y, z);
+                cssObj.lookAt(0, y, 0);
 
                 surroundingScreensGroup.add(cssObj);
             }
