@@ -374,49 +374,42 @@
             vrContainer.className = "w-[1600px] flex flex-col gap-8 floating-card pb-12";
             vrContainer.innerHTML = `
                 <div class="flex items-center justify-between">
-                    <button class="interactive-btn bg-black/95 border-4 border-cyan-400 text-cyan-300 px-10 py-5 rounded-full font-black text-2xl flex items-center gap-4 shadow-[0_0_30px_rgba(0,240,255,0.7)]" onclick="createMultiverseHUD()">
+                    <button class="interactive-btn bg-black/95 border-4 border-fuchsia-500 text-fuchsia-300 px-10 py-5 rounded-full font-black text-2xl flex items-center gap-4 shadow-[0_0_30px_rgba(240,0,255,0.7)]" onclick="createMultiverseHUD()">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                        <span>VOLVER AL MULTIVERSO PRINCIPAL</span>
+                        <span>VOLVER AL MULTIVERSO MS3</span>
                     </button>
-                    <h1 class="text-5xl font-black text-white drop-shadow-[0_0_20px_#f000ff] uppercase tracking-wider">MULTIVERSO VR: NETFLIX STREAM</h1>
+                    <h1 class="text-5xl font-black text-white drop-shadow-[0_0_20px_#00f0ff] uppercase tracking-wider">NETFLIX VR - CENTRO DE STREAMING</h1>
                 </div>
 
-                <div class="flex flex-col gap-4">
-                    <h2 class="text-3xl font-bold text-cyan-300">EXPLORACIÓN ESPACIAL 360°</h2>
-                    <div class="flex gap-6 overflow-x-auto pb-4 pt-2 px-2 no-scrollbar">
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Viaje a Marte 360', 'Explora las dunas rojas y bases espaciales de la próxima frontera humana con total libertad de movimiento.', 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')">
-                            <img src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=600&auto=format&fit=crop" alt="Marte">
-                            <div class="card-info"><h3 class="text-white text-xl font-bold">Viaje a Marte</h3><p class="text-cyan-300 text-sm">VR 360° • 4K</p></div>
-                        </div>
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Estación Espacial ISS', 'Vive un día completo flotando en órbita terrestre dentro de la Estación Espacial Internacional.', 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">
-                            <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop" alt="ISS">
-                            <div class="card-info"><h3 class="text-white text-xl font-bold">Estación ISS</h3><p class="text-cyan-300 text-sm">Inmersivo • 60FPS</p></div>
-                        </div>
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Nebulosa de Orión', 'Un viaje psicodélico y científico a través del nacimiento de nuevas estrellas en el cosmos profundo.', 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')">
-                            <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=600&auto=format&fit=crop" alt="Orión">
-                            <div class="card-info"><h3 class="text-white text-xl font-bold">Nebulosa Orión</h3><p class="text-cyan-300 text-sm">Cinemático 3D</p></div>
-                        </div>
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Agujero Negro', 'Traspasa el horizonte de sucesos en una simulación física interactiva sin precedentes.', 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')">
-                            <img src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=600&auto=format&fit=crop" alt="Agujero Negro">
-                            <div class="card-info"><h3 class="text-white text-xl font-bold">Agujero Negro</h3><p class="text-cyan-300 text-sm">Ficción • VR</p></div>
-                        </div>
+                <div class="w-full neon-box-magenta p-10 flex flex-col justify-between h-[450px] rounded-3xl" style="background-image: linear-gradient(to right, rgba(10,6,24,0.98), rgba(10,6,24,0.4)), url('https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?q=80&w=1600&auto=format&fit=crop'); background-size: cover;">
+                    <div>
+                        <span class="text-lg font-extrabold tracking-widest text-fuchsia-300 uppercase">Estreno Exclusivo VR</span>
+                        <h2 class="text-6xl font-black text-white mt-2 drop-shadow-[0_0_20px_#f000ff]">THE MATRIX DIMENSIONS</h2>
+                        <p class="text-gray-300 text-xl mt-3 max-w-xl leading-relaxed">Una experiencia cinemática interactiva de alta fidelidad optimizada para cascos de realidad virtual y visores 360°.</p>
+                    </div>
+                    <div>
+                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="interactive-btn bg-fuchsia-500 text-black px-10 py-4 rounded-xl font-black text-xl shadow-[0_0_25px_#f000ff]">VER AHORA</button>
                     </div>
                 </div>
 
                 <div class="flex flex-col gap-4">
-                    <h2 class="text-3xl font-bold text-fuchsia-300">DIMENSIONES ALTERNATIVAS</h2>
+                    <h3 class="text-3xl font-bold text-cyan-300">TENDENCIAS EN EL MULTIVERSO</h3>
                     <div class="flex gap-6 overflow-x-auto pb-4 pt-2 px-2 no-scrollbar">
                         <div class="netflix-card interactive-btn" onclick="openPreview('Cyberpunk City 2099', 'Recorre las calles iluminadas por neón de una metrópolis futurista gobernada por inteligencias artificiales.', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')">
                             <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600&auto=format&fit=crop" alt="Cyberpunk">
                             <div class="card-info"><h3 class="text-white text-xl font-bold">Cyberpunk 2099</h3><p class="text-fuchsia-300 text-sm">Interactivo</p></div>
                         </div>
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Bosque Bioluminiscente', 'Un santuario natural alienígena donde cada planta responde a tu presencia visual.', 'https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Viaje a Marte 360', 'Explora las dunas rojas y bases espaciales de la próxima frontera humana con total libertad de movimiento.', 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">
+                            <img src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=600&auto=format&fit=crop" alt="Marte">
+                            <div class="card-info"><h3 class="text-white text-xl font-bold">Viaje a Marte</h3><p class="text-cyan-300 text-sm">VR 360° • 4K</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Estación Espacial ISS', 'Vive un día completo flotando en órbita terrestre dentro de la Estación Espacial Internacional.', 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')">
+                            <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop" alt="ISS">
+                            <div class="card-info"><h3 class="text-white text-xl font-bold">Estación ISS</h3><p class="text-cyan-300 text-sm">Inmersivo • 60FPS</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Bosque Bioluminiscente', 'Un santuario natural alienígena donde cada planta responde a tu presencia visual.', 'https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')">
                             <img src="https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?q=80&w=600&auto=format&fit=crop" alt="Bosque">
                             <div class="card-info"><h3 class="text-white text-xl font-bold">Bosque Místico</h3><p class="text-fuchsia-300 text-sm">Relax VR</p></div>
-                        </div>
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Templo Cudimensional', 'Geometría sagrada y acertijos visuales en un espacio de cuatro dimensiones espaciales.', 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')">
-                            <img src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600&auto=format&fit=crop" alt="Templo">
-                            <div class="card-info"><h3 class="text-white text-xl font-bold">Templo 4D</h3><p class="text-fuchsia-300 text-sm">Puzzle VR</p></div>
                         </div>
                     </div>
                 </div>
