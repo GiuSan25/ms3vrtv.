@@ -179,7 +179,10 @@
     </div>
 
     <div id="video-modal">
-        <video id="active-video" controls autoplay playsinline></video>
+        <!-- MODIFICACIÓN: Contenedor adaptado para admitir tanto reproductores nativos como iframes de YouTube o incrustaciones dinámicas -->
+        <div id="video-container-wrapper" style="width: 100%; max-width: 900px; display: flex; justify-content: center; align-items: center;">
+            <video id="active-video" controls autoplay playsinline style="width: 100%; border-radius: 12px; box-shadow: 0 0 30px #0ff;"></video>
+        </div>
         <button class="modal-close-btn interactive-btn" onclick="closeVideo()">Cerrar Reproductor</button>
     </div>
 
@@ -288,7 +291,6 @@
         planetGroup.add(planet);
         scene.add(planetGroup);
 
-        // Logo MS3 principal con giro propio en 360 (más lento, sin reflejo)
         textGroup = new THREE.Group(); 
         textGroup.position.y = 0.8;
 
@@ -402,6 +404,11 @@
                     </div>
                     
                     <div class="netflix-grid">
+                        <!-- MODIFICACIÓN: Incorporación del video solicitado (https://youtu.be/y3qO1OL5nRg) en una de las tarjetas de programas VR -->
+                        <div class="netflix-card interactive-btn" onclick="openPreview('MS3 VRTV - BUSCANDO', 'Programa inclusivo y exclusivo del multiverso VR transmitido por MS3 VRTV.', 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=500&auto=format&fit=crop', 'https://www.youtube.com/embed/y3qO1OL5nRg?autoplay=1')">
+                            <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=500&auto=format&fit=crop" alt="Buscando VR">
+                            <div class="card-info"><h4 class="text-white text-xs font-bold">BUSCANDO (MS3 VR)</h4><p class="text-fuchsia-300 text-[10px]">Exclusivo VR</p></div>
+                        </div>
                         <div class="netflix-card interactive-btn" onclick="openPreview('Cyberpunk City 2099', 'Recorre las calles iluminadas por neón de una metrópolis futurista.', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')">
                             <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=500&auto=format&fit=crop" alt="Cyberpunk">
                             <div class="card-info"><h4 class="text-white text-xs font-bold">Cyberpunk 2099</h4><p class="text-fuchsia-300 text-[10px]">Interactivo</p></div>
@@ -429,10 +436,6 @@
                         <div class="netflix-card interactive-btn" onclick="openPreview('Cumbres Nevadas Extreme', 'Desciende montañas peligrosas en esquí.', 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')">
                             <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=80&w=500&auto=format&fit=crop" alt="Nieve">
                             <div class="card-info"><h4 class="text-white text-xs font-bold">Cumbres Nevadas</h4><p class="text-cyan-300 text-[10px]">Extremo</p></div>
-                        </div>
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Galaxia Lejana', 'Viaje astronómico por nebulosas.', 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')">
-                            <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=500&auto=format&fit=crop" alt="Galaxia">
-                            <div class="card-info"><h4 class="text-white text-xs font-bold">Galaxia Lejana</h4><p class="text-fuchsia-300 text-[10px]">Cosmos</p></div>
                         </div>
                     </div>
                 </div>
@@ -487,19 +490,43 @@
             }
         }
 
+        // MODIFICACIÓN: Función openVideo actualizada para soportar reproductores de video HTML5 normales o iframes de YouTube embebidos
         function openVideo(url) {
             const modal = document.getElementById('video-modal');
-            const video = document.getElementById('active-video');
-            video.src = url;
+            const wrapper = document.getElementById('video-container-wrapper');
             modal.style.display = 'flex';
-            video.play();
+            wrapper.innerHTML = ''; // Limpiar contenido previo
+
+            if (url.includes('youtube.com') || url.includes('youtu.be') || url.includes('embed')) {
+                const iframe = document.createElement('iframe');
+                iframe.src = url;
+                iframe.width = '100%';
+                iframe.height = '480';
+                iframe.setAttribute('frameborder', '0');
+                iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+                iframe.setAttribute('allowfullscreen', '');
+                iframe.style.borderRadius = '12px';
+                iframe.style.boxShadow = '0 0 30px #0ff';
+                wrapper.appendChild(iframe);
+            } else {
+                const video = document.createElement('video');
+                video.id = 'active-video';
+                video.controls = true;
+                video.autoplay = true;
+                video.playsInline = true;
+                video.style.width = '100%';
+                video.style.borderRadius = '12px';
+                video.style.boxShadow = '0 0 30px #0ff';
+                video.src = url;
+                wrapper.appendChild(video);
+                video.play();
+            }
         }
 
         function closeVideo() {
             const modal = document.getElementById('video-modal');
-            const video = document.getElementById('active-video');
-            video.pause();
-            video.src = '';
+            const wrapper = document.getElementById('video-container-wrapper');
+            wrapper.innerHTML = '<video id="active-video" controls autoplay playsinline style="width: 100%; border-radius: 12px; box-shadow: 0 0 30px #0ff;"></video>';
             modal.style.display = 'none';
         }
 
@@ -540,166 +567,12 @@
                 rendererRight.setSize(w, h);
                 cssRendererLeft.setSize(w, h);
                 cssRendererRight.setSize(w, h);
-                camera.aspect = w / h;
-                camera.updateProjectionMatrix();
+                cameraLeft.aspect = w / h;
+                cameraRight.aspect = w / h;
+                cameraLeft.updateProjectionMatrix();
+                cameraRight.updateProjectionMatrix();
             }
         }
-
-        function requestIOSPermissions() {
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission().then(response => {
-                    if (response === 'granted') {
-                        enableGyro();
-                    }
-                }).catch(console.error);
-            } else {
-                enableGyro();
-            }
-        }
-
-        function enableGyro() {
-            isGyroActive = true;
-            document.getElementById('gyro-btn-text').innerText = 'GIROSCOPIO: ON';
-            window.addEventListener('deviceorientation', handleOrientation, true);
-        }
-
-        function handleOrientation(e) {
-            if (!isGyroActive) return;
-            let alpha = e.alpha ? THREE.MathUtils.degToRad(e.alpha) : 0;
-            let beta = e.beta ? THREE.MathUtils.degToRad(e.beta) : 0;
-            let gamma = e.gamma ? THREE.MathUtils.degToRad(e.gamma) : 0;
-            
-            let zee = new THREE.Vector3(0, 0, 1);
-            let quaternion = new THREE.Quaternion();
-            
-            quaternion.setFromAxisAngle(zee, -alpha);
-            let m = new THREE.Matrix4().makeRotationFromQuaternion(quaternion);
-            
-            let x = new THREE.Vector3(1, 0, 0);
-            x.applyMatrix4(m);
-            
-            quaternion.setFromAxisAngle(x, -beta);
-            let y = new THREE.Vector3(0, 1, 0);
-            y.applyMatrix4(m);
-            
-            quaternion.setFromAxisAngle(y, -gamma);
-            cameraRig.quaternion.multiplyQuaternions(quaternion, m);
-        }
-
-        window.addEventListener('mousedown', (e) => {
-            if (e.target.closest('#top-ui-container') || e.target.closest('#preview-modal') || e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
-            isDragging = true;
-            previousMousePosition = { x: e.clientX, y: e.clientY };
-            dragDistance = 0;
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging || isGyroActive) return;
-            let deltaX = e.clientX - previousMousePosition.x;
-            let deltaY = e.clientY - previousMousePosition.y;
-            dragDistance += Math.abs(deltaX) + Math.abs(deltaY);
-
-            targetRotationY -= deltaX * 0.005;
-            targetRotationX -= deltaY * 0.005;
-            targetRotationX = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, targetRotationX));
-
-            previousMousePosition = { x: e.clientX, y: e.clientY };
-        });
-
-        window.addEventListener('mouseup', () => {
-            if (!isDragging) return;
-            isDragging = false;
-            if (dragDistance < 10 && currentActiveView === 'home' && !isSystemActive) {
-                triggerSystemEntry();
-            }
-        });
-
-        window.addEventListener('touchstart', (e) => {
-            if (e.target.closest('#top-ui-container') || e.target.closest('#preview-modal') || e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
-            if (e.touches.length === 1) {
-                isDragging = true;
-                previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-                dragDistance = 0;
-            }
-        }, { passive: true });
-
-        window.addEventListener('touchmove', (e) => {
-            if (!isDragging || isGyroActive || e.touches.length !== 1) return;
-            let deltaX = e.touches[0].clientX - previousMousePosition.x;
-            let deltaY = e.touches[0].clientY - previousMousePosition.y;
-            dragDistance += Math.abs(deltaX) + Math.abs(deltaY);
-
-            targetRotationY -= deltaX * 0.005;
-            targetRotationX -= deltaY * 0.005;
-            targetRotationX = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, targetRotationX));
-
-            previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        }, { passive: true });
-
-        window.addEventListener('touchend', () => {
-            if (!isDragging) return;
-            isDragging = false;
-            if (dragDistance < 10 && currentActiveView === 'home' && !isSystemActive) {
-                triggerSystemEntry();
-            }
-        });
-
-        function triggerSystemEntry() {
-            if (isSystemActive) return;
-            isSystemActive = true;
-            instruction.style.opacity = '0';
-
-            gsap.to(planet.scale, { x: 30, y: 30, z: 30, duration: 1.5, ease: "power2.in" });
-            gsap.to(textGroup.scale, { x: 0.1, y: 0.1, z: 0.1, duration: 0.8, onComplete: () => scene.remove(textGroup) });
-            gsap.to(cameraRig.position, { z: 1, duration: 1.5, ease: "power2.inOut", onComplete: () => {
-                createMultiverseHUD();
-                planet.scale.set(1, 1, 1);
-                planet.visible = false;
-            }});
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-
-            currentRotationX += (targetRotationX - currentRotationX) * 0.1;
-            currentRotationY += (targetRotationY - currentRotationY) * 0.1;
-
-            if (!isGyroActive) {
-                cameraRig.rotation.y = currentRotationY;
-                cameraRig.rotation.x = currentRotationX;
-            }
-
-            if (planetGroup) planetGroup.rotation.y += 0.005;
-            if (starField) starField.rotation.y -= 0.0005;
-
-            // Giro continuo sobre su propio eje en 360 grados (velocidad reducida)
-            if (textGroup && currentActiveView === 'home') {
-                textGroup.rotation.y += 0.005;
-            }
-
-            if (isVRMode) {
-                rendererLeft.render(scene, cameraLeft);
-                cssRendererLeft.render(cssScene, cameraLeft);
-                rendererRight.render(scene, cameraRight);
-                cssRendererRight.render(cssScene, cameraRight);
-            } else {
-                rendererLeft.render(scene, camera);
-                cssRendererLeft.render(cssScene, camera);
-            }
-        }
-
-        window.addEventListener('resize', () => {
-            const w = window.innerWidth;
-            const h = window.innerHeight;
-            camera.aspect = w / h;
-            camera.updateProjectionMatrix();
-            rendererLeft.setSize(w, h);
-            rendererRight.setSize(w, h);
-            cssRendererLeft.setSize(w, h);
-            cssRendererRight.setSize(w / 2, h);
-        });
-
-        animate();
     </script>
 </body>
 </html>
