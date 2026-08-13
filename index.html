@@ -308,8 +308,8 @@
             cssObject.scale.set(0.0055, 0.0055, 0.0055);
             hudGroup.add(cssObject);
             
-            // Menú posicionado más atrás en Z (-3.0) para ganar distancia y espacio
-            hudGroup.position.set(0, 0, -3.0);
+            // Pantalla del multiverso colocada mucho más atrás (-4.5)
+            hudGroup.position.set(0, 0, -4.5);
             cssScene.add(hudGroup);
         }
 
@@ -488,9 +488,9 @@
             isSystemActive = true;
             instruction.style.opacity = '0';
 
-            // Ajustado a un valor menor de acercamiento (-0.8) para que la cámara no quede encima del menú
+            // Cámara se detiene en el centro exacto (0.0) para mantener la perspectiva abierta y alejada del menú
             gsap.to(cameraRig.position, { 
-                z: -0.8, 
+                z: 0.0, 
                 duration: 1.2, 
                 ease: "power2.inOut" 
             });
