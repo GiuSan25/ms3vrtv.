@@ -378,7 +378,7 @@
 
         function openVRProgramsMultiverse(e) {
             if (e) e.stopPropagation();
-            destroyMultiverseHUD(); // Destruye completamente la plantilla anterior del Multiverso
+            destroyMultiverseHUD(); // Destruye completamente y remueve el grupo anterior
             currentActiveView = 'vr-programs';
 
             gsap.to(cameraRig.rotation, { y: cameraRig.rotation.y + Math.PI * 2, duration: 1.0, ease: "power2.inOut" });
@@ -460,6 +460,9 @@
         function destroyMultiverseHUD() {
             if (multiverseHudGroup) { 
                 cssScene.remove(multiverseHudGroup); 
+                multiverseHudGroup.traverse((child) => {
+                    if (child.element) child.element.remove();
+                });
                 multiverseHudGroup = null; 
             }
         }
@@ -467,6 +470,9 @@
         function destroyVRProgramsHUD() {
             if (vrProgramsHudGroup) { 
                 cssScene.remove(vrProgramsHudGroup); 
+                vrProgramsHudGroup.traverse((child) => {
+                    if (child.element) child.element.remove();
+                });
                 vrProgramsHudGroup = null; 
             }
         }
