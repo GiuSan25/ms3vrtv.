@@ -132,10 +132,10 @@
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             <span>MENÚ</span>
         </button>
-        <div id="dropdown-menu" class="hidden mt-3 w-64 neon-box-cyan p-4 flex flex-col gap-3 transition-all duration-300 transform scale-95 opacity-0">
+        <div id="dropdown-menu" class="hidden mt-3 w-72 neon-box-cyan p-4 flex flex-col gap-3 transition-all duration-300 transform scale-95 opacity-0">
             <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="requestIOSPermissions()"><span id="gyro-btn-text">GIROSCOPIO: OFF</span></button>
             <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="toggleVRMode()"><span id="vr-btn-text">VER EN VR</span></button>
-            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="toggleGazePointerState()"><span id="gaze-toggle-btn-text">PUNTERO VR: ON</span></button>
+            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="toggleGazePointerState()"><span id="gaze-toggle-btn-text">PUNTERO VR: OFF</span></button>
             <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="openAboutModal()"><span>NOSOTROS</span></button>
         </div>
     </div>
@@ -144,13 +144,13 @@
 
     <div id="vr-view-container">
         <div class="vr-eye" id="eye-left">
-            <div class="gaze-reticle" id="reticle-left"><div class="gaze-dot"></div><div class="gaze-progress"></div></div>
+            <div class="gaze-reticle disabled" id="reticle-left"><div class="gaze-dot"></div><div class="gaze-progress"></div></div>
             <div class="webgl-canvas-container" id="canvas-container-left"></div>
             <div class="css3d-container" id="css3d-container-left"></div>
         </div>
 
         <div class="vr-eye" id="eye-right">
-            <div class="gaze-reticle" id="reticle-right"><div class="gaze-dot"></div><div class="gaze-progress"></div></div>
+            <div class="gaze-reticle disabled" id="reticle-right"><div class="gaze-dot"></div><div class="gaze-progress"></div></div>
             <div class="webgl-canvas-container" id="canvas-container-right"></div>
             <div class="css3d-container" id="css3d-container-right"></div>
         </div>
@@ -189,7 +189,7 @@
         let currentActiveView = 'home';
         let selectedVideoData = null;
 
-        let isSystemActive = false, isGyroActive = false, isVRMode = false, isGazeEnabled = true;
+        let isSystemActive = false, isGyroActive = false, isVRMode = false, isGazeEnabled = false;
 
         let isDragging = false;
         let previousMousePosition = { x: 0, y: 0 };
@@ -330,12 +330,22 @@
             const mainContainer = document.createElement('div');
             mainContainer.className = "w-[1600px] flex flex-col gap-10 floating-card";
             mainContainer.innerHTML = `
-                <button class="interactive-btn self-start bg-black/95 border-6 border-fuchsia-500 text-fuchsia-300 px-14 py-7 rounded-full font-black text-3xl flex items-center gap-6 shadow-[0_0_50px_rgba(240,0,255,0.9)] tracking-widest" onclick="exitMultiverse(event)">
-                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    <span>VOLVER AL INICIO</span>
-                </button>
+                <div class="flex justify-between items-center w-full">
+                    <button class="interactive-btn self-start bg-black/95 border-6 border-fuchsia-500 text-fuchsia-300 px-14 py-7 rounded-full font-black text-3xl flex items-center gap-6 shadow-[0_0_50px_rgba(240,0,255,0.9)] tracking-widest" onclick="exitMultiverse(event)">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        <span>VOLVER AL INICIO</span>
+                    </button>
+                    <div class="neon-box-cyan px-8 py-5 max-w-xl text-left bg-black/80">
+                        <h4 class="text-cyan-300 font-extrabold text-lg mb-1 uppercase tracking-wider">Guía del Menú Superior</h4>
+                        <p class="text-gray-300 text-sm leading-relaxed">
+                            • <strong class="text-white">Giroscopio:</strong> Rota la cámara usando el movimiento de tu celular.<br>
+                            • <strong class="text-white">Ver en VR:</strong> Divide la pantalla en dos para visores tipo Cardboard.<br>
+                            • <strong class="text-white">Puntero VR:</strong> Activa el selector automático por fijación visual (Mirar 3s para pulsar).
+                        </p>
+                    </div>
+                </div>
 
-                <div class="w-full neon-box-cyan p-12 flex flex-col justify-between h-[580px] rounded-3xl" style="background-image: linear-gradient(to right, rgba(10,6,24,0.95), rgba(10,6,24,0.6)), url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=1600&auto=format&fit=crop'); background-size: cover;">
+                <div class="w-full neon-box-cyan p-12 flex flex-col justify-between h-[520px] rounded-3xl" style="background-image: linear-gradient(to right, rgba(10,6,24,0.95), rgba(10,6,24,0.6)), url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=1600&auto=format&fit=crop'); background-size: cover;">
                     <div>
                         <span class="text-xl font-extrabold tracking-widest text-cyan-300 uppercase">MS3 Multiverse Live</span>
                         <h1 class="text-7xl font-black text-white mt-4 drop-shadow-[0_0_20px_#00f0ff]">EL CONCIERTO DEL SIGLO</h1>
