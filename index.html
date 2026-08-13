@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MS3 - Universo 360 VR Inmersivo</title>
+    <title>MS3 - Multiverso Inmersivo VR</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS3DRenderer.js"></script>
@@ -117,6 +117,9 @@
         }
         #video-modal video { width: 100%; max-width: 900px; border-radius: 12px; box-shadow: 0 0 30px #0ff; }
         .modal-close-btn { margin-top: 20px; padding: 10px 25px; background: #0ff; color: #000; font-weight: bold; border-radius: 8px; cursor: pointer; }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body>
@@ -326,7 +329,7 @@
                 </div>
 
                 <div class="w-full grid grid-cols-3 gap-8">
-                    <button onclick="openVRPrograms(event)" class="interactive-btn pill-btn neon-box-cyan py-7 text-cyan-300 font-black text-2xl text-center">PROGRAMAS VR</button>
+                    <button onclick="openVRProgramsMultiverse(event)" class="interactive-btn pill-btn neon-box-cyan py-7 text-cyan-300 font-black text-2xl text-center">PROGRAMAS VR</button>
                     <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="interactive-btn pill-btn neon-box-magenta py-7 text-fuchsia-300 font-black text-2xl text-center">PROGRAMAS 2D</button>
                     <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')" class="interactive-btn pill-btn neon-box-cyan py-7 text-cyan-300 font-black text-2xl text-center">CANAL EN VIVO</button>
                 </div>
@@ -342,10 +345,13 @@
             cssScene.add(hudGroup);
         }
 
-        function openVRPrograms(e) {
+        function openVRProgramsMultiverse(e) {
             if (e) e.stopPropagation();
             destroyMultiverseHUD();
             currentActiveView = 'vr-programs';
+
+            // Teletransportar la cámara rig hacia adelante para simular salto de multiverso / rotación dimensional
+            gsap.to(cameraRig.rotation, { y: cameraRig.rotation.y + Math.PI * 2, duration: 1.0, ease: "power2.inOut" });
 
             const vrContainer = document.createElement('div');
             vrContainer.className = "w-[1600px] flex flex-col gap-8 floating-card pb-12";
@@ -353,9 +359,9 @@
                 <div class="flex items-center justify-between">
                     <button class="interactive-btn bg-black/95 border-4 border-cyan-400 text-cyan-300 px-10 py-5 rounded-full font-black text-2xl flex items-center gap-4 shadow-[0_0_30px_rgba(0,240,255,0.7)]" onclick="createMultiverseHUD()">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                        <span>VOLVER AL MULTIVERSO</span>
+                        <span>VOLVER AL MULTIVERSO PRINCIPAL</span>
                     </button>
-                    <h1 class="text-5xl font-black text-white drop-shadow-[0_0_20px_#00f0ff] uppercase tracking-wider">PROGRAMAS VR</h1>
+                    <h1 class="text-5xl font-black text-white drop-shadow-[0_0_20px_#f000ff] uppercase tracking-wider">MULTIVERSO VR: NETFLIX STREAM</h1>
                 </div>
 
                 <div class="flex flex-col gap-4">
