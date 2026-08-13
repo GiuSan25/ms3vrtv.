@@ -85,20 +85,34 @@
 
         .floating-card { pointer-events: auto; user-select: none; }
         .interactive-btn { pointer-events: auto; transition: transform 0.2s ease, border-color 0.2s ease; cursor: pointer; }
-        .interactive-btn.gaze-hover, .floating-card.gaze-hover { transform: scale(1.06); border-color: #f000ff !important; }
+        .interactive-btn.gaze-hover, .floating-card.gaze-hover { transform: scale(1.04); border-color: #f000ff !important; }
 
         .neon-box-cyan {
             border: 3px solid #00f0ff; box-shadow: 0 0 35px rgba(0, 240, 255, 0.6), inset 0 0 30px rgba(0, 240, 255, 0.3);
-            border-radius: 24px; background: rgba(10, 6, 24, 0.92); backdrop-filter: blur(16px);
+            border-radius: 24px; background: rgba(10, 6, 24, 0.95); backdrop-filter: blur(16px);
         }
 
         .neon-box-magenta {
             border: 3px solid #f000ff; box-shadow: 0 0 35px rgba(240, 0, 255, 0.6), inset 0 0 30px rgba(240, 0, 255, 0.3);
-            border-radius: 24px; background: rgba(10, 6, 24, 0.92); backdrop-filter: blur(16px);
+            border-radius: 24px; background: rgba(10, 6, 24, 0.95); backdrop-filter: blur(16px);
         }
 
-        #video-modal, #about-modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 2000;
+        .netflix-card {
+            flex: 0 0 260px; height: 380px; border-radius: 16px; overflow: hidden; position: relative;
+            border: 2px solid rgba(0, 240, 255, 0.4); transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer; background: #111;
+        }
+        .netflix-card:hover, .netflix-card.gaze-hover {
+            transform: scale(1.08); border-color: #f000ff; box-shadow: 0 0 25px rgba(240, 0, 255, 0.8); z-index: 10;
+        }
+        .netflix-card img { width: 100%; height: 100%; object-fit: cover; }
+        .netflix-card .card-info {
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+        }
+
+        #video-modal, #about-modal, #preview-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.94); z-index: 2000;
             display: none; justify-content: center; align-items: center; flex-direction: column; padding: 20px; pointer-events: auto;
         }
         #video-modal video { width: 100%; max-width: 900px; border-radius: 12px; box-shadow: 0 0 30px #0ff; }
@@ -135,6 +149,17 @@
         </div>
     </div>
 
+    <div id="preview-modal">
+        <div class="neon-box-magenta p-10 max-w-2xl w-full flex flex-col gap-6 relative">
+            <h2 id="preview-title" class="text-4xl font-black text-white drop-shadow-[0_0_15px_#f000ff]">Título del Programa</h2>
+            <p id="preview-desc" class="text-gray-300 text-lg leading-relaxed">Descripción detallada del contenido inmersivo VR exclusivo del multiverso.</p>
+            <div class="flex gap-4 mt-4">
+                <button id="preview-play-btn" class="interactive-btn bg-cyan-400 text-black px-8 py-4 rounded-xl font-black text-xl shadow-[0_0_20px_#00f0ff]" onclick="playFromPreview()">REPRODUCIR</button>
+                <button class="interactive-btn bg-transparent border-2 border-white text-white px-8 py-4 rounded-xl font-bold text-xl" onclick="closePreviewModal()">VOLVER</button>
+            </div>
+        </div>
+    </div>
+
     <div id="video-modal">
         <video id="active-video" controls autoplay playsinline></video>
         <button class="modal-close-btn interactive-btn" onclick="closeVideo()">Cerrar Reproductor</button>
@@ -154,6 +179,8 @@
         let planet, textGroup, planetGroup, universeSphere, starField;
         let hudGroup = null;
         let isTopMenuOpen = false;
+        let currentActiveView = 'home'; // 'home', 'multiverse', 'vr-programs'
+        let selectedVideoData = null;
 
         let isSystemActive = false, isGyroActive = false, isVRMode = false;
 
@@ -277,6 +304,7 @@
         }
 
         function createMultiverseHUD() {
+            currentActiveView = 'multiverse';
             const mainContainer = document.createElement('div');
             mainContainer.className = "w-[1600px] flex flex-col gap-10 floating-card";
             mainContainer.innerHTML = `
@@ -297,7 +325,7 @@
                 </div>
 
                 <div class="w-full grid grid-cols-3 gap-8">
-                    <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')" class="interactive-btn pill-btn neon-box-cyan py-7 text-cyan-300 font-black text-2xl text-center">PROGRAMAS VR</button>
+                    <button onclick="openVRPrograms(event)" class="interactive-btn pill-btn neon-box-cyan py-7 text-cyan-300 font-black text-2xl text-center">PROGRAMAS VR</button>
                     <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="interactive-btn pill-btn neon-box-magenta py-7 text-fuchsia-300 font-black text-2xl text-center">PROGRAMAS 2D</button>
                     <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')" class="interactive-btn pill-btn neon-box-cyan py-7 text-cyan-300 font-black text-2xl text-center">CANAL EN VIVO</button>
                 </div>
@@ -308,10 +336,96 @@
             cssObject.scale.set(0.0055, 0.0055, 0.0055);
             hudGroup.add(cssObject);
             
-            // Distancia responsive: más lejos (-5.5) en móviles, (-4.5) en escritorio
             const isMobile = window.innerWidth <= 768;
             hudGroup.position.set(0, 0, isMobile ? -5.5 : -4.5);
             cssScene.add(hudGroup);
+        }
+
+        function openVRPrograms(e) {
+            if (e) e.stopPropagation();
+            if (hudGroup) { cssScene.remove(hudGroup); hudGroup = null; }
+            currentActiveView = 'vr-programs';
+
+            const vrContainer = document.createElement('div');
+            vrContainer.className = "w-[1600px] flex flex-col gap-8 floating-card pb-12";
+            vrContainer.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <button class="interactive-btn bg-black/95 border-4 border-cyan-400 text-cyan-300 px-10 py-5 rounded-full font-black text-2xl flex items-center gap-4 shadow-[0_0_30px_rgba(0,240,255,0.7)]" onclick="createMultiverseHUD()">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        <span>VOLVER AL MULTIVERSO</span>
+                    </button>
+                    <h1 class="text-5xl font-black text-white drop-shadow-[0_0_20px_#00f0ff] uppercase tracking-wider">PROGRAMAS VR</h1>
+                </div>
+
+                <!-- Categoría 1: Exclusivos VR -->
+                <div class="flex flex-col gap-4">
+                    <h2 class="text-3xl font-bold text-cyan-300">EXPLORACIÓN ESPACIAL 360°</h2>
+                    <div class="flex gap-6 overflow-x-auto pb-4 pt-2 px-2 no-scrollbar">
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Viaje a Marte 360', 'Explora las dunas rojas y bases espaciales de la próxima frontera humana con total libertad de movimiento.', 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')">
+                            <img src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=600&auto=format&fit=crop" alt="Marte">
+                            <div class="card-info"><h3 class="text-white text-xl font-bold">Viaje a Marte</h3><p class="text-cyan-300 text-sm">VR 360° • 4K</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Estación Espacial ISS', 'Vive un día completo flotando en órbita terrestre dentro de la Estación Espacial Internacional.', 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">
+                            <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop" alt="ISS">
+                            <div class="card-info"><h3 class="text-white text-xl font-bold">Estación ISS</h3><p class="text-cyan-300 text-sm">Inmersivo • 60FPS</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Nebulosa de Orión', 'Un viaje psicodélico y científico a través del nacimiento de nuevas estrellas en el cosmos profundo.', 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')">
+                            <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=600&auto=format&fit=crop" alt="Orión">
+                            <div class="card-info"><h3 class="text-white text-xl font-bold">Nebulosa Orión</h3><p class="text-cyan-300 text-sm">Cinemático 3D</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Agujero Negro', 'Traspasa el horizonte de sucesos en una simulación física interactiva sin precedentes.', 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')">
+                            <img src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=600&auto=format&fit=crop" alt="Agujero Negro">
+                            <div class="card-info"><h3 class="text-white text-xl font-bold">Agujero Negro</h3><p class="text-cyan-300 text-sm">Ficción • VR</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categoría 2: Mundos Virtuales -->
+                <div class="flex flex-col gap-4">
+                    <h2 class="text-3xl font-bold text-fuchsia-300">DIMENSIONES ALTERNATIVAS</h2>
+                    <div class="flex gap-6 overflow-x-auto pb-4 pt-2 px-2 no-scrollbar">
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Cyberpunk City 2099', 'Recorre las calles iluminadas por neón de una metrópolis futurista gobernada por inteligencias artificiales.', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')">
+                            <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600&auto=format&fit=crop" alt="Cyberpunk">
+                            <div class="card-info"><h3 class="text-white text-xl font-bold">Cyberpunk 2099</h3><p class="text-fuchsia-300 text-sm">Interactivo</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Bosque Bioluminiscente', 'Un santuario natural alienígena donde cada planta responde a tu presencia visual.', 'https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">
+                            <img src="https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?q=80&w=600&auto=format&fit=crop" alt="Bosque">
+                            <div class="card-info"><h3 class="text-white text-xl font-bold">Bosque Místico</h3><p class="text-fuchsia-300 text-sm">Relax VR</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Templo Cudimensional', 'Geometría sagrada y acertijos visuales en un espacio de cuatro dimensiones espaciales.', 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')">
+                            <img src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600&auto=format&fit=crop" alt="Templo">
+                            <div class="card-info"><h3 class="text-white text-xl font-bold">Templo 4D</h3><p class="text-fuchsia-300 text-sm">Puzzle VR</p></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            hudGroup = new THREE.Group();
+            const cssObject = new THREE.CSS3DObject(vrContainer);
+            cssObject.scale.set(0.0055, 0.0055, 0.0055);
+            hudGroup.add(cssObject);
+            
+            const isMobile = window.innerWidth <= 768;
+            hudGroup.position.set(0, 0, isMobile ? -5.5 : -4.5);
+            cssScene.add(hudGroup);
+        }
+
+        function openPreview(title, desc, imgUrl, videoUrl) {
+            selectedVideoData = videoUrl;
+            document.getElementById('preview-title').innerText = title;
+            document.getElementById('preview-desc').innerText = desc;
+            document.getElementById('preview-modal').style.display = 'flex';
+        }
+
+        function closePreviewModal() {
+            document.getElementById('preview-modal').style.display = 'none';
+        }
+
+        function playFromPreview() {
+            closePreviewModal();
+            if (selectedVideoData) {
+                openVideo(selectedVideoData);
+            }
         }
 
         function destroyMultiverseHUD() {
@@ -365,7 +479,7 @@
         }
 
         function onPointerDown(e) {
-            if (e.target.closest('#top-ui-container') || e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
+            if (e.target.closest('#top-ui-container') || e.target.closest('#video-modal') || e.target.closest('#about-modal') || e.target.closest('#preview-modal')) return;
             isDragging = true;
             dragDistance = 0;
             const x = e.touches ? e.touches[0].clientX : e.clientX;
@@ -511,6 +625,7 @@
 
             gsap.to(hudGroup.scale, { x: 0, y: 0, z: 0, duration: 0.6, onComplete: () => {
                 destroyMultiverseHUD();
+                currentActiveView = 'home';
                 
                 planetGroup.visible = true;
                 textGroup.visible = true;
