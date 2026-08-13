@@ -100,7 +100,6 @@
             border-radius: 24px; background: rgba(10, 6, 24, 0.95); backdrop-filter: blur(16px);
         }
 
-        /* Cuadrícula optimizada para que entren todas las pantallas sin scroll */
         .netflix-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -195,7 +194,7 @@
     <script>
         let scene, cssScene, camera, cameraLeft, cameraRight, cameraRig;
         let rendererLeft, rendererRight, cssRendererLeft, cssRendererRight;
-        let planet, textGroup, planetGroup, universeSphere, starField;
+        let planet, textGroup, mirroredTextGroup, planetGroup, universeSphere, starField;
         let multiverseHudGroup = null;
         let vrProgramsHudGroup = null;
         let isTopMenuOpen = false;
@@ -289,16 +288,31 @@
         planetGroup.add(planet);
         scene.add(planetGroup);
 
-        textGroup = new THREE.Group(); textGroup.position.y = 0.8;
+        // Logo MS3 principal y espejo con giro propio en 360
+        textGroup = new THREE.Group(); 
+        textGroup.position.y = 0.8;
+
+        mirroredTextGroup = new THREE.Group();
+        mirroredTextGroup.position.y = -0.3;
+        mirroredTextGroup.scale.set(1, -0.4, 1); // Efecto espejo vertical invertido y atenuado
+
         const loader = new THREE.FontLoader();
         loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
             const textGeo = new THREE.TextGeometry('MS3', { font: font, size: 1.2, height: 0.4, curveSegments: 12, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.05 });
             textGeo.computeBoundingBox();
             const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
+            
             const textMesh = new THREE.Mesh(textGeo, new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0.9, roughness: 0.05, clearcoat: 1.0 }));
-            textMesh.position.x = centerOffset; textGroup.add(textMesh);
+            textMesh.position.x = centerOffset; 
+            textGroup.add(textMesh);
+
+            const mirrorGeo = textGeo.clone();
+            const mirrorMesh = new THREE.Mesh(mirrorGeo, new THREE.MeshPhysicalMaterial({ color: 0x00f0ff, metalness: 0.9, roughness: 0.2, transparent: true, opacity: 0.35 }));
+            mirrorMesh.position.x = centerOffset;
+            mirroredTextGroup.add(mirrorMesh);
         });
         scene.add(textGroup);
+        scene.add(mirroredTextGroup);
 
         function toggleTopMenu(e) {
             if (e) e.stopPropagation();
@@ -647,6 +661,7 @@
 
             gsap.to(planet.scale, { x: 30, y: 30, z: 30, duration: 1.5, ease: "power2.in" });
             gsap.to(textGroup.scale, { x: 0.1, y: 0.1, z: 0.1, duration: 0.8, onComplete: () => scene.remove(textGroup) });
+            gsap.to(mirroredTextGroup.scale, { x: 0.1, y: 0.1, z: 0.1, duration: 0.8, onComplete: () => scene.remove(mirroredTextGroup) });
             gsap.to(cameraRig.position, { z: 1, duration: 1.5, ease: "power2.inOut", onComplete: () => {
                 createMultiverseHUD();
                 planet.scale.set(1, 1, 1);
@@ -667,6 +682,14 @@
 
             if (planetGroup) planetGroup.rotation.y += 0.005;
             if (starField) starField.rotation.y -= 0.0005;
+
+            // Giro continuo sobre su propio eje en 360 grados para el logo principal y el reflejo
+            if (textGroup && currentActiveView === 'home') {
+                textGroup.rotation.y += 0.015;
+            }
+            if (mirroredTextGroup && currentActiveView === 'home') {
+                mirroredTextGroup.rotation.y += 0.015;
+            }
 
             if (isVRMode) {
                 rendererLeft.render(scene, cameraLeft);
