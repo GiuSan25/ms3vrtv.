@@ -304,6 +304,7 @@
         }
 
         function createMultiverseHUD() {
+            destroyMultiverseHUD();
             currentActiveView = 'multiverse';
             const mainContainer = document.createElement('div');
             mainContainer.className = "w-[1600px] flex flex-col gap-10 floating-card";
@@ -343,7 +344,7 @@
 
         function openVRPrograms(e) {
             if (e) e.stopPropagation();
-            if (hudGroup) { cssScene.remove(hudGroup); hudGroup = null; }
+            destroyMultiverseHUD();
             currentActiveView = 'vr-programs';
 
             const vrContainer = document.createElement('div');
@@ -357,7 +358,6 @@
                     <h1 class="text-5xl font-black text-white drop-shadow-[0_0_20px_#00f0ff] uppercase tracking-wider">PROGRAMAS VR</h1>
                 </div>
 
-                <!-- Categoría 1: Exclusivos VR -->
                 <div class="flex flex-col gap-4">
                     <h2 class="text-3xl font-bold text-cyan-300">EXPLORACIÓN ESPACIAL 360°</h2>
                     <div class="flex gap-6 overflow-x-auto pb-4 pt-2 px-2 no-scrollbar">
@@ -380,7 +380,6 @@
                     </div>
                 </div>
 
-                <!-- Categoría 2: Mundos Virtuales -->
                 <div class="flex flex-col gap-4">
                     <h2 class="text-3xl font-bold text-fuchsia-300">DIMENSIONES ALTERNATIVAS</h2>
                     <div class="flex gap-6 overflow-x-auto pb-4 pt-2 px-2 no-scrollbar">
@@ -408,6 +407,7 @@
             const isMobile = window.innerWidth <= 768;
             hudGroup.position.set(0, 0, isMobile ? -5.5 : -4.5);
             cssScene.add(hudGroup);
+            gsap.fromTo(hudGroup.scale, { x: 0.01, y: 0.01, z: 0.01 }, { x: 1, y: 1, z: 1, duration: 0.8, ease: "back.out(1.4)" });
         }
 
         function openPreview(title, desc, imgUrl, videoUrl) {
@@ -429,7 +429,10 @@
         }
 
         function destroyMultiverseHUD() {
-            if (hudGroup) { cssScene.remove(hudGroup); hudGroup = null; }
+            if (hudGroup) { 
+                cssScene.remove(hudGroup); 
+                hudGroup = null; 
+            }
         }
 
         function checkGazePointer() {
@@ -615,33 +618,30 @@
                 textGroup.visible = false;
                 
                 createMultiverseHUD();
-                gsap.fromTo(hudGroup.scale, { x: 0.01, y: 0.01, z: 0.01 }, { x: 1, y: 1, z: 1, duration: 1, ease: "back.out(1.4)" });
             }});
         }
 
         function exitMultiverse(event) {
             if (event) event.stopPropagation();
-            if (!isSystemActive || !hudGroup) return;
+            if (!isSystemActive) return;
 
-            gsap.to(hudGroup.scale, { x: 0, y: 0, z: 0, duration: 0.6, onComplete: () => {
-                destroyMultiverseHUD();
-                currentActiveView = 'home';
-                
-                planetGroup.visible = true;
-                textGroup.visible = true;
-                planetGroup.scale.set(1, 1, 1);
-                textGroup.scale.set(1, 1, 1);
+            destroyMultiverseHUD();
+            currentActiveView = 'home';
+            
+            planetGroup.visible = true;
+            textGroup.visible = true;
+            planetGroup.scale.set(1, 1, 1);
+            textGroup.scale.set(1, 1, 1);
 
-                gsap.to(cameraRig.position, { 
-                    z: 5, 
-                    duration: 1.2, 
-                    ease: "power2.inOut",
-                    onComplete: () => {
-                        isSystemActive = false;
-                        instruction.style.opacity = '1';
-                    }
-                });
-            }});
+            gsap.to(cameraRig.position, { 
+                z: 5, 
+                duration: 1.2, 
+                ease: "power2.inOut",
+                onComplete: () => {
+                    isSystemActive = false;
+                    instruction.style.opacity = '1';
+                }
+            });
         }
 
         function openAboutModal() { document.getElementById('about-modal').style.display = 'flex'; }
