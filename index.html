@@ -401,12 +401,12 @@
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                         <span>VOLVER AL MULTIVERSO MS3</span>
                     </button>
-                    <h1 class="text-4xl font-black text-white drop-shadow-[0_0_20px_#00f0ff] uppercase tracking-wider">NETFLIX VR - CENTRO DE PROGRAMAS</h1>
+                    <h1 class="text-4xl font-black text-white drop-shadow-[0_0_20px_#00f0ff] uppercase tracking-wider">PROGRAMAS VR</h1>
                 </div>
 
                 <div class="w-full neon-box-cyan p-8 flex flex-col gap-4">
                     <div class="flex justify-between items-center">
-                        <h3 class="text-2xl font-bold text-cyan-300">CATÁLOGO COMPLETO DE STREAMING VR</h3>
+                        <h3 class="text-2xl font-bold text-cyan-300">EXPLORA EL CONTENIDO INMERSIVO</h3>
                         <span class="text-sm text-fuchsia-400 font-bold uppercase tracking-widest">Desliza verticalmente para ver más</span>
                     </div>
                     
@@ -442,6 +442,23 @@
                         <div class="netflix-card interactive-btn" onclick="openPreview('Galaxia Lejana', 'Un viaje psicodélico y astronómico a través de nebulosas y agujeros negros en tiempo real.', 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')">
                             <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=600&auto=format&fit=crop" alt="Galaxia">
                             <div class="card-info"><h4 class="text-white text-base font-bold">Galaxia Lejana</h4><p class="text-fuchsia-300 text-xs">Cosmos</p></div>
+                        </div>
+                        <!-- Fila adicional de programas VR añadida -->
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Santuario Volcánico', 'Sobrevuela los cráteres activos y ríos de lava ardiente con cámaras de alta definición 360°.', 'https://images.unsplash.com/photo-1508873696983-2df5c920aac9?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')">
+                            <img src="https://images.unsplash.com/photo-1508873696983-2df5c920aac9?q=80&w=600&auto=format&fit=crop" alt="Volcán">
+                            <div class="card-info"><h4 class="text-white text-base font-bold">Santuario Volcánico</h4><p class="text-cyan-300 text-xs">Naturaleza VR</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Sinfonía Cuántica', 'Una experiencia visual abstracta guiada por música clásica y fractales matemáticos.', 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">
+                            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=600&auto=format&fit=crop" alt="Cuántica">
+                            <div class="card-info"><h4 class="text-white text-base font-bold">Sinfonía Cuántica</h4><p class="text-fuchsia-300 text-xs">Musical VR</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Ruinas Perdidas Maya', 'Investiga templos ancestrales ocultos en la selva profunda con reconstrucción holográfica.', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')">
+                            <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600&auto=format&fit=crop" alt="Ruinas">
+                            <div class="card-info"><h4 class="text-white text-base font-bold">Ruinas Mayas</h4><p class="text-cyan-300 text-xs">Historia VR</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Aurora Boreal 360', 'Contempla el espectáculo de luces del norte desde un domo transparente en Noruega.', 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')">
+                            <img src="https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=600&auto=format&fit=crop" alt="Aurora">
+                            <div class="card-info"><h4 class="text-white text-base font-bold">Aurora Boreal</h4><p class="text-fuchsia-300 text-xs">Relajación VR</p></div>
                         </div>
                     </div>
                 </div>
@@ -496,248 +513,215 @@
             }
         }
 
-        function checkGazePointer() {
-            if (!isGazeEnabled) return;
-
-            let elementToTrigger = null;
-
-            if (!isSystemActive) {
-                raycaster.setFromCamera(new THREE.Vector2(0, 0), isVRMode ? cameraLeft : camera);
-                const intersects = raycaster.intersectObjects([planet]);
-                if (intersects.length > 0) elementToTrigger = planet;
-            }
-            
-            if (!elementToTrigger) {
-                const centerElement = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2);
-                if (centerElement && centerElement.closest('.interactive-btn')) {
-                    elementToTrigger = centerElement.closest('.interactive-btn');
-                }
-            }
-
-            if (elementToTrigger) {
-                if (gazeTarget !== elementToTrigger) {
-                    resetGazeTimer();
-                    gazeTarget = elementToTrigger;
-                    document.querySelectorAll('.gaze-reticle').forEach(r => r.classList.add('active'));
-                    if (gazeTarget.classList) gazeTarget.classList.add('gaze-hover');
-
-                    gazeTimer = setTimeout(() => {
-                        triggerGazeAction(gazeTarget);
-                        resetGazeTimer();
-                    }, GAZE_TIME);
-                }
-            } else {
-                resetGazeTimer();
-            }
+        function openVideo(url) {
+            const modal = document.getElementById('video-modal');
+            const video = document.getElementById('active-video');
+            video.src = url;
+            modal.style.display = 'flex';
+            video.play();
         }
 
-        function resetGazeTimer() {
-            if (gazeTimer) clearTimeout(gazeTimer);
-            if (gazeTarget && gazeTarget.classList) gazeTarget.classList.remove('gaze-hover');
-            gazeTarget = null;
-            gazeTimer = null;
-            document.querySelectorAll('.gaze-reticle').forEach(r => r.classList.remove('active'));
+        function closeVideo() {
+            const modal = document.getElementById('video-modal');
+            const video = document.getElementById('active-video');
+            video.pause();
+            video.src = '';
+            modal.style.display = 'none';
         }
 
-        function triggerGazeAction(target) {
-            if (target === planet) enterMultiverse();
-            else if (target && typeof target.click === 'function') target.click();
+        function openAboutModal() {
+            document.getElementById('about-modal').style.display = 'flex';
         }
 
-        function onPointerDown(e) {
-            if (e.target.closest('#top-ui-container') || e.target.closest('#video-modal') || e.target.closest('#about-modal') || e.target.closest('#preview-modal')) return;
-            isDragging = true;
-            dragDistance = 0;
-            const x = e.touches ? e.touches[0].clientX : e.clientX;
-            const y = e.touches ? e.touches[0].clientY : e.clientY;
-            previousMousePosition = { x, y };
+        function closeAboutModal() {
+            document.getElementById('about-modal').style.display = 'none';
         }
 
-        function onPointerMove(e) {
-            if (!isDragging) return;
-            const x = e.touches ? e.touches[0].clientX : e.clientX;
-            const y = e.touches ? e.touches[0].clientY : e.clientY;
-
-            const deltaX = x - previousMousePosition.x;
-            const deltaY = y - previousMousePosition.y;
-
-            dragDistance += Math.abs(deltaX) + Math.abs(deltaY);
-
-            targetRotationY += deltaX * 0.004;
-            targetRotationX += deltaY * 0.004;
-            targetRotationX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, targetRotationX));
-
-            previousMousePosition = { x, y };
-        }
-
-        function onPointerUp(e) {
-            if (isDragging && dragDistance < 10 && !isSystemActive) {
-                if (!e.target.closest('#top-ui-container')) {
-                    enterMultiverse();
-                }
-            }
-            isDragging = false;
-        }
-
-        window.addEventListener('mousedown', onPointerDown);
-        window.addEventListener('mousemove', onPointerMove);
-        window.addEventListener('mouseup', onPointerUp);
-        window.addEventListener('touchstart', onPointerDown, { passive: true });
-        window.addEventListener('touchmove', onPointerMove, { passive: true });
-        window.addEventListener('touchend', onPointerUp, { passive: true });
-
-        function requestIOSPermissions() {
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission().then(resp => {
-                    if (resp === 'granted') setGyro(!isGyroActive);
-                }).catch(console.error);
-            } else setGyro(!isGyroActive);
-        }
-
-        function handleOrientation(e) {
-            if (!isGyroActive) return;
-            const alpha = e.alpha ? THREE.MathUtils.degToRad(e.alpha) : 0;
-            const beta = e.beta ? THREE.MathUtils.degToRad(e.beta) : 0;
-            const gamma = e.gamma ? THREE.MathUtils.degToRad(e.gamma) : 0;
-
-            const euler = new THREE.Euler(beta, alpha, -gamma, 'YXZ');
-            deviceQuaternion.setFromEuler(euler);
-
-            const orientFix = new THREE.Quaternion();
-            orientFix.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -Math.PI / 2);
-            deviceQuaternion.multiply(orientFix);
-        }
-
-        function setGyro(enable) {
-            isGyroActive = enable;
-            const text = isGyroActive ? 'GIROSCOPIO: ON' : 'GIROSCOPIO: OFF';
-            const gyroTextEl = document.getElementById('gyro-btn-text');
-            if (gyroTextEl) gyroTextEl.innerText = text;
-
-            if (isGyroActive) {
-                window.addEventListener('deviceorientation', handleOrientation, true);
-            } else {
-                window.removeEventListener('deviceorientation', handleOrientation, true);
-                cameraRig.quaternion.set(0, 0, 0, 1);
-                targetRotationX = 0; targetRotationY = 0;
-            }
+        function exitMultiverse(e) {
+            if (e) e.stopPropagation();
+            destroyMultiverseHUD();
+            destroyVRProgramsHUD();
+            currentActiveView = 'home';
+            gsap.to(cameraRig.rotation, { y: 0, duration: 1.0, ease: "power2.inOut" });
         }
 
         function toggleVRMode() {
             isVRMode = !isVRMode;
             document.body.classList.toggle('vr-mode', isVRMode);
-            const vrTextEl = document.getElementById('vr-btn-text');
-            if (vrTextEl) vrTextEl.innerText = isVRMode ? 'SALIR DE VR' : 'VER EN VR';
-            onWindowResize();
+            document.getElementById('vr-btn-text').innerText = isVRMode ? 'SALIR DE VR' : 'VER EN VR';
+            
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            if (isVRMode) {
+                rendererLeft.setSize(w / 2, h);
+                rendererRight.setSize(w / 2, h);
+                cssRendererLeft.setSize(w / 2, h);
+                cssRendererRight.setSize(w / 2, h);
+                cameraLeft.aspect = (w / 2) / h;
+                cameraRight.aspect = (w / 2) / h;
+                cameraLeft.updateProjectionMatrix();
+                cameraRight.updateProjectionMatrix();
+            } else {
+                rendererLeft.setSize(w, h);
+                rendererRight.setSize(w, h);
+                cssRendererLeft.setSize(w, h);
+                cssRendererRight.setSize(w, h);
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+            }
+        }
+
+        function requestIOSPermissions() {
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission().then(response => {
+                    if (response === 'granted') {
+                        enableGyro();
+                    }
+                }).catch(console.error);
+            } else {
+                enableGyro();
+            }
+        }
+
+        function enableGyro() {
+            isGyroActive = true;
+            document.getElementById('gyro-btn-text').innerText = 'GIROSCOPIO: ON';
+            window.addEventListener('deviceorientation', handleOrientation, true);
+        }
+
+        function handleOrientation(e) {
+            if (!isGyroActive) return;
+            let alpha = e.alpha ? THREE.MathUtils.degToRad(e.alpha) : 0;
+            let beta = e.beta ? THREE.MathUtils.degToRad(e.beta) : 0;
+            let gamma = e.gamma ? THREE.MathUtils.degToRad(e.gamma) : 0;
+            
+            let zee = new THREE.Vector3(0, 0, 1);
+            let quaternion = new THREE.Quaternion();
+            let axis = new THREE.Vector3();
+            
+            quaternion.setFromAxisAngle(zee, -alpha);
+            let m = new THREE.Matrix4().makeRotationFromQuaternion(quaternion);
+            
+            let x = new THREE.Vector3(1, 0, 0);
+            x.applyMatrix4(m);
+            
+            quaternion.setFromAxisAngle(x, -beta);
+            let y = new THREE.Vector3(0, 1, 0);
+            y.applyMatrix4(m);
+            
+            quaternion.setFromAxisAngle(y, -gamma);
+            cameraRig.quaternion.multiplyQuaternions(quaternion, m);
+        }
+
+        window.addEventListener('mousedown', (e) => {
+            if (e.target.closest('#top-ui-container') || e.target.closest('#preview-modal') || e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
+            isDragging = true;
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+            dragDistance = 0;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging || isGyroActive) return;
+            let deltaX = e.clientX - previousMousePosition.x;
+            let deltaY = e.clientY - previousMousePosition.y;
+            dragDistance += Math.abs(deltaX) + Math.abs(deltaY);
+
+            targetRotationY -= deltaX * 0.005;
+            targetRotationX -= deltaY * 0.005;
+            targetRotationX = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, targetRotationX));
+
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            if (dragDistance < 10 && currentActiveView === 'home' && !isSystemActive) {
+                triggerSystemEntry();
+            }
+        });
+
+        window.addEventListener('touchstart', (e) => {
+            if (e.target.closest('#top-ui-container') || e.target.closest('#preview-modal') || e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
+            if (e.touches.length === 1) {
+                isDragging = true;
+                previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                dragDistance = 0;
+            }
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging || isGyroActive || e.touches.length !== 1) return;
+            let deltaX = e.touches[0].clientX - previousMousePosition.x;
+            let deltaY = e.touches[0].clientY - previousMousePosition.y;
+            dragDistance += Math.abs(deltaX) + Math.abs(deltaY);
+
+            targetRotationY -= deltaX * 0.005;
+            targetRotationX -= deltaY * 0.005;
+            targetRotationX = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, targetRotationX));
+
+            previousMousePosition = { x: e.touches.clientX, y: e.touches.clientY };
+        });
+
+        window.addEventListener('touchend', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            if (dragDistance < 10 && currentActiveView === 'home' && !isSystemActive) {
+                triggerSystemEntry();
+            }
+        });
+
+        function triggerSystemEntry() {
+            if (isSystemActive) return;
+            isSystemActive = true;
+            instruction.style.opacity = '0';
+
+            gsap.to(planet.scale, { x: 30, y: 30, z: 30, duration: 1.5, ease: "power2.in" });
+            gsap.to(textGroup.scale, { x: 0.1, y: 0.1, z: 0.1, duration: 0.8, onComplete: () => scene.remove(textGroup) });
+            gsap.to(cameraRig.position, { z: 1, duration: 1.5, ease: "power2.inOut", onComplete: () => {
+                createMultiverseHUD();
+                planet.scale.set(1, 1, 1);
+                planet.visible = false;
+            }});
         }
 
         function animate() {
             requestAnimationFrame(animate);
 
-            if (isGyroActive) {
-                cameraRig.quaternion.slerp(deviceQuaternion, 0.2);
-            } else {
-                currentRotationX += (targetRotationX - currentRotationX) * 0.08;
-                currentRotationY += (targetRotationY - currentRotationY) * 0.08;
-                cameraRig.rotation.x = currentRotationX;
+            currentRotationX += (targetRotationX - currentRotationX) * 0.1;
+            currentRotationY += (targetRotationY - currentRotationY) * 0.1;
+
+            if (!isGyroActive) {
                 cameraRig.rotation.y = currentRotationY;
+                cameraRig.rotation.x = currentRotationX;
             }
 
-            planet.rotation.y += 0.008;
-            textGroup.rotation.y += 0.006;
-            starField.rotation.y += 0.0005;
-
-            checkGazePointer();
+            if (planetGroup) planetGroup.rotation.y += 0.005;
+            if (starField) starField.rotation.y -= 0.0005;
 
             if (isVRMode) {
                 rendererLeft.render(scene, cameraLeft);
-                rendererRight.render(scene, cameraRight);
                 cssRendererLeft.render(cssScene, cameraLeft);
+                rendererRight.render(scene, cameraRight);
                 cssRendererRight.render(cssScene, cameraRight);
             } else {
                 rendererLeft.render(scene, camera);
                 cssRendererLeft.render(cssScene, camera);
             }
         }
-        animate();
 
-        function enterMultiverse() {
-            if (isSystemActive) return;
-            isSystemActive = true;
-            instruction.style.opacity = '0';
-
-            gsap.to(cameraRig.position, { 
-                z: 0.0, 
-                duration: 1.2, 
-                ease: "power2.inOut" 
-            });
-
-            gsap.to(planetGroup.scale, { x: 4, y: 4, z: 4, duration: 1.0, opacity: 0 });
-            gsap.to(textGroup.scale, { x: 3, y: 3, z: 3, duration: 1.0, onComplete: () => {
-                planetGroup.visible = false;
-                textGroup.visible = false;
-                
-                createMultiverseHUD();
-            }});
-        }
-
-        function exitMultiverse(event) {
-            if (event) event.stopPropagation();
-            if (!isSystemActive) return;
-
-            destroyVRProgramsHUD();
-            destroyMultiverseHUD();
-            currentActiveView = 'home';
-            
-            planetGroup.visible = true;
-            textGroup.visible = true;
-            planetGroup.scale.set(1, 1, 1);
-            textGroup.scale.set(1, 1, 1);
-
-            gsap.to(cameraRig.position, { 
-                z: 5, 
-                duration: 1.2, 
-                ease: "power2.inOut",
-                onComplete: () => {
-                    isSystemActive = false;
-                    instruction.style.opacity = '1';
-                }
-            });
-        }
-
-        function openAboutModal() { document.getElementById('about-modal').style.display = 'flex'; }
-        function closeAboutModal() { document.getElementById('about-modal').style.display = 'none'; }
-        function openVideo(url) {
-            const v = document.getElementById('active-video');
-            v.src = url;
-            document.getElementById('video-modal').style.display = 'flex';
-            v.play();
-        }
-        function closeVideo() {
-            const v = document.getElementById('active-video');
-            v.pause(); v.src = "";
-            document.getElementById('video-modal').style.display = 'none';
-        }
-
-        function onWindowResize() {
-            const width = isVRMode ? window.innerWidth / 2 : window.innerWidth;
-            const height = window.innerHeight;
-
-            camera.aspect = window.innerWidth / height;
+        window.addEventListener('resize', () => {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            camera.aspect = w / h;
             camera.updateProjectionMatrix();
+            rendererLeft.setSize(w, h);
+            rendererRight.setSize(w, h);
+            cssRendererLeft.setSize(w, h);
+            cssRendererRight.setSize(w / 2, h);
+        });
 
-            cameraLeft.aspect = width / height;
-            cameraLeft.updateProjectionMatrix();
-            cameraRight.aspect = width / height;
-            cameraRight.updateProjectionMatrix();
-
-            rendererLeft.setSize(isVRMode ? width : window.innerWidth, height);
-            rendererRight.setSize(width, height);
-
-            cssRendererLeft.setSize(isVRMode ? width : window.innerWidth, height);
-            cssRendererRight.setSize(width, height);
-        }
-        window.addEventListener('resize', onWindowResize);
+        animate();
     </script>
 </body>
 </html>
