@@ -100,17 +100,26 @@
             border-radius: 24px; background: rgba(10, 6, 24, 0.95); backdrop-filter: blur(16px);
         }
 
+        .netflix-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 20px;
+            max-height: 520px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
         .netflix-card {
-            flex: 0 0 260px; height: 380px; border-radius: 16px; overflow: hidden; position: relative;
+            height: 250px; border-radius: 14px; overflow: hidden; position: relative;
             border: 2px solid rgba(0, 240, 255, 0.4); transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
             cursor: pointer; background: #111;
         }
         .netflix-card:hover, .netflix-card.gaze-hover {
-            transform: scale(1.08); border-color: #f000ff; box-shadow: 0 0 25px rgba(240, 0, 255, 0.8); z-index: 10;
+            transform: scale(1.05); border-color: #f000ff; box-shadow: 0 0 25px rgba(240, 0, 255, 0.8); z-index: 10;
         }
         .netflix-card img { width: 100%; height: 100%; object-fit: cover; }
         .netflix-card .card-info {
-            position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px;
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 12px;
             background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
         }
 
@@ -121,8 +130,9 @@
         #video-modal video { width: 100%; max-width: 900px; border-radius: 12px; box-shadow: 0 0 30px #0ff; }
         .modal-close-btn { margin-top: 20px; padding: 10px 25px; background: #0ff; color: #000; font-weight: bold; border-radius: 8px; cursor: pointer; }
         
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .no-scrollbar::-webkit-scrollbar { width: 6px; }
+        .no-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 240, 255, 0.5); border-radius: 4px; }
+        .no-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); }
     </style>
 </head>
 <body>
@@ -378,51 +388,60 @@
 
         function openVRProgramsMultiverse(e) {
             if (e) e.stopPropagation();
-            destroyMultiverseHUD(); // Destruye completamente y remueve el grupo anterior
+            destroyMultiverseHUD();
             currentActiveView = 'vr-programs';
 
             gsap.to(cameraRig.rotation, { y: cameraRig.rotation.y + Math.PI * 2, duration: 1.0, ease: "power2.inOut" });
 
             const vrContainer = document.createElement('div');
-            vrContainer.className = "w-[1600px] flex flex-col gap-8 floating-card pb-12";
+            vrContainer.className = "w-[1600px] flex flex-col gap-6 floating-card pb-12";
             vrContainer.innerHTML = `
                 <div class="flex items-center justify-between">
-                    <button class="interactive-btn bg-black/95 border-4 border-fuchsia-500 text-fuchsia-300 px-10 py-5 rounded-full font-black text-2xl flex items-center gap-4 shadow-[0_0_30px_rgba(240,0,255,0.7)]" onclick="createMultiverseHUD()">
+                    <button class="interactive-btn bg-black/95 border-4 border-fuchsia-500 text-fuchsia-300 px-10 py-4 rounded-full font-black text-2xl flex items-center gap-4 shadow-[0_0_30px_rgba(240,0,255,0.7)]" onclick="createMultiverseHUD()">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                         <span>VOLVER AL MULTIVERSO MS3</span>
                     </button>
-                    <h1 class="text-5xl font-black text-white drop-shadow-[0_0_20px_#00f0ff] uppercase tracking-wider">NETFLIX VR - CENTRO DE STREAMING</h1>
+                    <h1 class="text-4xl font-black text-white drop-shadow-[0_0_20px_#00f0ff] uppercase tracking-wider">NETFLIX VR - CENTRO DE PROGRAMAS</h1>
                 </div>
 
-                <div class="w-full neon-box-magenta p-10 flex flex-col justify-between h-[450px] rounded-3xl" style="background-image: linear-gradient(to right, rgba(10,6,24,0.98), rgba(10,6,24,0.4)), url('https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?q=80&w=1600&auto=format&fit=crop'); background-size: cover;">
-                    <div>
-                        <span class="text-lg font-extrabold tracking-widest text-fuchsia-300 uppercase">Estreno Exclusivo VR</span>
-                        <h2 class="text-6xl font-black text-white mt-2 drop-shadow-[0_0_20px_#f000ff]">THE MATRIX DIMENSIONS</h2>
-                        <p class="text-gray-300 text-xl mt-3 max-w-xl leading-relaxed">Una experiencia cinemática interactiva de alta fidelidad optimizada para cascos de realidad virtual y visores 360°.</p>
+                <div class="w-full neon-box-cyan p-8 flex flex-col gap-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-2xl font-bold text-cyan-300">CATÁLOGO COMPLETO DE STREAMING VR</h3>
+                        <span class="text-sm text-fuchsia-400 font-bold uppercase tracking-widest">Desliza verticalmente para ver más</span>
                     </div>
-                    <div>
-                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="interactive-btn bg-fuchsia-500 text-black px-10 py-4 rounded-xl font-black text-xl shadow-[0_0_25px_#f000ff]">VER AHORA</button>
-                    </div>
-                </div>
-
-                <div class="flex flex-col gap-4">
-                    <h3 class="text-3xl font-bold text-cyan-300">TENDENCIAS EN EL MULTIVERSO</h3>
-                    <div class="flex gap-6 overflow-x-auto pb-4 pt-2 px-2 no-scrollbar">
+                    
+                    <div class="netflix-grid no-scrollbar">
                         <div class="netflix-card interactive-btn" onclick="openPreview('Cyberpunk City 2099', 'Recorre las calles iluminadas por neón de una metrópolis futurista gobernada por inteligencias artificiales.', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')">
                             <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600&auto=format&fit=crop" alt="Cyberpunk">
-                            <div class="card-info"><h3 class="text-white text-xl font-bold">Cyberpunk 2099</h3><p class="text-fuchsia-300 text-sm">Interactivo</p></div>
+                            <div class="card-info"><h4 class="text-white text-base font-bold">Cyberpunk 2099</h4><p class="text-fuchsia-300 text-xs">Interactivo</p></div>
                         </div>
                         <div class="netflix-card interactive-btn" onclick="openPreview('Viaje a Marte 360', 'Explora las dunas rojas y bases espaciales de la próxima frontera humana con total libertad de movimiento.', 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">
                             <img src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=600&auto=format&fit=crop" alt="Marte">
-                            <div class="card-info"><h3 class="text-white text-xl font-bold">Viaje a Marte</h3><p class="text-cyan-300 text-sm">VR 360° • 4K</p></div>
+                            <div class="card-info"><h4 class="text-white text-base font-bold">Viaje a Marte</h4><p class="text-cyan-300 text-xs">VR 360° • 4K</p></div>
                         </div>
                         <div class="netflix-card interactive-btn" onclick="openPreview('Estación Espacial ISS', 'Vive un día completo flotando en órbita terrestre dentro de la Estación Espacial Internacional.', 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')">
                             <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop" alt="ISS">
-                            <div class="card-info"><h3 class="text-white text-xl font-bold">Estación ISS</h3><p class="text-cyan-300 text-sm">Inmersivo • 60FPS</p></div>
+                            <div class="card-info"><h4 class="text-white text-base font-bold">Estación ISS</h4><p class="text-cyan-300 text-xs">Inmersivo • 60FPS</p></div>
                         </div>
                         <div class="netflix-card interactive-btn" onclick="openPreview('Bosque Bioluminiscente', 'Un santuario natural alienígena donde cada planta responde a tu presencia visual.', 'https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')">
                             <img src="https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?q=80&w=600&auto=format&fit=crop" alt="Bosque">
-                            <div class="card-info"><h3 class="text-white text-xl font-bold">Bosque Místico</h3><p class="text-fuchsia-300 text-sm">Relax VR</p></div>
+                            <div class="card-info"><h4 class="text-white text-base font-bold">Bosque Místico</h4><p class="text-fuchsia-300 text-xs">Relax VR</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Océano Abisal 360', 'Sumergirme en las profundidades marinas y descubre criaturas abisales jamás vistas.', 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')">
+                            <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=600&auto=format&fit=crop" alt="Océano">
+                            <div class="card-info"><h4 class="text-white text-base font-bold">Océano Abisal</h4><p class="text-cyan-300 text-xs">Documental</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Neo Tokio Drifting', 'Acelera a fondo por las autopistas elevadas de Tokio en una noche lluviosa de carreras clandestinas.', 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">
+                            <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=600&auto=format&fit=crop" alt="Tokio">
+                            <div class="card-info"><h4 class="text-white text-base font-bold">Neo Tokio</h4><p class="text-fuchsia-300 text-xs">Acción VR</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Cumbres Nevadas Extreme', 'Desciende las montañas más peligrosas del mundo en esquí con visión panorámica total.', 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')">
+                            <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=80&w=600&auto=format&fit=crop" alt="Nieve">
+                            <div class="card-info"><h4 class="text-white text-base font-bold">Cumbres Nevadas</h4><p class="text-cyan-300 text-xs">Extremo</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Galaxia Lejana', 'Un viaje psicodélico y astronómico a través de nebulosas y agujeros negros en tiempo real.', 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=600&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')">
+                            <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=600&auto=format&fit=crop" alt="Galaxia">
+                            <div class="card-info"><h4 class="text-white text-base font-bold">Galaxia Lejana</h4><p class="text-fuchsia-300 text-xs">Cosmos</p></div>
                         </div>
                     </div>
                 </div>
@@ -597,7 +616,6 @@
 
             if (isGyroActive) {
                 window.addEventListener('deviceorientation', handleOrientation, true);
-                if (!isVRMode) toggleVRMode();
             } else {
                 window.removeEventListener('deviceorientation', handleOrientation, true);
                 cameraRig.quaternion.set(0, 0, 0, 1);
@@ -610,8 +628,6 @@
             document.body.classList.toggle('vr-mode', isVRMode);
             const vrTextEl = document.getElementById('vr-btn-text');
             if (vrTextEl) vrTextEl.innerText = isVRMode ? 'SALIR DE VR' : 'VER EN VR';
-
-            if (isVRMode && !isGyroActive) requestIOSPermissions();
             onWindowResize();
         }
 
