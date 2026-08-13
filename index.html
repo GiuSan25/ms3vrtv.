@@ -307,7 +307,9 @@
             const cssObject = new THREE.CSS3DObject(mainContainer);
             cssObject.scale.set(0.0055, 0.0055, 0.0055);
             hudGroup.add(cssObject);
-            hudGroup.position.set(0, 0, -1.6);
+            
+            // Posición más retirada en Z (-2.5) para que no se sienta demasiado cerca
+            hudGroup.position.set(0, 0, -2.5);
             cssScene.add(hudGroup);
         }
 
@@ -481,32 +483,27 @@
         }
         animate();
 
-        // EFECTO DE ACERCAMIENTO E INMERSIÓN DENTRO DE LA ESFERA
         function enterMultiverse() {
             if (isSystemActive) return;
             isSystemActive = true;
             instruction.style.opacity = '0';
 
-            // Animación para empujar la cámara hacia la posición y profundidad de la esfera (-1.5)
             gsap.to(cameraRig.position, { 
                 z: -1.5, 
                 duration: 1.2, 
                 ease: "power2.inOut" 
             });
 
-            // Animación para escalar la esfera y el texto hacia afuera de la pantalla (efecto de atravesarlos)
             gsap.to(planetGroup.scale, { x: 4, y: 4, z: 4, duration: 1.0, opacity: 0 });
             gsap.to(textGroup.scale, { x: 3, y: 3, z: 3, duration: 1.0, onComplete: () => {
                 planetGroup.visible = false;
                 textGroup.visible = false;
                 
-                // Una vez dentro, creamos el HUD y lo acercamos a la vista
                 createMultiverseHUD();
                 gsap.fromTo(hudGroup.scale, { x: 0.01, y: 0.01, z: 0.01 }, { x: 1, y: 1, z: 1, duration: 1, ease: "back.out(1.4)" });
             }});
         }
 
-        // SALIR DEL MULTIVERSO Y REGRESAR LA CÁMARA
         function exitMultiverse(event) {
             if (event) event.stopPropagation();
             if (!isSystemActive || !hudGroup) return;
@@ -519,7 +516,6 @@
                 planetGroup.scale.set(1, 1, 1);
                 textGroup.scale.set(1, 1, 1);
 
-                // Regresar la cámara a su posición inicial de origen (z: 5)
                 gsap.to(cameraRig.position, { 
                     z: 5, 
                     duration: 1.2, 
