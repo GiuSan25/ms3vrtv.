@@ -184,7 +184,8 @@
         let scene, cssScene, camera, cameraLeft, cameraRight, cameraRig;
         let rendererLeft, rendererRight, cssRendererLeft, cssRendererRight;
         let planet, textGroup, planetGroup, universeSphere, starField;
-        let hudGroup = null;
+        let multiverseHudGroup = null;
+        let vrProgramsHudGroup = null;
         let isTopMenuOpen = false;
         let currentActiveView = 'home';
         let selectedVideoData = null;
@@ -325,8 +326,10 @@
         }
 
         function createMultiverseHUD() {
+            destroyVRProgramsHUD();
             destroyMultiverseHUD();
             currentActiveView = 'multiverse';
+            
             const mainContainer = document.createElement('div');
             mainContainer.className = "w-[1600px] flex flex-col gap-10 floating-card";
             mainContainer.innerHTML = `
@@ -363,19 +366,19 @@
                 </div>
             `;
 
-            hudGroup = new THREE.Group();
+            multiverseHudGroup = new THREE.Group();
             const cssObject = new THREE.CSS3DObject(mainContainer);
             cssObject.scale.set(0.0055, 0.0055, 0.0055);
-            hudGroup.add(cssObject);
+            multiverseHudGroup.add(cssObject);
             
             const isMobile = window.innerWidth <= 768;
-            hudGroup.position.set(0, 0, isMobile ? -5.5 : -4.5);
-            cssScene.add(hudGroup);
+            multiverseHudGroup.position.set(0, 0, isMobile ? -5.5 : -4.5);
+            cssScene.add(multiverseHudGroup);
         }
 
         function openVRProgramsMultiverse(e) {
             if (e) e.stopPropagation();
-            destroyMultiverseHUD();
+            destroyMultiverseHUD(); // Destruye completamente la plantilla anterior del Multiverso
             currentActiveView = 'vr-programs';
 
             gsap.to(cameraRig.rotation, { y: cameraRig.rotation.y + Math.PI * 2, duration: 1.0, ease: "power2.inOut" });
@@ -425,15 +428,15 @@
                 </div>
             `;
 
-            hudGroup = new THREE.Group();
+            vrProgramsHudGroup = new THREE.Group();
             const cssObject = new THREE.CSS3DObject(vrContainer);
             cssObject.scale.set(0.0055, 0.0055, 0.0055);
-            hudGroup.add(cssObject);
+            vrProgramsHudGroup.add(cssObject);
             
             const isMobile = window.innerWidth <= 768;
-            hudGroup.position.set(0, 0, isMobile ? -5.5 : -4.5);
-            cssScene.add(hudGroup);
-            gsap.fromTo(hudGroup.scale, { x: 0.01, y: 0.01, z: 0.01 }, { x: 1, y: 1, z: 1, duration: 0.8, ease: "back.out(1.4)" });
+            vrProgramsHudGroup.position.set(0, 0, isMobile ? -5.5 : -4.5);
+            cssScene.add(vrProgramsHudGroup);
+            gsap.fromTo(vrProgramsHudGroup.scale, { x: 0.01, y: 0.01, z: 0.01 }, { x: 1, y: 1, z: 1, duration: 0.8, ease: "back.out(1.4)" });
         }
 
         function openPreview(title, desc, imgUrl, videoUrl) {
@@ -455,9 +458,16 @@
         }
 
         function destroyMultiverseHUD() {
-            if (hudGroup) { 
-                cssScene.remove(hudGroup); 
-                hudGroup = null; 
+            if (multiverseHudGroup) { 
+                cssScene.remove(multiverseHudGroup); 
+                multiverseHudGroup = null; 
+            }
+        }
+
+        function destroyVRProgramsHUD() {
+            if (vrProgramsHudGroup) { 
+                cssScene.remove(vrProgramsHudGroup); 
+                vrProgramsHudGroup = null; 
             }
         }
 
@@ -653,6 +663,7 @@
             if (event) event.stopPropagation();
             if (!isSystemActive) return;
 
+            destroyVRProgramsHUD();
             destroyMultiverseHUD();
             currentActiveView = 'home';
             
