@@ -51,7 +51,10 @@
             width: 32px; height: 32px; border-radius: 50%;
             border: 2px solid rgba(0, 240, 255, 0.6); z-index: 999; pointer-events: none;
             box-shadow: 0 0 10px rgba(0, 240, 255, 0.5); display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.3s ease;
         }
+
+        .gaze-reticle.disabled { opacity: 0 !important; }
 
         .gaze-dot { width: 6px; height: 6px; background: #00f0ff; border-radius: 50%; box-shadow: 0 0 8px #00f0ff; }
 
@@ -132,6 +135,7 @@
         <div id="dropdown-menu" class="hidden mt-3 w-64 neon-box-cyan p-4 flex flex-col gap-3 transition-all duration-300 transform scale-95 opacity-0">
             <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="requestIOSPermissions()"><span id="gyro-btn-text">GIROSCOPIO: OFF</span></button>
             <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="toggleVRMode()"><span id="vr-btn-text">VER EN VR</span></button>
+            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="toggleGazePointerState()"><span id="gaze-toggle-btn-text">PUNTERO VR: ON</span></button>
             <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="openAboutModal()"><span>NOSOTROS</span></button>
         </div>
     </div>
@@ -182,10 +186,10 @@
         let planet, textGroup, planetGroup, universeSphere, starField;
         let hudGroup = null;
         let isTopMenuOpen = false;
-        let currentActiveView = 'home'; // 'home', 'multiverse', 'vr-programs'
+        let currentActiveView = 'home';
         let selectedVideoData = null;
 
-        let isSystemActive = false, isGyroActive = false, isVRMode = false;
+        let isSystemActive = false, isGyroActive = false, isVRMode = false, isGazeEnabled = true;
 
         let isDragging = false;
         let previousMousePosition = { x: 0, y: 0 };
@@ -306,6 +310,20 @@
             }
         }
 
+        function toggleGazePointerState() {
+            isGazeEnabled = !isGazeEnabled;
+            const text = isGazeEnabled ? 'PUNTERO VR: ON' : 'PUNTERO VR: OFF';
+            document.getElementById('gaze-toggle-btn-text').innerText = text;
+
+            const reticles = document.querySelectorAll('.gaze-reticle');
+            reticles.forEach(r => {
+                if (isGazeEnabled) r.classList.remove('disabled');
+                else r.classList.add('disabled');
+            });
+
+            if (!isGazeEnabled) resetGazeTimer();
+        }
+
         function createMultiverseHUD() {
             destroyMultiverseHUD();
             currentActiveView = 'multiverse';
@@ -350,7 +368,6 @@
             destroyMultiverseHUD();
             currentActiveView = 'vr-programs';
 
-            // Teletransportar la cámara rig hacia adelante para simular salto de multiverso / rotación dimensional
             gsap.to(cameraRig.rotation, { y: cameraRig.rotation.y + Math.PI * 2, duration: 1.0, ease: "power2.inOut" });
 
             const vrContainer = document.createElement('div');
@@ -442,6 +459,8 @@
         }
 
         function checkGazePointer() {
+            if (!isGazeEnabled) return;
+
             let elementToTrigger = null;
 
             if (!isSystemActive) {
