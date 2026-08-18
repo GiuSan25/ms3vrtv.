@@ -55,7 +55,6 @@
         }
 
         .gaze-reticle.disabled { opacity: 0 !important; }
-
         .gaze-dot { width: 6px; height: 6px; background: #00f0ff; border-radius: 50%; box-shadow: 0 0 8px #00f0ff; }
 
         .gaze-progress {
@@ -63,9 +62,7 @@
             border-radius: 50%; border: 3px solid transparent; opacity: 0; transition: opacity 0.2s ease;
         }
 
-        .gaze-reticle.active .gaze-progress {
-            opacity: 1; animation: gazeFill 3s linear forwards;
-        }
+        .gaze-reticle.active .gaze-progress { opacity: 1; animation: gazeFill 3s linear forwards; }
 
         @keyframes gazeFill {
             0% { transform: rotate(0deg); border-top-color: #00f0ff; }
@@ -101,17 +98,10 @@
         }
 
         .netflix-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 10px;
-            overflow: visible;
+            display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; overflow: visible;
         }
-
         @media (max-width: 768px) {
-            .netflix-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 8px;
-            }
+            .netflix-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
         }
 
         .netflix-card {
@@ -119,9 +109,7 @@
             border: 2px solid rgba(0, 240, 255, 0.4); transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
             cursor: pointer; background: #111;
         }
-        .netflix-card:hover {
-            transform: scale(1.03); border-color: #f000ff; box-shadow: 0 0 15px rgba(240, 0, 255, 0.8); z-index: 10;
-        }
+        .netflix-card:hover { transform: scale(1.03); border-color: #f000ff; box-shadow: 0 0 15px rgba(240, 0, 255, 0.8); z-index: 10; }
         .netflix-card img { width: 100%; height: 100%; object-fit: cover; }
         .netflix-card .card-info {
             position: absolute; bottom: 0; left: 0; width: 100%; padding: 6px 8px;
@@ -151,7 +139,7 @@
         </div>
     </div>
 
-    <div id="instruction">Arrastra con el dedo en cualquier parte para mover el universo | Toca la esfera MS3 para entrar</div>
+    <div id="instruction">Arrastra con el dedo en cualquier parte para mover el universo | Toca el logo MS3 para entrar</div>
 
     <div id="vr-view-container">
         <div class="vr-eye" id="eye-left">
@@ -194,11 +182,10 @@
     <script>
         let scene, cssScene, camera, cameraLeft, cameraRight, cameraRig;
         let rendererLeft, rendererRight, cssRendererLeft, cssRendererRight;
-        let planet, textGroup, planetGroup, universeSphere, starField;
+        let logoGroup, universeSphere, starField;
         let multiverseHudGroup = null;
         let vrProgramsHudGroup = null;
         let isTopMenuOpen = false;
-        let currentActiveView = 'home';
         let selectedVideoData = null;
 
         let isSystemActive = false, isGyroActive = false, isVRMode = false, isGazeEnabled = false;
@@ -251,9 +238,20 @@
         cssRendererRight.setSize(window.innerWidth / 2, window.innerHeight);
         cssContainerRight.appendChild(cssRendererRight.domElement);
 
-        scene.add(new THREE.AmbientLight(0x3a1050, 1.5));
-        const pLightCyan = new THREE.PointLight(0x00f0ff, 4, 80); pLightCyan.position.set(-8, 8, 8); scene.add(pLightCyan);
-        const pLightPink = new THREE.PointLight(0xf000ff, 4, 80); pLightPink.position.set(8, -8, 8); scene.add(pLightPink);
+        // Sistema de Luces Dinámicas para el efecto Vidriado y Reflejos
+        scene.add(new THREE.AmbientLight(0x221133, 2.0));
+        
+        const pLightCyan = new THREE.PointLight(0x00f0ff, 6, 100); 
+        pLightCyan.position.set(-10, 10, 10); 
+        scene.add(pLightCyan);
+
+        const pLightPink = new THREE.PointLight(0xf000ff, 6, 100); 
+        pLightPink.position.set(10, -10, 10); 
+        scene.add(pLightPink);
+
+        const pLightWhite = new THREE.PointLight(0xffffff, 4, 50); 
+        pLightWhite.position.set(0, 5, 5); 
+        scene.add(pLightWhite);
 
         const universeGeo = new THREE.SphereGeometry(70, 32, 32);
         universeSphere = new THREE.Mesh(universeGeo, new THREE.MeshBasicMaterial({ color: 0x070216, side: THREE.BackSide }));
@@ -281,31 +279,48 @@
         starField = new THREE.Points(starsGeometry, new THREE.PointsMaterial({ size: 0.25, vertexColors: true, transparent: true, opacity: 0.9 }));
         scene.add(starField);
 
-        planetGroup = new THREE.Group();
-        planet = new THREE.Mesh(new THREE.IcosahedronGeometry(1.4, 4), new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.9 }));
-        planet.position.y = -1.5;
-        planetGroup.add(planet);
-        scene.add(planetGroup);
-
-        textGroup = new THREE.Group(); 
-        textGroup.position.y = 0.8;
+        // Grupo principal del Logo MS3 con efecto Vidriado (Glassmorphism / Physical Material 3D)
+        logoGroup = new THREE.Group();
+        logoGroup.position.y = 0.2;
+        scene.add(logoGroup);
 
         const loader = new THREE.FontLoader();
         loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
-            const textConfig = { font: font, size: 1.2, height: 0.4, curveSegments: 12, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.03, bevelSegments: 5 };
+            const textConfig = { 
+                font: font, 
+                size: 1.3, 
+                height: 0.35, 
+                curveSegments: 16, 
+                bevelEnabled: true, 
+                bevelThickness: 0.08, 
+                bevelSize: 0.04, 
+                bevelSegments: 8 
+            };
             const textGeo = new THREE.TextGeometry('MS3', textConfig);
             textGeo.computeBoundingBox();
             const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
             
-            const textMaterial = new THREE.MeshPhysicalMaterial({
-                color: 0x00f0ff, metalness: 0.9, roughness: 0.1, emissive: 0x006666, emissiveIntensity: 0.4, clearcoat: 1.0
+            // Material Vidriado / Cristal Holográfico con reflejos y refracción simulada
+            const glassMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0x00f0ff,
+                metalness: 0.1,
+                roughness: 0.05,
+                transmission: 0.85, // Efecto vidrio translúcido
+                thickness: 1.2,
+                transparent: true,
+                opacity: 0.9,
+                reflectivity: 0.9,
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.1,
+                emissive: 0x003344,
+                emissiveIntensity: 0.3,
+                side: THREE.DoubleSide
             });
 
-            const textMesh = new THREE.Mesh(textGeo, textMaterial);
+            const textMesh = new THREE.Mesh(textGeo, glassMaterial);
             textMesh.position.x = centerOffset; 
-            textGroup.add(textMesh);
+            logoGroup.add(textMesh);
         });
-        scene.add(textGroup);
 
         // Control de menú desplegable superior
         function toggleTopMenu(e) {
@@ -326,7 +341,6 @@
             }
         }
 
-        // Función del botón de Giroscopio (Permisos en iOS/Android)
         function requestIOSPermissions() {
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission().then(response => {
@@ -359,13 +373,11 @@
             const beta = event.beta ? THREE.MathUtils.degToRad(event.beta) : 0;
             const gamma = event.gamma ? THREE.MathUtils.degToRad(event.gamma) : 0;
             
-            const zee = new THREE.Vector3(0, 0, 1);
             const europa = new THREE.Euler(beta, alpha, -gamma, 'YXZ');
             deviceQuaternion.setFromEuler(europa);
             cameraRig.quaternion.copy(deviceQuaternion);
         }
 
-        // Función del Puntero VR
         function toggleGazePointerState() {
             isGazeEnabled = !isGazeEnabled;
             document.getElementById('gaze-toggle-btn-text').innerText = isGazeEnabled ? 'PUNTERO VR: ON' : 'PUNTERO VR: OFF';
@@ -376,7 +388,6 @@
             });
         }
 
-        // Interacción táctil para rotar la cámara manual si el giroscopio está inactivo
         const viewContainer = document.getElementById('vr-view-container');
         viewContainer.addEventListener('pointerdown', (e) => {
             isDragging = true;
@@ -397,7 +408,7 @@
 
         window.addEventListener('pointerup', () => { isDragging = false; });
 
-        // Clic en la esfera 3D principal para entrar al Multiverso
+        // Clic en el Logo MS3 para entrar al Multiverso
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
 
@@ -407,7 +418,7 @@
             mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
             raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObject(planet);
+            const intersects = raycaster.intersectObjects(logoGroup.children, true);
 
             if (intersects.length > 0) {
                 enterMultiverse();
@@ -416,21 +427,18 @@
 
         function enterMultiverse() {
             isSystemActive = true;
-            planet.visible = false;
-            if (scene.children.includes(textGroup)) {
-                scene.remove(textGroup);
-            }
             instruction.style.opacity = '0';
             
-            gsap.to(cameraRig.position, { z: 2, duration: 1.2, ease: "power2.inOut", onComplete: () => {
+            gsap.to(logoGroup.scale, { x: 0.1, y: 0.1, z: 0.1, opacity: 0, duration: 0.8, ease: "power2.in", onComplete: () => {
+                logoGroup.visible = false;
                 createMultiverseHUD();
             }});
+            gsap.to(cameraRig.position, { z: 2, duration: 1.2, ease: "power2.inOut" });
         }
 
         function createMultiverseHUD() {
             destroyVRProgramsHUD();
             destroyMultiverseHUD();
-            currentActiveView = 'multiverse';
             
             const mainContainer = document.createElement('div');
             mainContainer.className = "w-[1200px] flex flex-col gap-6 floating-card";
@@ -473,7 +481,6 @@
         function openVRProgramsMultiverse(e) {
             if (e) e.stopPropagation();
             destroyMultiverseHUD();
-            currentActiveView = 'vr-programs';
 
             const vrContainer = document.createElement('div');
             vrContainer.className = "w-[1200px] flex flex-col gap-4 floating-card";
@@ -586,16 +593,12 @@
             if (e) e.stopPropagation();
             destroyMultiverseHUD();
             destroyVRProgramsHUD();
-            currentActiveView = 'home';
             
-            planet.visible = true;
-            if (!scene.children.includes(textGroup)) {
-                scene.add(textGroup);
-            }
-            
+            logoGroup.visible = true;
             instruction.style.opacity = '1';
             isSystemActive = false;
             
+            gsap.to(logoGroup.scale, { x: 1, y: 1, z: 1, duration: 0.8, ease: "power2.out" });
             gsap.to(cameraRig.position, { z: 5, duration: 1.0, ease: "power2.inOut" });
         }
 
@@ -632,8 +635,11 @@
             requestAnimationFrame(animate);
 
             if (starField) starField.rotation.y += 0.0005;
-            if (planetGroup && !isSystemActive) planetGroup.rotation.y += 0.002;
-            if (textGroup) textGroup.rotation.y += 0.001;
+            
+            // Rotación constante de 360 grados sobre su propio eje en el centro
+            if (logoGroup && !isSystemActive) {
+                logoGroup.rotation.y += 0.012; 
+            }
 
             if (!isGyroActive) {
                 currentRotationX += (targetRotationX - currentRotationX) * 0.1;
