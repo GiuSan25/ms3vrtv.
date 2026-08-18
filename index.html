@@ -117,7 +117,7 @@
         <div id="dropdown-menu" class="hidden mt-3 w-72 neon-box-cyan p-4 flex flex-col gap-3 transition-all duration-300 transform scale-95 opacity-0">
             <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="requestIOSPermissions()"><span id="gyro-btn-text">GIROSCOPIO: OFF</span></button>
             <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="toggleVRMode()"><span id="vr-btn-text">VER EN VR</span></button>
-            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="openAboutSection()"><span>NOSOTROS</span></button>
+            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="openAboutSection(event)"><span>NOSOTROS</span></button>
         </div>
     </div>
 
@@ -254,6 +254,7 @@
         starField = new THREE.Points(starsGeometry, new THREE.PointsMaterial({ size: 0.25, vertexColors: true, transparent: true, opacity: 0.9 }));
         scene.add(starField);
 
+        // --- DEFINICIÓN AVANZADA DE LOS LOGOS DE BIENVENIDA (MS3 Y GAFAS VR) ---
         logoGroup = new THREE.Group();
         logoGroup.position.y = 0.2;
         scene.add(logoGroup);
@@ -263,20 +264,27 @@
         vrGogglesGroup.scale.set(0.01, 0.01, 0.01);
         scene.add(vrGogglesGroup);
 
+        // Materiales de alta calidad visual (Cristal Neón Cian y Magenta con Reflexión Física)
         const glassMaterial = new THREE.MeshPhysicalMaterial({
             color: 0x00f0ff, metalness: 0.1, roughness: 0.05,
-            transmission: 0.85, thickness: 1.2, transparent: true, opacity: 0.9,
+            transmission: 0.85, thickness: 1.2, transparent: true, opacity: 0.95,
             reflectivity: 0.9, clearcoat: 1.0, clearcoatRoughness: 0.1,
-            emissive: 0x003344, emissiveIntensity: 0.3, side: THREE.DoubleSide
+            emissive: 0x003344, emissiveIntensity: 0.4, side: THREE.DoubleSide
         });
 
         const magentaGlassMat = new THREE.MeshPhysicalMaterial({
             color: 0xf000ff, metalness: 0.1, roughness: 0.05,
-            transmission: 0.85, thickness: 1.2, transparent: true, opacity: 0.9,
+            transmission: 0.85, thickness: 1.2, transparent: true, opacity: 0.95,
             reflectivity: 0.9, clearcoat: 1.0, clearcoatRoughness: 0.1,
-            emissive: 0x440044, emissiveIntensity: 0.4, side: THREE.DoubleSide
+            emissive: 0x440044, emissiveIntensity: 0.5, side: THREE.DoubleSide
         });
 
+        const darkMetallicMat = new THREE.MeshStandardMaterial({
+            color: 0x0f0b1f, metalness: 0.9, roughness: 0.2,
+            emissive: 0x001122, emissiveIntensity: 0.3
+        });
+
+        // 1. Carga tipográfica y construcción refinada del logo MS3
         const loader = new THREE.FontLoader();
         loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
             const textConfig = { 
@@ -290,25 +298,41 @@
             const textMesh = new THREE.Mesh(textGeo, glassMaterial);
             textMesh.position.x = centerOffset; 
             logoGroup.add(textMesh);
+
+            // Añadir un anillo orbital decorativo alrededor del logo MS3 para mayor presencia inmersiva
+            const ringGeo = new THREE.TorusGeometry(2.2, 0.04, 16, 100);
+            const ringMesh = new THREE.Mesh(ringGeo, magentaGlassMat);
+            ringMesh.rotation.x = Math.PI / 3;
+            logoGroup.add(ringMesh);
         });
 
-        const visorGeo = new THREE.BoxGeometry(3.2, 1.4, 0.8);
-        const visorMesh = new THREE.Mesh(visorGeo, glassMaterial);
+        // 2. Construcción ultra detallada del modelo 3D de las Gafas de Realidad Virtual
+        // Cuerpo principal del visor aerodinámico curvado
+        const visorGeo = new THREE.BoxGeometry(3.4, 1.5, 0.9);
+        const visorMesh = new THREE.Mesh(visorGeo, darkMetallicMat);
         vrGogglesGroup.add(visorMesh);
 
-        const lensGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.9, 32);
+        // Placa frontal de cristal cian con bisel luminoso
+        const frontPlateGeo = new THREE.BoxGeometry(3.2, 1.3, 0.15);
+        const frontPlate = new THREE.Mesh(frontPlateGeo, glassMaterial);
+        frontPlate.position.z = 0.45;
+        vrGogglesGroup.add(frontPlate);
+
+        // Lentes ópticas cilíndricas independientes de alta precisión en color magenta brillante
+        const lensGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.2, 32);
         lensGeo.rotateX(Math.PI / 2);
         
         const leftLens = new THREE.Mesh(lensGeo, magentaGlassMat);
-        leftLens.position.set(-0.8, 0, 0.1);
+        leftLens.position.set(-0.85, 0, 0.5);
         vrGogglesGroup.add(leftLens);
 
         const rightLens = new THREE.Mesh(lensGeo, magentaGlassMat);
-        rightLens.position.set(0.8, 0, 0.1);
+        rightLens.position.set(0.85, 0, 0.5);
         vrGogglesGroup.add(rightLens);
 
-        const strapGeo = new THREE.CylinderGeometry(1.8, 1.8, 0.2, 32, 1, true);
-        const strapMesh = new THREE.Mesh(strapGeo, new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.6 }));
+        // Cinta de sujeción perimetral con rejilla digital futurista
+        const strapGeo = new THREE.CylinderGeometry(1.9, 1.9, 0.25, 32, 1, true);
+        const strapMesh = new THREE.Mesh(strapGeo, new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.7 }));
         vrGogglesGroup.add(strapMesh);
 
         function toggleTopMenu(e) {
@@ -403,6 +427,7 @@
             isSystemActive = true;
             instruction.style.opacity = '0';
 
+            // Animación de contracción del logotipo MS3 y despliegue fluido de las Gafas VR
             gsap.to(logoGroup.scale, { x: 0.01, y: 0.01, z: 0.01, duration: 0.4, ease: "power2.in", onComplete: () => {
                 logoGroup.visible = false;
                 vrGogglesGroup.position.copy(logoGroup.position);
@@ -544,14 +569,12 @@
             logoGroup.visible = false;
             instruction.style.opacity = '0';
 
-            // Flash de transición inmersiva
             flashOverlay.style.opacity = '1';
             setTimeout(() => { flashOverlay.style.opacity = '0'; }, 300);
 
             aboutHudGroup = new THREE.Group();
             spinningCoins = [];
 
-            // 1. Botón superior flotante para regresar al inicio
             const backWrapper = document.createElement('div');
             backWrapper.className = "w-[1200px] flex flex-col gap-4 floating-card";
             backWrapper.innerHTML = `
@@ -568,7 +591,6 @@
             backObj.position.set(0, 3.2, -4.5);
             aboutHudGroup.add(backObj);
 
-            // 2. Creación de las 4 pantallas verticales rectangulares alrededor del usuario (en círculo 360°)
             const screenData = [
                 { title: "INNOVACIÓN VR", desc: "Tecnología de punta aplicada al entretenimiento inmersivo.", img: "https://images.unsplash.com/photo-1593508512255-86ab42a8e620?q=80&w=400&auto=format&fit=crop", angle: 0 },
                 { title: "MULTIVERSO MS3", desc: "Plataforma de streaming y experiencias visuales ilimitadas.", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop", angle: Math.PI / 2 },
@@ -579,7 +601,6 @@
             const radius = 4.2;
 
             screenData.forEach((data, index) => {
-                // Pantalla Vertical Rectangular (HTML/CSS)
                 const screenDiv = document.createElement('div');
                 screenDiv.className = "neon-box-cyan p-6 flex flex-col items-center justify-between text-center floating-card w-[320px] h-[480px] rounded-3xl";
                 screenDiv.innerHTML = `
@@ -587,9 +608,7 @@
                         <span class="text-xs font-extrabold text-cyan-300 tracking-widest uppercase">MS3 PROFILE 0${index + 1}</span>
                         <h2 class="text-2xl font-black text-white drop-shadow-[0_0_10px_#00f0ff]">${data.title}</h2>
                     </div>
-                    <div class="w-28 h-28 my-auto relative flex items-center justify-center" id="coin-slot-${index}">
-                        <!-- Contenedor WebGL 3D para la moneda de oro giratoria -->
-                    </div>
+                    <div class="w-28 h-28 my-auto relative flex items-center justify-center"></div>
                     <p class="text-gray-300 text-sm leading-relaxed mb-4">${data.desc}</p>
                 `;
 
@@ -602,31 +621,21 @@
                 screenObj.lookAt(0, -0.2, 0);
                 aboutHudGroup.add(screenObj);
 
-                // --- CREACIÓN DE LA MONEDA DE ORO 3D GIRATORIA CON TRANSFORMACIÓN A GAFAS VR ---
                 const coinGroup = new THREE.Group();
                 coinGroup.position.set(xPos, -0.2, zPos);
-                
-                // Orientar la moneda hacia el centro de la escena
                 coinGroup.rotation.y = data.angle;
 
-                // Material brillante de oro
                 const goldMaterial = new THREE.MeshStandardMaterial({
-                    color: 0xffd700,
-                    metalness: 0.9,
-                    roughness: 0.2,
-                    emissive: 0x332200,
-                    emissiveIntensity: 0.2,
-                    side: THREE.DoubleSide
+                    color: 0xffd700, metalness: 0.9, roughness: 0.2,
+                    emissive: 0x332200, emissiveIntensity: 0.2, side: THREE.DoubleSide
                 });
 
-                // Crear textura canvas para la cara de la moneda (Imagen ilustrativa vs Gafas VR)
                 const canvas = document.createElement('canvas');
                 canvas.width = 512;
                 canvas.height = 512;
                 const ctx = canvas.getContext('2d');
 
                 function drawCoinFace(isVR) {
-                    // Fondo dorado con borde ornamental
                     ctx.fillStyle = '#ffcc00';
                     ctx.fillRect(0, 0, 512, 512);
                     ctx.fillStyle = '#b38600';
@@ -635,7 +644,6 @@
                     ctx.beginPath(); ctx.arc(256, 256, 220, 0, Math.PI * 2); ctx.fill();
 
                     if (!isVR) {
-                        // Dibujar icono/texto ilustrativo (Corona o iniciales MS3)
                         ctx.fillStyle = '#805d00';
                         ctx.font = 'bold 90px Inter';
                         ctx.textAlign = 'center';
@@ -644,9 +652,8 @@
                         ctx.font = 'bold 35px Inter';
                         ctx.fillText('VR WORLD', 256, 310);
                     } else {
-                        // Dibujar Gafas de Realidad Virtual esquemáticas en la cara de la moneda
                         ctx.fillStyle = '#00f0ff';
-                        ctx.fillRect(136, 196, 240, 120); // Visor
+                        ctx.fillRect(136, 196, 240, 120);
                         ctx.fillStyle = '#000';
                         ctx.beginPath(); ctx.arc(206, 256, 40, 0, Math.PI * 2); ctx.fill();
                         ctx.beginPath(); ctx.arc(306, 256, 40, 0, Math.PI * 2); ctx.fill();
@@ -657,30 +664,23 @@
                     }
                 }
 
-                // Generar textura inicial de imagen
                 drawCoinFace(false);
                 const textureImage = new THREE.CanvasTexture(canvas);
-
-                // Textura para el reverso / caras de la moneda
                 const coinFaceMat = new THREE.MeshStandardMaterial({ map: textureImage, metalness: 0.7, roughness: 0.3 });
                 
-                // Geometría de cilindro plano para simular una moneda
                 const coinGeo = new THREE.CylinderGeometry(0.8, 0.8, 0.15, 48);
                 coinGeo.rotateX(Math.PI / 2);
                 
                 const coinMesh = new THREE.Mesh(coinGeo, [goldMaterial, coinFaceMat, coinFaceMat]);
                 coinGroup.add(coinMesh);
-                
                 aboutHudGroup.add(coinGroup);
 
-                // Guardar referencia para animación continua de giro y morphing de textura
                 spinningCoins.push({
                     group: coinGroup,
-                    mesh: coinMesh,
                     canvas: canvas,
                     ctx: ctx,
                     texture: textureImage,
-                    angleAccumulator: index * 1.5, // Desfasar el giro de cada moneda
+                    angleAccumulator: index * 1.5,
                     isCurrentlyVR: false
                 });
             });
@@ -793,20 +793,17 @@
                 logoGroup.rotation.y += 0.012; 
             }
 
-            // Animación de las monedas de oro en la sección NOSOTROS (giro 360 sobre su eje y cambio de textura dinámico)
             if (isInAboutSection && spinningCoins.length > 0) {
                 spinningCoins.forEach(coin => {
-                    coin.angleAccumulator += 0.03; // Velocidad de giro en 360 grados
+                    coin.angleAccumulator += 0.03;
                     coin.group.rotation.y += 0.03;
 
-                    // Detectar cuando la moneda está de perfil (90° o 270°) para alternar textura entre Imagen y Gafas VR
                     const normalizedAngle = Math.abs(Math.sin(coin.angleAccumulator));
-                    const shouldBeVR = normalizedAngle < 0.25; // Cerca del punto de perfil se realiza el cambio fluido
+                    const shouldBeVR = normalizedAngle < 0.25;
 
                     if (shouldBeVR !== coin.isCurrentlyVR) {
                         coin.isCurrentlyVR = shouldBeVR;
                         
-                        // Redibujar canvas con la variante correspondiente
                         coin.ctx.clearRect(0, 0, 512, 512);
                         coin.ctx.fillStyle = '#ffcc00';
                         coin.ctx.fillRect(0, 0, 512, 512);
@@ -824,7 +821,6 @@
                             coin.ctx.font = 'bold 35px Inter';
                             coin.ctx.fillText('VR WORLD', 256, 310);
                         } else {
-                            // Dibujar pequeñas gafas de realidad virtual
                             coin.ctx.fillStyle = '#00f0ff';
                             coin.ctx.fillRect(156, 216, 200, 90);
                             coin.ctx.fillStyle = '#000';
