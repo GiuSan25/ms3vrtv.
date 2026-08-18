@@ -10,28 +10,128 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+        
         * { -webkit-tap-highlight-color: transparent; }
-        body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; width: 100vw; height: 100dvh; user-select: none; -webkit-user-select: none; touch-action: none; }
-        #vr-view-container { display: flex; width: 100vw; height: 100dvh; position: absolute; top: 0; left: 0; z-index: 2; cursor: grab; }
+        
+        body, html { 
+            margin: 0; padding: 0; overflow: hidden; background-color: #000; 
+            font-family: 'Inter', sans-serif; width: 100vw; height: 100dvh; 
+            user-select: none; -webkit-user-select: none; touch-action: none;
+        }
+        
+        #vr-view-container {
+            display: flex; width: 100vw; height: 100dvh; position: absolute;
+            top: 0; left: 0; z-index: 2; cursor: grab;
+        }
+
         #vr-view-container:active { cursor: grabbing; }
-        .vr-eye { position: relative; width: 100%; height: 100%; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+
+        .vr-eye {
+            position: relative; width: 100%; height: 100%; overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+        }
+
         body.vr-mode .vr-eye { width: 50vw; }
         body.vr-mode #eye-right { display: flex !important; border-left: 2px solid rgba(0, 240, 255, 0.4); }
         #eye-right { display: none; }
-        .webgl-canvas-container, .css3d-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+
+        .webgl-canvas-container, .css3d-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+        }
+        
         .css3d-container { z-index: 10; }
-        #top-ui-container { position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; align-items: flex-end; pointer-events: auto; }
-        .gaze-reticle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(0, 240, 255, 0.6); z-index: 999; pointer-events: none; box-shadow: 0 0 10px rgba(0, 240, 255, 0.5); display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease; }
+
+        #top-ui-container {
+            position: fixed; top: 20px; right: 20px; z-index: 1000;
+            display: flex; flex-direction: column; align-items: flex-end; pointer-events: auto;
+        }
+
+        .gaze-reticle {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 32px; height: 32px; border-radius: 50%;
+            border: 2px solid rgba(0, 240, 255, 0.6); z-index: 999; pointer-events: none;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5); display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.3s ease;
+        }
+
         .gaze-reticle.disabled { opacity: 0 !important; }
+
         .gaze-dot { width: 6px; height: 6px; background: #00f0ff; border-radius: 50%; box-shadow: 0 0 8px #00f0ff; }
-        .control-btn { background: rgba(10, 6, 24, 0.85); border: 2px solid #00f0ff; color: #00f0ff; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); backdrop-filter: blur(8px); padding: 12px 24px; border-radius: 9999px; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; white-space: nowrap; pointer-events: auto; }
+
+        .gaze-progress {
+            position: absolute; top: -4px; left: -4px; width: 36px; height: 36px;
+            border-radius: 50%; border: 3px solid transparent; opacity: 0; transition: opacity 0.2s ease;
+        }
+
+        .gaze-reticle.active .gaze-progress {
+            opacity: 1; animation: gazeFill 3s linear forwards;
+        }
+
+        @keyframes gazeFill {
+            0% { transform: rotate(0deg); border-top-color: #00f0ff; }
+            50% { border-right-color: #f000ff; border-bottom-color: #f000ff; }
+            100% { transform: rotate(360deg); border-color: #f000ff; }
+        }
+
+        .control-btn {
+            background: rgba(10, 6, 24, 0.85); border: 2px solid #00f0ff; color: #00f0ff; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+            backdrop-filter: blur(8px); padding: 12px 24px; border-radius: 9999px; font-weight: 700; font-size: 0.95rem; cursor: pointer;
+            display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; white-space: nowrap; pointer-events: auto;
+        }
+
         .control-btn:hover { background: rgba(0, 240, 255, 0.2); box-shadow: 0 0 25px rgba(0, 240, 255, 0.8); transform: scale(1.05); }
-        #instruction { position: fixed; bottom: 35px; width: 100%; text-align: center; color: #fff; z-index: 100; font-size: 1.1rem; pointer-events: none; text-shadow: 0 0 10px #0ff, 0 0 20px #f0f; font-weight: 600; transition: opacity 0.5s ease; }
-        .neon-box-cyan { border: 3px solid #00f0ff; box-shadow: 0 0 35px rgba(0, 240, 255, 0.6), inset 0 0 30px rgba(0, 240, 255, 0.3); border-radius: 24px; background: rgba(10, 6, 24, 0.95); backdrop-filter: blur(16px); }
-        .neon-box-magenta { border: 3px solid #f000ff; box-shadow: 0 0 35px rgba(240, 0, 255, 0.6), inset 0 0 30px rgba(240, 0, 255, 0.3); border-radius: 24px; background: rgba(10, 6, 24, 0.95); backdrop-filter: blur(16px); }
-        .netflix-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
-        .netflix-card { height: 125px; border-radius: 10px; overflow: hidden; position: relative; border: 2px solid rgba(0, 240, 255, 0.4); cursor: pointer; background: #111; }
-        #video-modal, #about-modal, #preview-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.94); z-index: 2000; display: none; justify-content: center; align-items: center; flex-direction: column; padding: 20px; pointer-events: auto; }
+
+        #instruction { 
+            position: fixed; bottom: 35px; width: 100%; text-align: center; color: #fff; z-index: 100; 
+            font-size: 1.1rem; pointer-events: none; text-shadow: 0 0 10px #0ff, 0 0 20px #f0f; font-weight: 600; transition: opacity 0.5s ease;
+        }
+
+        .floating-card { pointer-events: auto; user-select: none; }
+        .interactive-btn { pointer-events: auto; transition: transform 0.2s ease, border-color 0.2s ease; cursor: pointer; }
+        .interactive-btn.gaze-hover, .floating-card.gaze-hover { transform: scale(1.04); border-color: #f000ff !important; }
+
+        .neon-box-cyan {
+            border: 3px solid #00f0ff; box-shadow: 0 0 35px rgba(0, 240, 255, 0.6), inset 0 0 30px rgba(0, 240, 255, 0.3);
+            border-radius: 24px; background: rgba(10, 6, 24, 0.95); backdrop-filter: blur(16px);
+        }
+
+        .neon-box-magenta {
+            border: 3px solid #f000ff; box-shadow: 0 0 35px rgba(240, 0, 255, 0.6), inset 0 0 30px rgba(240, 0, 255, 0.3);
+            border-radius: 24px; background: rgba(10, 6, 24, 0.95); backdrop-filter: blur(16px);
+        }
+
+        .netflix-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+            overflow: visible;
+        }
+
+        @media (max-width: 768px) {
+            .netflix-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px;
+            }
+        }
+
+        .netflix-card {
+            height: 125px; border-radius: 10px; overflow: hidden; position: relative;
+            border: 2px solid rgba(0, 240, 255, 0.4); transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer; background: #111;
+        }
+        .netflix-card:hover, .netflix-card.gaze-hover {
+            transform: scale(1.03); border-color: #f000ff; box-shadow: 0 0 15px rgba(240, 0, 255, 0.8); z-index: 10;
+        }
+        .netflix-card img { width: 100%; height: 100%; object-fit: cover; }
+        .netflix-card .card-info {
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 6px 8px;
+            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+        }
+
+        #video-modal, #about-modal, #preview-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.94); z-index: 2000;
+            display: none; justify-content: center; align-items: center; flex-direction: column; padding: 20px; pointer-events: auto;
+        }
         #video-modal video { width: 100%; max-width: 900px; border-radius: 12px; box-shadow: 0 0 30px #0ff; }
         .modal-close-btn { margin-top: 20px; padding: 10px 25px; background: #0ff; color: #000; font-weight: bold; border-radius: 8px; cursor: pointer; }
     </style>
@@ -39,117 +139,567 @@
 <body>
 
     <div id="top-ui-container">
-        <button id="menu-toggle-btn" class="interactive-btn control-btn" onclick="toggleTopMenu(event)"><span>MENÚ</span></button>
-        <div id="dropdown-menu" class="hidden mt-3 w-72 neon-box-cyan p-4 flex flex-col gap-3">
-            <button class="control-btn justify-start w-full text-sm" onclick="requestIOSPermissions()">GIROSCOPIO</button>
-            <button class="control-btn justify-start w-full text-sm" onclick="toggleVRMode()">VR MODE</button>
+        <button id="menu-toggle-btn" class="interactive-btn control-btn" onclick="toggleTopMenu(event)">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            <span>MENÚ</span>
+        </button>
+        <div id="dropdown-menu" class="hidden mt-3 w-72 neon-box-cyan p-4 flex flex-col gap-3 transition-all duration-300 transform scale-95 opacity-0">
+            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="requestIOSPermissions()"><span id="gyro-btn-text">GIROSCOPIO: OFF</span></button>
+            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="toggleVRMode()"><span id="vr-btn-text">VER EN VR</span></button>
+            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="toggleGazePointerState()"><span id="gaze-toggle-btn-text">PUNTERO VR: OFF</span></button>
+            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="openAboutModal()"><span>NOSOTROS</span></button>
         </div>
     </div>
 
-    <div id="instruction">Arrastra para mover el universo | Toca únicamente la esfera MS3 para entrar</div>
+    <div id="instruction">Arrastra con el dedo en cualquier parte para mover el universo | Toca la esfera MS3 para entrar</div>
 
     <div id="vr-view-container">
         <div class="vr-eye" id="eye-left">
+            <div class="gaze-reticle disabled" id="reticle-left"><div class="gaze-dot"></div><div class="gaze-progress"></div></div>
             <div class="webgl-canvas-container" id="canvas-container-left"></div>
             <div class="css3d-container" id="css3d-container-left"></div>
         </div>
+
         <div class="vr-eye" id="eye-right">
+            <div class="gaze-reticle disabled" id="reticle-right"><div class="gaze-dot"></div><div class="gaze-progress"></div></div>
             <div class="webgl-canvas-container" id="canvas-container-right"></div>
             <div class="css3d-container" id="css3d-container-right"></div>
         </div>
     </div>
 
-    <div id="preview-modal"><div class="neon-box-magenta p-8 max-w-lg w-full flex flex-col gap-5 relative"><h2 id="preview-title" class="text-3xl font-black text-white">Título</h2><button class="modal-close-btn" onclick="closePreviewModal()">VOLVER</button></div></div>
-    <div id="video-modal"><video id="active-video" controls autoplay playsinline></video><button class="modal-close-btn" onclick="closeVideo()">Cerrar</button></div>
-    <div id="about-modal"><div class="neon-box-cyan p-8 max-w-md text-center"><h2 class="text-3xl font-bold text-cyan-400">MS3</h2><button class="modal-close-btn" onclick="closeAboutModal()">CERRAR</button></div></div>
+    <div id="preview-modal">
+        <div class="neon-box-magenta p-8 max-w-lg w-full flex flex-col gap-5 relative">
+            <h2 id="preview-title" class="text-3xl font-black text-white drop-shadow-[0_0_15px_#f000ff]">Título del Programa</h2>
+            <p id="preview-desc" class="text-gray-300 text-base leading-relaxed">Descripción detallada del contenido inmersivo VR exclusivo del multiverso.</p>
+            <div class="flex gap-4 mt-2">
+                <button id="preview-play-btn" class="interactive-btn bg-cyan-400 text-black px-6 py-3 rounded-xl font-black text-lg shadow-[0_0_20px_#00f0ff]" onclick="playFromPreview()">REPRODUCIR</button>
+                <button class="interactive-btn bg-transparent border-2 border-white text-white px-6 py-3 rounded-xl font-bold text-lg" onclick="closePreviewModal()">VOLVER</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="video-modal">
+        <video id="active-video" controls autoplay playsinline></video>
+        <button class="modal-close-btn interactive-btn" onclick="closeVideo()">Cerrar Reproductor</button>
+    </div>
+
+    <div id="about-modal">
+        <div class="neon-box-cyan p-8 max-w-md text-center">
+            <h2 class="text-3xl font-bold text-cyan-400 mb-4">SOBRE NOSOTROS</h2>
+            <p class="text-gray-300 mb-6">Plataforma inmersiva 360° diseñada para experiencias interactivas y realidad virtual.</p>
+            <button class="modal-close-btn interactive-btn" onclick="closeAboutModal()">CERRAR</button>
+        </div>
+    </div>
 
     <script>
         let scene, cssScene, camera, cameraLeft, cameraRight, cameraRig;
         let rendererLeft, rendererRight, cssRendererLeft, cssRendererRight;
-        let planet, textGroup, planetGroup;
-        let isSystemActive = false, isGyroActive = false, isVRMode = false;
-        let isDragging = false, dragDistance = 0, previousMousePosition = { x: 0, y: 0 };
-        let targetRotationX = 0, targetRotationY = 0, currentRotationX = 0, currentRotationY = 0;
-        
-        // Variables para Raycaster
-        let raycaster = new THREE.Raycaster();
-        let mouse = new THREE.Vector2();
+        let planet, textGroup, planetGroup, universeSphere, starField;
+        let multiverseHudGroup = null;
+        let vrProgramsHudGroup = null;
+        let isTopMenuOpen = false;
+        let currentActiveView = 'home';
+        let selectedVideoData = null;
+
+        let isSystemActive = false, isGyroActive = false, isVRMode = false, isGazeEnabled = false;
+
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let targetRotationX = 0, targetRotationY = 0;
+        let currentRotationX = 0, currentRotationY = 0;
+        let dragDistance = 0;
+
+        let deviceQuaternion = new THREE.Quaternion();
+        const eyeSeparation = 0.064;
+
+        const containerLeft = document.getElementById('canvas-container-left');
+        const containerRight = document.getElementById('canvas-container-right');
+        const cssContainerLeft = document.getElementById('css3d-container-left');
+        const cssContainerRight = document.getElementById('css3d-container-right');
+        const instruction = document.getElementById('instruction');
 
         scene = new THREE.Scene();
         cssScene = new THREE.Scene();
+
         cameraRig = new THREE.Object3D();
         scene.add(cameraRig);
+
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        cameraLeft = new THREE.PerspectiveCamera(75, (window.innerWidth / 2) / window.innerHeight, 0.1, 1000);
+        cameraRight = new THREE.PerspectiveCamera(75, (window.innerWidth / 2) / window.innerHeight, 0.1, 1000);
+
+        cameraLeft.position.x = -eyeSeparation / 2;
+        cameraRight.position.x = eyeSeparation / 2;
+
         cameraRig.add(camera);
+        cameraRig.add(cameraLeft);
+        cameraRig.add(cameraRight);
         cameraRig.position.set(0, 0, 5);
 
         rendererLeft = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         rendererLeft.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('canvas-container-left').appendChild(rendererLeft.domElement);
+        containerLeft.appendChild(rendererLeft.domElement);
+
+        rendererRight = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        rendererRight.setSize(window.innerWidth, window.innerHeight);
+        containerRight.appendChild(rendererRight.domElement);
 
         cssRendererLeft = new THREE.CSS3DRenderer();
         cssRendererLeft.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('css3d-container-left').appendChild(cssRendererLeft.domElement);
+        cssContainerLeft.appendChild(cssRendererLeft.domElement);
 
-        // Planeta (Esfera)
+        cssRendererRight = new THREE.CSS3DRenderer();
+        cssRendererRight.setSize(window.innerWidth / 2, window.innerHeight);
+        cssContainerRight.appendChild(cssRendererRight.domElement);
+
+        scene.add(new THREE.AmbientLight(0x3a1050, 1.5));
+        const pLightCyan = new THREE.PointLight(0x00f0ff, 4, 80); pLightCyan.position.set(-8, 8, 8); scene.add(pLightCyan);
+        const pLightPink = new THREE.PointLight(0xf000ff, 4, 80); pLightPink.position.set(8, -8, 8); scene.add(pLightPink);
+
+        const universeGeo = new THREE.SphereGeometry(70, 32, 32);
+        universeSphere = new THREE.Mesh(universeGeo, new THREE.MeshBasicMaterial({ color: 0x070216, side: THREE.BackSide }));
+        scene.add(universeSphere);
+
+        const starsGeometry = new THREE.BufferGeometry();
+        const starCount = 3000;
+        const starPositions = new Float32Array(starCount * 3);
+        const starColors = new Float32Array(starCount * 3);
+        const palette = [new THREE.Color(0x00f0ff), new THREE.Color(0xf000ff), new THREE.Color(0x9d4edd), new THREE.Color(0xffffff)];
+
+        for (let i = 0; i < starCount; i++) {
+            const radius = 15 + Math.random() * 45;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos((Math.random() * 2) - 1);
+            starPositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+            starPositions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+            starPositions[i * 3 + 2] = radius * Math.cos(phi);
+            const color = palette[Math.floor(Math.random() * palette.length)];
+            starColors[i * 3] = color.r; starColors[i * 3 + 1] = color.g; starColors[i * 3 + 2] = color.b;
+        }
+
+        starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+        starsGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+        starField = new THREE.Points(starsGeometry, new THREE.PointsMaterial({ size: 0.25, vertexColors: true, transparent: true, opacity: 0.9 }));
+        scene.add(starField);
+
         planetGroup = new THREE.Group();
-        planet = new THREE.Mesh(new THREE.IcosahedronGeometry(1.4, 4), new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true }));
+        planet = new THREE.Mesh(new THREE.IcosahedronGeometry(1.4, 4), new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.9 }));
         planet.position.y = -1.5;
         planetGroup.add(planet);
         scene.add(planetGroup);
 
-        // Lógica de Interacción con Raycaster
-        function handleCanvasInteraction(clientX, clientY) {
-            if (isSystemActive) return;
-            mouse.x = (clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(clientY / window.innerHeight) * 2 + 1;
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObject(planet);
-            if (intersects.length > 0) {
-                triggerSystemEntry();
+        // Logo MS3 principal con giro propio en 360 (más lento, sin reflejo)
+        textGroup = new THREE.Group(); 
+        textGroup.position.y = 0.8;
+
+        const loader = new THREE.FontLoader();
+        loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
+            const textGeo = new THREE.TextGeometry('MS3', { font: font, size: 1.2, height: 0.4, curveSegments: 12, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.05 });
+            textGeo.computeBoundingBox();
+            const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
+            
+            const textMesh = new THREE.Mesh(textGeo, new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0.9, roughness: 0.05, clearcoat: 1.0 }));
+            textMesh.position.x = centerOffset; 
+            textGroup.add(textMesh);
+        });
+        scene.add(textGroup);
+
+        function toggleTopMenu(e) {
+            if (e) e.stopPropagation();
+            const dropdown = document.getElementById('dropdown-menu');
+            isTopMenuOpen = !isTopMenuOpen;
+
+            if (isTopMenuOpen) {
+                dropdown.classList.remove('hidden');
+                setTimeout(() => {
+                    dropdown.classList.remove('scale-95', 'opacity-0');
+                    dropdown.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            } else {
+                dropdown.classList.remove('scale-100', 'opacity-100');
+                dropdown.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => dropdown.classList.add('hidden'), 300);
             }
         }
 
+        function toggleGazePointerState() {
+            isGazeEnabled = !isGazeEnabled;
+            const text = isGazeEnabled ? 'PUNTERO VR: ON' : 'PUNTERO VR: OFF';
+            document.getElementById('gaze-toggle-btn-text').innerText = text;
+
+            const reticles = document.querySelectorAll('.gaze-reticle');
+            reticles.forEach(r => {
+                if (isGazeEnabled) r.classList.remove('disabled');
+                else r.classList.add('disabled');
+            });
+        }
+
+        function createMultiverseHUD() {
+            destroyVRProgramsHUD();
+            destroyMultiverseHUD();
+            currentActiveView = 'multiverse';
+            
+            const mainContainer = document.createElement('div');
+            mainContainer.className = "w-[1200px] flex flex-col gap-6 floating-card";
+            mainContainer.innerHTML = `
+                <div class="flex justify-between items-center w-full">
+                    <button class="interactive-btn self-start bg-black/95 border-4 border-fuchsia-500 text-fuchsia-300 px-8 py-3 rounded-full font-black text-xl flex items-center gap-3 shadow-[0_0_30px_rgba(240,0,255,0.7)] tracking-widest" onclick="exitMultiverse(event)">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        <span>VOLVER AL INICIO</span>
+                    </button>
+                </div>
+
+                <div class="w-full neon-box-cyan p-8 flex flex-col justify-between h-[360px] rounded-3xl" style="background-image: linear-gradient(to right, rgba(10,6,24,0.95), rgba(10,6,24,0.6)), url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=1400&auto=format&fit=crop'); background-size: cover;">
+                    <div>
+                        <span class="text-sm font-extrabold tracking-widest text-cyan-300 uppercase">MS3 Multiverse Live</span>
+                        <h1 class="text-5xl font-black text-white mt-2 drop-shadow-[0_0_20px_#00f0ff]">EL CONCIERTO DEL SIGLO</h1>
+                        <p class="text-gray-200 text-base mt-2 max-w-xl leading-relaxed">Experiencia inmersiva 360° en vivo transmitida directamente desde el núcleo del Multiverso MS3.</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="interactive-btn bg-white text-black px-8 py-3 rounded-2xl font-black text-lg shadow-[0_0_25px_#fff]">REPRODUCIR AHORA</button>
+                    </div>
+                </div>
+
+                <div class="w-full grid grid-cols-3 gap-6">
+                    <button onclick="openVRProgramsMultiverse(event)" class="interactive-btn pill-btn neon-box-cyan py-5 text-cyan-300 font-black text-lg text-center">PROGRAMAS VR</button>
+                    <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="interactive-btn pill-btn neon-box-magenta py-5 text-fuchsia-300 font-black text-lg text-center">PROGRAMAS 2D</button>
+                    <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')" class="interactive-btn pill-btn neon-box-cyan py-5 text-cyan-300 font-black text-lg text-center">CANAL EN VIVO</button>
+                </div>
+            `;
+
+            multiverseHudGroup = new THREE.Group();
+            const cssObject = new THREE.CSS3DObject(mainContainer);
+            cssObject.scale.set(0.0055, 0.0055, 0.0055);
+            multiverseHudGroup.add(cssObject);
+            
+            const isMobile = window.innerWidth <= 768;
+            multiverseHudGroup.position.set(0, 0, isMobile ? -5.0 : -4.5);
+            cssScene.add(multiverseHudGroup);
+        }
+
+        function openVRProgramsMultiverse(e) {
+            if (e) e.stopPropagation();
+            destroyMultiverseHUD();
+            currentActiveView = 'vr-programs';
+
+            gsap.to(cameraRig.rotation, { y: cameraRig.rotation.y + Math.PI * 2, duration: 1.0, ease: "power2.inOut" });
+
+            const vrContainer = document.createElement('div');
+            vrContainer.className = "w-[1200px] flex flex-col gap-4 floating-card";
+            vrContainer.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <button class="interactive-btn bg-black/95 border-4 border-fuchsia-500 text-fuchsia-300 px-6 py-2.5 rounded-full font-black text-lg flex items-center gap-3 shadow-[0_0_25px_rgba(240,0,255,0.7)]" onclick="createMultiverseHUD()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        <span>VOLVER</span>
+                    </button>
+                    <h1 class="text-2xl font-black text-white drop-shadow-[0_0_20px_#00f0ff] uppercase tracking-wider">PROGRAMAS VR</h1>
+                </div>
+
+                <div class="w-full neon-box-cyan p-5 flex flex-col gap-3">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-cyan-300">CATÁLOGO DE PANTALLAS</h3>
+                        <span class="text-xs text-fuchsia-400 font-bold uppercase tracking-widest">Todas visibles en primer plano</span>
+                    </div>
+                    
+                    <div class="netflix-grid">
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Cyberpunk City 2099', 'Recorre las calles iluminadas por neón de una metrópolis futurista.', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')">
+                            <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=500&auto=format&fit=crop" alt="Cyberpunk">
+                            <div class="card-info"><h4 class="text-white text-xs font-bold">Cyberpunk 2099</h4><p class="text-fuchsia-300 text-[10px]">Interactivo</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Viaje a Marte 360', 'Explora las dunas rojas y bases espaciales de la próxima frontera.', 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">
+                            <img src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=500&auto=format&fit=crop" alt="Marte">
+                            <div class="card-info"><h4 class="text-white text-xs font-bold">Viaje a Marte</h4><p class="text-cyan-300 text-[10px]">VR 360°</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Estación Espacial ISS', 'Vive un día completo flotando en órbita terrestre.', 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')">
+                            <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=500&auto=format&fit=crop" alt="ISS">
+                            <div class="card-info"><h4 class="text-white text-xs font-bold">Estación ISS</h4><p class="text-cyan-300 text-[10px]">Inmersivo</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Bosque Bioluminiscente', 'Un santuario natural alienígena interactivo.', 'https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')">
+                            <img src="https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?q=80&w=500&auto=format&fit=crop" alt="Bosque">
+                            <div class="card-info"><h4 class="text-white text-xs font-bold">Bosque Místico</h4><p class="text-fuchsia-300 text-[10px]">Relax VR</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Océano Abisal 360', 'Sumergirme en las profundidades marinas.', 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')">
+                            <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=500&auto=format&fit=crop" alt="Océano">
+                            <div class="card-info"><h4 class="text-white text-xs font-bold">Océano Abisal</h4><p class="text-cyan-300 text-[10px]">Documental</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Neo Tokio Drifting', 'Acelera por autopistas elevadas de Tokio.', 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">
+                            <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=500&auto=format&fit=crop" alt="Tokio">
+                            <div class="card-info"><h4 class="text-white text-xs font-bold">Neo Tokio</h4><p class="text-fuchsia-300 text-[10px]">Acción VR</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Cumbres Nevadas Extreme', 'Desciende montañas peligrosas en esquí.', 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')">
+                            <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=80&w=500&auto=format&fit=crop" alt="Nieve">
+                            <div class="card-info"><h4 class="text-white text-xs font-bold">Cumbres Nevadas</h4><p class="text-cyan-300 text-[10px]">Extremo</p></div>
+                        </div>
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Galaxia Lejana', 'Viaje astronómico por nebulosas.', 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')">
+                            <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=500&auto=format&fit=crop" alt="Galaxia">
+                            <div class="card-info"><h4 class="text-white text-xs font-bold">Galaxia Lejana</h4><p class="text-fuchsia-300 text-[10px]">Cosmos</p></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            vrProgramsHudGroup = new THREE.Group();
+            const cssObject = new THREE.CSS3DObject(vrContainer);
+            cssObject.scale.set(0.0055, 0.0055, 0.0055);
+            vrProgramsHudGroup.add(cssObject);
+            
+            const isMobile = window.innerWidth <= 768;
+            vrProgramsHudGroup.position.set(0, 0, isMobile ? -5.0 : -4.5);
+            cssScene.add(vrProgramsHudGroup);
+            gsap.fromTo(vrProgramsHudGroup.scale, { x: 0.01, y: 0.01, z: 0.01 }, { x: 1, y: 1, z: 1, duration: 0.8, ease: "back.out(1.4)" });
+        }
+
+        function openPreview(title, desc, imgUrl, videoUrl) {
+            selectedVideoData = videoUrl;
+            document.getElementById('preview-title').innerText = title;
+            document.getElementById('preview-desc').innerText = desc;
+            document.getElementById('preview-modal').style.display = 'flex';
+        }
+
+        function closePreviewModal() {
+            document.getElementById('preview-modal').style.display = 'none';
+        }
+
+        function playFromPreview() {
+            closePreviewModal();
+            if (selectedVideoData) {
+                openVideo(selectedVideoData);
+            }
+        }
+
+        function destroyMultiverseHUD() {
+            if (multiverseHudGroup) { 
+                cssScene.remove(multiverseHudGroup); 
+                multiverseHudGroup.traverse((child) => {
+                    if (child.element) child.element.remove();
+                });
+                multiverseHudGroup = null; 
+            }
+        }
+
+        function destroyVRProgramsHUD() {
+            if (vrProgramsHudGroup) { 
+                cssScene.remove(vrProgramsHudGroup); 
+                vrProgramsHudGroup.traverse((child) => {
+                    if (child.element) child.element.remove();
+                });
+                vrProgramsHudGroup = null; 
+            }
+        }
+
+        function openVideo(url) {
+            const modal = document.getElementById('video-modal');
+            const video = document.getElementById('active-video');
+            video.src = url;
+            modal.style.display = 'flex';
+            video.play();
+        }
+
+        function closeVideo() {
+            const modal = document.getElementById('video-modal');
+            const video = document.getElementById('active-video');
+            video.pause();
+            video.src = '';
+            modal.style.display = 'none';
+        }
+
+        function openAboutModal() {
+            document.getElementById('about-modal').style.display = 'flex';
+        }
+
+        function closeAboutModal() {
+            document.getElementById('about-modal').style.display = 'none';
+        }
+
+        function exitMultiverse(e) {
+            if (e) e.stopPropagation();
+            destroyMultiverseHUD();
+            destroyVRProgramsHUD();
+            currentActiveView = 'home';
+            gsap.to(cameraRig.rotation, { y: 0, duration: 1.0, ease: "power2.inOut" });
+        }
+
+        function toggleVRMode() {
+            isVRMode = !isVRMode;
+            document.body.classList.toggle('vr-mode', isVRMode);
+            document.getElementById('vr-btn-text').innerText = isVRMode ? 'SALIR DE VR' : 'VER EN VR';
+            
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            if (isVRMode) {
+                rendererLeft.setSize(w / 2, h);
+                rendererRight.setSize(w / 2, h);
+                cssRendererLeft.setSize(w / 2, h);
+                cssRendererRight.setSize(w / 2, h);
+                cameraLeft.aspect = (w / 2) / h;
+                cameraRight.aspect = (w / 2) / h;
+                cameraLeft.updateProjectionMatrix();
+                cameraRight.updateProjectionMatrix();
+            } else {
+                rendererLeft.setSize(w, h);
+                rendererRight.setSize(w, h);
+                cssRendererLeft.setSize(w, h);
+                cssRendererRight.setSize(w, h);
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+            }
+        }
+
+        function requestIOSPermissions() {
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission().then(response => {
+                    if (response === 'granted') {
+                        enableGyro();
+                    }
+                }).catch(console.error);
+            } else {
+                enableGyro();
+            }
+        }
+
+        function enableGyro() {
+            isGyroActive = true;
+            document.getElementById('gyro-btn-text').innerText = 'GIROSCOPIO: ON';
+            window.addEventListener('deviceorientation', handleOrientation, true);
+        }
+
+        function handleOrientation(e) {
+            if (!isGyroActive) return;
+            let alpha = e.alpha ? THREE.MathUtils.degToRad(e.alpha) : 0;
+            let beta = e.beta ? THREE.MathUtils.degToRad(e.beta) : 0;
+            let gamma = e.gamma ? THREE.MathUtils.degToRad(e.gamma) : 0;
+            
+            let zee = new THREE.Vector3(0, 0, 1);
+            let quaternion = new THREE.Quaternion();
+            
+            quaternion.setFromAxisAngle(zee, -alpha);
+            let m = new THREE.Matrix4().makeRotationFromQuaternion(quaternion);
+            
+            let x = new THREE.Vector3(1, 0, 0);
+            x.applyMatrix4(m);
+            
+            quaternion.setFromAxisAngle(x, -beta);
+            let y = new THREE.Vector3(0, 1, 0);
+            y.applyMatrix4(m);
+            
+            quaternion.setFromAxisAngle(y, -gamma);
+            cameraRig.quaternion.multiplyQuaternions(quaternion, m);
+        }
+
         window.addEventListener('mousedown', (e) => {
+            if (e.target.closest('#top-ui-container') || e.target.closest('#preview-modal') || e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
             isDragging = true;
             previousMousePosition = { x: e.clientX, y: e.clientY };
             dragDistance = 0;
         });
 
         window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
+            if (!isDragging || isGyroActive) return;
             let deltaX = e.clientX - previousMousePosition.x;
             let deltaY = e.clientY - previousMousePosition.y;
             dragDistance += Math.abs(deltaX) + Math.abs(deltaY);
+
             targetRotationY -= deltaX * 0.005;
             targetRotationX -= deltaY * 0.005;
+            targetRotationX = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, targetRotationX));
+
             previousMousePosition = { x: e.clientX, y: e.clientY };
         });
 
-        window.addEventListener('mouseup', (e) => {
+        window.addEventListener('mouseup', () => {
+            if (!isDragging) return;
             isDragging = false;
-            if (dragDistance < 10) handleCanvasInteraction(e.clientX, e.clientY);
+            if (dragDistance < 10 && currentActiveView === 'home' && !isSystemActive) {
+                triggerSystemEntry();
+            }
+        });
+
+        window.addEventListener('touchstart', (e) => {
+            if (e.target.closest('#top-ui-container') || e.target.closest('#preview-modal') || e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
+            if (e.touches.length === 1) {
+                isDragging = true;
+                previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                dragDistance = 0;
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging || isGyroActive || e.touches.length !== 1) return;
+            let deltaX = e.touches[0].clientX - previousMousePosition.x;
+            let deltaY = e.touches[0].clientY - previousMousePosition.y;
+            dragDistance += Math.abs(deltaX) + Math.abs(deltaY);
+
+            targetRotationY -= deltaX * 0.005;
+            targetRotationX -= deltaY * 0.005;
+            targetRotationX = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, targetRotationX));
+
+            previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }, { passive: true });
+
+        window.addEventListener('touchend', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            if (dragDistance < 10 && currentActiveView === 'home' && !isSystemActive) {
+                triggerSystemEntry();
+            }
         });
 
         function triggerSystemEntry() {
+            if (isSystemActive) return;
             isSystemActive = true;
-            document.getElementById('instruction').style.opacity = '0';
-            gsap.to(planet.scale, { x: 30, y: 30, z: 30, duration: 1.5 });
-            gsap.to(cameraRig.position, { z: 1, duration: 1.5, onComplete: () => { planet.visible = false; }});
+            instruction.style.opacity = '0';
+
+            gsap.to(planet.scale, { x: 30, y: 30, z: 30, duration: 1.5, ease: "power2.in" });
+            gsap.to(textGroup.scale, { x: 0.1, y: 0.1, z: 0.1, duration: 0.8, onComplete: () => scene.remove(textGroup) });
+            gsap.to(cameraRig.position, { z: 1, duration: 1.5, ease: "power2.inOut", onComplete: () => {
+                createMultiverseHUD();
+                planet.scale.set(1, 1, 1);
+                planet.visible = false;
+            }});
         }
 
         function animate() {
             requestAnimationFrame(animate);
+
             currentRotationX += (targetRotationX - currentRotationX) * 0.1;
             currentRotationY += (targetRotationY - currentRotationY) * 0.1;
-            cameraRig.rotation.y = currentRotationY;
-            cameraRig.rotation.x = currentRotationX;
-            planetGroup.rotation.y += 0.005;
-            rendererLeft.render(scene, camera);
-            cssRendererLeft.render(cssScene, camera);
+
+            if (!isGyroActive) {
+                cameraRig.rotation.y = currentRotationY;
+                cameraRig.rotation.x = currentRotationX;
+            }
+
+            if (planetGroup) planetGroup.rotation.y += 0.005;
+            if (starField) starField.rotation.y -= 0.0005;
+
+            // Giro continuo sobre su propio eje en 360 grados (velocidad reducida)
+            if (textGroup && currentActiveView === 'home') {
+                textGroup.rotation.y += 0.005;
+            }
+
+            if (isVRMode) {
+                rendererLeft.render(scene, cameraLeft);
+                cssRendererLeft.render(cssScene, cameraLeft);
+                rendererRight.render(scene, cameraRight);
+                cssRendererRight.render(cssScene, cameraRight);
+            } else {
+                rendererLeft.render(scene, camera);
+                cssRendererLeft.render(cssScene, camera);
+            }
         }
+
+        window.addEventListener('resize', () => {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            rendererLeft.setSize(w, h);
+            rendererRight.setSize(w, h);
+            cssRendererLeft.setSize(w, h);
+            cssRendererRight.setSize(w / 2, h);
+        });
+
         animate();
     </script>
 </body>
 </html>
-```[cite: 1]
