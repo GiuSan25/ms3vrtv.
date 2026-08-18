@@ -254,7 +254,6 @@
         starField = new THREE.Points(starsGeometry, new THREE.PointsMaterial({ size: 0.25, vertexColors: true, transparent: true, opacity: 0.9 }));
         scene.add(starField);
 
-        // --- DEFINICIÓN AVANZADA DE LOS LOGOS DE BIENVENIDA (MS3 Y GAFAS VR) ---
         logoGroup = new THREE.Group();
         logoGroup.position.y = 0.2;
         scene.add(logoGroup);
@@ -264,27 +263,23 @@
         vrGogglesGroup.scale.set(0.01, 0.01, 0.01);
         scene.add(vrGogglesGroup);
 
-        // Materiales de alta calidad visual (Cristal Neón Cian y Magenta con Reflexión Física)
-        const glassMaterial = new THREE.MeshPhysicalMaterial({
-            color: 0x00f0ff, metalness: 0.1, roughness: 0.05,
-            transmission: 0.85, thickness: 1.2, transparent: true, opacity: 0.95,
-            reflectivity: 0.9, clearcoat: 1.0, clearcoatRoughness: 0.1,
-            emissive: 0x003344, emissiveIntensity: 0.4, side: THREE.DoubleSide
+        // --- MATERIAL SÓLIDO Y METÁLICO PARA EL LOGO MS3 (Cero transparencia) ---
+        const solidNeonCyanMat = new THREE.MeshStandardMaterial({
+            color: 0x00f0ff,
+            metalness: 0.8,
+            roughness: 0.2,
+            emissive: 0x006688,
+            emissiveIntensity: 0.6
         });
 
-        const magentaGlassMat = new THREE.MeshPhysicalMaterial({
-            color: 0xf000ff, metalness: 0.1, roughness: 0.05,
-            transmission: 0.85, thickness: 1.2, transparent: true, opacity: 0.95,
-            reflectivity: 0.9, clearcoat: 1.0, clearcoatRoughness: 0.1,
-            emissive: 0x440044, emissiveIntensity: 0.5, side: THREE.DoubleSide
+        const solidMagentaMat = new THREE.MeshStandardMaterial({
+            color: 0xf000ff,
+            metalness: 0.8,
+            roughness: 0.2,
+            emissive: 0x880088,
+            emissiveIntensity: 0.6
         });
 
-        const darkMetallicMat = new THREE.MeshStandardMaterial({
-            color: 0x0f0b1f, metalness: 0.9, roughness: 0.2,
-            emissive: 0x001122, emissiveIntensity: 0.3
-        });
-
-        // 1. Carga tipográfica y construcción refinada del logo MS3
         const loader = new THREE.FontLoader();
         loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
             const textConfig = { 
@@ -295,44 +290,72 @@
             textGeo.computeBoundingBox();
             const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
             
-            const textMesh = new THREE.Mesh(textGeo, glassMaterial);
+            const textMesh = new THREE.Mesh(textGeo, solidNeonCyanMat);
             textMesh.position.x = centerOffset; 
             logoGroup.add(textMesh);
 
-            // Añadir un anillo orbital decorativo alrededor del logo MS3 para mayor presencia inmersiva
-            const ringGeo = new THREE.TorusGeometry(2.2, 0.04, 16, 100);
-            const ringMesh = new THREE.Mesh(ringGeo, magentaGlassMat);
+            const ringGeo = new THREE.TorusGeometry(2.2, 0.05, 16, 100);
+            const ringMesh = new THREE.Mesh(ringGeo, solidMagentaMat);
             ringMesh.rotation.x = Math.PI / 3;
             logoGroup.add(ringMesh);
         });
 
-        // 2. Construcción ultra detallada del modelo 3D de las Gafas de Realidad Virtual
-        // Cuerpo principal del visor aerodinámico curvado
-        const visorGeo = new THREE.BoxGeometry(3.4, 1.5, 0.9);
-        const visorMesh = new THREE.Mesh(visorGeo, darkMetallicMat);
-        vrGogglesGroup.add(visorMesh);
+        // --- MODELO 3D DE GAFAS DE REALIDAD VIRTUAL DE ALTA GAMA Y DETALLE ---
+        const headsetBodyMat = new THREE.MeshStandardMaterial({ color: 0x111625, metalness: 0.95, roughness: 0.15 });
+        const accentCyanMat = new THREE.MeshStandardMaterial({ color: 0x00f0ff, metalness: 0.8, roughness: 0.2, emissive: 0x005577, emissiveIntensity: 0.5 });
+        const lensGlassMat = new THREE.MeshPhysicalMaterial({ color: 0xff00ff, metalness: 0.1, roughness: 0.1, transmission: 0.9, thickness: 1.5, transparent: true, opacity: 0.95 });
+        const facePadMat = new THREE.MeshStandardMaterial({ color: 0x0a0c14, roughness: 0.9 });
 
-        // Placa frontal de cristal cian con bisel luminoso
-        const frontPlateGeo = new THREE.BoxGeometry(3.2, 1.3, 0.15);
-        const frontPlate = new THREE.Mesh(frontPlateGeo, glassMaterial);
-        frontPlate.position.z = 0.45;
-        vrGogglesGroup.add(frontPlate);
+        // Visor principal curvado y ergonómico
+        const visorMainGeo = new THREE.BoxGeometry(3.6, 1.6, 1.1);
+        const visorMain = new THREE.Mesh(visorMainGeo, headsetBodyMat);
+        vrGogglesGroup.add(visorMain);
 
-        // Lentes ópticas cilíndricas independientes de alta precisión en color magenta brillante
-        const lensGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.2, 32);
-        lensGeo.rotateX(Math.PI / 2);
+        // Panel frontal estético con bisel cian iluminado
+        const frontPanelGeo = new THREE.BoxGeometry(3.3, 1.3, 0.2);
+        const frontPanel = new THREE.Mesh(frontPanelGeo, accentCyanMat);
+        frontPanel.position.z = 0.52;
+        vrGogglesGroup.add(frontPanel);
+
+        // Cámaras de seguimiento frontales estilo visor VR pro (pequeños cilindros metálicos)
+        const camGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.1, 16);
+        camGeo.rotateX(Math.PI / 2);
+        const leftCam = new THREE.Mesh(camGeo, headsetBodyMat);
+        leftCam.position.set(-1.2, 0.5, 0.63);
+        const rightCam = new THREE.Mesh(camGeo, headsetBodyMat);
+        rightCam.position.set(1.2, 0.5, 0.63);
+        vrGogglesGroup.add(leftCam);
+        vrGogglesGroup.add(rightCam);
+
+        // Lentes ópticas de alta precisión
+        const lensHolderGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.15, 32);
+        lensHolderGeo.rotateX(Math.PI / 2);
         
-        const leftLens = new THREE.Mesh(lensGeo, magentaGlassMat);
-        leftLens.position.set(-0.85, 0, 0.5);
-        vrGogglesGroup.add(leftLens);
+        const leftLensHolder = new THREE.Mesh(lensHolderGeo, accentCyanMat);
+        leftLensHolder.position.set(-0.9, 0, 0.55);
+        const rightLensHolder = new THREE.Mesh(lensHolderGeo, accentCyanMat);
+        rightLensHolder.position.set(0.9, 0, 0.55);
+        vrGogglesGroup.add(leftLensHolder);
+        vrGogglesGroup.add(rightLensHolder);
 
-        const rightLens = new THREE.Mesh(lensGeo, magentaGlassMat);
-        rightLens.position.set(0.85, 0, 0.5);
+        const lensGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.2, 32);
+        lensGeo.rotateX(Math.PI / 2);
+        const leftLens = new THREE.Mesh(lensGeo, lensGlassMat);
+        leftLens.position.set(-0.9, 0, 0.58);
+        const rightLens = new THREE.Mesh(lensGeo, lensGlassMat);
+        rightLens.position.set(0.9, 0, 0.58);
+        vrGogglesGroup.add(leftLens);
         vrGogglesGroup.add(rightLens);
 
-        // Cinta de sujeción perimetral con rejilla digital futurista
-        const strapGeo = new THREE.CylinderGeometry(1.9, 1.9, 0.25, 32, 1, true);
-        const strapMesh = new THREE.Mesh(strapGeo, new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.7 }));
+        // Almohadilla facial ergonómica trasera
+        const facePadGeo = new THREE.BoxGeometry(3.4, 1.4, 0.3);
+        const facePad = new THREE.Mesh(facePadGeo, facePadMat);
+        facePad.position.z = -0.55;
+        vrGogglesGroup.add(facePad);
+
+        // Correas de sujeción laterales ajustables
+        const strapGeo = new THREE.CylinderGeometry(1.9, 1.9, 0.3, 32, 1, true);
+        const strapMesh = new THREE.Mesh(strapGeo, new THREE.MeshStandardMaterial({ color: 0x1a2238, roughness: 0.5, side: THREE.DoubleSide }));
         vrGogglesGroup.add(strapMesh);
 
         function toggleTopMenu(e) {
@@ -427,7 +450,6 @@
             isSystemActive = true;
             instruction.style.opacity = '0';
 
-            // Animación de contracción del logotipo MS3 y despliegue fluido de las Gafas VR
             gsap.to(logoGroup.scale, { x: 0.01, y: 0.01, z: 0.01, duration: 0.4, ease: "power2.in", onComplete: () => {
                 logoGroup.visible = false;
                 vrGogglesGroup.position.copy(logoGroup.position);
@@ -559,7 +581,6 @@
             cssScene.add(vrProgramsHudGroup);
         }
 
-        // --- SECCIÓN "NOSOTROS" CON 4 PANTALLAS VERTICALES Y MONEDAS 3D DE ORO GIRATORIAS ---
         function openAboutSection(e) {
             if (e) e.stopPropagation();
             if (isTopMenuOpen) toggleTopMenu();
