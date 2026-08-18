@@ -57,19 +57,6 @@
         .gaze-reticle.disabled { opacity: 0 !important; }
         .gaze-dot { width: 6px; height: 6px; background: #00f0ff; border-radius: 50%; box-shadow: 0 0 8px #00f0ff; }
 
-        .gaze-progress {
-            position: absolute; top: -4px; left: -4px; width: 36px; height: 36px;
-            border-radius: 50%; border: 3px solid transparent; opacity: 0; transition: opacity 0.2s ease;
-        }
-
-        .gaze-reticle.active .gaze-progress { opacity: 1; animation: gazeFill 3s linear forwards; }
-
-        @keyframes gazeFill {
-            0% { transform: rotate(0deg); border-top-color: #00f0ff; }
-            50% { border-right-color: #f000ff; border-bottom-color: #f000ff; }
-            100% { transform: rotate(360deg); border-color: #f000ff; }
-        }
-
         .control-btn {
             background: rgba(10, 6, 24, 0.85); border: 2px solid #00f0ff; color: #00f0ff; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
             backdrop-filter: blur(8px); padding: 12px 24px; border-radius: 9999px; font-weight: 700; font-size: 0.95rem; cursor: pointer;
@@ -81,6 +68,12 @@
         #instruction { 
             position: fixed; bottom: 35px; width: 100%; text-align: center; color: #fff; z-index: 100; 
             font-size: 1.1rem; pointer-events: none; text-shadow: 0 0 10px #0ff, 0 0 20px #f0f; font-weight: 600; transition: opacity 0.5s ease;
+        }
+
+        /* Efecto de destello de pantalla para la entrada al multiverso */
+        #flash-overlay {
+            position: fixed; inset: 0; background: #00f0ff; opacity: 0; pointer-events: none; z-index: 3000;
+            transition: opacity 0.3s ease; mix-blend-mode: screen;
         }
 
         .floating-card { pointer-events: auto; user-select: none; }
@@ -126,6 +119,8 @@
 </head>
 <body>
 
+    <div id="flash-overlay"></div>
+
     <div id="top-ui-container">
         <button id="menu-toggle-btn" class="interactive-btn control-btn" onclick="toggleTopMenu(event)">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
@@ -139,7 +134,7 @@
         </div>
     </div>
 
-    <div id="instruction">Arrastra con el dedo en cualquier parte para mover el universo | Toca el logo MS3 para entrar</div>
+    <div id="instruction">Arrastra con el dedo en cualquier parte para mover el universo | Toca el logo MS3 para ingresar</div>
 
     <div id="vr-view-container">
         <div class="vr-eye" id="eye-left">
@@ -203,6 +198,7 @@
         const cssContainerLeft = document.getElementById('css3d-container-left');
         const cssContainerRight = document.getElementById('css3d-container-right');
         const instruction = document.getElementById('instruction');
+        const flashOverlay = document.getElementById('flash-overlay');
 
         scene = new THREE.Scene();
         cssScene = new THREE.Scene();
@@ -238,7 +234,6 @@
         cssRendererRight.setSize(window.innerWidth / 2, window.innerHeight);
         cssContainerRight.appendChild(cssRendererRight.domElement);
 
-        // Sistema de Luces Dinámicas para el efecto Vidriado y Reflejos
         scene.add(new THREE.AmbientLight(0x221133, 2.0));
         
         const pLightCyan = new THREE.PointLight(0x00f0ff, 6, 100); 
@@ -279,7 +274,6 @@
         starField = new THREE.Points(starsGeometry, new THREE.PointsMaterial({ size: 0.25, vertexColors: true, transparent: true, opacity: 0.9 }));
         scene.add(starField);
 
-        // Grupo principal del Logo MS3 con efecto Vidriado (Glassmorphism / Physical Material 3D)
         logoGroup = new THREE.Group();
         logoGroup.position.y = 0.2;
         scene.add(logoGroup);
@@ -287,34 +281,18 @@
         const loader = new THREE.FontLoader();
         loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
             const textConfig = { 
-                font: font, 
-                size: 1.3, 
-                height: 0.35, 
-                curveSegments: 16, 
-                bevelEnabled: true, 
-                bevelThickness: 0.08, 
-                bevelSize: 0.04, 
-                bevelSegments: 8 
+                font: font, size: 1.3, height: 0.35, curveSegments: 16, 
+                bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.04, bevelSegments: 8 
             };
             const textGeo = new THREE.TextGeometry('MS3', textConfig);
             textGeo.computeBoundingBox();
             const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
             
-            // Material Vidriado / Cristal Holográfico con reflejos y refracción simulada
             const glassMaterial = new THREE.MeshPhysicalMaterial({
-                color: 0x00f0ff,
-                metalness: 0.1,
-                roughness: 0.05,
-                transmission: 0.85, // Efecto vidrio translúcido
-                thickness: 1.2,
-                transparent: true,
-                opacity: 0.9,
-                reflectivity: 0.9,
-                clearcoat: 1.0,
-                clearcoatRoughness: 0.1,
-                emissive: 0x003344,
-                emissiveIntensity: 0.3,
-                side: THREE.DoubleSide
+                color: 0x00f0ff, metalness: 0.1, roughness: 0.05,
+                transmission: 0.85, thickness: 1.2, transparent: true, opacity: 0.9,
+                reflectivity: 0.9, clearcoat: 1.0, clearcoatRoughness: 0.1,
+                emissive: 0x003344, emissiveIntensity: 0.3, side: THREE.DoubleSide
             });
 
             const textMesh = new THREE.Mesh(textGeo, glassMaterial);
@@ -322,7 +300,6 @@
             logoGroup.add(textMesh);
         });
 
-        // Control de menú desplegable superior
         function toggleTopMenu(e) {
             if (e) e.stopPropagation();
             const dropdown = document.getElementById('dropdown-menu');
@@ -344,11 +321,8 @@
         function requestIOSPermissions() {
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission().then(response => {
-                    if (response === 'granted') {
-                        activateGyroscope();
-                    } else {
-                        alert('Permiso de giroscopio denegado.');
-                    }
+                    if (response === 'granted') activateGyroscope();
+                    else alert('Permiso de giroscopio denegado.');
                 }).catch(console.error);
             } else {
                 activateGyroscope();
@@ -408,7 +382,6 @@
 
         window.addEventListener('pointerup', () => { isDragging = false; });
 
-        // Clic en el Logo MS3 para entrar al Multiverso
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
 
@@ -425,15 +398,40 @@
             }
         });
 
+        // Efecto de entrada atravesando el logo y fundido a luz
         function enterMultiverse() {
             isSystemActive = true;
             instruction.style.opacity = '0';
             
-            gsap.to(logoGroup.scale, { x: 0.1, y: 0.1, z: 0.1, opacity: 0, duration: 0.8, ease: "power2.in", onComplete: () => {
+            // Animación de zoom rápido atravesando el centro del logo hacia adelante
+            gsap.to(cameraRig.position, { 
+                z: 0.2, 
+                duration: 0.9, 
+                ease: "power3.in",
+                onUpdate: () => {
+                    // Sincroniza las cámaras del sistema estereoscópico VR
+                    cameraLeft.position.z = cameraRig.position.z;
+                    cameraRight.position.z = cameraRig.position.z;
+                }
+            });
+
+            // Animación de expansión gigante del logo alrededor de la cámara (efecto de atravesarlo)
+            gsap.to(logoGroup.scale, { x: 5.0, y: 5.0, z: 5.0, duration: 0.9, ease: "power2.in" });
+
+            // Destello de luz brillante al cruzar
+            setTimeout(() => {
+                flashOverlay.style.opacity = '1';
+            }, 600);
+
+            setTimeout(() => {
                 logoGroup.visible = false;
+                logoGroup.scale.set(1, 1, 1);
                 createMultiverseHUD();
-            }});
-            gsap.to(cameraRig.position, { z: 2, duration: 1.2, ease: "power2.inOut" });
+                
+                // Restablecer posición de cámara y fundir flash de entrada
+                cameraRig.position.set(0, 0, 5);
+                flashOverlay.style.opacity = '0';
+            }, 950);
         }
 
         function createMultiverseHUD() {
@@ -598,7 +596,7 @@
             instruction.style.opacity = '1';
             isSystemActive = false;
             
-            gsap.to(logoGroup.scale, { x: 1, y: 1, z: 1, duration: 0.8, ease: "power2.out" });
+            gsap.fromTo(logoGroup.scale, { x: 5, y: 5, z: 5 }, { x: 1, y: 1, z: 1, duration: 0.8, ease: "power2.out" });
             gsap.to(cameraRig.position, { z: 5, duration: 1.0, ease: "power2.inOut" });
         }
 
@@ -636,7 +634,6 @@
 
             if (starField) starField.rotation.y += 0.0005;
             
-            // Rotación constante de 360 grados sobre su propio eje en el centro
             if (logoGroup && !isSystemActive) {
                 logoGroup.rotation.y += 0.012; 
             }
