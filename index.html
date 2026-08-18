@@ -46,33 +46,6 @@
             display: flex; flex-direction: column; align-items: flex-end; pointer-events: auto;
         }
 
-        .gaze-reticle {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 32px; height: 32px; border-radius: 50%;
-            border: 2px solid rgba(0, 240, 255, 0.6); z-index: 999; pointer-events: none;
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5); display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.3s ease;
-        }
-
-        .gaze-reticle.disabled { opacity: 0 !important; }
-
-        .gaze-dot { width: 6px; height: 6px; background: #00f0ff; border-radius: 50%; box-shadow: 0 0 8px #00f0ff; }
-
-        .gaze-progress {
-            position: absolute; top: -4px; left: -4px; width: 36px; height: 36px;
-            border-radius: 50%; border: 3px solid transparent; opacity: 0; transition: opacity 0.2s ease;
-        }
-
-        .gaze-reticle.active .gaze-progress {
-            opacity: 1; animation: gazeFill 3s linear forwards;
-        }
-
-        @keyframes gazeFill {
-            0% { transform: rotate(0deg); border-top-color: #00f0ff; }
-            50% { border-right-color: #f000ff; border-bottom-color: #f000ff; }
-            100% { transform: rotate(360deg); border-color: #f000ff; }
-        }
-
         .control-btn {
             background: rgba(10, 6, 24, 0.85); border: 2px solid #00f0ff; color: #00f0ff; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
             backdrop-filter: blur(8px); padding: 12px 24px; border-radius: 9999px; font-weight: 700; font-size: 0.95rem; cursor: pointer;
@@ -86,9 +59,14 @@
             font-size: 1.1rem; pointer-events: none; text-shadow: 0 0 10px #0ff, 0 0 20px #f0f; font-weight: 600; transition: opacity 0.5s ease;
         }
 
+        #flash-overlay {
+            position: fixed; inset: 0; background: #00f0ff; opacity: 0; pointer-events: none; z-index: 3000;
+            transition: opacity 0.3s ease; mix-blend-mode: screen;
+        }
+
         .floating-card { pointer-events: auto; user-select: none; }
         .interactive-btn { pointer-events: auto; transition: transform 0.2s ease, border-color 0.2s ease; cursor: pointer; }
-        .interactive-btn.gaze-hover, .floating-card.gaze-hover { transform: scale(1.04); border-color: #f000ff !important; }
+        .interactive-btn:hover, .floating-card:hover { transform: scale(1.02); }
 
         .neon-box-cyan {
             border: 3px solid #00f0ff; box-shadow: 0 0 35px rgba(0, 240, 255, 0.6), inset 0 0 30px rgba(0, 240, 255, 0.3);
@@ -101,17 +79,10 @@
         }
 
         .netflix-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 10px;
-            overflow: visible;
+            display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; overflow: visible;
         }
-
         @media (max-width: 768px) {
-            .netflix-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 8px;
-            }
+            .netflix-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
         }
 
         .netflix-card {
@@ -119,16 +90,14 @@
             border: 2px solid rgba(0, 240, 255, 0.4); transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
             cursor: pointer; background: #111;
         }
-        .netflix-card:hover, .netflix-card.gaze-hover {
-            transform: scale(1.03); border-color: #f000ff; box-shadow: 0 0 15px rgba(240, 0, 255, 0.8); z-index: 10;
-        }
+        .netflix-card:hover { transform: scale(1.03); border-color: #f000ff; box-shadow: 0 0 15px rgba(240, 0, 255, 0.8); z-index: 10; }
         .netflix-card img { width: 100%; height: 100%; object-fit: cover; }
         .netflix-card .card-info {
             position: absolute; bottom: 0; left: 0; width: 100%; padding: 6px 8px;
             background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
         }
 
-        #video-modal, #about-modal, #preview-modal {
+        #video-modal, #preview-modal {
             position: fixed; inset: 0; background: rgba(0,0,0,0.94); z-index: 2000;
             display: none; justify-content: center; align-items: center; flex-direction: column; padding: 20px; pointer-events: auto;
         }
@@ -138,6 +107,8 @@
 </head>
 <body>
 
+    <div id="flash-overlay"></div>
+
     <div id="top-ui-container">
         <button id="menu-toggle-btn" class="interactive-btn control-btn" onclick="toggleTopMenu(event)">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
@@ -146,22 +117,19 @@
         <div id="dropdown-menu" class="hidden mt-3 w-72 neon-box-cyan p-4 flex flex-col gap-3 transition-all duration-300 transform scale-95 opacity-0">
             <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="requestIOSPermissions()"><span id="gyro-btn-text">GIROSCOPIO: OFF</span></button>
             <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="toggleVRMode()"><span id="vr-btn-text">VER EN VR</span></button>
-            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="toggleGazePointerState()"><span id="gaze-toggle-btn-text">PUNTERO VR: OFF</span></button>
-            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="openAboutModal()"><span>NOSOTROS</span></button>
+            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="openAboutSection()"><span>NOSOTROS</span></button>
         </div>
     </div>
 
-    <div id="instruction">Arrastra con el dedo en cualquier parte para mover el universo | Toca la esfera MS3 para entrar</div>
+    <div id="instruction">Arrastra con el dedo en cualquier parte para mover el universo | Toca el logo MS3 para activar las gafas VR</div>
 
     <div id="vr-view-container">
         <div class="vr-eye" id="eye-left">
-            <div class="gaze-reticle disabled" id="reticle-left"><div class="gaze-dot"></div><div class="gaze-progress"></div></div>
             <div class="webgl-canvas-container" id="canvas-container-left"></div>
             <div class="css3d-container" id="css3d-container-left"></div>
         </div>
 
         <div class="vr-eye" id="eye-right">
-            <div class="gaze-reticle disabled" id="reticle-right"><div class="gaze-dot"></div><div class="gaze-progress"></div></div>
             <div class="webgl-canvas-container" id="canvas-container-right"></div>
             <div class="css3d-container" id="css3d-container-right"></div>
         </div>
@@ -183,31 +151,24 @@
         <button class="modal-close-btn interactive-btn" onclick="closeVideo()">Cerrar Reproductor</button>
     </div>
 
-    <div id="about-modal">
-        <div class="neon-box-cyan p-8 max-w-md text-center">
-            <h2 class="text-3xl font-bold text-cyan-400 mb-4">SOBRE NOSOTROS</h2>
-            <p class="text-gray-300 mb-6">Plataforma inmersiva 360° diseñada para experiencias interactivas y realidad virtual.</p>
-            <button class="modal-close-btn interactive-btn" onclick="closeAboutModal()">CERRAR</button>
-        </div>
-    </div>
-
     <script>
         let scene, cssScene, camera, cameraLeft, cameraRight, cameraRig;
         let rendererLeft, rendererRight, cssRendererLeft, cssRendererRight;
-        let planet, textGroup, planetGroup, universeSphere, starField;
+        let logoGroup, vrGogglesGroup, universeSphere, starField;
         let multiverseHudGroup = null;
         let vrProgramsHudGroup = null;
+        let aboutHudGroup = null;
+        let spinningCoins = [];
         let isTopMenuOpen = false;
-        let currentActiveView = 'home';
         let selectedVideoData = null;
 
-        let isSystemActive = false, isGyroActive = false, isVRMode = false, isGazeEnabled = false;
+        let isSystemActive = false, isGyroActive = false, isVRMode = false;
+        let isInAboutSection = false;
 
         let isDragging = false;
         let previousMousePosition = { x: 0, y: 0 };
         let targetRotationX = 0, targetRotationY = 0;
         let currentRotationX = 0, currentRotationY = 0;
-        let dragDistance = 0;
 
         let deviceQuaternion = new THREE.Quaternion();
         const eyeSeparation = 0.064;
@@ -217,6 +178,7 @@
         const cssContainerLeft = document.getElementById('css3d-container-left');
         const cssContainerRight = document.getElementById('css3d-container-right');
         const instruction = document.getElementById('instruction');
+        const flashOverlay = document.getElementById('flash-overlay');
 
         scene = new THREE.Scene();
         cssScene = new THREE.Scene();
@@ -252,9 +214,19 @@
         cssRendererRight.setSize(window.innerWidth / 2, window.innerHeight);
         cssContainerRight.appendChild(cssRendererRight.domElement);
 
-        scene.add(new THREE.AmbientLight(0x3a1050, 1.5));
-        const pLightCyan = new THREE.PointLight(0x00f0ff, 4, 80); pLightCyan.position.set(-8, 8, 8); scene.add(pLightCyan);
-        const pLightPink = new THREE.PointLight(0xf000ff, 4, 80); pLightPink.position.set(8, -8, 8); scene.add(pLightPink);
+        scene.add(new THREE.AmbientLight(0x221133, 2.0));
+        
+        const pLightCyan = new THREE.PointLight(0x00f0ff, 6, 100); 
+        pLightCyan.position.set(-10, 10, 10); 
+        scene.add(pLightCyan);
+
+        const pLightPink = new THREE.PointLight(0xf000ff, 6, 100); 
+        pLightPink.position.set(10, -10, 10); 
+        scene.add(pLightPink);
+
+        const pLightWhite = new THREE.PointLight(0xffffff, 4, 50); 
+        pLightWhite.position.set(0, 5, 5); 
+        scene.add(pLightWhite);
 
         const universeGeo = new THREE.SphereGeometry(70, 32, 32);
         universeSphere = new THREE.Mesh(universeGeo, new THREE.MeshBasicMaterial({ color: 0x070216, side: THREE.BackSide }));
@@ -282,27 +254,62 @@
         starField = new THREE.Points(starsGeometry, new THREE.PointsMaterial({ size: 0.25, vertexColors: true, transparent: true, opacity: 0.9 }));
         scene.add(starField);
 
-        planetGroup = new THREE.Group();
-        planet = new THREE.Mesh(new THREE.IcosahedronGeometry(1.4, 4), new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.9 }));
-        planet.position.y = -1.5;
-        planetGroup.add(planet);
-        scene.add(planetGroup);
+        logoGroup = new THREE.Group();
+        logoGroup.position.y = 0.2;
+        scene.add(logoGroup);
 
-        // Logo MS3 principal con giro propio en 360 (más lento, sin reflejo)
-        textGroup = new THREE.Group(); 
-        textGroup.position.y = 0.8;
+        vrGogglesGroup = new THREE.Group();
+        vrGogglesGroup.visible = false;
+        vrGogglesGroup.scale.set(0.01, 0.01, 0.01);
+        scene.add(vrGogglesGroup);
+
+        const glassMaterial = new THREE.MeshPhysicalMaterial({
+            color: 0x00f0ff, metalness: 0.1, roughness: 0.05,
+            transmission: 0.85, thickness: 1.2, transparent: true, opacity: 0.9,
+            reflectivity: 0.9, clearcoat: 1.0, clearcoatRoughness: 0.1,
+            emissive: 0x003344, emissiveIntensity: 0.3, side: THREE.DoubleSide
+        });
+
+        const magentaGlassMat = new THREE.MeshPhysicalMaterial({
+            color: 0xf000ff, metalness: 0.1, roughness: 0.05,
+            transmission: 0.85, thickness: 1.2, transparent: true, opacity: 0.9,
+            reflectivity: 0.9, clearcoat: 1.0, clearcoatRoughness: 0.1,
+            emissive: 0x440044, emissiveIntensity: 0.4, side: THREE.DoubleSide
+        });
 
         const loader = new THREE.FontLoader();
         loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
-            const textGeo = new THREE.TextGeometry('MS3', { font: font, size: 1.2, height: 0.4, curveSegments: 12, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.05 });
+            const textConfig = { 
+                font: font, size: 1.3, height: 0.35, curveSegments: 16, 
+                bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.04, bevelSegments: 8 
+            };
+            const textGeo = new THREE.TextGeometry('MS3', textConfig);
             textGeo.computeBoundingBox();
             const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
             
-            const textMesh = new THREE.Mesh(textGeo, new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0.9, roughness: 0.05, clearcoat: 1.0 }));
+            const textMesh = new THREE.Mesh(textGeo, glassMaterial);
             textMesh.position.x = centerOffset; 
-            textGroup.add(textMesh);
+            logoGroup.add(textMesh);
         });
-        scene.add(textGroup);
+
+        const visorGeo = new THREE.BoxGeometry(3.2, 1.4, 0.8);
+        const visorMesh = new THREE.Mesh(visorGeo, glassMaterial);
+        vrGogglesGroup.add(visorMesh);
+
+        const lensGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.9, 32);
+        lensGeo.rotateX(Math.PI / 2);
+        
+        const leftLens = new THREE.Mesh(lensGeo, magentaGlassMat);
+        leftLens.position.set(-0.8, 0, 0.1);
+        vrGogglesGroup.add(leftLens);
+
+        const rightLens = new THREE.Mesh(lensGeo, magentaGlassMat);
+        rightLens.position.set(0.8, 0, 0.1);
+        vrGogglesGroup.add(rightLens);
+
+        const strapGeo = new THREE.CylinderGeometry(1.8, 1.8, 0.2, 32, 1, true);
+        const strapMesh = new THREE.Mesh(strapGeo, new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.6 }));
+        vrGogglesGroup.add(strapMesh);
 
         function toggleTopMenu(e) {
             if (e) e.stopPropagation();
@@ -322,22 +329,120 @@
             }
         }
 
-        function toggleGazePointerState() {
-            isGazeEnabled = !isGazeEnabled;
-            const text = isGazeEnabled ? 'PUNTERO VR: ON' : 'PUNTERO VR: OFF';
-            document.getElementById('gaze-toggle-btn-text').innerText = text;
+        function requestIOSPermissions() {
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission().then(response => {
+                    if (response === 'granted') activateGyroscope();
+                    else alert('Permiso de giroscopio denegado.');
+                }).catch(console.error);
+            } else {
+                activateGyroscope();
+            }
+        }
 
-            const reticles = document.querySelectorAll('.gaze-reticle');
-            reticles.forEach(r => {
-                if (isGazeEnabled) r.classList.remove('disabled');
-                else r.classList.add('disabled');
-            });
+        function activateGyroscope() {
+            isGyroActive = !isGyroActive;
+            const btnText = document.getElementById('gyro-btn-text');
+            if (isGyroActive) {
+                btnText.innerText = 'GIROSCOPIO: ON';
+                window.addEventListener('deviceorientation', handleOrientation, true);
+            } else {
+                btnText.innerText = 'GIROSCOPIO: OFF';
+                window.removeEventListener('deviceorientation', handleOrientation, true);
+            }
+        }
+
+        function handleOrientation(event) {
+            if (!isGyroActive) return;
+            const alpha = event.alpha ? THREE.MathUtils.degToRad(event.alpha) : 0;
+            const beta = event.beta ? THREE.MathUtils.degToRad(event.beta) : 0;
+            const gamma = event.gamma ? THREE.MathUtils.degToRad(event.gamma) : 0;
+            
+            const europa = new THREE.Euler(beta, alpha, -gamma, 'YXZ');
+            deviceQuaternion.setFromEuler(europa);
+            cameraRig.quaternion.copy(deviceQuaternion);
+        }
+
+        const viewContainer = document.getElementById('vr-view-container');
+        viewContainer.addEventListener('pointerdown', (e) => {
+            isDragging = true;
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        window.addEventListener('pointermove', (e) => {
+            if (!isDragging || isGyroActive) return;
+            const deltaX = e.clientX - previousMousePosition.x;
+            const deltaY = e.clientY - previousMousePosition.y;
+
+            targetRotationY -= deltaX * 0.005;
+            targetRotationX -= deltaY * 0.005;
+            targetRotationX = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, targetRotationX));
+
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        window.addEventListener('pointerup', () => { isDragging = false; });
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        window.addEventListener('click', (e) => {
+            if (isSystemActive || isInAboutSection) return;
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(logoGroup.children, true);
+
+            if (intersects.length > 0) {
+                transformToGogglesAndEnter();
+            }
+        });
+
+        function transformToGogglesAndEnter() {
+            isSystemActive = true;
+            instruction.style.opacity = '0';
+
+            gsap.to(logoGroup.scale, { x: 0.01, y: 0.01, z: 0.01, duration: 0.4, ease: "power2.in", onComplete: () => {
+                logoGroup.visible = false;
+                vrGogglesGroup.position.copy(logoGroup.position);
+                vrGogglesGroup.rotation.copy(logoGroup.rotation);
+                vrGogglesGroup.visible = true;
+
+                gsap.to(vrGogglesGroup.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.5, ease: "back.out(1.7)" });
+                gsap.to(vrGogglesGroup.rotation, { y: 0, x: 0, duration: 0.5, ease: "power2.out" });
+            }});
+
+            setTimeout(() => {
+                gsap.to(cameraRig.position, { 
+                    z: 0.1, 
+                    duration: 0.7, 
+                    ease: "power3.in",
+                    onUpdate: () => {
+                        cameraLeft.position.z = cameraRig.position.z;
+                        cameraRight.position.z = cameraRig.position.z;
+                    }
+                });
+
+                gsap.to(vrGogglesGroup.scale, { x: 8.0, y: 8.0, z: 8.0, duration: 0.7, ease: "power2.in" });
+
+                setTimeout(() => {
+                    flashOverlay.style.opacity = '1';
+                }, 450);
+
+                setTimeout(() => {
+                    vrGogglesGroup.visible = false;
+                    vrGogglesGroup.scale.set(0.01, 0.01, 0.01);
+                    createMultiverseHUD();
+                    
+                    cameraRig.position.set(0, 0, 5);
+                    flashOverlay.style.opacity = '0';
+                }, 750);
+            }, 450);
         }
 
         function createMultiverseHUD() {
-            destroyVRProgramsHUD();
-            destroyMultiverseHUD();
-            currentActiveView = 'multiverse';
+            destroyAllHUDs();
             
             const mainContainer = document.createElement('div');
             mainContainer.className = "w-[1200px] flex flex-col gap-6 floating-card";
@@ -361,9 +466,9 @@
                 </div>
 
                 <div class="w-full grid grid-cols-3 gap-6">
-                    <button onclick="openVRProgramsMultiverse(event)" class="interactive-btn pill-btn neon-box-cyan py-5 text-cyan-300 font-black text-lg text-center">PROGRAMAS VR</button>
-                    <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="interactive-btn pill-btn neon-box-magenta py-5 text-fuchsia-300 font-black text-lg text-center">PROGRAMAS 2D</button>
-                    <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')" class="interactive-btn pill-btn neon-box-cyan py-5 text-cyan-300 font-black text-lg text-center">CANAL EN VIVO</button>
+                    <button onclick="openVRProgramsMultiverse(event)" class="interactive-btn neon-box-cyan py-5 text-cyan-300 font-black text-lg text-center rounded-2xl">PROGRAMAS VR</button>
+                    <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="interactive-btn neon-box-magenta py-5 text-fuchsia-300 font-black text-lg text-center rounded-2xl">PROGRAMAS 2D</button>
+                    <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')" class="interactive-btn neon-box-cyan py-5 text-cyan-300 font-black text-lg text-center rounded-2xl">CANAL EN VIVO</button>
                 </div>
             `;
 
@@ -379,10 +484,7 @@
 
         function openVRProgramsMultiverse(e) {
             if (e) e.stopPropagation();
-            destroyMultiverseHUD();
-            currentActiveView = 'vr-programs';
-
-            gsap.to(cameraRig.rotation, { y: cameraRig.rotation.y + Math.PI * 2, duration: 1.0, ease: "power2.inOut" });
+            destroyAllHUDs();
 
             const vrContainer = document.createElement('div');
             vrContainer.className = "w-[1200px] flex flex-col gap-4 floating-card";
@@ -398,7 +500,7 @@
                 <div class="w-full neon-box-cyan p-5 flex flex-col gap-3">
                     <div class="flex justify-between items-center">
                         <h3 class="text-lg font-bold text-cyan-300">CATÁLOGO DE PANTALLAS</h3>
-                        <span class="text-xs text-fuchsia-400 font-bold uppercase tracking-widest">Todas visibles en primer plano</span>
+                        <span class="text-xs text-fuchsia-400 font-bold uppercase tracking-widest">Selecciona un contenido</span>
                     </div>
                     
                     <div class="netflix-grid">
@@ -418,22 +520,6 @@
                             <img src="https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?q=80&w=500&auto=format&fit=crop" alt="Bosque">
                             <div class="card-info"><h4 class="text-white text-xs font-bold">Bosque Místico</h4><p class="text-fuchsia-300 text-[10px]">Relax VR</p></div>
                         </div>
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Océano Abisal 360', 'Sumergirme en las profundidades marinas.', 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')">
-                            <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=500&auto=format&fit=crop" alt="Océano">
-                            <div class="card-info"><h4 class="text-white text-xs font-bold">Océano Abisal</h4><p class="text-cyan-300 text-[10px]">Documental</p></div>
-                        </div>
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Neo Tokio Drifting', 'Acelera por autopistas elevadas de Tokio.', 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">
-                            <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=500&auto=format&fit=crop" alt="Tokio">
-                            <div class="card-info"><h4 class="text-white text-xs font-bold">Neo Tokio</h4><p class="text-fuchsia-300 text-[10px]">Acción VR</p></div>
-                        </div>
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Cumbres Nevadas Extreme', 'Desciende montañas peligrosas en esquí.', 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')">
-                            <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=80&w=500&auto=format&fit=crop" alt="Nieve">
-                            <div class="card-info"><h4 class="text-white text-xs font-bold">Cumbres Nevadas</h4><p class="text-cyan-300 text-[10px]">Extremo</p></div>
-                        </div>
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Galaxia Lejana', 'Viaje astronómico por nebulosas.', 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')">
-                            <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=500&auto=format&fit=crop" alt="Galaxia">
-                            <div class="card-info"><h4 class="text-white text-xs font-bold">Galaxia Lejana</h4><p class="text-fuchsia-300 text-[10px]">Cosmos</p></div>
-                        </div>
                     </div>
                 </div>
             `;
@@ -446,7 +532,180 @@
             const isMobile = window.innerWidth <= 768;
             vrProgramsHudGroup.position.set(0, 0, isMobile ? -5.0 : -4.5);
             cssScene.add(vrProgramsHudGroup);
-            gsap.fromTo(vrProgramsHudGroup.scale, { x: 0.01, y: 0.01, z: 0.01 }, { x: 1, y: 1, z: 1, duration: 0.8, ease: "back.out(1.4)" });
+        }
+
+        // --- SECCIÓN "NOSOTROS" CON 4 PANTALLAS VERTICALES Y MONEDAS 3D DE ORO GIRATORIAS ---
+        function openAboutSection(e) {
+            if (e) e.stopPropagation();
+            if (isTopMenuOpen) toggleTopMenu();
+            destroyAllHUDs();
+            
+            isInAboutSection = true;
+            logoGroup.visible = false;
+            instruction.style.opacity = '0';
+
+            // Flash de transición inmersiva
+            flashOverlay.style.opacity = '1';
+            setTimeout(() => { flashOverlay.style.opacity = '0'; }, 300);
+
+            aboutHudGroup = new THREE.Group();
+            spinningCoins = [];
+
+            // 1. Botón superior flotante para regresar al inicio
+            const backWrapper = document.createElement('div');
+            backWrapper.className = "w-[1200px] flex flex-col gap-4 floating-card";
+            backWrapper.innerHTML = `
+                <div class="flex justify-between items-center w-full">
+                    <button class="interactive-btn bg-black/95 border-4 border-cyan-400 text-cyan-300 px-8 py-3 rounded-full font-black text-xl flex items-center gap-3 shadow-[0_0_30px_rgba(0,240,255,0.7)] tracking-widest" onclick="exitMultiverse(event)">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        <span>VOLVER AL INICIO</span>
+                    </button>
+                    <h1 class="text-3xl font-black text-white drop-shadow-[0_0_20px_#00f0ff] uppercase tracking-wider">NOSOTROS - UNIVERSO 360</h1>
+                </div>
+            `;
+            const backObj = new THREE.CSS3DObject(backWrapper);
+            backObj.scale.set(0.0055, 0.0055, 0.0055);
+            backObj.position.set(0, 3.2, -4.5);
+            aboutHudGroup.add(backObj);
+
+            // 2. Creación de las 4 pantallas verticales rectangulares alrededor del usuario (en círculo 360°)
+            const screenData = [
+                { title: "INNOVACIÓN VR", desc: "Tecnología de punta aplicada al entretenimiento inmersivo.", img: "https://images.unsplash.com/photo-1593508512255-86ab42a8e620?q=80&w=400&auto=format&fit=crop", angle: 0 },
+                { title: "MULTIVERSO MS3", desc: "Plataforma de streaming y experiencias visuales ilimitadas.", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop", angle: Math.PI / 2 },
+                { title: "ARTE Y ESCENA", desc: "Fusión perfecta entre el arte escénico profesional y la realidad virtual.", img: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=400&auto=format&fit=crop", angle: Math.PI },
+                { title: "FUTURO DIGITAL", desc: "Creando mundos interactivos accesibles desde cualquier dispositivo.", img: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?q=80&w=400&auto=format&fit=crop", angle: (3 * Math.PI) / 2 }
+            ];
+
+            const radius = 4.2;
+
+            screenData.forEach((data, index) => {
+                // Pantalla Vertical Rectangular (HTML/CSS)
+                const screenDiv = document.createElement('div');
+                screenDiv.className = "neon-box-cyan p-6 flex flex-col items-center justify-between text-center floating-card w-[320px] h-[480px] rounded-3xl";
+                screenDiv.innerHTML = `
+                    <div class="w-full flex flex-col items-center gap-2 mt-4">
+                        <span class="text-xs font-extrabold text-cyan-300 tracking-widest uppercase">MS3 PROFILE 0${index + 1}</span>
+                        <h2 class="text-2xl font-black text-white drop-shadow-[0_0_10px_#00f0ff]">${data.title}</h2>
+                    </div>
+                    <div class="w-28 h-28 my-auto relative flex items-center justify-center" id="coin-slot-${index}">
+                        <!-- Contenedor WebGL 3D para la moneda de oro giratoria -->
+                    </div>
+                    <p class="text-gray-300 text-sm leading-relaxed mb-4">${data.desc}</p>
+                `;
+
+                const screenObj = new THREE.CSS3DObject(screenDiv);
+                screenObj.scale.set(0.0042, 0.0042, 0.0042);
+                
+                const xPos = Math.sin(data.angle) * radius;
+                const zPos = -Math.cos(data.angle) * radius;
+                screenObj.position.set(xPos, -0.2, zPos);
+                screenObj.lookAt(0, -0.2, 0);
+                aboutHudGroup.add(screenObj);
+
+                // --- CREACIÓN DE LA MONEDA DE ORO 3D GIRATORIA CON TRANSFORMACIÓN A GAFAS VR ---
+                const coinGroup = new THREE.Group();
+                coinGroup.position.set(xPos, -0.2, zPos);
+                
+                // Orientar la moneda hacia el centro de la escena
+                coinGroup.rotation.y = data.angle;
+
+                // Material brillante de oro
+                const goldMaterial = new THREE.MeshStandardMaterial({
+                    color: 0xffd700,
+                    metalness: 0.9,
+                    roughness: 0.2,
+                    emissive: 0x332200,
+                    emissiveIntensity: 0.2,
+                    side: THREE.DoubleSide
+                });
+
+                // Crear textura canvas para la cara de la moneda (Imagen ilustrativa vs Gafas VR)
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 512;
+                const ctx = canvas.getContext('2d');
+
+                function drawCoinFace(isVR) {
+                    // Fondo dorado con borde ornamental
+                    ctx.fillStyle = '#ffcc00';
+                    ctx.fillRect(0, 0, 512, 512);
+                    ctx.fillStyle = '#b38600';
+                    ctx.beginPath(); ctx.arc(256, 256, 240, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#ffdf33';
+                    ctx.beginPath(); ctx.arc(256, 256, 220, 0, Math.PI * 2); ctx.fill();
+
+                    if (!isVR) {
+                        // Dibujar icono/texto ilustrativo (Corona o iniciales MS3)
+                        ctx.fillStyle = '#805d00';
+                        ctx.font = 'bold 90px Inter';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('MS3', 256, 230);
+                        ctx.font = 'bold 35px Inter';
+                        ctx.fillText('VR WORLD', 256, 310);
+                    } else {
+                        // Dibujar Gafas de Realidad Virtual esquemáticas en la cara de la moneda
+                        ctx.fillStyle = '#00f0ff';
+                        ctx.fillRect(136, 196, 240, 120); // Visor
+                        ctx.fillStyle = '#000';
+                        ctx.beginPath(); ctx.arc(206, 256, 40, 0, Math.PI * 2); ctx.fill();
+                        ctx.beginPath(); ctx.arc(306, 256, 40, 0, Math.PI * 2); ctx.fill();
+                        ctx.fillStyle = '#f000ff';
+                        ctx.font = 'bold 30px Inter';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('VR GOGGLES', 256, 360);
+                    }
+                }
+
+                // Generar textura inicial de imagen
+                drawCoinFace(false);
+                const textureImage = new THREE.CanvasTexture(canvas);
+
+                // Textura para el reverso / caras de la moneda
+                const coinFaceMat = new THREE.MeshStandardMaterial({ map: textureImage, metalness: 0.7, roughness: 0.3 });
+                
+                // Geometría de cilindro plano para simular una moneda
+                const coinGeo = new THREE.CylinderGeometry(0.8, 0.8, 0.15, 48);
+                coinGeo.rotateX(Math.PI / 2);
+                
+                const coinMesh = new THREE.Mesh(coinGeo, [goldMaterial, coinFaceMat, coinFaceMat]);
+                coinGroup.add(coinMesh);
+                
+                aboutHudGroup.add(coinGroup);
+
+                // Guardar referencia para animación continua de giro y morphing de textura
+                spinningCoins.push({
+                    group: coinGroup,
+                    mesh: coinMesh,
+                    canvas: canvas,
+                    ctx: ctx,
+                    texture: textureImage,
+                    angleAccumulator: index * 1.5, // Desfasar el giro de cada moneda
+                    isCurrentlyVR: false
+                });
+            });
+
+            cssScene.add(aboutHudGroup);
+        }
+
+        function destroyAllHUDs() {
+            if (multiverseHudGroup) { 
+                cssScene.remove(multiverseHudGroup); 
+                multiverseHudGroup.traverse((child) => { if (child.element) child.element.remove(); });
+                multiverseHudGroup = null; 
+            }
+            if (vrProgramsHudGroup) { 
+                cssScene.remove(vrProgramsHudGroup); 
+                vrProgramsHudGroup.traverse((child) => { if (child.element) child.element.remove(); });
+                vrProgramsHudGroup = null; 
+            }
+            if (aboutHudGroup) { 
+                cssScene.remove(aboutHudGroup); 
+                aboutHudGroup.traverse((child) => { if (child.element) child.element.remove(); });
+                aboutHudGroup = null; 
+            }
+            spinningCoins = [];
+            isInAboutSection = false;
         }
 
         function openPreview(title, desc, imgUrl, videoUrl) {
@@ -467,26 +726,6 @@
             }
         }
 
-        function destroyMultiverseHUD() {
-            if (multiverseHudGroup) { 
-                cssScene.remove(multiverseHudGroup); 
-                multiverseHudGroup.traverse((child) => {
-                    if (child.element) child.element.remove();
-                });
-                multiverseHudGroup = null; 
-            }
-        }
-
-        function destroyVRProgramsHUD() {
-            if (vrProgramsHudGroup) { 
-                cssScene.remove(vrProgramsHudGroup); 
-                vrProgramsHudGroup.traverse((child) => {
-                    if (child.element) child.element.remove();
-                });
-                vrProgramsHudGroup = null; 
-            }
-        }
-
         function openVideo(url) {
             const modal = document.getElementById('video-modal');
             const video = document.getElementById('active-video');
@@ -503,20 +742,17 @@
             modal.style.display = 'none';
         }
 
-        function openAboutModal() {
-            document.getElementById('about-modal').style.display = 'flex';
-        }
-
-        function closeAboutModal() {
-            document.getElementById('about-modal').style.display = 'none';
-        }
-
         function exitMultiverse(e) {
             if (e) e.stopPropagation();
-            destroyMultiverseHUD();
-            destroyVRProgramsHUD();
-            currentActiveView = 'home';
-            gsap.to(cameraRig.rotation, { y: 0, duration: 1.0, ease: "power2.inOut" });
+            destroyAllHUDs();
+            
+            logoGroup.visible = true;
+            instruction.style.opacity = '1';
+            isSystemActive = false;
+            isInAboutSection = false;
+            
+            gsap.fromTo(logoGroup.scale, { x: 0.01, y: 0.01, z: 0.01 }, { x: 1, y: 1, z: 1, duration: 0.8, ease: "power2.out" });
+            gsap.to(cameraRig.position, { z: 5, duration: 1.0, ease: "power2.inOut" });
         }
 
         function toggleVRMode() {
@@ -540,165 +776,85 @@
                 rendererRight.setSize(w, h);
                 cssRendererLeft.setSize(w, h);
                 cssRendererRight.setSize(w, h);
-                camera.aspect = w / h;
-                camera.updateProjectionMatrix();
+                cameraLeft.aspect = w / h;
+                cameraRight.aspect = w / h;
+                cameraLeft.updateProjectionMatrix();
+                cameraRight.updateProjectionMatrix();
             }
-        }
-
-        function requestIOSPermissions() {
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission().then(response => {
-                    if (response === 'granted') {
-                        enableGyro();
-                    }
-                }).catch(console.error);
-            } else {
-                enableGyro();
-            }
-        }
-
-        function enableGyro() {
-            isGyroActive = true;
-            document.getElementById('gyro-btn-text').innerText = 'GIROSCOPIO: ON';
-            window.addEventListener('deviceorientation', handleOrientation, true);
-        }
-
-        function handleOrientation(e) {
-            if (!isGyroActive) return;
-            let alpha = e.alpha ? THREE.MathUtils.degToRad(e.alpha) : 0;
-            let beta = e.beta ? THREE.MathUtils.degToRad(e.beta) : 0;
-            let gamma = e.gamma ? THREE.MathUtils.degToRad(e.gamma) : 0;
-            
-            let zee = new THREE.Vector3(0, 0, 1);
-            let quaternion = new THREE.Quaternion();
-            
-            quaternion.setFromAxisAngle(zee, -alpha);
-            let m = new THREE.Matrix4().makeRotationFromQuaternion(quaternion);
-            
-            let x = new THREE.Vector3(1, 0, 0);
-            x.applyMatrix4(m);
-            
-            quaternion.setFromAxisAngle(x, -beta);
-            let y = new THREE.Vector3(0, 1, 0);
-            y.applyMatrix4(m);
-            
-            quaternion.setFromAxisAngle(y, -gamma);
-            cameraRig.quaternion.multiplyQuaternions(quaternion, m);
-        }
-
-        window.addEventListener('mousedown', (e) => {
-            if (e.target.closest('#top-ui-container') || e.target.closest('#preview-modal') || e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
-            isDragging = true;
-            previousMousePosition = { x: e.clientX, y: e.clientY };
-            dragDistance = 0;
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging || isGyroActive) return;
-            let deltaX = e.clientX - previousMousePosition.x;
-            let deltaY = e.clientY - previousMousePosition.y;
-            dragDistance += Math.abs(deltaX) + Math.abs(deltaY);
-
-            targetRotationY -= deltaX * 0.005;
-            targetRotationX -= deltaY * 0.005;
-            targetRotationX = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, targetRotationX));
-
-            previousMousePosition = { x: e.clientX, y: e.clientY };
-        });
-
-        window.addEventListener('mouseup', () => {
-            if (!isDragging) return;
-            isDragging = false;
-            if (dragDistance < 10 && currentActiveView === 'home' && !isSystemActive) {
-                triggerSystemEntry();
-            }
-        });
-
-        window.addEventListener('touchstart', (e) => {
-            if (e.target.closest('#top-ui-container') || e.target.closest('#preview-modal') || e.target.closest('#video-modal') || e.target.closest('#about-modal')) return;
-            if (e.touches.length === 1) {
-                isDragging = true;
-                previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-                dragDistance = 0;
-            }
-        }, { passive: true });
-
-        window.addEventListener('touchmove', (e) => {
-            if (!isDragging || isGyroActive || e.touches.length !== 1) return;
-            let deltaX = e.touches[0].clientX - previousMousePosition.x;
-            let deltaY = e.touches[0].clientY - previousMousePosition.y;
-            dragDistance += Math.abs(deltaX) + Math.abs(deltaY);
-
-            targetRotationY -= deltaX * 0.005;
-            targetRotationX -= deltaY * 0.005;
-            targetRotationX = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, targetRotationX));
-
-            previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        }, { passive: true });
-
-        window.addEventListener('touchend', () => {
-            if (!isDragging) return;
-            isDragging = false;
-            if (dragDistance < 10 && currentActiveView === 'home' && !isSystemActive) {
-                triggerSystemEntry();
-            }
-        });
-
-        function triggerSystemEntry() {
-            if (isSystemActive) return;
-            isSystemActive = true;
-            instruction.style.opacity = '0';
-
-            gsap.to(planet.scale, { x: 30, y: 30, z: 30, duration: 1.5, ease: "power2.in" });
-            gsap.to(textGroup.scale, { x: 0.1, y: 0.1, z: 0.1, duration: 0.8, onComplete: () => scene.remove(textGroup) });
-            gsap.to(cameraRig.position, { z: 1, duration: 1.5, ease: "power2.inOut", onComplete: () => {
-                createMultiverseHUD();
-                planet.scale.set(1, 1, 1);
-                planet.visible = false;
-            }});
+            toggleTopMenu();
         }
 
         function animate() {
             requestAnimationFrame(animate);
 
-            currentRotationX += (targetRotationX - currentRotationX) * 0.1;
-            currentRotationY += (targetRotationY - currentRotationY) * 0.1;
+            if (starField) starField.rotation.y += 0.0005;
+            
+            if (logoGroup && !isSystemActive && !isInAboutSection && logoGroup.visible) {
+                logoGroup.rotation.y += 0.012; 
+            }
+
+            // Animación de las monedas de oro en la sección NOSOTROS (giro 360 sobre su eje y cambio de textura dinámico)
+            if (isInAboutSection && spinningCoins.length > 0) {
+                spinningCoins.forEach(coin => {
+                    coin.angleAccumulator += 0.03; // Velocidad de giro en 360 grados
+                    coin.group.rotation.y += 0.03;
+
+                    // Detectar cuando la moneda está de perfil (90° o 270°) para alternar textura entre Imagen y Gafas VR
+                    const normalizedAngle = Math.abs(Math.sin(coin.angleAccumulator));
+                    const shouldBeVR = normalizedAngle < 0.25; // Cerca del punto de perfil se realiza el cambio fluido
+
+                    if (shouldBeVR !== coin.isCurrentlyVR) {
+                        coin.isCurrentlyVR = shouldBeVR;
+                        
+                        // Redibujar canvas con la variante correspondiente
+                        coin.ctx.clearRect(0, 0, 512, 512);
+                        coin.ctx.fillStyle = '#ffcc00';
+                        coin.ctx.fillRect(0, 0, 512, 512);
+                        coin.ctx.fillStyle = '#b38600';
+                        coin.ctx.beginPath(); coin.ctx.arc(256, 256, 240, 0, Math.PI * 2); coin.ctx.fill();
+                        coin.ctx.fillStyle = '#ffdf33';
+                        coin.ctx.beginPath(); coin.ctx.arc(256, 256, 220, 0, Math.PI * 2); coin.ctx.fill();
+
+                        if (!coin.isCurrentlyVR) {
+                            coin.ctx.fillStyle = '#805d00';
+                            coin.ctx.font = 'bold 90px Inter';
+                            coin.ctx.textAlign = 'center';
+                            coin.ctx.textBaseline = 'middle';
+                            coin.ctx.fillText('MS3', 256, 230);
+                            coin.ctx.font = 'bold 35px Inter';
+                            coin.ctx.fillText('VR WORLD', 256, 310);
+                        } else {
+                            // Dibujar pequeñas gafas de realidad virtual
+                            coin.ctx.fillStyle = '#00f0ff';
+                            coin.ctx.fillRect(156, 216, 200, 90);
+                            coin.ctx.fillStyle = '#000';
+                            coin.ctx.beginPath(); coin.ctx.arc(216, 261, 30, 0, Math.PI * 2); coin.ctx.fill();
+                            coin.ctx.beginPath(); coin.ctx.arc(296, 261, 30, 0, Math.PI * 2); coin.ctx.fill();
+                            coin.ctx.fillStyle = '#f000ff';
+                            coin.ctx.font = 'bold 28px Inter';
+                            coin.ctx.textAlign = 'center';
+                            coin.ctx.fillText('VR GOGGLES', 256, 340);
+                        }
+                        coin.texture.needsUpdate = true;
+                    }
+                });
+            }
 
             if (!isGyroActive) {
+                currentRotationX += (targetRotationX - currentRotationX) * 0.1;
+                currentRotationY += (targetRotationY - currentRotationY) * 0.1;
                 cameraRig.rotation.y = currentRotationY;
                 cameraRig.rotation.x = currentRotationX;
             }
 
-            if (planetGroup) planetGroup.rotation.y += 0.005;
-            if (starField) starField.rotation.y -= 0.0005;
-
-            // Giro continuo sobre su propio eje en 360 grados (velocidad reducida)
-            if (textGroup && currentActiveView === 'home') {
-                textGroup.rotation.y += 0.005;
-            }
+            rendererLeft.render(scene, isVRMode ? cameraLeft : camera);
+            cssRendererLeft.render(cssScene, isVRMode ? cameraLeft : camera);
 
             if (isVRMode) {
-                rendererLeft.render(scene, cameraLeft);
-                cssRendererLeft.render(cssScene, cameraLeft);
                 rendererRight.render(scene, cameraRight);
                 cssRendererRight.render(cssScene, cameraRight);
-            } else {
-                rendererLeft.render(scene, camera);
-                cssRendererLeft.render(cssScene, camera);
             }
         }
-
-        window.addEventListener('resize', () => {
-            const w = window.innerWidth;
-            const h = window.innerHeight;
-            camera.aspect = w / h;
-            camera.updateProjectionMatrix();
-            rendererLeft.setSize(w, h);
-            rendererRight.setSize(w, h);
-            cssRendererLeft.setSize(w, h);
-            cssRendererRight.setSize(w / 2, h);
-        });
-
         animate();
     </script>
 </body>
