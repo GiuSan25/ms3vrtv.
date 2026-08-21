@@ -194,10 +194,9 @@
         let deviceQuaternion = new THREE.Quaternion();
         const eyeSeparation = 0.064;
 
-        // Variables para el temporizador de mirada (Gaze Dwell)
         let gazeStartTime = null;
         let currentTargetElement = null;
-        const dwellTimeThreshold = 2000; // 2 segundos
+        const dwellTimeThreshold = 2000;
 
         const containerLeft = document.getElementById('canvas-container-left');
         const containerRight = document.getElementById('canvas-container-right');
@@ -509,8 +508,8 @@
             cssObject.scale.set(0.0055, 0.0055, 0.0055);
             multiverseHudGroup.add(cssObject);
             
-            const isMobile = window.innerWidth <= 768;
-            multiverseHudGroup.position.set(0, 0, isMobile ? -5.0 : -4.5);
+            // Distancia más cercana (z: -2.8 para mayor inmersión y comodidad)
+            multiverseHudGroup.position.set(0, 0, -2.8);
             cssScene.add(multiverseHudGroup);
         }
 
@@ -562,8 +561,8 @@
             cssObject.scale.set(0.0055, 0.0055, 0.0055);
             vrProgramsHudGroup.add(cssObject);
             
-            const isMobile = window.innerWidth <= 768;
-            vrProgramsHudGroup.position.set(0, 0, isMobile ? -5.0 : -4.5);
+            // Posición cercana también para programas VR
+            vrProgramsHudGroup.position.set(0, 0, -2.8);
             cssScene.add(vrProgramsHudGroup);
         }
 
@@ -583,6 +582,7 @@
             aboutHudGroup = new THREE.Group();
             spinningCoins = [];
 
+            // Botón superior para volver al inicio desde la sección Nosotros
             const backWrapper = document.createElement('div');
             backWrapper.className = "w-[1200px] flex flex-col gap-4 floating-card";
             backWrapper.innerHTML = `
@@ -596,32 +596,33 @@
             `;
             const backObj = new THREE.CSS3DObject(backWrapper);
             backObj.scale.set(0.0055, 0.0055, 0.0055);
-            backObj.position.set(0, 3.2, -4.5);
+            backObj.position.set(0, 2.8, -3.2);
             aboutHudGroup.add(backObj);
 
+            // Las 4 pantallas flotantes con borde neón dispuestas frente al usuario
             const screenData = [
-                { title: "INNOVACIÓN VR", desc: "Tecnología de punta aplicada al entretenimiento inmersivo.", img: "https://images.unsplash.com/photo-1593508512255-86ab42a8e620?q=80&w=400&auto=format&fit=crop", angle: 0 },
-                { title: "MULTIVERSO MS3", desc: "Plataforma de streaming y experiencias visuales ilimitadas.", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop", angle: Math.PI / 2 },
-                { title: "ARTE Y ESCENA", desc: "Fusión perfecta entre el arte escénico profesional y la realidad virtual.", img: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=400&auto=format&fit=crop", angle: Math.PI },
-                { title: "FUTURO DIGITAL", desc: "Creando mundos interactivos accesibles desde cualquier dispositivo.", img: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?q=80&w=400&auto=format&fit=crop", angle: (3 * Math.PI) / 2 }
+                { title: "INNOVACIÓN VR", desc: "Tecnología de punta aplicada al entretenimiento inmersivo.", img: "https://images.unsplash.com/photo-1593508512255-86ab42a8e620?q=80&w=400&auto=format&fit=crop", angle: -0.75 },
+                { title: "MULTIVERSO MS3", desc: "Plataforma de streaming y experiencias visuales ilimitadas.", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop", angle: -0.25 },
+                { title: "ARTE Y ESCENA", desc: "Fusión perfecta entre el arte escénico profesional y la realidad virtual.", img: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=400&auto=format&fit=crop", angle: 0.25 },
+                { title: "FUTURO DIGITAL", desc: "Creando mundos interactivos accesibles desde cualquier dispositivo.", img: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?q=80&w=400&auto=format&fit=crop", angle: 0.75 }
             ];
 
-            const radius = 4.2;
+            const radius = 3.4; // Más cerca del usuario
 
             screenData.forEach((data, index) => {
                 const screenDiv = document.createElement('div');
-                screenDiv.className = "neon-box-purple p-6 flex flex-col items-center justify-between text-center floating-card w-[320px] h-[480px] rounded-3xl";
+                screenDiv.className = "neon-box-purple p-6 flex flex-col items-center justify-between text-center floating-card w-[280px] h-[400px] rounded-3xl";
                 screenDiv.innerHTML = `
-                    <div class="w-full flex flex-col items-center gap-2 mt-4">
-                        <span class="text-xs font-extrabold text-purple-300 tracking-widest uppercase">MS3 PROFILE 0${index + 1}</span>
-                        <h2 class="text-2xl font-black text-white drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]">${data.title}</h2>
+                    <div class="w-full flex flex-col items-center gap-1 mt-2">
+                        <span class="text-[10px] font-extrabold text-purple-300 tracking-widest uppercase">MS3 PROFILE 0${index + 1}</span>
+                        <h2 class="text-xl font-black text-white drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]">${data.title}</h2>
                     </div>
-                    <div class="w-28 h-28 my-auto relative flex items-center justify-center"></div>
-                    <p class="text-gray-300 text-sm leading-relaxed mb-4">${data.desc}</p>
+                    <div class="w-20 h-20 my-auto relative flex items-center justify-center"></div>
+                    <p class="text-gray-300 text-xs leading-relaxed mb-2">${data.desc}</p>
                 `;
 
                 const screenObj = new THREE.CSS3DObject(screenDiv);
-                screenObj.scale.set(0.0042, 0.0042, 0.0042);
+                screenObj.scale.set(0.0038, 0.0038, 0.0038);
                 
                 const xPos = Math.sin(data.angle) * radius;
                 const zPos = -Math.cos(data.angle) * radius;
@@ -676,7 +677,7 @@
                 const textureImage = new THREE.CanvasTexture(canvas);
                 const coinFaceMat = new THREE.MeshStandardMaterial({ map: textureImage, metalness: 0.7, roughness: 0.3 });
                 
-                const coinGeo = new THREE.CylinderGeometry(0.8, 0.8, 0.15, 48);
+                const coinGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.12, 48);
                 coinGeo.rotateX(Math.PI / 2);
                 
                 const coinMesh = new THREE.Mesh(coinGeo, [goldMaterial, coinFaceMat, coinFaceMat]);
@@ -802,15 +803,51 @@
                 logoGroup.rotation.y += 0.012; 
             }
 
-            // --- LÓGICA DE DETECCIÓN Y TEMPORIZADOR DE MIRADA (GAZE DWELL) ---
+            // Animación de rotación de las monedas en "NOSOTROS"
+            spinningCoins.forEach(coin => {
+                coin.angleAccumulator += 0.03;
+                coin.group.rotation.y += 0.015;
+                
+                const showVRFace = Math.sin(coin.angleAccumulator) > 0;
+                if (showVRFace !== coin.isCurrentlyVR) {
+                    coin.isCurrentlyVR = showVRFace;
+                    coin.ctx.clearRect(0, 0, 512, 512);
+                    
+                    coin.ctx.fillStyle = '#ffcc00';
+                    coin.ctx.fillRect(0, 0, 512, 512);
+                    coin.ctx.fillStyle = '#b38600';
+                    coin.ctx.beginPath(); coin.ctx.arc(256, 256, 240, 0, Math.PI * 2); coin.ctx.fill();
+                    coin.ctx.fillStyle = '#ffdf33';
+                    coin.ctx.beginPath(); coin.ctx.arc(256, 256, 220, 0, Math.PI * 2); coin.ctx.fill();
+
+                    if (!showVRFace) {
+                        coin.ctx.fillStyle = '#805d00';
+                        coin.ctx.font = 'bold 90px Inter';
+                        coin.ctx.textAlign = 'center';
+                        coin.ctx.textBaseline = 'middle';
+                        coin.ctx.fillText('MS3', 256, 230);
+                        coin.ctx.font = 'bold 35px Inter';
+                        coin.ctx.fillText('VR WORLD', 256, 310);
+                    } else {
+                        coin.ctx.fillStyle = '#c084fc';
+                        coin.ctx.fillRect(136, 196, 240, 120);
+                        coin.ctx.fillStyle = '#000';
+                        coin.ctx.beginPath(); coin.ctx.arc(206, 256, 40, 0, Math.PI * 2); coin.ctx.fill();
+                        coin.ctx.beginPath(); coin.ctx.arc(306, 256, 40, 0, Math.PI * 2); coin.ctx.fill();
+                        coin.ctx.fillStyle = '#e879f9';
+                        coin.ctx.font = 'bold 30px Inter';
+                        coin.ctx.textAlign = 'center';
+                        coin.ctx.fillText('VR GOGGLES', 256, 360);
+                    }
+                    coin.texture.needsUpdate = true;
+                }
+            });
+
             if (isGazePointerActive) {
                 const activeCamera = isVRMode ? cameraLeft : camera;
                 raycaster.setFromCamera(new THREE.Vector2(0, 0), activeCamera);
                 
-                // Comprobar intersección con objetos 3D (ej. logo MS3)
                 const intersects3D = raycaster.intersectObjects(scene.children, true);
-                
-                // Comprobar elementos HTML interactivos bajo el centro de la pantalla
                 const elemUnderCenter = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2);
                 const interactiveElem = elemUnderCenter ? elemUnderCenter.closest('button, .interactive-btn, .netflix-card, input, a') : null;
 
@@ -832,7 +869,6 @@
                         progressCircle.style.strokeDashoffset = dashOffset;
 
                         if (elapsed >= dwellTimeThreshold) {
-                            // Disparar acción según el elemento apuntado
                             if (currentTargetElement === logoGroup) {
                                 transformToGogglesAndEnter();
                             } else if (currentTargetElement.tagName === 'BUTTON' || currentTargetElement.classList.contains('interactive-btn') || currentTargetElement.classList.contains('netflix-card')) {
