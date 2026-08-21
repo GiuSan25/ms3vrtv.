@@ -54,22 +54,22 @@
 
         .control-btn:hover { background: rgba(138, 43, 226, 0.2); box-shadow: 0 0 25px rgba(168, 85, 247, 0.5); transform: scale(1.05); color: #fff; }
 
-        /* Puntero de la vista (Gaze Pointer) */
+        /* Puntero de la vista con temporizador SVG circular */
         #gaze-pointer {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 16px; height: 16px; border: 2px solid rgba(216, 180, 254, 0.8);
-            border-radius: 50%; z-index: 9999; pointer-events: none; display: none;
-            box-shadow: 0 0 10px rgba(168, 85, 247, 0.8);
-            transition: transform 0.1s ease, background-color 0.2s ease;
+            width: 24px; height: 24px; z-index: 9999; pointer-events: none; display: none;
         }
-        #gaze-pointer.active-target {
-            transform: translate(-50%, -50%) scale(1.4);
-            background-color: rgba(216, 180, 254, 0.6);
+        #gaze-pointer svg {
+            width: 100%; height: 100%; transform: rotate(-90deg);
         }
-        body.vr-mode .vr-eye-pointer {
+        #gaze-progress-circle {
+            fill: none; stroke: #d8b4fe; stroke-width: 3; stroke-dasharray: 69; stroke-dashoffset: 69;
+            transition: stroke-dashoffset 0.05s linear;
+        }
+        #gaze-dot {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 16px; height: 16px; border: 2px solid rgba(216, 180, 254, 0.8);
-            border-radius: 50%; z-index: 9999; pointer-events: none; display: none;
+            width: 6px; height: 6px; background-color: #fff; border-radius: 50%;
+            box-shadow: 0 0 8px rgba(168, 85, 247, 1);
         }
 
         #instruction { 
@@ -121,7 +121,13 @@
 <body>
 
     <div id="flash-overlay"></div>
-    <div id="gaze-pointer"></div>
+    
+    <div id="gaze-pointer">
+        <svg viewBox="0 0 36 36">
+            <path id="gaze-progress-circle" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+        </svg>
+        <div id="gaze-dot"></div>
+    </div>
 
     <div id="top-ui-container">
         <button id="menu-toggle-btn" class="interactive-btn control-btn" onclick="toggleTopMenu(event)">
@@ -188,6 +194,11 @@
         let deviceQuaternion = new THREE.Quaternion();
         const eyeSeparation = 0.064;
 
+        // Variables para el temporizador de mirada (Gaze Dwell)
+        let gazeStartTime = null;
+        let currentTargetElement = null;
+        const dwellTimeThreshold = 2000; // 2 segundos
+
         const containerLeft = document.getElementById('canvas-container-left');
         const containerRight = document.getElementById('canvas-container-right');
         const cssContainerLeft = document.getElementById('css3d-container-left');
@@ -195,6 +206,7 @@
         const instruction = document.getElementById('instruction');
         const flashOverlay = document.getElementById('flash-overlay');
         const gazePointer = document.getElementById('gaze-pointer');
+        const progressCircle = document.getElementById('gaze-progress-circle');
 
         scene = new THREE.Scene();
         cssScene = new THREE.Scene();
@@ -309,8 +321,6 @@
         const headsetBodyMat = new THREE.MeshStandardMaterial({ color: 0x0f0b1e, metalness: 0.9, roughness: 0.2 });
         const glowingTrimMat = new THREE.MeshStandardMaterial({ color: 0xd946ef, metalness: 0.8, roughness: 0.1, emissive: 0xc084fc, emissiveIntensity: 0.9 });
         const neonCoreMat = new THREE.MeshStandardMaterial({ color: 0xa855f7, metalness: 0.5, roughness: 0.1, emissive: 0x9333ea, emissiveIntensity: 1.0 });
-        const brightLensGlassMat = new THREE.MeshPhysicalMaterial({ color: 0xe879f9, metalness: 0.1, roughness: 0.05, transmission: 0.92, thickness: 1.8, transparent: true, opacity: 0.98, emissive: 0xd946ef, emissiveIntensity: 0.5 });
-        const facePadMat = new THREE.MeshStandardMaterial({ color: 0x080612, roughness: 0.8 });
 
         const visorMain = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.6, 1.1), headsetBodyMat);
         vrGogglesGroup.add(visorMain);
@@ -344,6 +354,13 @@
             const btnText = document.getElementById('pointer-btn-text');
             btnText.innerText = isGazePointerActive ? 'PUNTERO VISTA: ON' : 'PUNTERO VISTA: OFF';
             gazePointer.style.display = isGazePointerActive ? 'block' : 'none';
+            resetGazeTimer();
+        }
+
+        function resetGazeTimer() {
+            gazeStartTime = null;
+            currentTargetElement = null;
+            progressCircle.style.strokeDashoffset = '69';
         }
 
         function requestIOSPermissions() {
@@ -419,6 +436,7 @@
         function transformToGogglesAndEnter() {
             isSystemActive = true;
             instruction.style.opacity = '0';
+            resetGazeTimer();
 
             gsap.to(logoGroup.scale, { x: 0.01, y: 0.01, z: 0.01, duration: 0.4, ease: "power2.in", onComplete: () => {
                 logoGroup.visible = false;
@@ -456,6 +474,7 @@
 
         function createMultiverseHUD() {
             destroyAllHUDs();
+            resetGazeTimer();
             
             const mainContainer = document.createElement('div');
             mainContainer.className = "w-[1200px] flex flex-col gap-6 floating-card";
@@ -498,6 +517,7 @@
         function openVRProgramsMultiverse(e) {
             if (e) e.stopPropagation();
             destroyAllHUDs();
+            resetGazeTimer();
 
             const vrContainer = document.createElement('div');
             vrContainer.className = "w-[1200px] flex flex-col gap-4 floating-card";
@@ -551,6 +571,7 @@
             if (e) e.stopPropagation();
             if (isTopMenuOpen) toggleTopMenu();
             destroyAllHUDs();
+            resetGazeTimer();
             
             isInAboutSection = true;
             logoGroup.visible = false;
@@ -726,6 +747,7 @@
         function exitMultiverse(e) {
             if (e) e.stopPropagation();
             destroyAllHUDs();
+            resetGazeTimer();
             
             logoGroup.visible = true;
             instruction.style.opacity = '1';
@@ -741,7 +763,6 @@
             document.body.classList.toggle('vr-mode', isVRMode);
             document.getElementById('vr-btn-text').innerText = isVRMode ? 'SALIR DE VR' : 'VER EN VR';
             
-            // Activar automáticamente el puntero de la vista al entrar en VR (o desactivarlo al salir)
             if (isVRMode && !isGazePointerActive) {
                 toggleGazePointer();
             } else if (!isVRMode && isGazePointerActive) {
@@ -781,13 +802,47 @@
                 logoGroup.rotation.y += 0.012; 
             }
 
+            // --- LÓGICA DE DETECCIÓN Y TEMPORIZADOR DE MIRADA (GAZE DWELL) ---
             if (isGazePointerActive) {
-                raycaster.setFromCamera(new THREE.Vector2(0, 0), isVRMode ? cameraLeft : camera);
-                const intersects = raycaster.intersectObjects(scene.children, true);
-                if (intersects.length > 0) {
-                    gazePointer.classList.add('active-target');
+                const activeCamera = isVRMode ? cameraLeft : camera;
+                raycaster.setFromCamera(new THREE.Vector2(0, 0), activeCamera);
+                
+                // Comprobar intersección con objetos 3D (ej. logo MS3)
+                const intersects3D = raycaster.intersectObjects(scene.children, true);
+                
+                // Comprobar elementos HTML interactivos bajo el centro de la pantalla
+                const elemUnderCenter = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2);
+                const interactiveElem = elemUnderCenter ? elemUnderCenter.closest('button, .interactive-btn, .netflix-card, input, a') : null;
+
+                let targetFound = null;
+                if (intersects3D.length > 0 && (!isSystemActive && !isInAboutSection)) {
+                    targetFound = logoGroup;
+                } else if (interactiveElem) {
+                    targetFound = interactiveElem;
+                }
+
+                if (targetFound) {
+                    if (currentTargetElement !== targetFound) {
+                        currentTargetElement = targetFound;
+                        gazeStartTime = performance.now();
+                    } else {
+                        const elapsed = performance.now() - gazeStartTime;
+                        const progress = Math.min(elapsed / dwellTimeThreshold, 1);
+                        const dashOffset = 69 - (progress * 69);
+                        progressCircle.style.strokeDashoffset = dashOffset;
+
+                        if (elapsed >= dwellTimeThreshold) {
+                            // Disparar acción según el elemento apuntado
+                            if (currentTargetElement === logoGroup) {
+                                transformToGogglesAndEnter();
+                            } else if (currentTargetElement.tagName === 'BUTTON' || currentTargetElement.classList.contains('interactive-btn') || currentTargetElement.classList.contains('netflix-card')) {
+                                currentTargetElement.click();
+                            }
+                            resetGazeTimer();
+                        }
+                    }
                 } else {
-                    gazePointer.classList.remove('active-target');
+                    resetGazeTimer();
                 }
             }
 
