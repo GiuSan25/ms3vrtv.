@@ -31,10 +31,6 @@
             display: flex; justify-content: center; align-items: center;
         }
 
-        body.vr-mode .vr-eye { width: 50vw; }
-        body.vr-mode #eye-right { display: flex !important; border-left: 2px solid rgba(138, 43, 226, 0.3); }
-        #eye-right { display: none; }
-
         .webgl-canvas-container, .css3d-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
         }
@@ -108,8 +104,8 @@
         </button>
         <div id="dropdown-menu" class="hidden mt-3 w-72 neon-box-purple p-4 flex flex-col gap-3 transition-all duration-300 transform scale-95 opacity-0">
             <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="requestIOSPermissions()"><span id="gyro-btn-text">GIROSCOPIO: OFF</span></button>
-            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="toggleVRMode()"><span id="vr-btn-text">VER EN VR</span></button>
             <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="openAboutSection(event)"><span>NOSOTROS</span></button>
+            <button id="logout-menu-btn" class="interactive-btn control-btn justify-start w-full text-sm hidden" style="border-color: #ef4444; color: #fca5a5;" onclick="logoutUser()"><span>CERRAR SESIÓN</span></button>
         </div>
     </div>
 
@@ -119,11 +115,6 @@
         <div class="vr-eye" id="eye-left">
             <div class="webgl-canvas-container" id="canvas-container-left"></div>
             <div class="css3d-container" id="css3d-container-left"></div>
-        </div>
-
-        <div class="vr-eye" id="eye-right">
-            <div class="webgl-canvas-container" id="canvas-container-right"></div>
-            <div class="css3d-container" id="css3d-container-right"></div>
         </div>
     </div>
 
@@ -144,19 +135,21 @@
     </div>
 
     <script>
-        let scene, cssScene, camera, cameraLeft, cameraRight, cameraRig;
-        let rendererLeft, rendererRight, cssRendererLeft, cssRendererRight;
+        let scene, cssScene, camera, cameraRig;
+        let rendererLeft, cssRendererLeft;
         let logoGroup, universeSphere, starField;
         let multiverseHudGroup = null;
         let vrProgramsHudGroup = null;
         let aboutHudGroup = null;
         let loginHudGroup = null;
         let editorHudGroup = null;
+        let verifyHudGroup = null;
+        
         let spinningCoins = [];
         let isTopMenuOpen = false;
         let selectedVideoData = null;
 
-        let isSystemActive = false, isGyroActive = false, isVRMode = false;
+        let isSystemActive = false, isGyroActive = false;
         let isInAboutSection = false;
 
         let isDragging = false;
@@ -165,7 +158,8 @@
         let currentRotationX = 0, currentRotationY = 0;
 
         let deviceQuaternion = new THREE.Quaternion();
-        const eyeSeparation = 0.064;
+        let currentVerificationCode = "";
+        let userPendingAuth = "";
 
         let pendingUsers = [
             { id: 1, name: "Carlos Mendoza", email: "carlos.m@gmail.com", provider: "Google" },
@@ -174,9 +168,7 @@
         ];
 
         const containerLeft = document.getElementById('canvas-container-left');
-        const containerRight = document.getElementById('canvas-container-right');
         const cssContainerLeft = document.getElementById('css3d-container-left');
-        const cssContainerRight = document.getElementById('css3d-container-right');
         const instruction = document.getElementById('instruction');
         const flashOverlay = document.getElementById('flash-overlay');
 
@@ -190,32 +182,16 @@
         function getViewportHeight() { return window.innerHeight; }
 
         camera = new THREE.PerspectiveCamera(75, getViewportWidth() / getViewportHeight(), 0.1, 1000);
-        cameraLeft = new THREE.PerspectiveCamera(75, (getViewportWidth() / 2) / getViewportHeight(), 0.1, 1000);
-        cameraRight = new THREE.PerspectiveCamera(75, (getViewportWidth() / 2) / getViewportHeight(), 0.1, 1000);
-
-        cameraLeft.position.x = -eyeSeparation / 2;
-        cameraRight.position.x = eyeSeparation / 2;
-
         cameraRig.add(camera);
-        cameraRig.add(cameraLeft);
-        cameraRig.add(cameraRight);
         cameraRig.position.set(0, 0, 5);
 
         rendererLeft = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         rendererLeft.setSize(getViewportWidth(), getViewportHeight());
         containerLeft.appendChild(rendererLeft.domElement);
 
-        rendererRight = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        rendererRight.setSize(getViewportWidth(), getViewportHeight());
-        containerRight.appendChild(rendererRight.domElement);
-
         cssRendererLeft = new THREE.CSS3DRenderer();
         cssRendererLeft.setSize(getViewportWidth(), getViewportHeight());
         cssContainerLeft.appendChild(cssRendererLeft.domElement);
-
-        cssRendererRight = new THREE.CSS3DRenderer();
-        cssRendererRight.setSize(getViewportWidth() / 2, getViewportHeight());
-        cssContainerRight.appendChild(cssRendererRight.domElement);
 
         scene.add(new THREE.AmbientLight(0x2a1b4e, 1.8));
         
@@ -226,10 +202,6 @@
         const pLightIndigo = new THREE.PointLight(0x6366f1, 4.5, 100); 
         pLightIndigo.position.set(10, -10, 10); 
         scene.add(pLightIndigo);
-
-        const pLightWhite = new THREE.PointLight(0xffffff, 2.5, 50); 
-        pLightWhite.position.set(0, 5, 5); 
-        scene.add(pLightWhite);
 
         const universeGeo = new THREE.SphereGeometry(70, 32, 32);
         universeSphere = new THREE.Mesh(universeGeo, new THREE.MeshBasicMaterial({ color: 0x05030d, side: THREE.BackSide }));
@@ -287,7 +259,24 @@
             const ringMesh = new THREE.Mesh(ringGeo, solidSubtleIndigoMat);
             ringMesh.rotation.x = Math.PI / 3;
             logoGroup.add(ringMesh);
+            
+            checkAutoLogin();
         });
+
+        function checkAutoLogin() {
+            const savedSession = localStorage.getItem('ms3_user_session');
+            if (savedSession) {
+                document.getElementById('logout-menu-btn').classList.remove('hidden');
+                enterUniverseTransition();
+            }
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('ms3_user_session');
+            document.getElementById('logout-menu-btn').classList.add('hidden');
+            if (isTopMenuOpen) toggleTopMenu();
+            exitMultiverse();
+        }
 
         function toggleTopMenu(e) {
             if (e) e.stopPropagation();
@@ -373,7 +362,12 @@
             const intersects = raycaster.intersectObjects(logoGroup.children, true);
 
             if (intersects.length > 0) {
-                openLoginPanel();
+                const savedSession = localStorage.getItem('ms3_user_session');
+                if (savedSession) {
+                    enterUniverseTransition();
+                } else {
+                    openLoginPanel();
+                }
             }
         });
 
@@ -393,15 +387,15 @@
                 </div>
 
                 <div class="flex flex-col gap-4 my-2">
-                    <button onclick="handleLoginSuccess('Google')" class="interactive-btn w-full bg-white text-black py-4 px-5 rounded-xl font-bold flex items-center justify-center gap-3 shadow-md text-base">
+                    <button onclick="initiateEmailVerification('usuario.google@gmail.com')" class="interactive-btn w-full bg-white text-black py-4 px-5 rounded-xl font-bold flex items-center justify-center gap-3 shadow-md text-base">
                         <svg class="w-6 h-6" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
                         <span>Continuar con Google</span>
                     </button>
-                    <button onclick="handleLoginSuccess('Facebook')" class="interactive-btn w-full bg-[#1877F2] text-white py-4 px-5 rounded-xl font-bold flex items-center justify-center gap-3 shadow-md text-base">
+                    <button onclick="initiateEmailVerification('usuario.facebook@facebook.com')" class="interactive-btn w-full bg-[#1877F2] text-white py-4 px-5 rounded-xl font-bold flex items-center justify-center gap-3 shadow-md text-base">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                         <span>Continuar con Facebook</span>
                     </button>
-                    <button onclick="handleLoginSuccess('Apple')" class="interactive-btn w-full bg-black text-white border border-gray-700 py-4 px-5 rounded-xl font-bold flex items-center justify-center gap-3 shadow-md text-base">
+                    <button onclick="initiateEmailVerification('usuario.apple@icloud.com')" class="interactive-btn w-full bg-black text-white border border-gray-700 py-4 px-5 rounded-xl font-bold flex items-center justify-center gap-3 shadow-md text-base">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.85c.66-.8 1.11-1.92.99-3.05-.96.04-2.12.64-2.8 1.44-.61.71-1.14 1.86-1 2.98 1.08.08 2.16-.57 2.81-1.37z"/></svg>
                         <span>Continuar con Apple</span>
                     </button>
@@ -414,7 +408,7 @@
                 </div>
 
                 <div class="flex flex-col gap-4">
-                    <input type="text" id="login-input" placeholder="Correo electrónico o Código Secreto" class="w-full bg-black/60 border border-purple-500/50 rounded-xl px-5 py-4 text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 text-center font-bold text-base">
+                    <input type="text" id="login-input" placeholder="Ingresa tu correo o código especial" class="w-full bg-black/60 border border-purple-500/50 rounded-xl px-5 py-4 text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 text-center font-bold text-base">
                     <button onclick="checkCustomLogin()" class="interactive-btn bg-purple-600 hover:bg-purple-500 text-white font-black py-4 rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.5)] tracking-wider text-base">ENTRAR</button>
                 </div>
 
@@ -435,15 +429,62 @@
             if (inputVal === "hhHxz25@@") {
                 openEditorPanel();
             } else if (inputVal !== "") {
-                handleLoginSuccess("Correo (" + inputVal + ")");
+                initiateEmailVerification(inputVal);
             } else {
-                alert("Por favor ingresa un correo o código válido.");
+                alert("Por favor ingresa un correo electrónico válido.");
             }
         }
 
-        function handleLoginSuccess(method) {
+        function initiateEmailVerification(email) {
+            userPendingAuth = email;
+            currentVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+            
             destroyAllHUDs();
-            enterUniverseTransition();
+
+            const verifyCard = document.createElement('div');
+            verifyCard.className = "w-[550px] neon-box-purple p-10 flex flex-col gap-6 floating-card text-center";
+            verifyCard.innerHTML = `
+                <div class="flex flex-col items-center gap-2">
+                    <span class="text-sm font-black tracking-widest text-emerald-400 uppercase">VERIFICACIÓN REQUERIDA</span>
+                    <h2 class="text-3xl font-black text-white">CONFIRMA TU CORREO</h2>
+                </div>
+
+                <p class="text-gray-300 text-sm leading-relaxed">
+                    Hemos enviado un código de seguridad de 6 dígitos a:<br>
+                    <strong class="text-purple-300 text-base">${email}</strong>
+                </p>
+
+                <div class="bg-purple-950/60 border border-purple-500/40 p-3 rounded-xl text-xs text-purple-200">
+                    💡 <strong>CÓDIGO DE PRUEBA:</strong> Utiliza el código <span class="text-emerald-400 font-bold text-sm underline">${currentVerificationCode}</span>
+                </div>
+
+                <div class="flex flex-col gap-4">
+                    <input type="text" id="verify-code-input" maxlength="6" placeholder="000000" class="w-full bg-black/70 border border-purple-500/60 rounded-xl px-5 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-emerald-400 text-center font-black text-2xl tracking-widest">
+                    <button onclick="confirmEmailCode()" class="interactive-btn bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.5)] tracking-wider text-base">VERIFICAR E INRESAR</button>
+                </div>
+
+                <button onclick="openLoginPanel()" class="text-sm text-purple-400 hover:text-white font-bold">← VOLVER ATRÁS</button>
+            `;
+
+            verifyHudGroup = new THREE.Group();
+            const cssObject = new THREE.CSS3DObject(verifyCard);
+            cssObject.scale.set(0.008, 0.008, 0.008);
+            verifyHudGroup.add(cssObject);
+
+            verifyHudGroup.position.set(0, 0, -1.2);
+            cssScene.add(verifyHudGroup);
+        }
+
+        function confirmEmailCode() {
+            const inputCode = document.getElementById('verify-code-input').value.trim();
+            if (inputCode === currentVerificationCode) {
+                localStorage.setItem('ms3_user_session', JSON.stringify({ email: userPendingAuth, loginTime: Date.now() }));
+                document.getElementById('logout-menu-btn').classList.remove('hidden');
+                destroyAllHUDs();
+                enterUniverseTransition();
+            } else {
+                alert("El código ingresado es incorrecto. Inténtalo de nuevo.");
+            }
         }
 
         function openEditorPanel() {
@@ -502,6 +543,8 @@
         }
 
         function continueToMultiverseFromEditor() {
+            localStorage.setItem('ms3_user_session', JSON.stringify({ role: 'admin', loginTime: Date.now() }));
+            document.getElementById('logout-menu-btn').classList.remove('hidden');
             destroyAllHUDs();
             enterUniverseTransition();
         }
@@ -781,6 +824,11 @@
                 editorHudGroup.traverse((child) => { if (child.element) child.element.remove(); });
                 editorHudGroup = null; 
             }
+            if (verifyHudGroup) { 
+                cssScene.remove(verifyHudGroup); 
+                verifyHudGroup.traverse((child) => { if (child.element) child.element.remove(); });
+                verifyHudGroup = null; 
+            }
             spinningCoins = [];
             isInAboutSection = false;
         }
@@ -832,35 +880,6 @@
             gsap.to(cameraRig.position, { z: 5, duration: 1.0, ease: "power2.inOut" });
         }
 
-        function toggleVRMode() {
-            isVRMode = !isVRMode;
-            document.body.classList.toggle('vr-mode', isVRMode);
-            document.getElementById('vr-btn-text').innerText = isVRMode ? 'SALIR DE VR' : 'VER EN VR';
-            
-            const w = getViewportWidth();
-            const h = getViewportHeight();
-            if (isVRMode) {
-                rendererLeft.setSize(w / 2, h);
-                rendererRight.setSize(w / 2, h);
-                cssRendererLeft.setSize(w / 2, h);
-                cssRendererRight.setSize(w / 2, h);
-                cameraLeft.aspect = (w / 2) / h;
-                cameraRight.aspect = (w / 2) / h;
-                cameraLeft.updateProjectionMatrix();
-                cameraRight.updateProjectionMatrix();
-            } else {
-                rendererLeft.setSize(w, h);
-                rendererRight.setSize(w, h);
-                cssRendererLeft.setSize(w, h);
-                cssRendererRight.setSize(w, h);
-                cameraLeft.aspect = w / h;
-                cameraRight.aspect = w / h;
-                cameraLeft.updateProjectionMatrix();
-                cameraRight.updateProjectionMatrix();
-            }
-            toggleTopMenu();
-        }
-
         window.addEventListener('resize', () => {
             const w = getViewportWidth();
             const h = getViewportHeight();
@@ -868,19 +887,8 @@
             camera.aspect = w / h;
             camera.updateProjectionMatrix();
 
-            if (isVRMode) {
-                cameraLeft.aspect = (w / 2) / h;
-                cameraRight.aspect = (w / 2) / h;
-                rendererLeft.setSize(w / 2, h);
-                rendererRight.setSize(w / 2, h);
-                cssRendererLeft.setSize(w / 2, h);
-                cssRendererRight.setSize(w / 2, h);
-            } else {
-                rendererLeft.setSize(w, h);
-                cssRendererLeft.setSize(w, h);
-            }
-            cameraLeft.updateProjectionMatrix();
-            cameraRight.updateProjectionMatrix();
+            rendererLeft.setSize(w, h);
+            cssRendererLeft.setSize(w, h);
         });
 
         function animate() {
@@ -942,13 +950,8 @@
                 cameraRig.rotation.x = currentRotationX;
             }
 
-            rendererLeft.render(scene, isVRMode ? cameraLeft : camera);
-            cssRendererLeft.render(cssScene, isVRMode ? cameraLeft : camera);
-
-            if (isVRMode) {
-                rendererRight.render(scene, cameraRight);
-                cssRendererRight.render(cssScene, cameraRight);
-            }
+            rendererLeft.render(scene, camera);
+            cssRendererLeft.render(cssScene, camera);
         }
         animate();
     </script>
