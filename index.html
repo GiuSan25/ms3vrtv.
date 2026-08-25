@@ -8,7 +8,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS3DRenderer.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <!-- SDK Oficial de Autenticación de Google -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
@@ -329,7 +328,7 @@
 
         const viewContainer = document.getElementById('vr-view-container');
         
-        // Manejadores unificados de interacción táctil y mouse con detección de toque limpio
+        // Alta sensibilidad táctil con tolerancia optimizada para celulares
         viewContainer.addEventListener('pointerdown', (e) => {
             isDragging = true;
             previousMousePosition = { x: e.clientX, y: e.clientY };
@@ -352,9 +351,9 @@
             if (!isDragging) return;
             isDragging = false;
 
-            // Si el movimiento fue mínimo (un toque directo sin arrastrar el universo), evaluamos clic en el logo
             const moveDistance = Math.hypot(e.clientX - touchStartedPos.x, e.clientY - touchStartedPos.y);
-            if (moveDistance < 10) {
+            // Tolerancia de 15px para toques limpios en pantallas táctiles móviles
+            if (moveDistance < 15) {
                 handleLogoInteraction(e.clientX, e.clientY);
             }
         });
@@ -388,7 +387,7 @@
             destroyAllHUDs();
 
             const loginCard = document.createElement('div');
-            loginCard.className = "w-[90vw] max-w-[450px] neon-box-purple p-6 sm:p-10 flex flex-col gap-4 floating-card text-center";
+            loginCard.className = "w-[92vw] max-w-[400px] neon-box-purple p-6 sm:p-8 flex flex-col gap-4 floating-card text-center";
             const isReg = mode === 'register';
 
             loginCard.innerHTML = `
@@ -410,9 +409,11 @@
 
             loginHudGroup = new THREE.Group();
             const cssObject = new THREE.CSS3DObject(loginCard);
-            cssObject.scale.set(0.005, 0.005, 0.005);
+            cssObject.scale.set(0.0035, 0.0035, 0.0035); // Escala optimizada
             loginHudGroup.add(cssObject);
-            loginHudGroup.position.set(0, 0, -1.2);
+            
+            // Posición Z más cerca de la cámara para que el usuario no tenga que buscarlo
+            loginHudGroup.position.set(0, 0, -2.2); 
             cssScene.add(loginHudGroup);
 
             document.getElementById('custom-action-btn').addEventListener('click', isReg ? handleCustomRegister : handleCustomLogin);
@@ -482,9 +483,9 @@
 
             multiverseHudGroup = new THREE.Group();
             const cssObject = new THREE.CSS3DObject(mainContainer);
-            cssObject.scale.set(0.0045, 0.0045, 0.0045);
+            cssObject.scale.set(0.004, 0.004, 0.004);
             multiverseHudGroup.add(cssObject);
-            multiverseHudGroup.position.set(0, 0, -4.5);
+            multiverseHudGroup.position.set(0, 0, -3.5);
             cssScene.add(multiverseHudGroup);
 
             document.getElementById('hud-back-btn').addEventListener('click', exitMultiverse);
@@ -519,9 +520,9 @@
 
             vrProgramsHudGroup = new THREE.Group();
             const cssObject = new THREE.CSS3DObject(vrContainer);
-            cssObject.scale.set(0.0045, 0.0045, 0.0045);
+            cssObject.scale.set(0.004, 0.004, 0.004);
             vrProgramsHudGroup.add(cssObject);
-            vrProgramsHudGroup.position.set(0, 0, -4.5);
+            vrProgramsHudGroup.position.set(0, 0, -3.5);
             cssScene.add(vrProgramsHudGroup);
 
             document.getElementById('vr-back-btn').addEventListener('click', createMultiverseHUD);
@@ -548,8 +549,8 @@
                 <button id="about-back-btn" class="interactive-btn bg-black/95 border-2 border-purple-400 text-purple-300 px-6 py-2.5 rounded-full font-black text-sm">VOLVER AL INICIO</button>
             `;
             const backObj = new THREE.CSS3DObject(backWrapper);
-            backObj.scale.set(0.0045, 0.0045, 0.0045);
-            backObj.position.set(0, 2.8, -4.5);
+            backObj.scale.set(0.004, 0.004, 0.004);
+            backObj.position.set(0, 2.8, -3.5);
             aboutHudGroup.add(backObj);
             cssScene.add(aboutHudGroup);
 
