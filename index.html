@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1280, initial-scale=0.3, maximum-scale=3.0, user-scalable=yes">
+    <!-- Forzar escala fija idéntica a escritorio en cualquier dispositivo móvil -->
+    <meta name="viewport" content="width=1280, initial-scale=0.5, maximum-scale=3.0, user-scalable=yes">
     <title>MS3 - Multiverso Inmersivo VR</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -111,7 +112,7 @@
         </div>
     </div>
 
-    <div id="instruction">Arrastra con el dedo en cualquier parte para mover el universo | Toca el logo MS3 para ingresar al Multiverso</div>
+    <div id="instruction">Arrastra con el dedo o mouse para mover el universo | Toca el logo MS3 para ingresar</div>
 
     <div id="vr-view-container">
         <div class="vr-eye" id="eye-left">
@@ -137,7 +138,6 @@
     </div>
 
     <script>
-        // Coloca aquí tu Client ID de Google Cloud Console
         const GOOGLE_CLIENT_ID = "TU_GOOGLE_CLIENT_ID.apps.googleusercontent.com"; 
 
         let scene, cssScene, camera, cameraRig;
@@ -326,6 +326,8 @@
         }
 
         const viewContainer = document.getElementById('vr-view-container');
+        
+        // Soporte unificado de eventos táctiles y de mouse para movimiento fluido en móviles
         viewContainer.addEventListener('pointerdown', (e) => {
             isDragging = true;
             previousMousePosition = { x: e.clientX, y: e.clientY };
@@ -405,7 +407,6 @@
                 </div>
 
                 <div class="flex flex-col items-center gap-3">
-                    <!-- Contenedor Oficial del Botón Google Sign-In -->
                     <div id="google-btn-container" class="w-full flex justify-center"></div>
                 </div>
 
@@ -420,7 +421,6 @@
             loginHudGroup.position.set(0, 0, -1.2);
             cssScene.add(loginHudGroup);
 
-            // Inicializar el SDK de Autenticación de Google
             initGoogleAuth();
         }
 
@@ -482,7 +482,6 @@
                     callback: handleGoogleCredentialResponse
                 });
 
-                // Renderizar el botón oficial de Google Sign-In
                 const btnContainer = document.getElementById("google-btn-container");
                 if (btnContainer) {
                     google.accounts.id.renderButton(
@@ -490,9 +489,6 @@
                         { theme: "outline", size: "large", type: "standard", shape: "pill", width: 320, text: "continue_with" }
                     );
                 }
-
-                // Desplegar automáticamente la ventana flotante One Tap
-                google.accounts.id.prompt();
             }
         }
 
@@ -512,7 +508,6 @@
         function handleGoogleCredentialResponse(response) {
             const userData = parseJwt(response.credential);
             if (userData) {
-                // Guardar la sesión verificada por Google
                 localStorage.setItem('ms3_user_session', JSON.stringify({
                     name: userData.name,
                     email: userData.email,
