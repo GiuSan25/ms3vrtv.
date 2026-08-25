@@ -1,940 +1,199 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MS3 - Multiverso Inmersivo VR</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS3DRenderer.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
-        
-        * { -webkit-tap-highlight-color: transparent; }
-        
-        body, html { 
-            margin: 0; padding: 0; overflow: hidden; background-color: #030208; 
-            font-family: 'Inter', sans-serif; width: 100vw; height: 100dvh; 
-            user-select: none; -webkit-user-select: none; touch-action: none;
-        }
-        
-        #vr-view-container {
-            display: flex; width: 100vw; height: 100dvh; position: absolute;
-            top: 0; left: 0; z-index: 2; cursor: grab;
-        }
-
-        #vr-view-container:active { cursor: grabbing; }
-
-        .vr-eye {
-            position: relative; width: 100%; height: 100%; overflow: hidden;
-            display: flex; justify-content: center; align-items: center;
-        }
-
-        body.vr-mode .vr-eye { width: 50vw; }
-        body.vr-mode #eye-right { display: flex !important; border-left: 2px solid rgba(138, 43, 226, 0.3); }
-        #eye-right { display: none; }
-
-        .webgl-canvas-container, .css3d-container {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
-        }
-        
-        .css3d-container { z-index: 10; }
-
-        #top-ui-container {
-            position: fixed; top: 20px; right: 20px; z-index: 1000;
-            display: flex; flex-direction: column; align-items: flex-end; pointer-events: auto;
-        }
-
-        .control-btn {
-            background: rgba(15, 12, 30, 0.85); border: 1.5px solid rgba(138, 43, 226, 0.6); color: #d8b4fe; box-shadow: 0 0 15px rgba(138, 43, 226, 0.25);
-            backdrop-filter: blur(8px); padding: 12px 24px; border-radius: 9999px; font-weight: 700; font-size: 0.95rem; cursor: pointer;
-            display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; white-space: nowrap; pointer-events: auto;
-        }
-
-        .control-btn:hover { background: rgba(138, 43, 226, 0.2); box-shadow: 0 0 25px rgba(168, 85, 247, 0.5); transform: scale(1.05); color: #fff; }
-
-        #instruction { 
-            position: fixed; bottom: 35px; width: 100%; text-align: center; color: #e9d5ff; z-index: 100; 
-            font-size: 1.1rem; pointer-events: none; text-shadow: 0 0 10px rgba(168, 85, 247, 0.6); font-weight: 600; transition: opacity 0.5s ease;
-        }
-
-        #flash-overlay {
-            position: fixed; inset: 0; background: #a855f7; opacity: 0; pointer-events: none; z-index: 3000;
-            transition: opacity 0.3s ease; mix-blend-mode: screen;
-        }
-
-        .floating-card { pointer-events: auto; user-select: none; }
-        .interactive-btn { pointer-events: auto; transition: transform 0.2s ease, border-color 0.2s ease; cursor: pointer; }
-        .interactive-btn:hover, .floating-card:hover { transform: scale(1.02); }
-
-        .neon-box-purple {
-            border: 2px solid rgba(168, 85, 247, 0.5); box-shadow: 0 0 25px rgba(138, 43, 226, 0.25), inset 0 0 20px rgba(138, 43, 226, 0.15);
-            border-radius: 24px; background: rgba(12, 10, 25, 0.92); backdrop-filter: blur(16px);
-        }
-
-        .netflix-grid {
-            display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; overflow: visible;
-        }
-        @media (max-width: 768px) {
-            .netflix-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-        }
-
-        .netflix-card {
-            height: 125px; border-radius: 10px; overflow: hidden; position: relative;
-            border: 1.5px solid rgba(168, 85, 247, 0.3); transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-            cursor: pointer; background: #111;
-        }
-        .netflix-card:hover { transform: scale(1.03); border-color: #a855f7; box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); z-index: 10; }
-        .netflix-card img { width: 100%; height: 100%; object-fit: cover; }
-        .netflix-card .card-info {
-            position: absolute; bottom: 0; left: 0; width: 100%; padding: 6px 8px;
-            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
-        }
-
-        #video-modal, #preview-modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.94); z-index: 2000;
-            display: none; justify-content: center; align-items: center; flex-direction: column; padding: 20px; pointer-events: auto;
-        }
-        #video-modal video { width: 100%; max-width: 900px; border-radius: 12px; box-shadow: 0 0 30px rgba(168, 85, 247, 0.5); }
-        .modal-close-btn { margin-top: 20px; padding: 10px 25px; background: #a855f7; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plataforma MS3 - Reproductor</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .card {
+      background-color: #1e293b;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      width: 100%;
+      max-width: 650px;
+      text-align: center;
+    }
+    h1 { margin-bottom: 0.5rem; color: #38bdf8; }
+    p.subtitle { color: #94a3b8; margin-bottom: 1.5rem; font-size: 0.95rem; }
+    
+    /* Formulario de Registro / Acceso */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+    input[type="email"] {
+      padding: 12px 16px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      background-color: #0f172a;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+    }
+    input[type="email"]:focus { border-color: #38bdf8; }
+    button {
+      padding: 12px 20px;
+      border-radius: 6px;
+      border: none;
+      background-color: #0284c7;
+      color: #fff;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    button:hover { background-color: #0369a1; }
+    
+    /* Panel del Reproductor */
+    .player-container { margin-top: 1rem; }
+    video {
+      width: 100%;
+      border-radius: 8px;
+      outline: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    .user-badge {
+      background-color: #334155;
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      color: #cbd5e1;
+    }
+    .logout-btn {
+      background-color: #ef4444;
+      margin-top: 1rem;
+    }
+    .logout-btn:hover { background-color: #dc2626; }
+    .status-msg {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: #4ade80;
+    }
+    .oculto { display: none; }
+  </style>
 </head>
 <body>
 
-    <div id="flash-overlay"></div>
+  <div class="card">
+    <h1>MS3 Media Player</h1>
+    <p class="subtitle">Guarda tu progreso de reproducción de forma automática</p>
 
-    <div id="top-ui-container">
-        <button id="menu-toggle-btn" class="interactive-btn control-btn" onclick="toggleTopMenu(event)">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            <span>MENÚ</span>
-        </button>
-        <div id="dropdown-menu" class="hidden mt-3 w-72 neon-box-purple p-4 flex flex-col gap-3 transition-all duration-300 transform scale-95 opacity-0">
-            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="requestIOSPermissions()"><span id="gyro-btn-text">GIROSCOPIO: OFF</span></button>
-            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="toggleVRMode()"><span id="vr-btn-text">VER EN VR</span></button>
-            <button class="interactive-btn control-btn justify-start w-full text-sm" onclick="openAboutSection(event)"><span>NOSOTROS</span></button>
+    <!-- 1. VISTA DE ACCESO (Sin contraseñas ni códigos) -->
+    <div id="seccion-login">
+      <form id="loginForm" onsubmit="iniciarSesion(event)">
+        <div class="form-group">
+          <input type="email" id="email" placeholder="Ingresa tu correo electrónico" required>
+          <button type="submit">Ingresar a mi cuenta</button>
         </div>
+      </form>
     </div>
 
-    <div id="instruction">Arrastra con el dedo en cualquier parte para mover el universo | Toca el logo MS3 para ingresar al Multiverso</div>
+    <!-- 2. VISTA REPRODUCTOR -->
+    <div id="seccion-reproductor" class="oculto">
+      <div class="user-badge" id="badge-usuario"></div>
+      
+      <div class="player-container">
+        <video id="reproductor" controls>
+          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+          Tu navegador no soporta la reproducción de video.
+        </video>
+      </div>
 
-    <div id="vr-view-container">
-        <div class="vr-eye" id="eye-left">
-            <div class="webgl-canvas-container" id="canvas-container-left"></div>
-            <div class="css3d-container" id="css3d-container-left"></div>
-        </div>
-
-        <div class="vr-eye" id="eye-right">
-            <div class="webgl-canvas-container" id="canvas-container-right"></div>
-            <div class="css3d-container" id="css3d-container-right"></div>
-        </div>
+      <div class="status-msg" id="mensaje-estado"></div>
+      <button class="logout-btn" onclick="cerrarSesion()">Salir de la cuenta</button>
     </div>
+  </div>
 
-    <div id="preview-modal">
-        <div class="neon-box-purple p-8 max-w-lg w-full flex flex-col gap-5 relative">
-            <h2 id="preview-title" class="text-3xl font-black text-white drop-shadow-[0_0_15px_rgba(168,85,247,0.8)]">Título del Programa</h2>
-            <p id="preview-desc" class="text-gray-300 text-base leading-relaxed">Descripción detallada del contenido inmersivo VR exclusivo del multiverso.</p>
-            <div class="flex gap-4 mt-2">
-                <button id="preview-play-btn" class="interactive-btn bg-purple-600 text-white px-6 py-3 rounded-xl font-black text-lg shadow-[0_0_20px_rgba(168,85,247,0.6)]" onclick="playFromPreview()">REPRODUCIR</button>
-                <button class="interactive-btn bg-transparent border-2 border-white text-white px-6 py-3 rounded-xl font-bold text-lg" onclick="closePreviewModal()">VOLVER</button>
-            </div>
-        </div>
-    </div>
+  <script>
+    const CONTENIDO_ID = 'video_ms3_01'; // ID del video actual
+    let usuarioActual = localStorage.getItem('ms3_usuario_activo');
 
-    <div id="video-modal">
-        <video id="active-video" controls autoplay playsinline></video>
-        <button class="modal-close-btn interactive-btn" onclick="closeVideo()">Cerrar Reproductor</button>
-    </div>
+    // Inicialización al cargar la página
+    window.onload = () => {
+      if (usuarioActual) {
+        mostrarReproductor();
+      }
+    };
 
-    <script>
-        let scene, cssScene, camera, cameraLeft, cameraRight, cameraRig;
-        let rendererLeft, rendererRight, cssRendererLeft, cssRendererRight;
-        let logoGroup, universeSphere, starField;
-        let multiverseHudGroup = null;
-        let vrProgramsHudGroup = null;
-        let aboutHudGroup = null;
-        let loginHudGroup = null;
-        let editorHudGroup = null;
-        let spinningCoins = [];
-        let isTopMenuOpen = false;
-        let selectedVideoData = null;
+    // Crear/Acceder a la cuenta simplemente enviando el correo
+    function iniciarSesion(event) {
+      event.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      
+      if (email) {
+        localStorage.setItem('ms3_usuario_activo', email);
+        usuarioActual = email;
+        mostrarReproductor();
+      }
+    }
 
-        let isSystemActive = false, isGyroActive = false, isVRMode = false;
-        let isInAboutSection = false;
+    // Cargar la interfaz del reproductor y restaurar tiempo
+    function mostrarReproductor() {
+      document.getElementById('seccion-login').classList.add('oculto');
+      document.getElementById('seccion-reproductor').classList.remove('oculto');
+      document.getElementById('badge-usuario').innerText = `Cuenta: ${usuarioActual}`;
 
-        let isDragging = false;
-        let previousMousePosition = { x: 0, y: 0 };
-        let targetRotationX = 0, targetRotationY = 0;
-        let currentRotationX = 0, currentRotationY = 0;
+      const reproductor = document.getElementById('reproductor');
 
-        let deviceQuaternion = new THREE.Quaternion();
-        const eyeSeparation = 0.064;
+      // Buscar si el usuario ya tenía tiempo guardado en este video
+      const claveGuardado = `ms3_progreso_${usuarioActual}_${CONTENIDO_ID}`;
+      const tiempoGuardado = localStorage.getItem(claveGuardado);
 
-        // Lista simulada de usuarios registrados pendientes para el Editor
-        let pendingUsers = [
-            { id: 1, name: "Carlos Mendoza", email: "carlos.m@gmail.com", provider: "Google" },
-            { id: 2, name: "Elena Rostova", email: "elena.r@icloud.com", provider: "Apple" },
-            { id: 3, name: "Marcos Silva", email: "marcos.s@facebook.com", provider: "Facebook" }
-        ];
+      if (tiempoGuardado) {
+        reproductor.currentTime = parseFloat(tiempoGuardado);
+        notificarEstado(`Reanudado desde el segundo ${Math.floor(tiempoGuardado)}`);
+      }
 
-        const containerLeft = document.getElementById('canvas-container-left');
-        const containerRight = document.getElementById('canvas-container-right');
-        const cssContainerLeft = document.getElementById('css3d-container-left');
-        const cssContainerRight = document.getElementById('css3d-container-right');
-        const instruction = document.getElementById('instruction');
-        const flashOverlay = document.getElementById('flash-overlay');
-
-        scene = new THREE.Scene();
-        cssScene = new THREE.Scene();
-
-        cameraRig = new THREE.Object3D();
-        scene.add(cameraRig);
-
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        cameraLeft = new THREE.PerspectiveCamera(75, (window.innerWidth / 2) / window.innerHeight, 0.1, 1000);
-        cameraRight = new THREE.PerspectiveCamera(75, (window.innerWidth / 2) / window.innerHeight, 0.1, 1000);
-
-        cameraLeft.position.x = -eyeSeparation / 2;
-        cameraRight.position.x = eyeSeparation / 2;
-
-        cameraRig.add(camera);
-        cameraRig.add(cameraLeft);
-        cameraRig.add(cameraRight);
-        cameraRig.position.set(0, 0, 5);
-
-        rendererLeft = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        rendererLeft.setSize(window.innerWidth, window.innerHeight);
-        containerLeft.appendChild(rendererLeft.domElement);
-
-        rendererRight = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        rendererRight.setSize(window.innerWidth, window.innerHeight);
-        containerRight.appendChild(rendererRight.domElement);
-
-        cssRendererLeft = new THREE.CSS3DRenderer();
-        cssRendererLeft.setSize(window.innerWidth, window.innerHeight);
-        cssContainerLeft.appendChild(cssRendererLeft.domElement);
-
-        cssRendererRight = new THREE.CSS3DRenderer();
-        cssRendererRight.setSize(window.innerWidth / 2, window.innerHeight);
-        cssContainerRight.appendChild(cssRendererRight.domElement);
-
-        scene.add(new THREE.AmbientLight(0x2a1b4e, 1.8));
-        
-        const pLightPurple = new THREE.PointLight(0xa855f7, 4.5, 100); 
-        pLightPurple.position.set(-10, 10, 10); 
-        scene.add(pLightPurple);
-
-        const pLightIndigo = new THREE.PointLight(0x6366f1, 4.5, 100); 
-        pLightIndigo.position.set(10, -10, 10); 
-        scene.add(pLightIndigo);
-
-        const pLightWhite = new THREE.PointLight(0xffffff, 2.5, 50); 
-        pLightWhite.position.set(0, 5, 5); 
-        scene.add(pLightWhite);
-
-        const universeGeo = new THREE.SphereGeometry(70, 32, 32);
-        universeSphere = new THREE.Mesh(universeGeo, new THREE.MeshBasicMaterial({ color: 0x05030d, side: THREE.BackSide }));
-        scene.add(universeSphere);
-
-        const starsGeometry = new THREE.BufferGeometry();
-        const starCount = 3000;
-        const starPositions = new Float32Array(starCount * 3);
-        const starColors = new Float32Array(starCount * 3);
-        const palette = [new THREE.Color(0xa855f7), new THREE.Color(0x6366f1), new THREE.Color(0xd946ef), new THREE.Color(0xffffff)];
-
-        for (let i = 0; i < starCount; i++) {
-            const radius = 15 + Math.random() * 45;
-            const theta = Math.random() * Math.PI * 2;
-            const phi = Math.acos((Math.random() * 2) - 1);
-            starPositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-            starPositions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
-            starPositions[i * 3 + 2] = radius * Math.cos(phi);
-            const color = palette[Math.floor(Math.random() * palette.length)];
-            starColors[i * 3] = color.r; starColors[i * 3 + 1] = color.g; starColors[i * 3 + 2] = color.b;
+      // Sincronizar y guardar la posición cada 3 segundos mientras corre el video
+      setInterval(() => {
+        if (!reproductor.paused) {
+          guardarProgreso(reproductor.currentTime);
         }
-
-        starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-        starsGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
-        starField = new THREE.Points(starsGeometry, new THREE.PointsMaterial({ size: 0.25, vertexColors: true, transparent: true, opacity: 0.85 }));
-        scene.add(starField);
-
-        logoGroup = new THREE.Group();
-        logoGroup.position.y = 0.2;
-        scene.add(logoGroup);
-
-        const solidSubtlePurpleMat = new THREE.MeshStandardMaterial({
-            color: 0xc084fc, metalness: 0.75, roughness: 0.25, emissive: 0x4a1d96, emissiveIntensity: 0.4
-        });
-
-        const solidSubtleIndigoMat = new THREE.MeshStandardMaterial({
-            color: 0x818cf8, metalness: 0.75, roughness: 0.25, emissive: 0x312e81, emissiveIntensity: 0.4
-        });
-
-        const loader = new THREE.FontLoader();
-        loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
-            const textConfig = { 
-                font: font, size: 1.3, height: 0.35, curveSegments: 16, 
-                bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.04, bevelSegments: 8 
-            };
-            const textGeo = new THREE.TextGeometry('MS3', textConfig);
-            textGeo.computeBoundingBox();
-            const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
-            
-            const textMesh = new THREE.Mesh(textGeo, solidSubtlePurpleMat);
-            textMesh.position.x = centerOffset; 
-            logoGroup.add(textMesh);
-
-            const ringGeo = new THREE.TorusGeometry(2.2, 0.05, 16, 100);
-            const ringMesh = new THREE.Mesh(ringGeo, solidSubtleIndigoMat);
-            ringMesh.rotation.x = Math.PI / 3;
-            logoGroup.add(ringMesh);
-        });
-
-        function toggleTopMenu(e) {
-            if (e) e.stopPropagation();
-            const dropdown = document.getElementById('dropdown-menu');
-            isTopMenuOpen = !isTopMenuOpen;
-
-            if (isTopMenuOpen) {
-                dropdown.classList.remove('hidden');
-                setTimeout(() => {
-                    dropdown.classList.remove('scale-95', 'opacity-0');
-                    dropdown.classList.add('scale-100', 'opacity-100');
-                }, 10);
-            } else {
-                dropdown.classList.remove('scale-100', 'opacity-100');
-                dropdown.classList.add('scale-95', 'opacity-0');
-                setTimeout(() => dropdown.classList.add('hidden'), 300);
-            }
-        }
-
-        function requestIOSPermissions() {
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission().then(response => {
-                    if (response === 'granted') activateGyroscope();
-                    else alert('Permiso de giroscopio denegado.');
-                }).catch(console.error);
-            } else {
-                activateGyroscope();
-            }
-        }
-
-        function activateGyroscope() {
-            isGyroActive = !isGyroActive;
-            const btnText = document.getElementById('gyro-btn-text');
-            if (isGyroActive) {
-                btnText.innerText = 'GIROSCOPIO: ON';
-                window.addEventListener('deviceorientation', handleOrientation, true);
-            } else {
-                btnText.innerText = 'GIROSCOPIO: OFF';
-                window.removeEventListener('deviceorientation', handleOrientation, true);
-            }
-        }
-
-        function handleOrientation(event) {
-            if (!isGyroActive) return;
-            const alpha = event.alpha ? THREE.MathUtils.degToRad(event.alpha) : 0;
-            const beta = event.beta ? THREE.MathUtils.degToRad(event.beta) : 0;
-            const gamma = event.gamma ? THREE.MathUtils.degToRad(event.gamma) : 0;
-            
-            const europa = new THREE.Euler(beta, alpha, -gamma, 'YXZ');
-            deviceQuaternion.setFromEuler(europa);
-            cameraRig.quaternion.copy(deviceQuaternion);
-        }
-
-        const viewContainer = document.getElementById('vr-view-container');
-        viewContainer.addEventListener('pointerdown', (e) => {
-            isDragging = true;
-            previousMousePosition = { x: e.clientX, y: e.clientY };
-        });
-
-        window.addEventListener('pointermove', (e) => {
-            if (!isDragging || isGyroActive) return;
-            const deltaX = e.clientX - previousMousePosition.x;
-            const deltaY = e.clientY - previousMousePosition.y;
-
-            targetRotationY -= deltaX * 0.005;
-            targetRotationX -= deltaY * 0.005;
-            targetRotationX = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, targetRotationX));
-
-            previousMousePosition = { x: e.clientX, y: e.clientY };
-        });
-
-        window.addEventListener('pointerup', () => { isDragging = false; });
-
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-
-        window.addEventListener('click', (e) => {
-            if (isSystemActive || isInAboutSection) return;
-            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(logoGroup.children, true);
-
-            if (intersects.length > 0) {
-                openLoginPanel();
-            }
-        });
-
-        /* --- PASO 1: DESPLEGAR PANEL DE LOGIN CERCA --- */
-        function openLoginPanel() {
-            isSystemActive = true;
-            instruction.style.opacity = '0';
-            logoGroup.visible = false;
-
-            destroyAllHUDs();
-
-            const loginCard = document.createElement('div');
-            loginCard.className = "w-[450px] neon-box-purple p-8 flex flex-col gap-5 floating-card text-center";
-            loginCard.innerHTML = `
-                <div class="flex flex-col items-center gap-1">
-                    <span class="text-xs font-black tracking-widest text-purple-400 uppercase">ACCESO AL MULTIVERSO</span>
-                    <h2 class="text-3xl font-black text-white drop-shadow-[0_0_15px_rgba(168,85,247,0.8)]">INICIAR SESIÓN</h2>
-                </div>
-
-                <div class="flex flex-col gap-3 my-2">
-                    <button onclick="handleLoginSuccess('Google')" class="interactive-btn w-full bg-white text-black py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-3 shadow-md">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-                        <span>Continuar con Google</span>
-                    </button>
-                    <button onclick="handleLoginSuccess('Facebook')" class="interactive-btn w-full bg-[#1877F2] text-white py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-3 shadow-md">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                        <span>Continuar con Facebook</span>
-                    </button>
-                    <button onclick="handleLoginSuccess('Apple')" class="interactive-btn w-full bg-black text-white border border-gray-700 py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-3 shadow-md">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.85c.66-.8 1.11-1.92.99-3.05-.96.04-2.12.64-2.8 1.44-.61.71-1.14 1.86-1 2.98 1.08.08 2.16-.57 2.81-1.37z"/></svg>
-                        <span>Continuar con Apple</span>
-                    </button>
-                </div>
-
-                <div class="relative my-1 flex items-center justify-center">
-                    <div class="border-t border-purple-500/30 w-full"></div>
-                    <span class="bg-[#0c0a19] px-3 text-xs text-purple-300 uppercase font-extrabold relative z-10">O CORREO / CÓDIGO</span>
-                    <div class="border-t border-purple-500/30 w-full"></div>
-                </div>
-
-                <div class="flex flex-col gap-3">
-                    <input type="text" id="login-input" placeholder="Correo electrónico o Código Secreto" class="w-full bg-black/60 border border-purple-500/50 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 text-center font-bold text-sm">
-                    <button onclick="checkCustomLogin()" class="interactive-btn bg-purple-600 hover:bg-purple-500 text-white font-black py-3 rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.5)] tracking-wider">ENTRAR</button>
-                </div>
-
-                <button onclick="exitMultiverse(event)" class="text-xs text-purple-400 hover:text-white font-bold mt-1">CANCELAR Y VOLVER</button>
-            `;
-
-            loginHudGroup = new THREE.Group();
-            const cssObject = new THREE.CSS3DObject(loginCard);
-            cssObject.scale.set(0.005, 0.005, 0.005);
-            loginHudGroup.add(cssObject);
-
-            loginHudGroup.position.set(0, 0, -2.5);
-            cssScene.add(loginHudGroup);
-        }
-
-        function checkCustomLogin() {
-            const inputVal = document.getElementById('login-input').value.trim();
-            if (inputVal === "hhHxz25@@") {
-                openEditorPanel();
-            } else if (inputVal !== "") {
-                handleLoginSuccess("Correo (" + inputVal + ")");
-            } else {
-                alert("Por favor ingresa un correo o código válido.");
-            }
-        }
-
-        function handleLoginSuccess(method) {
-            destroyAllHUDs();
-            enterUniverseTransition();
-        }
-
-        /* --- PASO 2: PANEL DE EDITOR SECRETO --- */
-        function openEditorPanel() {
-            destroyAllHUDs();
-
-            const editorCard = document.createElement('div');
-            editorCard.className = "w-[650px] neon-box-purple p-8 flex flex-col gap-5 floating-card";
-            
-            let usersRows = pendingUsers.map(user => `
-                <div class="flex items-center justify-between bg-purple-950/40 border border-purple-500/30 p-3 rounded-xl" id="user-row-${user.id}">
-                    <div class="flex flex-col text-left">
-                        <span class="text-white font-bold text-base">${user.name}</span>
-                        <span class="text-purple-300 text-xs">${user.email} • Via ${user.provider}</span>
-                    </div>
-                    <button onclick="approveUser(${user.id})" class="interactive-btn bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black px-4 py-2 rounded-lg shadow-[0_0_10px_rgba(16,185,129,0.5)] uppercase tracking-wider">APROBAR ACCESO</button>
-                </div>
-            `).join('');
-
-            editorCard.innerHTML = `
-                <div class="flex justify-between items-center border-b border-purple-500/30 pb-3">
-                    <div>
-                        <span class="text-xs font-black tracking-widest text-emerald-400 uppercase">MODO ADMINISTRADOR</span>
-                        <h2 class="text-2xl font-black text-white">PANEL DE EDITOR SECRETO</h2>
-                    </div>
-                    <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs px-3 py-1 rounded-full font-bold">CÓDIGO CORRECTO</span>
-                </div>
-
-                <p class="text-gray-300 text-xs">Usuarios registrados esperando aprobación de ingreso al Multiverso MS3:</p>
-
-                <div class="flex flex-col gap-2 max-h-[250px] overflow-y-auto pr-1" id="users-container">
-                    ${usersRows.length > 0 ? usersRows : '<p class="text-purple-300 text-center py-4">No hay usuarios pendientes.</p>'}
-                </div>
-
-                <div class="flex justify-between items-center pt-3 border-t border-purple-500/30">
-                    <button onclick="exitMultiverse(event)" class="text-xs text-purple-400 font-bold">CERRAR SESIÓN EDITOR</button>
-                    <button onclick="continueToMultiverseFromEditor()" class="interactive-btn bg-purple-600 text-white font-black px-6 py-3 rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.5)] text-sm">CONTINUAR AL MULTIVERSO →</button>
-                </div>
-            `;
-
-            editorHudGroup = new THREE.Group();
-            const cssObject = new THREE.CSS3DObject(editorCard);
-            cssObject.scale.set(0.005, 0.005, 0.005);
-            editorHudGroup.add(cssObject);
-
-            editorHudGroup.position.set(0, 0, -2.5);
-            cssScene.add(editorHudGroup);
-        }
-
-        function approveUser(id) {
-            pendingUsers = pendingUsers.filter(u => u.id !== id);
-            const row = document.getElementById(`user-row-${id}`);
-            if (row) {
-                row.style.opacity = '0.5';
-                row.innerHTML = `<span class="text-emerald-400 text-xs font-bold py-2 w-full text-center">✓ USUARIO APROBADO Y HABILITADO</span>`;
-            }
-        }
-
-        function continueToMultiverseFromEditor() {
-            destroyAllHUDs();
-            enterUniverseTransition();
-        }
-
-        /* --- TRANSICIÓN DIRECTA AL UNIVERSO / MULTIVERSO --- */
-        function enterUniverseTransition() {
-            isSystemActive = true;
-            instruction.style.opacity = '0';
-
-            gsap.to(cameraRig.position, { 
-                z: -2, 
-                duration: 0.8, 
-                ease: "power3.in"
-            });
-
-            gsap.to(logoGroup.scale, { 
-                x: 6.0, y: 6.0, z: 6.0, 
-                duration: 0.8, 
-                ease: "power2.in" 
-            });
-
-            setTimeout(() => {
-                flashOverlay.style.opacity = '1';
-            }, 500);
-
-            setTimeout(() => {
-                logoGroup.visible = false;
-                logoGroup.scale.set(1, 1, 1);
-                createMultiverseHUD();
-                
-                cameraRig.position.set(0, 0, 5);
-                flashOverlay.style.opacity = '0';
-            }, 850);
-        }
-
-        function createMultiverseHUD() {
-            destroyAllHUDs();
-            
-            const mainContainer = document.createElement('div');
-            mainContainer.className = "w-[1200px] flex flex-col gap-6 floating-card";
-            mainContainer.innerHTML = `
-                <div class="flex justify-between items-center w-full">
-                    <button class="interactive-btn self-start bg-black/95 border-2 border-purple-500 text-purple-300 px-8 py-3 rounded-full font-black text-xl flex items-center gap-3 shadow-[0_0_25px_rgba(168,85,247,0.5)] tracking-widest" onclick="exitMultiverse(event)">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                        <span>VOLVER AL INICIO</span>
-                    </button>
-                </div>
-
-                <div class="w-full neon-box-purple p-8 flex flex-col justify-between h-[360px] rounded-3xl" style="background-image: linear-gradient(to right, rgba(12,10,25,0.95), rgba(12,10,25,0.6)), url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=1400&auto=format&fit=crop'); background-size: cover;">
-                    <div>
-                        <span class="text-sm font-extrabold tracking-widest text-purple-300 uppercase">MS3 Multiverse Live</span>
-                        <h1 class="text-5xl font-black text-white mt-2 drop-shadow-[0_0_20px_rgba(168,85,247,0.8)]">EL CONCIERTO DEL SIGLO</h1>
-                        <p class="text-gray-200 text-base mt-2 max-w-xl leading-relaxed">Experiencia inmersiva 360° en vivo transmitida directamente desde el núcleo del Multiverso MS3.</p>
-                    </div>
-                    <div class="flex gap-4">
-                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="interactive-btn bg-white text-black px-8 py-3 rounded-2xl font-black text-lg shadow-[0_0_25px_rgba(255,255,255,0.8)]">REPRODUCIR AHORA</button>
-                    </div>
-                </div>
-
-                <div class="w-full grid grid-cols-3 gap-6">
-                    <button onclick="openVRProgramsMultiverse(event)" class="interactive-btn neon-box-purple py-5 text-purple-300 font-black text-lg text-center rounded-2xl">PROGRAMAS VR</button>
-                    <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="interactive-btn neon-box-purple py-5 text-purple-300 font-black text-lg text-center rounded-2xl">PROGRAMAS 2D</button>
-                    <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')" class="interactive-btn neon-box-purple py-5 text-purple-300 font-black text-lg text-center rounded-2xl">CANAL EN VIVO</button>
-                </div>
-            `;
-
-            multiverseHudGroup = new THREE.Group();
-            const cssObject = new THREE.CSS3DObject(mainContainer);
-            cssObject.scale.set(0.0055, 0.0055, 0.0055);
-            multiverseHudGroup.add(cssObject);
-            
-            const isMobile = window.innerWidth <= 768;
-            multiverseHudGroup.position.set(0, 0, isMobile ? -5.0 : -4.5);
-            cssScene.add(multiverseHudGroup);
-        }
-
-        function openVRProgramsMultiverse(e) {
-            if (e) e.stopPropagation();
-            destroyAllHUDs();
-
-            const vrContainer = document.createElement('div');
-            vrContainer.className = "w-[1200px] flex flex-col gap-4 floating-card";
-            vrContainer.innerHTML = `
-                <div class="flex items-center justify-between">
-                    <button class="interactive-btn bg-black/95 border-2 border-purple-500 text-purple-300 px-6 py-2.5 rounded-full font-black text-lg flex items-center gap-3 shadow-[0_0_25px_rgba(168,85,247,0.5)]" onclick="createMultiverseHUD()">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                        <span>VOLVER</span>
-                    </button>
-                    <h1 class="text-2xl font-black text-white drop-shadow-[0_0_20px_rgba(168,85,247,0.8)] uppercase tracking-wider">PROGRAMAS VR</h1>
-                </div>
-
-                <div class="w-full neon-box-purple p-5 flex flex-col gap-3">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-bold text-purple-300">CATÁLOGO DE PANTALLAS</h3>
-                        <span class="text-xs text-purple-400 font-bold uppercase tracking-widest">Selecciona un contenido</span>
-                    </div>
-                    
-                    <div class="netflix-grid">
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Cyberpunk City 2099', 'Recorre las calles iluminadas por neón de una metrópolis futurista.', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')">
-                            <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=500&auto=format&fit=crop" alt="Cyberpunk">
-                            <div class="card-info"><h4 class="text-white text-xs font-bold">Cyberpunk 2099</h4><p class="text-purple-300 text-[10px]">Interactivo</p></div>
-                        </div>
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Viaje a Marte 360', 'Explora las dunas rojas y bases espaciales de la próxima frontera.', 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">
-                            <img src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=500&auto=format&fit=crop" alt="Marte">
-                            <div class="card-info"><h4 class="text-white text-xs font-bold">Viaje a Marte</h4><p class="text-purple-300 text-[10px]">VR 360°</p></div>
-                        </div>
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Estación Espacial ISS', 'Vive un día completo flotando en órbita terrestre.', 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')">
-                            <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=500&auto=format&fit=crop" alt="ISS">
-                            <div class="card-info"><h4 class="text-white text-xs font-bold">Estación ISS</h4><p class="text-purple-300 text-[10px]">Inmersivo</p></div>
-                        </div>
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Bosque Bioluminiscente', 'Un santuario natural alienígena interactivo.', 'https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')">
-                            <img src="https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?q=80&w=500&auto=format&fit=crop" alt="Bosque">
-                            <div class="card-info"><h4 class="text-white text-xs font-bold">Bosque Místico</h4><p class="text-purple-300 text-[10px]">Relax VR</p></div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            vrProgramsHudGroup = new THREE.Group();
-            const cssObject = new THREE.CSS3DObject(vrContainer);
-            cssObject.scale.set(0.0055, 0.0055, 0.0055);
-            vrProgramsHudGroup.add(cssObject);
-            
-            const isMobile = window.innerWidth <= 768;
-            vrProgramsHudGroup.position.set(0, 0, isMobile ? -5.0 : -4.5);
-            cssScene.add(vrProgramsHudGroup);
-        }
-
-        function openAboutSection(e) {
-            if (e) e.stopPropagation();
-            if (isTopMenuOpen) toggleTopMenu();
-            destroyAllHUDs();
-            
-            isInAboutSection = true;
-            logoGroup.visible = false;
-            instruction.style.opacity = '0';
-
-            flashOverlay.style.opacity = '1';
-            setTimeout(() => { flashOverlay.style.opacity = '0'; }, 300);
-
-            aboutHudGroup = new THREE.Group();
-            spinningCoins = [];
-
-            const backWrapper = document.createElement('div');
-            backWrapper.className = "w-[1200px] flex flex-col gap-4 floating-card";
-            backWrapper.innerHTML = `
-                <div class="flex justify-between items-center w-full">
-                    <button class="interactive-btn bg-black/95 border-2 border-purple-400 text-purple-300 px-8 py-3 rounded-full font-black text-xl flex items-center gap-3 shadow-[0_0_25px_rgba(168,85,247,0.5)] tracking-widest" onclick="exitMultiverse(event)">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                        <span>VOLVER AL INICIO</span>
-                    </button>
-                    <h1 class="text-3xl font-black text-white drop-shadow-[0_0_20px_rgba(168,85,247,0.8)] uppercase tracking-wider">NOSOTROS - UNIVERSO 360</h1>
-                </div>
-            `;
-            const backObj = new THREE.CSS3DObject(backWrapper);
-            backObj.scale.set(0.0055, 0.0055, 0.0055);
-            backObj.position.set(0, 3.2, -4.5);
-            aboutHudGroup.add(backObj);
-
-            const screenData = [
-                { title: "INNOVACIÓN VR", desc: "Tecnología de punta aplicada al entretenimiento inmersivo.", img: "https://images.unsplash.com/photo-1593508512255-86ab42a8e620?q=80&w=400&auto=format&fit=crop", angle: 0 },
-                { title: "MULTIVERSO MS3", desc: "Plataforma de streaming y experiencias visuales ilimitadas.", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop", angle: Math.PI / 2 },
-                { title: "ARTE Y ESCENA", desc: "Fusión perfecta entre el arte escénico profesional y la realidad virtual.", img: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=400&auto=format&fit=crop", angle: Math.PI },
-                { title: "FUTURO DIGITAL", desc: "Creando mundos interactivos accesibles desde cualquier dispositivo.", img: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?q=80&w=400&auto=format&fit=crop", angle: (3 * Math.PI) / 2 }
-            ];
-
-            const radius = 4.2;
-
-            screenData.forEach((data, index) => {
-                const screenDiv = document.createElement('div');
-                screenDiv.className = "neon-box-purple p-6 flex flex-col items-center justify-between text-center floating-card w-[320px] h-[480px] rounded-3xl";
-                screenDiv.innerHTML = `
-                    <div class="w-full flex flex-col items-center gap-2 mt-4">
-                        <span class="text-xs font-extrabold text-purple-300 tracking-widest uppercase">MS3 PROFILE 0${index + 1}</span>
-                        <h2 class="text-2xl font-black text-white drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]">${data.title}</h2>
-                    </div>
-                    <div class="w-28 h-28 my-auto relative flex items-center justify-center"></div>
-                    <p class="text-gray-300 text-sm leading-relaxed mb-4">${data.desc}</p>
-                `;
-
-                const screenObj = new THREE.CSS3DObject(screenDiv);
-                screenObj.scale.set(0.0042, 0.0042, 0.0042);
-                
-                const xPos = Math.sin(data.angle) * radius;
-                const zPos = -Math.cos(data.angle) * radius;
-                screenObj.position.set(xPos, -0.2, zPos);
-                screenObj.lookAt(0, -0.2, 0);
-                aboutHudGroup.add(screenObj);
-
-                const coinGroup = new THREE.Group();
-                coinGroup.position.set(xPos, -0.2, zPos);
-                coinGroup.rotation.y = data.angle;
-
-                const goldMaterial = new THREE.MeshStandardMaterial({
-                    color: 0xffd700, metalness: 0.9, roughness: 0.2,
-                    emissive: 0x332200, emissiveIntensity: 0.2, side: THREE.DoubleSide
-                });
-
-                const canvas = document.createElement('canvas');
-                canvas.width = 512;
-                canvas.height = 512;
-                const ctx = canvas.getContext('2d');
-
-                function drawCoinFace(isVR) {
-                    ctx.fillStyle = '#ffcc00';
-                    ctx.fillRect(0, 0, 512, 512);
-                    ctx.fillStyle = '#b38600';
-                    ctx.beginPath(); ctx.arc(256, 256, 240, 0, Math.PI * 2); ctx.fill();
-                    ctx.fillStyle = '#ffdf33';
-                    ctx.beginPath(); ctx.arc(256, 256, 220, 0, Math.PI * 2); ctx.fill();
-
-                    if (!isVR) {
-                        ctx.fillStyle = '#805d00';
-                        ctx.font = 'bold 90px Inter';
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText('MS3', 256, 230);
-                        ctx.font = 'bold 35px Inter';
-                        ctx.fillText('VR WORLD', 256, 310);
-                    } else {
-                        ctx.fillStyle = '#c084fc';
-                        ctx.fillRect(136, 196, 240, 120);
-                        ctx.fillStyle = '#000';
-                        ctx.beginPath(); ctx.arc(206, 256, 40, 0, Math.PI * 2); ctx.fill();
-                        ctx.beginPath(); ctx.arc(306, 256, 40, 0, Math.PI * 2); ctx.fill();
-                        ctx.fillStyle = '#e879f9';
-                        ctx.font = 'bold 30px Inter';
-                        ctx.textAlign = 'center';
-                        ctx.fillText('VR GOGGLES', 256, 360);
-                    }
-                }
-
-                drawCoinFace(false);
-                const textureImage = new THREE.CanvasTexture(canvas);
-                const coinFaceMat = new THREE.MeshStandardMaterial({ map: textureImage, metalness: 0.7, roughness: 0.3 });
-                
-                const coinGeo = new THREE.CylinderGeometry(0.8, 0.8, 0.15, 48);
-                coinGeo.rotateX(Math.PI / 2);
-                
-                const coinMesh = new THREE.Mesh(coinGeo, [goldMaterial, coinFaceMat, coinFaceMat]);
-                coinGroup.add(coinMesh);
-                aboutHudGroup.add(coinGroup);
-
-                spinningCoins.push({
-                    group: coinGroup,
-                    canvas: canvas,
-                    ctx: ctx,
-                    texture: textureImage,
-                    angleAccumulator: index * 1.5,
-                    isCurrentlyVR: false
-                });
-            });
-
-            cssScene.add(aboutHudGroup);
-        }
-
-        function destroyAllHUDs() {
-            if (multiverseHudGroup) { 
-                cssScene.remove(multiverseHudGroup); 
-                multiverseHudGroup.traverse((child) => { if (child.element) child.element.remove(); });
-                multiverseHudGroup = null; 
-            }
-            if (vrProgramsHudGroup) { 
-                cssScene.remove(vrProgramsHudGroup); 
-                vrProgramsHudGroup.traverse((child) => { if (child.element) child.element.remove(); });
-                vrProgramsHudGroup = null; 
-            }
-            if (aboutHudGroup) { 
-                cssScene.remove(aboutHudGroup); 
-                aboutHudGroup.traverse((child) => { if (child.element) child.element.remove(); });
-                aboutHudGroup = null; 
-            }
-            if (loginHudGroup) { 
-                cssScene.remove(loginHudGroup); 
-                loginHudGroup.traverse((child) => { if (child.element) child.element.remove(); });
-                loginHudGroup = null; 
-            }
-            if (editorHudGroup) { 
-                cssScene.remove(editorHudGroup); 
-                editorHudGroup.traverse((child) => { if (child.element) child.element.remove(); });
-                editorHudGroup = null; 
-            }
-            spinningCoins = [];
-            isInAboutSection = false;
-        }
-
-        function openPreview(title, desc, imgUrl, videoUrl) {
-            selectedVideoData = videoUrl;
-            document.getElementById('preview-title').innerText = title;
-            document.getElementById('preview-desc').innerText = desc;
-            document.getElementById('preview-modal').style.display = 'flex';
-        }
-
-        function closePreviewModal() {
-            document.getElementById('preview-modal').style.display = 'none';
-        }
-
-        function playFromPreview() {
-            closePreviewModal();
-            if (selectedVideoData) {
-                openVideo(selectedVideoData);
-            }
-        }
-
-        function openVideo(url) {
-            const modal = document.getElementById('video-modal');
-            const video = document.getElementById('active-video');
-            video.src = url;
-            modal.style.display = 'flex';
-            video.play();
-        }
-
-        function closeVideo() {
-            const modal = document.getElementById('video-modal');
-            const video = document.getElementById('active-video');
-            video.pause();
-            video.src = '';
-            modal.style.display = 'none';
-        }
-
-        function exitMultiverse(e) {
-            if (e) e.stopPropagation();
-            destroyAllHUDs();
-            
-            logoGroup.visible = true;
-            instruction.style.opacity = '1';
-            isSystemActive = false;
-            isInAboutSection = false;
-            
-            gsap.fromTo(logoGroup.scale, { x: 0.01, y: 0.01, z: 0.01 }, { x: 1, y: 1, z: 1, duration: 0.8, ease: "power2.out" });
-            gsap.to(cameraRig.position, { z: 5, duration: 1.0, ease: "power2.inOut" });
-        }
-
-        function toggleVRMode() {
-            isVRMode = !isVRMode;
-            document.body.classList.toggle('vr-mode', isVRMode);
-            document.getElementById('vr-btn-text').innerText = isVRMode ? 'SALIR DE VR' : 'VER EN VR';
-            
-            const w = window.innerWidth;
-            const h = window.innerHeight;
-            if (isVRMode) {
-                rendererLeft.setSize(w / 2, h);
-                rendererRight.setSize(w / 2, h);
-                cssRendererLeft.setSize(w / 2, h);
-                cssRendererRight.setSize(w / 2, h);
-                cameraLeft.aspect = (w / 2) / h;
-                cameraRight.aspect = (w / 2) / h;
-                cameraLeft.updateProjectionMatrix();
-                cameraRight.updateProjectionMatrix();
-            } else {
-                rendererLeft.setSize(w, h);
-                rendererRight.setSize(w, h);
-                cssRendererLeft.setSize(w, h);
-                cssRendererRight.setSize(w, h);
-                cameraLeft.aspect = w / h;
-                cameraRight.aspect = w / h;
-                cameraLeft.updateProjectionMatrix();
-                cameraRight.updateProjectionMatrix();
-            }
-            toggleTopMenu();
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-
-            if (starField) starField.rotation.y += 0.0005;
-            
-            if (logoGroup && !isSystemActive && !isInAboutSection && logoGroup.visible) {
-                logoGroup.rotation.y += 0.012; 
-            }
-
-            if (isInAboutSection && spinningCoins.length > 0) {
-                spinningCoins.forEach(coin => {
-                    coin.angleAccumulator += 0.03;
-                    coin.group.rotation.y += 0.03;
-
-                    const normalizedAngle = Math.abs(Math.sin(coin.angleAccumulator));
-                    const shouldBeVR = normalizedAngle < 0.25;
-
-                    if (shouldBeVR !== coin.isCurrentlyVR) {
-                        coin.isCurrentlyVR = shouldBeVR;
-                        
-                        coin.ctx.clearRect(0, 0, 512, 512);
-                        coin.ctx.fillStyle = '#ffcc00';
-                        coin.ctx.fillRect(0, 0, 512, 512);
-                        coin.ctx.fillStyle = '#b38600';
-                        coin.ctx.beginPath(); coin.ctx.arc(256, 256, 240, 0, Math.PI * 2); coin.ctx.fill();
-                        coin.ctx.fillStyle = '#ffdf33';
-                        coin.ctx.beginPath(); coin.ctx.arc(256, 256, 220, 0, Math.PI * 2); coin.ctx.fill();
-
-                        if (!coin.isCurrentlyVR) {
-                            coin.ctx.fillStyle = '#805d00';
-                            coin.ctx.font = 'bold 90px Inter';
-                            coin.ctx.textAlign = 'center';
-                            coin.ctx.textBaseline = 'middle';
-                            coin.ctx.fillText('MS3', 256, 230);
-                            coin.ctx.font = 'bold 35px Inter';
-                            coin.ctx.fillText('VR WORLD', 256, 310);
-                        } else {
-                            coin.ctx.fillStyle = '#c084fc';
-                            coin.ctx.fillRect(156, 216, 200, 90);
-                            coin.ctx.fillStyle = '#000';
-                            coin.ctx.beginPath(); coin.ctx.arc(216, 261, 30, 0, Math.PI * 2); coin.ctx.fill();
-                            coin.ctx.beginPath(); coin.ctx.arc(296, 261, 30, 0, Math.PI * 2); coin.ctx.fill();
-                            coin.ctx.fillStyle = '#e879f9';
-                            coin.ctx.font = 'bold 28px Inter';
-                            coin.ctx.textAlign = 'center';
-                            coin.ctx.fillText('VR GOGGLES', 256, 340);
-                        }
-                        coin.texture.needsUpdate = true;
-                    }
-                });
-            }
-
-            if (!isGyroActive) {
-                currentRotationX += (targetRotationX - currentRotationX) * 0.1;
-                currentRotationY += (targetRotationY - currentRotationY) * 0.1;
-                cameraRig.rotation.y = currentRotationY;
-                cameraRig.rotation.x = currentRotationX;
-            }
-
-            rendererLeft.render(scene, isVRMode ? cameraLeft : camera);
-            cssRendererLeft.render(cssScene, isVRMode ? cameraLeft : camera);
-
-            if (isVRMode) {
-                rendererRight.render(scene, cameraRight);
-                cssRendererRight.render(cssScene, cameraRight);
-            }
-        }
-        animate();
-    </script>
+      }, 3000);
+
+      // Guardar también al pausar
+      reproductor.onpause = () => guardarProgreso(reproductor.currentTime);
+    }
+
+    // Guardar el tiempo actual asociado a la cuenta de usuario activa
+    function guardarProgreso(tiempo) {
+      if (!usuarioActual) return;
+      const claveGuardado = `ms3_progreso_${usuarioActual}_${CONTENIDO_ID}`;
+      localStorage.setItem(claveGuardado, tiempo);
+      notificarEstado('Progreso guardado automáticamente');
+    }
+
+    // Mensaje visual discreto al guardar
+    function notificarEstado(texto) {
+      const msg = document.getElementById('mensaje-estado');
+      msg.innerText = texto;
+      setTimeout(() => { msg.innerText = ''; }, 2000);
+    }
+
+    // Cerrar sesión
+    function cerrarSesion() {
+      const reproductor = document.getElementById('reproductor');
+      guardarProgreso(reproductor.currentTime);
+      
+      localStorage.removeItem('ms3_usuario_activo');
+      location.reload();
+    }
+  </script>
 </body>
 </html>
