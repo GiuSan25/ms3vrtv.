@@ -147,7 +147,6 @@
         let vrProgramsHudGroup = null;
         let aboutHudGroup = null;
         let loginHudGroup = null;
-        let editorHudGroup = null;
         
         let spinningCoins = [];
         let isTopMenuOpen = false;
@@ -162,11 +161,6 @@
         let currentRotationX = 0, currentRotationY = 0;
 
         let deviceQuaternion = new THREE.Quaternion();
-
-        let pendingUsers = [
-            { id: 1, name: "Carlos Mendoza", email: "carlos.m@gmail.com", provider: "Google" },
-            { id: 2, name: "Elena Rostova", email: "elena.r@icloud.com", provider: "Apple" }
-        ];
 
         const containerLeft = document.getElementById('canvas-container-left');
         const cssContainerLeft = document.getElementById('css3d-container-left');
@@ -367,12 +361,12 @@
                 if (savedSession) {
                     enterUniverseTransition();
                 } else {
-                    openLoginPanel();
+                    openLoginPanel('login');
                 }
             }
         });
 
-        function openLoginPanel() {
+        function openLoginPanel(mode = 'login') {
             isSystemActive = true;
             instruction.style.opacity = '0';
             logoGroup.visible = false;
@@ -380,30 +374,42 @@
             destroyAllHUDs();
 
             const loginCard = document.createElement('div');
-            loginCard.className = "w-[550px] neon-box-purple p-10 flex flex-col gap-6 floating-card text-center";
+            loginCard.className = "w-[550px] neon-box-purple p-10 flex flex-col gap-5 floating-card text-center";
+            
+            const isReg = mode === 'register';
+
             loginCard.innerHTML = `
-                <div class="flex flex-col items-center gap-2">
-                    <span class="text-sm font-black tracking-widest text-purple-400 uppercase">ACCESO AL MULTIVERSO</span>
-                    <h2 class="text-4xl font-black text-white drop-shadow-[0_0_15px_rgba(168,85,247,0.8)]">INICIAR SESIÓN</h2>
+                <div class="flex flex-col items-center gap-1">
+                    <span class="text-xs font-black tracking-widest text-purple-400 uppercase">ACCESO AL MULTIVERSO</span>
+                    <h2 class="text-3xl font-black text-white drop-shadow-[0_0_15px_rgba(168,85,247,0.8)]">${isReg ? 'CREAR CUENTA' : 'INICIAR SESIÓN'}</h2>
                 </div>
 
-                <div class="flex flex-col items-center gap-4 my-2">
+                <div class="flex flex-col gap-3 my-1">
+                    <input type="text" id="custom-user" placeholder="Nombre de usuario" class="w-full bg-black/60 border border-purple-500/50 rounded-xl px-5 py-3.5 text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 text-center font-bold text-sm">
+                    <input type="password" id="custom-pass" placeholder="Contraseña" class="w-full bg-black/60 border border-purple-500/50 rounded-xl px-5 py-3.5 text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 text-center font-bold text-sm">
+                    
+                    <button onclick="${isReg ? 'handleCustomRegister()' : 'handleCustomLogin()'}" class="interactive-btn bg-purple-600 hover:bg-purple-500 text-white font-black py-3.5 rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.5)] tracking-wider text-sm mt-1">
+                        ${isReg ? 'REGISTRARSE' : 'INGRESAR'}
+                    </button>
+                </div>
+
+                <div class="flex justify-center text-xs font-bold text-purple-300">
+                    ${isReg ? '¿Ya tienes una cuenta?' : '¿No tienes cuenta?'} 
+                    <button onclick="openLoginPanel('${isReg ? 'login' : 'register'}')" class="text-white underline ml-1 hover:text-purple-400">${isReg ? 'Inicia sesión aquí' : 'Regístrate aquí'}</button>
+                </div>
+
+                <div class="relative my-1 flex items-center justify-center">
+                    <div class="border-t border-purple-500/30 w-full"></div>
+                    <span class="bg-[#0c0a19] px-3 text-[11px] text-purple-300 uppercase font-extrabold relative z-10">O CONTINÚA CON</span>
+                    <div class="border-t border-purple-500/30 w-full"></div>
+                </div>
+
+                <div class="flex flex-col items-center gap-3">
                     <!-- Contenedor Oficial del Botón Google Sign-In -->
                     <div id="google-btn-container" class="w-full flex justify-center"></div>
                 </div>
 
-                <div class="relative my-2 flex items-center justify-center">
-                    <div class="border-t border-purple-500/30 w-full"></div>
-                    <span class="bg-[#0c0a19] px-3 text-xs text-purple-300 uppercase font-extrabold relative z-10">O ACCESO ADMINISTRADOR</span>
-                    <div class="border-t border-purple-500/30 w-full"></div>
-                </div>
-
-                <div class="flex flex-col gap-4">
-                    <input type="password" id="admin-input" placeholder="Clave de administrador" class="w-full bg-black/60 border border-purple-500/50 rounded-xl px-5 py-4 text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 text-center font-bold text-base">
-                    <button onclick="checkAdminLogin()" class="interactive-btn bg-purple-600 hover:bg-purple-500 text-white font-black py-4 rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.5)] tracking-wider text-base">ENTRAR MODO EDITOR</button>
-                </div>
-
-                <button onclick="exitMultiverse(event)" class="text-sm text-purple-400 hover:text-white font-bold mt-2">CANCELAR Y VOLVER</button>
+                <button onclick="exitMultiverse(event)" class="text-xs text-purple-400 hover:text-white font-bold mt-1">CANCELAR Y VOLVER</button>
             `;
 
             loginHudGroup = new THREE.Group();
@@ -416,6 +422,57 @@
 
             // Inicializar el SDK de Autenticación de Google
             initGoogleAuth();
+        }
+
+        function handleCustomRegister() {
+            const user = document.getElementById('custom-user').value.trim();
+            const pass = document.getElementById('custom-pass').value.trim();
+
+            if (!user || !pass) {
+                alert("Por favor completa ambos campos para registrarte.");
+                return;
+            }
+
+            let registeredUsers = JSON.parse(localStorage.getItem('ms3_registered_users') || '[]');
+            const exists = registeredUsers.find(u => u.user === user);
+
+            if (exists) {
+                alert("El usuario ya existe. Prueba con otro nombre o inicia sesión.");
+                return;
+            }
+
+            registeredUsers.push({ user, pass });
+            localStorage.setItem('ms3_registered_users', JSON.stringify(registeredUsers));
+
+            alert("¡Cuenta creada con éxito! Ahora puedes iniciar sesión.");
+            openLoginPanel('login');
+        }
+
+        function handleCustomLogin() {
+            const user = document.getElementById('custom-user').value.trim();
+            const pass = document.getElementById('custom-pass').value.trim();
+
+            if (!user || !pass) {
+                alert("Por favor ingresa usuario y contraseña.");
+                return;
+            }
+
+            let registeredUsers = JSON.parse(localStorage.getItem('ms3_registered_users') || '[]');
+            const found = registeredUsers.find(u => u.user === user && u.pass === pass);
+
+            if (!found) {
+                alert("Usuario o contraseña incorrectos, o la cuenta no existe.");
+                return;
+            }
+
+            localStorage.setItem('ms3_user_session', JSON.stringify({
+                name: user,
+                loginTime: Date.now()
+            }));
+
+            document.getElementById('logout-menu-btn').classList.remove('hidden');
+            destroyAllHUDs();
+            enterUniverseTransition();
         }
 
         function initGoogleAuth() {
@@ -467,77 +524,6 @@
                 destroyAllHUDs();
                 enterUniverseTransition();
             }
-        }
-
-        function checkAdminLogin() {
-            const inputVal = document.getElementById('admin-input').value.trim();
-            if (inputVal === "hhHxz25@@") {
-                openEditorPanel();
-            } else {
-                alert("Clave de acceso incorrecta.");
-            }
-        }
-
-        function openEditorPanel() {
-            destroyAllHUDs();
-
-            const editorCard = document.createElement('div');
-            editorCard.className = "w-[650px] neon-box-purple p-8 flex flex-col gap-5 floating-card";
-            
-            let usersRows = pendingUsers.map(user => `
-                <div class="flex items-center justify-between bg-purple-950/40 border border-purple-500/30 p-3 rounded-xl" id="user-row-${user.id}">
-                    <div class="flex flex-col text-left">
-                        <span class="text-white font-bold text-base">${user.name}</span>
-                        <span class="text-purple-300 text-xs">${user.email} • Autenticado con ${user.provider}</span>
-                    </div>
-                    <button onclick="approveUser(${user.id})" class="interactive-btn bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black px-4 py-2 rounded-lg shadow-[0_0_10px_rgba(16,185,129,0.5)] uppercase tracking-wider">APROBAR ACCESO</button>
-                </div>
-            `).join('');
-
-            editorCard.innerHTML = `
-                <div class="flex justify-between items-center border-b border-purple-500/30 pb-3">
-                    <div>
-                        <span class="text-xs font-black tracking-widest text-emerald-400 uppercase">MODO ADMINISTRADOR</span>
-                        <h2 class="text-2xl font-black text-white">PANEL DE EDITOR SECRETO</h2>
-                    </div>
-                    <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs px-3 py-1 rounded-full font-bold">SESIÓN ACTIVA</span>
-                </div>
-
-                <p class="text-gray-300 text-xs">Usuarios autenticados vía Google esperando validación de ingreso al Multiverso MS3:</p>
-
-                <div class="flex flex-col gap-2 max-h-[250px] overflow-y-auto pr-1" id="users-container">
-                    ${usersRows.length > 0 ? usersRows : '<p class="text-purple-300 text-center py-4">No hay usuarios pendientes.</p>'}
-                </div>
-
-                <div class="flex justify-between items-center pt-3 border-t border-purple-500/30">
-                    <button onclick="exitMultiverse(event)" class="text-xs text-purple-400 font-bold">CERRAR SESIÓN EDITOR</button>
-                    <button onclick="continueToMultiverseFromEditor()" class="interactive-btn bg-purple-600 text-white font-black px-6 py-3 rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.5)] text-sm">CONTINUAR AL MULTIVERSO →</button>
-                </div>
-            `;
-
-            editorHudGroup = new THREE.Group();
-            const cssObject = new THREE.CSS3DObject(editorCard);
-            cssObject.scale.set(0.005, 0.005, 0.005);
-            editorHudGroup.add(cssObject);
-
-            editorHudGroup.position.set(0, 0, -2.5);
-            cssScene.add(editorHudGroup);
-        }
-
-        function approveUser(id) {
-            pendingUsers = pendingUsers.filter(u => u.id !== id);
-            const row = document.getElementById(`user-row-${id}`);
-            if (row) {
-                row.style.opacity = '0.5';
-                row.innerHTML = `<span class="text-emerald-400 text-xs font-bold py-2 w-full text-center">✓ USUARIO APROBADO Y HABILITADO</span>`;
-            }
-        }
-
-        function continueToMultiverseFromEditor() {
-            localStorage.setItem('ms3_user_session', JSON.stringify({ role: 'admin', loginTime: Date.now() }));
-            document.getElementById('logout-menu-btn').classList.remove('hidden');
-            destroyAllHUDs();
-            enterUniverseTransition();
         }
 
         function enterUniverseTransition() {
@@ -809,11 +795,6 @@
                 cssScene.remove(loginHudGroup); 
                 loginHudGroup.traverse((child) => { if (child.element) child.element.remove(); });
                 loginHudGroup = null; 
-            }
-            if (editorHudGroup) { 
-                cssScene.remove(editorHudGroup); 
-                editorHudGroup.traverse((child) => { if (child.element) child.element.remove(); });
-                editorHudGroup = null; 
             }
             spinningCoins = [];
             isInAboutSection = false;
