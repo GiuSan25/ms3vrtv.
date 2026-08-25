@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MS3 - Transición al Metaverso</title>
+  <title>MS3 - Universo 3D</title>
+  <!-- Three.js para el Logo 3D y el Universo -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
-    /* RESET & ESTILOS BASE */
     * {
       margin: 0;
       padding: 0;
@@ -13,55 +14,45 @@
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #0b0c10;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #05020a;
       color: #ffffff;
       overflow-x: hidden;
     }
 
-    /* NAVEGACIÓN Y HERO */
+    /* HEADER Y LOGO 3D */
     header {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      padding: 20px 50px;
+      padding: 10px 40px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
       z-index: 10;
-      background: rgba(11, 12, 16, 0.8);
-      backdrop-filter: blur(5px);
+      background: rgba(5, 2, 10, 0.7);
+      backdrop-filter: blur(8px);
     }
 
-    .logo-container {
+    /* Contenedor interactivo del Canvas 3D del Logo */
+    #logo-3d-container {
+      width: 70px;
+      height: 70px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: transform 0.3s ease;
     }
 
-    .logo-container:hover {
-      transform: scale(1.08);
-    }
-
-    .logo-svg {
-      width: 50px;
-      height: 50px;
-      filter: drop-shadow(0 0 8px #00f2fe);
-    }
-
-    .logo-text {
-      font-weight: 800;
-      font-size: 1.5rem;
-      letter-spacing: 2px;
-      background: linear-gradient(45deg, #00f2fe, #4facfe);
+    .brand-title {
+      font-weight: 900;
+      font-size: 1.6rem;
+      letter-spacing: 3px;
+      margin-left: 10px;
+      background: linear-gradient(45deg, #ff007f, #b026ff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
     }
 
-    /* SECCIONES DE LA PÁGINA */
+    /* SECCIONES */
     section {
       min-height: 100vh;
       display: flex;
@@ -73,12 +64,12 @@
     }
 
     #inicio {
-      background: radial-gradient(circle at center, #1f2833 0%, #0b0c10 100%);
+      background: radial-gradient(circle at center, #1a0933 0%, #05020a 100%);
     }
 
     #metaverso-ms3 {
-      background: radial-gradient(circle at center, #0f0c1b 0%, #05020a 100%);
-      border-top: 1px solid rgba(0, 242, 254, 0.2);
+      background: radial-gradient(circle at center, #2a0845 0%, #05020a 100%);
+      border-top: 1px solid rgba(255, 0, 127, 0.3);
     }
 
     h1 {
@@ -88,14 +79,16 @@
 
     h2 {
       font-size: 3.5rem;
-      color: #00f2fe;
-      text-shadow: 0 0 20px rgba(0, 242, 254, 0.6);
+      background: linear-gradient(45deg, #ff007f, #7928ca);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 15px rgba(255, 0, 127, 0.5));
       margin-bottom: 15px;
     }
 
     p {
       max-width: 600px;
-      color: #c5c6c7;
+      color: #d1c4e9;
       font-size: 1.2rem;
       line-height: 1.6;
     }
@@ -103,19 +96,14 @@
     .hint {
       margin-top: 30px;
       font-size: 0.9rem;
-      color: #66fcf1;
-      border: 1px solid #66fcf1;
+      color: #ff007f;
+      border: 1px solid #ff007f;
       padding: 10px 20px;
       border-radius: 20px;
-      animation: pulse 2s infinite;
+      box-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 0.6; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.05); }
-    }
-
-    /* CANVAS UNIVERSO (OVERLAY DE TRANSICIÓN) */
+    /* CANVAS TRANSICIÓN UNIVERSO */
     #universe-canvas {
       position: fixed;
       top: 0;
@@ -125,8 +113,8 @@
       pointer-events: none;
       opacity: 0;
       z-index: 9999;
-      transition: opacity 0.4s ease;
-      background: #000000;
+      transition: opacity 0.5s ease;
+      background: #000;
     }
 
     #universe-canvas.active {
@@ -137,50 +125,99 @@
 </head>
 <body>
 
-  <!-- NAVEGACIÓN -->
+  <!-- HEADER CON LOGO 3D GIRATORIO -->
   <header>
-    <div class="logo-container" id="logo-ms3" title="Haz clic para viajar al Metaverso">
-      <!-- Logo vectorial generado dinámicamente -->
-      <svg class="logo-svg" viewBox="0 0 100 100">
-        <polygon points="50,5 95,25 95,75 50,95 5,75 5,25" fill="none" stroke="#00f2fe" stroke-width="4"/>
-        <text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="bold">MS3</text>
-      </svg>
-      <span class="logo-text">MS3</span>
-    </div>
+    <div id="logo-3d-container" title="Haz clic para entrar al Metaverso"></div>
+    <span class="brand-title">MS3</span>
   </header>
 
-  <!-- CANVAS EFECTO UNIVERSO -->
+  <!-- CANVAS EFECTO TRANSICIÓN DE UNIVERSO -->
   <canvas id="universe-canvas"></canvas>
 
-  <!-- SECCIÓN PRINCIPAL -->
+  <!-- INICIO -->
   <section id="inicio">
-    <h1>Bienvenido a MS3 Web</h1>
-    <p>Explora nuestras herramientas y tecnología de vanguardia.</p>
-    <div class="hint">↖ Haz clic en el logo de MS3 para saltar al Metaverso</div>
+    <h1>Experiencia MS3 3D</h1>
+    <p>Plataforma interactiva con estética cyberpunk y futurista.</p>
+    <div class="hint">↖ Presiona el logo 3D rosa/violeta para viajar al Metaverso</div>
   </section>
 
-  <!-- SECCIÓN METAVERSO DE DESTINO -->
+  <!-- DESTINO METAVERSO -->
   <section id="metaverso-ms3">
     <h2>METAVERSO MS3</h2>
-    <p>Has ingresado a la nueva dimensión digital. Bienvenido al entorno inmersivo de MS3 donde los límites físicos desaparecen.</p>
+    <p>Bienvenido a la dimensión inmersiva. El salto hiperespacial se ha completado con éxito.</p>
   </section>
 
-  <!-- LÓGICA JAVASCRIPT -->
   <script>
+    /* ===================================================
+       1. RENDERIZADO DEL LOGO MS3 EN 3D (ROSA / VIOLETA)
+       =================================================== */
+    const logoContainer = document.getElementById('logo-3d-container');
+    
+    // Escena, cámara y renderer para el logo
+    const logoScene = new THREE.Scene();
+    const logoCamera = new THREE.PerspectiveCamera(50, 1, 0.1, 1000);
+    logoCamera.position.z = 4.5;
+
+    const logoRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    logoRenderer.setSize(70, 70);
+    logoContainer.appendChild(logoRenderer.domElement);
+
+    // Creación del Objeto 3D del Logo (Geometría Futuro-Hexagonal con Anillos)
+    const logoGroup = new THREE.Group();
+
+    // Núcleo Diamante / Cristalino
+    const coreGeo = new THREE.OctahedronGeometry(1.2, 0);
+    const coreMat = new THREE.MeshPhongMaterial({
+      color: 0xff007f,
+      emissive: 0x4a0033,
+      shininess: 100,
+      flatShading: true
+    });
+    const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+    logoGroup.add(coreMesh);
+
+    // Anillo exterior Violeta Neón
+    const ringGeo = new THREE.TorusGeometry(1.7, 0.08, 16, 100);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0xb026ff, wireframe: true });
+    const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+    ringMesh.rotation.x = Math.PI / 3;
+    logoGroup.add(ringMesh);
+
+    logoScene.add(logoGroup);
+
+    // Iluminación Rosa / Violeta
+    const light1 = new THREE.PointLight(0xff007f, 2, 50);
+    light1.position.set(5, 5, 5);
+    logoScene.add(light1);
+
+    const light2 = new THREE.PointLight(0xb026ff, 2, 50);
+    light2.position.set(-5, -5, 5);
+    logoScene.add(light2);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    logoScene.add(ambientLight);
+
+    // Animación de Rotación 360 sobre su propio eje
+    function animateLogo() {
+      requestAnimationFrame(animateLogo);
+      logoGroup.rotation.y += 0.015;
+      ringMesh.rotation.z -= 0.01;
+      logoRenderer.render(logoScene, logoCamera);
+    }
+    animateLogo();
+
+
+    /* ===================================================
+       2. EFECTO UNIVERSO (CANVAS TRANSICIÓN HIPERESPACIO)
+       =================================================== */
     const canvas = document.getElementById('universe-canvas');
     const ctx = canvas.getContext('2d');
-    const logo = document.getElementById('logo-ms3');
     const targetSection = document.getElementById('metaverso-ms3');
 
     let stars = [];
-    const numStars = 1000;
     let speed = 2;
-    let baseSpeed = 2;
-    let maxSpeed = 80;
-    let isAnimating = false;
-    let animationId = null;
+    let isTransitioning = false;
 
-    // Redimensionar Canvas
     function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -188,93 +225,76 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Inicializar Posición de las Estrellas
-    function initStars() {
-      stars = [];
-      for (let i = 0; i < numStars; i++) {
-        stars.push({
-          x: (Math.random() - 0.5) * canvas.width * 2,
-          y: (Math.random() - 0.5) * canvas.height * 2,
-          z: Math.random() * canvas.width
-        });
-      }
+    // Generar estrellas iniciales
+    for (let i = 0; i < 900; i++) {
+      stars.push({
+        x: (Math.random() - 0.5) * canvas.width * 2,
+        y: (Math.random() - 0.5) * canvas.height * 2,
+        z: Math.random() * canvas.width
+      });
     }
-    initStars();
 
-    // Bucle de Renderizado del Universo 3D
-    function render() {
-      // Fondo negro profundo
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'; // Traza leve para efecto estela
+    // Dibujar Túnel Estelar en Canvas 2D
+    function drawUniverse() {
+      ctx.fillStyle = 'rgba(5, 2, 10, 0.4)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       const cx = canvas.width / 2;
       const cy = canvas.height / 2;
 
       stars.forEach(star => {
-        // Mover estrella hacia la cámara
         star.z -= speed;
+        if (star.z <= 0) star.z = canvas.width;
 
-        // Si sobrepasa la pantalla, se reinicia al fondo
-        if (star.z <= 0) {
-          star.z = canvas.width;
-          star.x = (Math.random() - 0.5) * canvas.width * 2;
-          star.y = (Math.random() - 0.5) * canvas.height * 2;
-        }
-
-        // Proyección perspectiva 3D a 2D
-        const k = 256 / star.z;
+        const k = 128 / star.z;
         const px = star.x * k + cx;
         const py = star.y * k + cy;
 
         if (px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height) {
-          const size = Math.max(0.5, (1 - star.z / canvas.width) * 3);
-          
-          // Color dinámico según la velocidad (Pasa de blanco a azul cian)
-          const shade = Math.floor((1 - star.z / canvas.width) * 255);
-          ctx.fillStyle = speed > 20 ? '#00f2fe' : `rgb(${shade}, ${shade}, ${shade})`;
-
+          const size = (1 - star.z / canvas.width) * 3.5;
+          // Estrellas en tonos Neón Magenta y Violeta durante el viaje
+          ctx.fillStyle = speed > 15 ? '#ff007f' : '#b026ff';
           ctx.beginPath();
           ctx.arc(px, py, size, 0, Math.PI * 2);
           ctx.fill();
         }
       });
 
-      if (isAnimating) {
-        animationId = requestAnimationFrame(render);
+      if (isTransitioning) {
+        requestAnimationFrame(drawUniverse);
       }
     }
 
-    // DISPARADOR DE LA TRANSICIÓN
-    logo.addEventListener('click', () => {
-      if (isAnimating) return; // Evitar múltiples clics continuos
+    /* ===================================================
+       3. ACTIVACIÓN AL HACER CLIC EN EL LOGO 3D
+       =================================================== */
+    logoContainer.addEventListener('click', () => {
+      if (isTransitioning) return;
 
-      isAnimating = true;
-      speed = baseSpeed;
+      isTransitioning = true;
+      speed = 2;
       canvas.classList.add('active');
-      render();
+      drawUniverse();
 
-      // Fase 1: Aceleración (Salto a hipervelocidad)
-      let acceleration = setInterval(() => {
+      // Transición tipo túnel al espacio / hiperespacio
+      let accel = setInterval(() => {
         speed += 3;
-        if (speed >= maxSpeed) {
-          clearInterval(acceleration);
-
-          // Fase 2: Hacer el Scroll al Metaverso en el pico de velocidad
+        if (speed > 60) {
+          clearInterval(accel);
+          
+          // Desplazamiento a la sección del metaverso
           targetSection.scrollIntoView({ behavior: 'smooth' });
 
-          // Fase 3: Desacelerar y desvanecer overlay
+          // Finalizar y desvanecer el fondo espacial
           setTimeout(() => {
             canvas.classList.remove('active');
-            
             setTimeout(() => {
-              isAnimating = false;
-              cancelAnimationFrame(animationId);
-              speed = baseSpeed;
+              isTransitioning = false;
+              speed = 2;
             }, 500);
-
-          }, 800);
+          }, 600);
         }
-      }, 20);
+      }, 25);
     });
   </script>
 </body>
