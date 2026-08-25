@@ -65,8 +65,8 @@
         .interactive-btn { pointer-events: auto; cursor: pointer; }
 
         .neon-box-purple {
-            border: 2px solid rgba(168, 85, 247, 0.5); box-shadow: 0 0 35px rgba(138, 43, 226, 0.35), inset 0 0 25px rgba(138, 43, 226, 0.2);
-            border-radius: 28px; background: rgba(12, 10, 25, 0.96); backdrop-filter: blur(16px);
+            border: 3px solid rgba(168, 85, 247, 0.7); box-shadow: 0 0 60px rgba(138, 43, 226, 0.5), inset 0 0 40px rgba(138, 43, 226, 0.3);
+            border-radius: 36px; background: rgba(10, 8, 22, 0.98); backdrop-filter: blur(20px);
         }
 
         .netflix-card {
@@ -385,36 +385,36 @@
             destroyAllHUDs();
 
             const loginCard = document.createElement('div');
-            // Panel ensanchado y optimizado con padding y elementos grandes ideales para toque táctil
-            loginCard.className = "w-[94vw] max-w-[480px] neon-box-purple p-10 sm:p-12 flex flex-col gap-6 floating-card text-center";
+            // Panel extra ancho, con diseño imponente y ultra cómodo al tacto
+            loginCard.className = "w-[98vw] max-w-[650px] neon-box-purple p-14 sm:p-16 flex flex-col gap-8 floating-card text-center";
             const isReg = mode === 'register';
 
             loginCard.innerHTML = `
-                <div class="flex flex-col items-center gap-2">
-                    <span class="text-xs sm:text-sm font-black tracking-widest text-purple-400 uppercase">ACCESO AL MULTIVERSO</span>
-                    <h2 class="text-3xl sm:text-5xl font-black text-white">${isReg ? 'CREAR CUENTA' : 'INICIAR SESIÓN'}</h2>
+                <div class="flex flex-col items-center gap-3">
+                    <span class="text-sm sm:text-base font-black tracking-widest text-purple-400 uppercase">ACCESO AL MULTIVERSO</span>
+                    <h2 class="text-4xl sm:text-6xl font-black text-white">${isReg ? 'CREAR CUENTA' : 'INICIAR SESIÓN'}</h2>
                 </div>
-                <div class="flex flex-col gap-5 my-3">
-                    <input type="text" id="custom-user" placeholder="Nombre de usuario" class="w-full bg-black/80 border-2 border-purple-500 rounded-2xl px-6 py-4 text-white placeholder-gray-400 text-center font-bold text-lg shadow-inner">
-                    <input type="password" id="custom-pass" placeholder="Contraseña" class="w-full bg-black/80 border-2 border-purple-500 rounded-2xl px-6 py-4 text-white placeholder-gray-400 text-center font-bold text-lg shadow-inner">
-                    <button id="custom-action-btn" class="interactive-btn bg-purple-600 hover:bg-purple-500 text-white font-black py-4 rounded-2xl shadow-[0_0_25px_rgba(168,85,247,0.7)] text-lg tracking-wide uppercase">${isReg ? 'REGISTRARSE' : 'INGRESAR'}</button>
+                <div class="flex flex-col gap-7 my-4">
+                    <input type="text" id="custom-user" placeholder="Nombre de usuario" class="w-full bg-black/90 border-3 border-purple-500 rounded-3xl px-8 py-6 text-white placeholder-gray-400 text-center font-extrabold text-2xl shadow-inner">
+                    <input type="password" id="custom-pass" placeholder="Contraseña" class="w-full bg-black/90 border-3 border-purple-500 rounded-3xl px-8 py-6 text-white placeholder-gray-400 text-center font-extrabold text-2xl shadow-inner">
+                    <button id="custom-action-btn" class="interactive-btn bg-purple-600 hover:bg-purple-500 text-white font-black py-6 rounded-3xl shadow-[0_0_35px_rgba(168,85,247,0.9)] text-2xl tracking-wide uppercase">${isReg ? 'REGISTRARSE' : 'INGRESAR'}</button>
                 </div>
-                <div class="flex justify-center text-sm sm:text-base font-bold text-purple-300">
+                <div class="flex justify-center text-lg sm:text-xl font-bold text-purple-300">
                     ${isReg ? '¿Ya tienes una cuenta?' : '¿No tienes cuenta?'} 
                     <button id="switch-auth-mode" class="text-white underline ml-2 font-extrabold">${isReg ? 'Inicia sesión' : 'Regístrate'}</button>
                 </div>
-                <button id="cancel-login-btn" class="text-sm sm:text-base text-purple-400 hover:text-white font-bold mt-2 uppercase tracking-wider">CANCELAR</button>
+                <button id="cancel-login-btn" class="text-lg sm:text-xl text-purple-400 hover:text-white font-bold mt-2 uppercase tracking-wider">CANCELAR</button>
             `;
 
             loginHudGroup = new THREE.Group();
             const cssObject = new THREE.CSS3DObject(loginCard);
             
-            // Escala optimizada para que se vea masivo, claro y perfectamente al alcance del usuario
-            cssObject.scale.set(0.0035, 0.0035, 0.0035);
+            // Escala aumentada drásticamente para ocupar toda la escena visual de frente con gran presencia
+            cssObject.scale.set(0.0055, 0.0055, 0.0055);
             loginHudGroup.add(cssObject);
             
-            // Ubicado de frente y un poco más cerca para gran visibilidad
-            loginHudGroup.position.set(0, 0, -1.1); 
+            // Ubicado de frente y cómodo a la vista
+            loginHudGroup.position.set(0, 0, -1.0); 
             cssScene.add(loginHudGroup);
 
             document.getElementById('custom-action-btn').addEventListener('click', isReg ? handleCustomRegister : handleCustomLogin);
