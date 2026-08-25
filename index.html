@@ -328,7 +328,6 @@
 
         const viewContainer = document.getElementById('vr-view-container');
         
-        // Alta sensibilidad táctil con tolerancia optimizada para celulares
         viewContainer.addEventListener('pointerdown', (e) => {
             isDragging = true;
             previousMousePosition = { x: e.clientX, y: e.clientY };
@@ -352,7 +351,6 @@
             isDragging = false;
 
             const moveDistance = Math.hypot(e.clientX - touchStartedPos.x, e.clientY - touchStartedPos.y);
-            // Tolerancia de 15px para toques limpios en pantallas táctiles móviles
             if (moveDistance < 15) {
                 handleLogoInteraction(e.clientX, e.clientY);
             }
@@ -387,7 +385,7 @@
             destroyAllHUDs();
 
             const loginCard = document.createElement('div');
-            loginCard.className = "w-[92vw] max-w-[400px] neon-box-purple p-6 sm:p-8 flex flex-col gap-4 floating-card text-center";
+            loginCard.className = "w-[92vw] max-w-[380px] neon-box-purple p-6 sm:p-8 flex flex-col gap-4 floating-card text-center";
             const isReg = mode === 'register';
 
             loginCard.innerHTML = `
@@ -409,11 +407,11 @@
 
             loginHudGroup = new THREE.Group();
             const cssObject = new THREE.CSS3DObject(loginCard);
-            cssObject.scale.set(0.0035, 0.0035, 0.0035); // Escala optimizada
+            cssObject.scale.set(0.0028, 0.0028, 0.0028); // Escala ajustada para mantener proporción correcta de la tarjeta cerca
             loginHudGroup.add(cssObject);
             
-            // Posición Z más cerca de la cámara para que el usuario no tenga que buscarlo
-            loginHudGroup.position.set(0, 0, -2.2); 
+            // ¡Panel de inicio de sesión súper cerca de la pantalla para máxima comodidad táctil!
+            loginHudGroup.position.set(0, 0, -1.3); 
             cssScene.add(loginHudGroup);
 
             document.getElementById('custom-action-btn').addEventListener('click', isReg ? handleCustomRegister : handleCustomLogin);
