@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=1280, initial-scale=0.3, maximum-scale=3.0, user-scalable=yes">
     <title>MS3 - Multiverso Inmersivo VR</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -13,14 +13,14 @@
         
         * { -webkit-tap-highlight-color: transparent; }
         
-        body, html { 
+        html, body { 
             margin: 0; padding: 0; overflow: hidden; background-color: #030208; 
-            font-family: 'Inter', sans-serif; width: 100vw; height: 100dvh; 
+            font-family: 'Inter', sans-serif; width: 100vw; height: 100vh; 
             user-select: none; -webkit-user-select: none; touch-action: none;
         }
         
         #vr-view-container {
-            display: flex; width: 100vw; height: 100dvh; position: absolute;
+            display: flex; width: 100vw; height: 100vh; position: absolute;
             top: 0; left: 0; z-index: 2; cursor: grab;
         }
 
@@ -74,10 +74,7 @@
         }
 
         .netflix-grid {
-            display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; overflow: visible;
-        }
-        @media (max-width: 768px) {
-            .netflix-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+            display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; overflow: visible;
         }
 
         .netflix-card {
@@ -189,9 +186,12 @@
         cameraRig = new THREE.Object3D();
         scene.add(cameraRig);
 
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        cameraLeft = new THREE.PerspectiveCamera(75, (window.innerWidth / 2) / window.innerHeight, 0.1, 1000);
-        cameraRight = new THREE.PerspectiveCamera(75, (window.innerWidth / 2) / window.innerHeight, 0.1, 1000);
+        function getViewportWidth() { return window.innerWidth; }
+        function getViewportHeight() { return window.innerHeight; }
+
+        camera = new THREE.PerspectiveCamera(75, getViewportWidth() / getViewportHeight(), 0.1, 1000);
+        cameraLeft = new THREE.PerspectiveCamera(75, (getViewportWidth() / 2) / getViewportHeight(), 0.1, 1000);
+        cameraRight = new THREE.PerspectiveCamera(75, (getViewportWidth() / 2) / getViewportHeight(), 0.1, 1000);
 
         cameraLeft.position.x = -eyeSeparation / 2;
         cameraRight.position.x = eyeSeparation / 2;
@@ -202,19 +202,19 @@
         cameraRig.position.set(0, 0, 5);
 
         rendererLeft = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        rendererLeft.setSize(window.innerWidth, window.innerHeight);
+        rendererLeft.setSize(getViewportWidth(), getViewportHeight());
         containerLeft.appendChild(rendererLeft.domElement);
 
         rendererRight = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        rendererRight.setSize(window.innerWidth, window.innerHeight);
+        rendererRight.setSize(getViewportWidth(), getViewportHeight());
         containerRight.appendChild(rendererRight.domElement);
 
         cssRendererLeft = new THREE.CSS3DRenderer();
-        cssRendererLeft.setSize(window.innerWidth, window.innerHeight);
+        cssRendererLeft.setSize(getViewportWidth(), getViewportHeight());
         cssContainerLeft.appendChild(cssRendererLeft.domElement);
 
         cssRendererRight = new THREE.CSS3DRenderer();
-        cssRendererRight.setSize(window.innerWidth / 2, window.innerHeight);
+        cssRendererRight.setSize(getViewportWidth() / 2, getViewportHeight());
         cssContainerRight.appendChild(cssRendererRight.domElement);
 
         scene.add(new THREE.AmbientLight(0x2a1b4e, 1.8));
@@ -572,8 +572,7 @@
             cssObject.scale.set(0.0055, 0.0055, 0.0055);
             multiverseHudGroup.add(cssObject);
             
-            const isMobile = window.innerWidth <= 768;
-            multiverseHudGroup.position.set(0, 0, isMobile ? -5.0 : -4.5);
+            multiverseHudGroup.position.set(0, 0, -4.5);
             cssScene.add(multiverseHudGroup);
         }
 
@@ -624,8 +623,7 @@
             cssObject.scale.set(0.0055, 0.0055, 0.0055);
             vrProgramsHudGroup.add(cssObject);
             
-            const isMobile = window.innerWidth <= 768;
-            vrProgramsHudGroup.position.set(0, 0, isMobile ? -5.0 : -4.5);
+            vrProgramsHudGroup.position.set(0, 0, -4.5);
             cssScene.add(vrProgramsHudGroup);
         }
 
@@ -839,8 +837,8 @@
             document.body.classList.toggle('vr-mode', isVRMode);
             document.getElementById('vr-btn-text').innerText = isVRMode ? 'SALIR DE VR' : 'VER EN VR';
             
-            const w = window.innerWidth;
-            const h = window.innerHeight;
+            const w = getViewportWidth();
+            const h = getViewportHeight();
             if (isVRMode) {
                 rendererLeft.setSize(w / 2, h);
                 rendererRight.setSize(w / 2, h);
@@ -862,6 +860,28 @@
             }
             toggleTopMenu();
         }
+
+        window.addEventListener('resize', () => {
+            const w = getViewportWidth();
+            const h = getViewportHeight();
+            
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+
+            if (isVRMode) {
+                cameraLeft.aspect = (w / 2) / h;
+                cameraRight.aspect = (w / 2) / h;
+                rendererLeft.setSize(w / 2, h);
+                rendererRight.setSize(w / 2, h);
+                cssRendererLeft.setSize(w / 2, h);
+                cssRendererRight.setSize(w / 2, h);
+            } else {
+                rendererLeft.setSize(w, h);
+                cssRendererLeft.setSize(w, h);
+            }
+            cameraLeft.updateProjectionMatrix();
+            cameraRight.updateProjectionMatrix();
+        });
 
         function animate() {
             requestAnimationFrame(animate);
