@@ -385,33 +385,34 @@
             destroyAllHUDs();
 
             const loginCard = document.createElement('div');
-            loginCard.className = "w-[92vw] max-w-[380px] neon-box-purple p-6 sm:p-8 flex flex-col gap-4 floating-card text-center";
+            loginCard.className = "w-[94vw] max-w-[420px] neon-box-purple p-8 sm:p-10 flex flex-col gap-5 floating-card text-center";
             const isReg = mode === 'register';
 
             loginCard.innerHTML = `
-                <div class="flex flex-col items-center gap-1">
-                    <span class="text-xs font-black tracking-widest text-purple-400 uppercase">ACCESO AL MULTIVERSO</span>
-                    <h2 class="text-2xl sm:text-3xl font-black text-white">${isReg ? 'CREAR CUENTA' : 'INICIAR SESIÓN'}</h2>
+                <div class="flex flex-col items-center gap-1.5">
+                    <span class="text-xs sm:text-sm font-black tracking-widest text-purple-400 uppercase">ACCESO AL MULTIVERSO</span>
+                    <h2 class="text-3xl sm:text-4xl font-black text-white">${isReg ? 'CREAR CUENTA' : 'INICIAR SESIÓN'}</h2>
                 </div>
-                <div class="flex flex-col gap-3 my-1">
-                    <input type="text" id="custom-user" placeholder="Nombre de usuario" class="w-full bg-black/60 border border-purple-500/50 rounded-xl px-4 py-3 text-white placeholder-gray-400 text-center font-bold text-sm">
-                    <input type="password" id="custom-pass" placeholder="Contraseña" class="w-full bg-black/60 border border-purple-500/50 rounded-xl px-4 py-3 text-white placeholder-gray-400 text-center font-bold text-sm">
-                    <button id="custom-action-btn" class="interactive-btn bg-purple-600 text-white font-black py-3 rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.5)] text-sm">${isReg ? 'REGISTRARSE' : 'INGRESAR'}</button>
+                <div class="flex flex-col gap-4 my-2">
+                    <input type="text" id="custom-user" placeholder="Nombre de usuario" class="w-full bg-black/70 border-2 border-purple-500/70 rounded-2xl px-5 py-3.5 text-white placeholder-gray-400 text-center font-bold text-base">
+                    <input type="password" id="custom-pass" placeholder="Contraseña" class="w-full bg-black/70 border-2 border-purple-500/70 rounded-2xl px-5 py-3.5 text-white placeholder-gray-400 text-center font-bold text-base">
+                    <button id="custom-action-btn" class="interactive-btn bg-purple-600 hover:bg-purple-500 text-white font-black py-4 rounded-2xl shadow-[0_0_20px_rgba(168,85,247,0.6)] text-base tracking-wide">${isReg ? 'REGISTRARSE' : 'INGRESAR'}</button>
                 </div>
-                <div class="flex justify-center text-xs font-bold text-purple-300">
+                <div class="flex justify-center text-sm font-bold text-purple-300">
                     ${isReg ? '¿Ya tienes una cuenta?' : '¿No tienes cuenta?'} 
-                    <button id="switch-auth-mode" class="text-white underline ml-1">${isReg ? 'Inicia sesión' : 'Regístrate'}</button>
+                    <button id="switch-auth-mode" class="text-white underline ml-1.5">${isReg ? 'Inicia sesión' : 'Regístrate'}</button>
                 </div>
-                <button id="cancel-login-btn" class="text-xs text-purple-400 hover:text-white font-bold mt-1">CANCELAR</button>
+                <button id="cancel-login-btn" class="text-sm text-purple-400 hover:text-white font-bold mt-1">CANCELAR</button>
             `;
 
             loginHudGroup = new THREE.Group();
             const cssObject = new THREE.CSS3DObject(loginCard);
-            cssObject.scale.set(0.0028, 0.0028, 0.0028); // Escala ajustada para mantener proporción correcta de la tarjeta cerca
+            // ¡Escala grande para que luzca imponente y sumamente legible en el centro!
+            cssObject.scale.set(0.0032, 0.0032, 0.0032);
             loginHudGroup.add(cssObject);
             
-            // ¡Panel de inicio de sesión súper cerca de la pantalla para máxima comodidad táctil!
-            loginHudGroup.position.set(0, 0, -1.3); 
+            // Posicionado bien al frente y cómodo a la vista
+            loginHudGroup.position.set(0, 0, -1.2); 
             cssScene.add(loginHudGroup);
 
             document.getElementById('custom-action-btn').addEventListener('click', isReg ? handleCustomRegister : handleCustomLogin);
