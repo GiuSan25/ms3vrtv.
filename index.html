@@ -385,7 +385,7 @@
             destroyAllHUDs();
 
             const loginCard = document.createElement('div');
-            // Panel extra ancho, con diseño imponente y ultra cómodo al tacto
+            // Panel optimizado, ancho y extremadamente cómodo al tacto
             loginCard.className = "w-[98vw] max-w-[650px] neon-box-purple p-14 sm:p-16 flex flex-col gap-8 floating-card text-center";
             const isReg = mode === 'register';
 
@@ -409,12 +409,11 @@
             loginHudGroup = new THREE.Group();
             const cssObject = new THREE.CSS3DObject(loginCard);
             
-            // Escala aumentada drásticamente para ocupar toda la escena visual de frente con gran presencia
-            cssObject.scale.set(0.0055, 0.0055, 0.0055);
+            // Escala incrementada y posición muchísimo más cerca de la cámara (-0.65)
+            cssObject.scale.set(0.0058, 0.0058, 0.0058);
             loginHudGroup.add(cssObject);
             
-            // Ubicado de frente y cómodo a la vista
-            loginHudGroup.position.set(0, 0, -1.0); 
+            loginHudGroup.position.set(0, 0, -0.65); 
             cssScene.add(loginHudGroup);
 
             document.getElementById('custom-action-btn').addEventListener('click', isReg ? handleCustomRegister : handleCustomLogin);
