@@ -7,23 +7,26 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
         body { font-family: 'Outfit', sans-serif; background-color: #050508; color: #ffffff; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0b0c16; }
         ::-webkit-scrollbar-thumb { background: #2d2f4d; border-radius: 3px; }
-        .glow-purple { text-shadow: 0 0 20px rgba(168, 85, 247, 0.6); }
-        .glow-box { box-shadow: 0 0 25px rgba(126, 34, 206, 0.25); }
+        .glow-purple { text-shadow: 0 0 25px rgba(168, 85, 247, 0.7); }
+        .glow-box { box-shadow: 0 0 30px rgba(126, 34, 206, 0.4); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body class="bg-[#050508] text-white selection:bg-purple-600 selection:text-white">
 
-    <div id="intro-screen" class="fixed inset-0 z-50 bg-[#030305] flex flex-col items-center justify-center transition-opacity duration-1000">
-        <div id="canvas-container" class="w-full h-[60vh]"></div>
-        <h1 class="text-4xl font-extrabold tracking-widest mt-4 glow-purple bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent">MS3</h1>
-        <p class="text-gray-400 text-sm mt-2 tracking-wider">MÁS ALLÁ DE LO QUE VES</p>
-        <button onclick="enterApp()" class="mt-8 px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full font-semibold tracking-wider hover:opacity-90 transition transform hover:scale-105 glow-box">
+    <div id="intro-screen" class="fixed inset-0 z-50 bg-[#030305] flex flex-col items-center justify-center transition-all duration-1000">
+        <div id="canvas-container" class="w-full h-[65vh] flex items-center justify-center"></div>
+        <p class="text-gray-400 text-xs tracking-[0.3em] uppercase mb-6 font-semibold glow-purple">MÁS ALLÁ DE LO QUE VES</p>
+        <button onclick="enterApp()" class="px-10 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl font-bold text-sm tracking-wider hover:opacity-90 transition transform hover:scale-105 glow-box cursor-pointer">
             INGRESAR AL MUNDO MS3
         </button>
     </div>
@@ -37,20 +40,20 @@
             <div class="text-[10px] text-gray-500 font-semibold tracking-widest mb-4">MÁS ALLÁ DE LO QUE VES</div>
             
             <nav class="space-y-2 flex-1">
-                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-purple-600/20 text-purple-400 border border-purple-500/30 font-medium"><i class="fa-solid fa-house"></i><span>Inicio</span></a>
-                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition"><i class="fa-solid fa-compass"></i><span>Explorar</span></a>
-                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition"><i class="fa-solid fa-fire"></i><span>Tendencias</span></a>
-                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition"><i class="fa-solid fa-desktop"></i><span>En 2D</span></a>
-                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition"><i class="fa-solid fa-vr-cardboard"></i><span>En Realidad Virtual</span></a>
-                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition"><i class="fa-solid fa-film"></i><span>Películas</span></a>
-                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition"><i class="fa-solid fa-tv"></i><span>Series</span></a>
-                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition"><i class="fa-solid fa-list"></i><span>Mi lista</span></a>
+                <button onclick="switchTab('inicio', this)" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-purple-600/20 text-purple-400 border border-purple-500/30 font-medium transition cursor-pointer"><i class="fa-solid fa-house"></i><span>Inicio</span></button>
+                <button onclick="switchTab('explorar', this)" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition cursor-pointer"><i class="fa-solid fa-compass"></i><span>Explorar</span></button>
+                <button onclick="switchTab('tendencias', this)" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition cursor-pointer"><i class="fa-solid fa-fire"></i><span>Tendencias</span></button>
+                <button onclick="switchTab('en2d', this)" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition cursor-pointer"><i class="fa-solid fa-desktop"></i><span>En 2D</span></button>
+                <button onclick="switchTab('envr', this)" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition cursor-pointer"><i class="fa-solid fa-vr-cardboard"></i><span>En Realidad Virtual</span></button>
+                <button onclick="switchTab('peliculas', this)" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition cursor-pointer"><i class="fa-solid fa-film"></i><span>Películas</span></button>
+                <button onclick="switchTab('series', this)" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition cursor-pointer"><i class="fa-solid fa-tv"></i><span>Series</span></button>
+                <button onclick="switchTab('milista', this)" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition cursor-pointer"><i class="fa-solid fa-list"></i><span>Mi lista</span></button>
             </nav>
 
             <div class="p-4 bg-gradient-to-br from-purple-900/40 to-indigo-900/40 border border-purple-500/20 rounded-2xl text-center">
                 <p class="text-xs font-bold text-purple-300 mb-1">EXPERIENCIA SIN LÍMITES</p>
                 <p class="text-[10px] text-gray-400 mb-3">2D • VR • 360°</p>
-                <button class="w-full py-2 bg-purple-600 hover:bg-purple-500 text-xs font-bold rounded-xl transition shadow-lg shadow-purple-600/30">SUBSCRIBITE AHORA</button>
+                <button onclick="alert('¡Gracias por unirte a MS3! Tu suscripción está activa.')" class="w-full py-2 bg-purple-600 hover:bg-purple-500 text-xs font-bold rounded-xl transition shadow-lg shadow-purple-600/30 cursor-pointer">SUBSCRIBITE AHORA</button>
             </div>
         </aside>
 
@@ -58,95 +61,189 @@
             <header class="flex items-center justify-between px-6 py-4 border-b border-[#1a1c2e] bg-[#050508]/80 backdrop-blur sticky top-0 z-30">
                 <div class="flex items-center bg-[#0d0f1d] border border-white/10 rounded-full px-4 py-2 w-72 md:w-96">
                     <i class="fa-solid fa-magnifying-glass text-gray-400 mr-2 text-sm"></i>
-                    <input type="text" placeholder="Buscar contenido..." class="bg-transparent border-none outline-none text-xs w-full text-white placeholder-gray-500">
+                    <input type="text" id="search-input" placeholder="Buscar contenido..." onkeyup="handleSearch(event)" class="bg-transparent border-none outline-none text-xs w-full text-white placeholder-gray-500">
                 </div>
                 <div class="flex items-center space-x-4">
-                    <button class="flex items-center space-x-2 px-3 py-1.5 bg-purple-600/20 border border-purple-500/40 rounded-full text-xs font-semibold text-purple-300 hover:bg-purple-600/30 transition">
+                    <button onclick="openVRExperience('MS3 Hub Inmersivo')" class="flex items-center space-x-2 px-3 py-1.5 bg-purple-600/20 border border-purple-500/40 rounded-full text-xs font-semibold text-purple-300 hover:bg-purple-600/30 transition cursor-pointer">
                         <i class="fa-solid fa-vr-cardboard"></i><span>Modo VR</span>
                     </button>
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center font-bold text-xs">Alex</div>
+                    <div onclick="switchTab('milista', document.querySelector('.nav-btn'))" class="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center font-bold text-xs cursor-pointer shadow-md">Alex</div>
                 </div>
             </header>
 
-            <section class="p-6 md:p-10">
-                <div class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-purple-950/60 to-indigo-950/40 border border-purple-500/20 p-8 md:p-14 flex flex-col justify-center min-h-[420px] shadow-2xl">
-                    <div class="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-luminosity" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1600&q=80')"></div>
-                    <div class="absolute inset-0 bg-gradient-to-r from-[#050508] via-[#050508]/70 to-transparent"></div>
+            <div id="tab-inicio" class="tab-content active">
+                <section class="p-6 md:p-10">
+                    <div class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-purple-950/60 to-indigo-950/40 border border-purple-500/20 p-8 md:p-14 flex flex-col justify-center min-h-[420px] shadow-2xl">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-luminosity" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1600&q=80')"></div>
+                        <div class="absolute inset-0 bg-gradient-to-r from-[#050508] via-[#050508]/70 to-transparent"></div>
+                        <div class="relative z-10 max-w-xl">
+                            <span class="text-xs font-bold tracking-widest text-purple-400 mb-2 block">DESTACADO</span>
+                            <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-4">TU MUNDO.<br>TUS REGLAS.</h2>
+                            <p class="text-gray-300 text-sm md:text-base mb-6 leading-relaxed">Disfrutá miles de títulos en 2D y Realidad Virtual. Donde quieras, como quieras.</p>
+                            <div class="flex flex-wrap gap-4">
+                                <button onclick="openVRExperience('The Expanse')" class="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl font-bold text-sm hover:opacity-90 transition shadow-lg shadow-purple-600/40 cursor-pointer">
+                                    <i class="fa-solid fa-play"></i><span>Ver ahora</span>
+                                </button>
+                                <button onclick="openVRExperience('The Expanse')" class="flex items-center space-x-2 px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl font-bold text-sm transition backdrop-blur cursor-pointer">
+                                    <i class="fa-solid fa-vr-cardboard"></i><span>Explorar en VR</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-                    <div class="relative z-10 max-w-xl">
-                        <span class="text-xs font-bold tracking-widest text-purple-400 mb-2 block">DESTACADO</span>
-                        <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-4">TU MUNDO.<br>TUS REGLAS.</h2>
-                        <p class="text-gray-300 text-sm md:text-base mb-6 leading-relaxed">Disfrutá miles de títulos en 2D y Realidad Virtual. Donde quieras, como quieras.</p>
-                        <div class="flex flex-wrap gap-4">
-                            <button onclick="openVRExperience('The Expanse')" class="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl font-bold text-sm hover:opacity-90 transition shadow-lg shadow-purple-600/40">
-                                <i class="fa-solid fa-play"></i><span>Ver ahora</span>
-                            </button>
-                            <button onclick="openVRExperience('The Expanse')" class="flex items-center space-x-2 px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl font-bold text-sm transition backdrop-blur">
-                                <i class="fa-solid fa-vr-cardboard"></i><span>Explorar en VR</span>
-                            </button>
+                <section class="px-6 md:px-10 mb-10">
+                    <h3 class="text-lg font-bold mb-4">Continuar viendo</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <div onclick="openVRExperience('The Expanse')" class="group cursor-pointer bg-[#0d0f1d] border border-white/5 rounded-2xl overflow-hidden hover:border-purple-500/50 transition">
+                            <div class="relative h-36 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=500&q=80')">
+                                <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/70 backdrop-blur text-[10px] font-bold rounded text-purple-300 border border-purple-500/30">VR</span>
+                                <div class="absolute bottom-0 inset-x-0 h-1 bg-white/20"><div class="w-[75%] h-full bg-purple-500"></div></div>
+                            </div>
+                            <div class="p-3"><h4 class="text-xs font-bold truncate">THE EXPANSE</h4><span class="text-[10px] text-gray-500">75% completado</span></div>
+                        </div>
+                        <div onclick="openVRExperience('Blade Runner 2049')" class="group cursor-pointer bg-[#0d0f1d] border border-white/5 rounded-2xl overflow-hidden hover:border-purple-500/50 transition">
+                            <div class="relative h-36 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=500&q=80')">
+                                <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/70 backdrop-blur text-[10px] font-bold rounded text-blue-300 border border-blue-500/30">2D</span>
+                                <div class="absolute bottom-0 inset-x-0 h-1 bg-white/20"><div class="w-[65%] h-full bg-blue-500"></div></div>
+                            </div>
+                            <div class="p-3"><h4 class="text-xs font-bold truncate">BLADE RUNNER 2049</h4><span class="text-[10px] text-gray-500">65% completado</span></div>
+                        </div>
+                        <div onclick="openVRExperience('Everest')" class="group cursor-pointer bg-[#0d0f1d] border border-white/5 rounded-2xl overflow-hidden hover:border-purple-500/50 transition">
+                            <div class="relative h-36 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=500&q=80')">
+                                <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/70 backdrop-blur text-[10px] font-bold rounded text-purple-300 border border-purple-500/30">VR</span>
+                                <div class="absolute bottom-0 inset-x-0 h-1 bg-white/20"><div class="w-[40%] h-full bg-purple-500"></div></div>
+                            </div>
+                            <div class="p-3"><h4 class="text-xs font-bold truncate">EVEREST</h4><span class="text-[10px] text-gray-500">40% completado</span></div>
+                        </div>
+                        <div onclick="openVRExperience('Jurassic World')" class="group cursor-pointer bg-[#0d0f1d] border border-white/5 rounded-2xl overflow-hidden hover:border-purple-500/50 transition">
+                            <div class="relative h-36 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=500&q=80')">
+                                <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/70 backdrop-blur text-[10px] font-bold rounded text-blue-300 border border-blue-500/30">2D</span>
+                                <div class="absolute bottom-0 inset-x-0 h-1 bg-white/20"><div class="w-[80%] h-full bg-blue-500"></div></div>
+                            </div>
+                            <div class="p-3"><h4 class="text-xs font-bold truncate">JURASSIC WORLD</h4><span class="text-[10px] text-gray-500">80% completado</span></div>
+                        </div>
+                        <div onclick="openVRExperience('Ad Astra')" class="group cursor-pointer bg-[#0d0f1d] border border-white/5 rounded-2xl overflow-hidden hover:border-purple-500/50 transition">
+                            <div class="relative h-36 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=500&q=80')">
+                                <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/70 backdrop-blur text-[10px] font-bold rounded text-blue-300 border border-blue-500/30">2D</span>
+                                <div class="absolute bottom-0 inset-x-0 h-1 bg-white/20"><div class="w-[55%] h-full bg-blue-500"></div></div>
+                            </div>
+                            <div class="p-3"><h4 class="text-xs font-bold truncate">AD ASTRA</h4><span class="text-[10px] text-gray-500">55% completado</span></div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
 
-            <section class="px-6 md:px-10 mb-10">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold">Continuar viendo</h3>
-                    <span class="text-xs text-purple-400 cursor-pointer hover:underline">Ver todo</span>
-                </div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-                    <div onclick="openVRExperience('The Expanse')" class="group cursor-pointer bg-[#0d0f1d] border border-white/5 rounded-2xl overflow-hidden hover:border-purple-500/50 transition">
-                        <div class="relative h-36 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=500&q=80')">
-                            <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/70 backdrop-blur text-[10px] font-bold rounded text-purple-300 border border-purple-500/30">VR</span>
-                            <div class="absolute bottom-0 inset-x-0 h-1 bg-white/20"><div class="w-[75%] h-full bg-purple-500"></div></div>
-                        </div>
-                        <div class="p-3">
-                            <h4 class="text-xs font-bold truncate">THE EXPANSE</h4>
-                            <span class="text-[10px] text-gray-500">75% completado</span>
-                        </div>
+            <div id="tab-explorar" class="tab-content p-6 md:p-10">
+                <h2 class="text-2xl font-bold mb-6">Explorar Catálogo General</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div onclick="openVRExperience('Dune 2021')" class="bg-[#0d0f1d] p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-purple-500/50 transition">
+                        <div class="h-40 bg-cover bg-center rounded-xl mb-3" style="background-image: url('https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?auto=format&fit=crop&w=400&q=80')"></div>
+                        <h4 class="font-bold text-sm">DUNE</h4>
+                        <p class="text-xs text-gray-400">Ciencia Ficción • 2D/VR</p>
                     </div>
-                    <div class="group cursor-pointer bg-[#0d0f1d] border border-white/5 rounded-2xl overflow-hidden hover:border-purple-500/50 transition">
-                        <div class="relative h-36 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=500&q=80')">
-                            <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/70 backdrop-blur text-[10px] font-bold rounded text-blue-300 border border-blue-500/30">2D</span>
-                            <div class="absolute bottom-0 inset-x-0 h-1 bg-white/20"><div class="w-[65%] h-full bg-blue-500"></div></div>
-                        </div>
-                        <div class="p-3">
-                            <h4 class="text-xs font-bold truncate">BLADE RUNNER 2049</h4>
-                            <span class="text-[10px] text-gray-500">65% completado</span>
-                        </div>
+                    <div onclick="openVRExperience('The Void')" class="bg-[#0d0f1d] p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-purple-500/50 transition">
+                        <div class="h-40 bg-cover bg-center rounded-xl mb-3" style="background-image: url('https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=400&q=80')"></div>
+                        <h4 class="font-bold text-sm">THE VOID</h4>
+                        <p class="text-xs text-gray-400">Espacio • VR 360°</p>
                     </div>
-                    <div onclick="openVRExperience('Everest')" class="group cursor-pointer bg-[#0d0f1d] border border-white/5 rounded-2xl overflow-hidden hover:border-purple-500/50 transition">
-                        <div class="relative h-36 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=500&q=80')">
-                            <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/70 backdrop-blur text-[10px] font-bold rounded text-purple-300 border border-purple-500/30">VR</span>
-                            <div class="absolute bottom-0 inset-x-0 h-1 bg-white/20"><div class="w-[40%] h-full bg-purple-500"></div></div>
-                        </div>
-                        <div class="p-3">
-                            <h4 class="text-xs font-bold truncate">EVEREST</h4>
-                            <span class="text-[10px] text-gray-500">40% completado</span>
-                        </div>
+                    <div onclick="openVRExperience('Beat Horizon')" class="bg-[#0d0f1d] p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-purple-500/50 transition">
+                        <div class="h-40 bg-cover bg-center rounded-xl mb-3" style="background-image: url('https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=400&q=80')"></div>
+                        <h4 class="font-bold text-sm">BEAT HORIZON</h4>
+                        <p class="text-xs text-gray-400">Musical • 2D</p>
                     </div>
-                    <div class="group cursor-pointer bg-[#0d0f1d] border border-white/5 rounded-2xl overflow-hidden hover:border-purple-500/50 transition">
-                        <div class="relative h-36 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=500&q=80')">
-                            <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/70 backdrop-blur text-[10px] font-bold rounded text-blue-300 border border-blue-500/30">2D</span>
-                            <div class="absolute bottom-0 inset-x-0 h-1 bg-white/20"><div class="w-[80%] h-full bg-blue-500"></div></div>
-                        </div>
-                        <div class="p-3">
-                            <h4 class="text-xs font-bold truncate">JURASSIC WORLD</h4>
-                            <span class="text-[10px] text-gray-500">80% completado</span>
-                        </div>
-                    </div>
-                    <div class="group cursor-pointer bg-[#0d0f1d] border border-white/5 rounded-2xl overflow-hidden hover:border-purple-500/50 transition">
-                        <div class="relative h-36 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=500&q=80')">
-                            <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/70 backdrop-blur text-[10px] font-bold rounded text-blue-300 border border-blue-500/30">2D</span>
-                            <div class="absolute bottom-0 inset-x-0 h-1 bg-white/20"><div class="w-[55%] h-full bg-blue-500"></div></div>
-                        </div>
-                        <div class="p-3">
-                            <h4 class="text-xs font-bold truncate">AD ASTRA</h4>
-                            <span class="text-[10px] text-gray-500">55% completado</span>
-                        </div>
+                    <div onclick="openVRExperience('Wild Planet')" class="bg-[#0d0f1d] p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-purple-500/50 transition">
+                        <div class="h-40 bg-cover bg-center rounded-xl mb-3" style="background-image: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=400&q=80')"></div>
+                        <h4 class="font-bold text-sm">WILD PLANET</h4>
+                        <p class="text-xs text-gray-400">Naturaleza • VR</p>
                     </div>
                 </div>
-            </section>
+            </div>
+
+            <div id="tab-tendencias" class="tab-content p-6 md:p-10">
+                <h2 class="text-2xl font-bold mb-6">Tendencias Globales MS3</h2>
+                <div class="space-y-4">
+                    <div onclick="openVRExperience('The Expanse')" class="flex items-center justify-between bg-[#0d0f1d] p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-purple-500/40 transition">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-2xl font-black text-purple-500">01</span>
+                            <div class="w-16 h-12 bg-cover bg-center rounded-lg" style="background-image: url('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=200&q=80')"></div>
+                            <div><h4 class="font-bold text-sm">THE EXPANSE (VR)</h4><p class="text-xs text-gray-400">#1 en vistas esta semana</p></div>
+                        </div>
+                        <span class="px-3 py-1 bg-purple-600/20 text-purple-300 text-xs rounded-full">Ver Inmersión</span>
+                    </div>
+                    <div onclick="openVRExperience('Blade Runner 2049')" class="flex items-center justify-between bg-[#0d0f1d] p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-purple-500/40 transition">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-2xl font-black text-purple-500">02</span>
+                            <div class="w-16 h-12 bg-cover bg-center rounded-lg" style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=200&q=80')"></div>
+                            <div><h4 class="font-bold text-sm">BLADE RUNNER 2049 (2D)</h4><p class="text-xs text-gray-400">Clásico Moderno</p></div>
+                        </div>
+                        <span class="px-3 py-1 bg-purple-600/20 text-purple-300 text-xs rounded-full">Reproducir</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-en2d" class="tab-content p-6 md:p-10">
+                <h2 class="text-2xl font-bold mb-6">Contenido Estándar en 2D</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div onclick="openVRExperience('Blade Runner 2049')" class="bg-[#0d0f1d] p-4 rounded-2xl border border-white/5 cursor-pointer">
+                        <div class="h-48 bg-cover bg-center rounded-xl mb-3" style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=400&q=80')"></div>
+                        <h4 class="font-bold">Blade Runner 2049</h4>
+                        <p class="text-xs text-gray-400">Ultra HD 4K • 2D</p>
+                    </div>
+                    <div onclick="openVRExperience('Jurassic World')" class="bg-[#0d0f1d] p-4 rounded-2xl border border-white/5 cursor-pointer">
+                        <div class="h-48 bg-cover bg-center rounded-xl mb-3" style="background-image: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=400&q=80')"></div>
+                        <h4 class="font-bold">Jurassic World</h4>
+                        <p class="text-xs text-gray-400">Acción • 2D</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-envr" class="tab-content p-6 md:p-10">
+                <h2 class="text-2xl font-bold mb-2">Experiencias Inmersivas VR</h2>
+                <p class="text-xs text-purple-400 mb-6">Contenido optimizado para cascos y celulares con giroscopio en 360°.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div onclick="openVRExperience('The Expanse VR')" class="relative rounded-2xl overflow-hidden h-64 bg-cover bg-center flex items-end p-6 cursor-pointer border border-purple-500/30 group" style="background-image: url('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=800&q=80')">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                        <div class="relative z-10">
+                            <span class="px-2.5 py-1 bg-purple-600 rounded text-[10px] font-bold mb-2 inline-block">VR 360°</span>
+                            <h3 class="text-xl font-bold">The Expanse Inmersivo</h3>
+                            <p class="text-xs text-gray-300">Sumérgete en el espacio exterior con total libertad de movimiento.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-peliculas" class="tab-content p-6 md:p-10">
+                <h2 class="text-2xl font-bold mb-6">Películas Seleccionadas</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div onclick="openVRExperience('Ad Astra')" class="bg-[#0d0f1d] p-4 rounded-2xl border border-white/5 cursor-pointer">
+                        <div class="h-40 bg-cover bg-center rounded-xl mb-3" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=400&q=80')"></div>
+                        <h4 class="font-bold text-sm">Ad Astra</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-series" class="tab-content p-6 md:p-10">
+                <h2 class="text-2xl font-bold mb-6">Series Exclusivas MS3</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div onclick="openVRExperience('The Expanse Temporadas')" class="bg-[#0d0f1d] p-4 rounded-2xl border border-white/5 cursor-pointer">
+                        <div class="h-40 bg-cover bg-center rounded-xl mb-3" style="background-image: url('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=400&q=80')"></div>
+                        <h4 class="font-bold text-sm">The Expanse (Serie)</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-milista" class="tab-content p-6 md:p-10">
+                <h2 class="text-2xl font-bold mb-2">Mi Perfil y Lista Guardada</h2>
+                <p class="text-xs text-gray-400 mb-6">Usuario: Alex • Plan MS3 Ultra Premium</p>
+                <div class="bg-[#0d0f1d] border border-white/10 rounded-2xl p-6 max-w-md">
+                    <h3 class="font-bold mb-4">Títulos favoritos guardados</h3>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex justify-between items-center bg-white/5 px-4 py-2 rounded-xl"><span>The Expanse VR</span><i class="fa-solid fa-check text-purple-400"></i></li>
+                        <li class="flex justify-between items-center bg-white/5 px-4 py-2 rounded-xl"><span>Blade Runner 2049</span><i class="fa-solid fa-check text-purple-400"></i></li>
+                    </ul>
+                </div>
+            </div>
 
         </main>
     </div>
@@ -157,84 +254,130 @@
                 <span class="text-xs text-purple-400 font-bold">MODO INMERSIVO 360° VR</span>
                 <h3 id="vr-title" class="text-base font-extrabold">Título de la Experiencia</h3>
             </div>
-            <button onclick="closeVRPlayer()" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
+            <button onclick="closeVRPlayer()" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition cursor-pointer">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
         <div id="vr-viewport" class="flex-1 w-full h-full cursor-grab"></div>
-        <div class="absolute bottom-6 inset-x-0 z-20 flex justify-center">
+        <div class="absolute bottom-6 inset-x-0 z-20 flex justify-center pointer-events-none">
             <div class="bg-black/60 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10 text-center text-xs text-gray-300">
-                <i class="fa-solid fa-arrows-spin mr-2"></i> Arrastrá con el mouse o mové tu dispositivo para explorar el entorno virtual 360°
+                <i class="fa-solid fa-arrows-spin mr-2"></i> Arrastrá con el mouse o mové tu celular para explorar el entorno virtual 360°
             </div>
         </div>
     </div>
 
     <nav class="md:hidden fixed bottom-0 inset-x-0 bg-[#08080f]/90 backdrop-blur-lg border-t border-[#1a1c2e] flex justify-around py-3 z-40">
-        <a href="#" class="flex flex-col items-center text-purple-400"><i class="fa-solid fa-house text-sm"></i><span class="text-[10px] mt-1">Inicio</span></a>
-        <a href="#" class="flex flex-col items-center text-gray-400"><i class="fa-solid fa-compass text-sm"></i><span class="text-[10px] mt-1">Explorar</span></a>
-        <a href="#" class="flex flex-col items-center text-gray-400"><i class="fa-solid fa-vr-cardboard text-sm"></i><span class="text-[10px] mt-1">VR</span></a>
-        <a href="#" class="flex flex-col items-center text-gray-400"><i class="fa-solid fa-download text-sm"></i><span class="text-[10px] mt-1">Descargas</span></a>
-        <a href="#" class="flex flex-col items-center text-gray-400"><i class="fa-solid fa-user text-sm"></i><span class="text-[10px] mt-1">Mi perfil</span></a>
+        <button onclick="switchTab('inicio', this)" class="mobile-nav-btn flex flex-col items-center text-purple-400 cursor-pointer"><i class="fa-solid fa-house text-sm"></i><span class="text-[10px] mt-1">Inicio</span></button>
+        <button onclick="switchTab('explorar', this)" class="mobile-nav-btn flex flex-col items-center text-gray-400 cursor-pointer"><i class="fa-solid fa-compass text-sm"></i><span class="text-[10px] mt-1">Explorar</span></button>
+        <button onclick="switchTab('envr', this)" class="mobile-nav-btn flex flex-col items-center text-gray-400 cursor-pointer"><i class="fa-solid fa-vr-cardboard text-sm"></i><span class="text-[10px] mt-1">VR</span></button>
+        <button onclick="switchTab('tendencias', this)" class="mobile-nav-btn flex flex-col items-center text-gray-400 cursor-pointer"><i class="fa-solid fa-fire text-sm"></i><span class="text-[10px] mt-1">Tendencias</span></button>
+        <button onclick="switchTab('milista', this)" class="mobile-nav-btn flex flex-col items-center text-gray-400 cursor-pointer"><i class="fa-solid fa-user text-sm"></i><span class="text-[10px] mt-1">Perfil</span></button>
     </nav>
 
     <script>
-        // 1. Animación del Intro 3D con Three.js
-        let scene, camera, renderer, logoMesh;
+        // 1. Pantalla de Bienvenida 3D con Letras MS3 3D en 360°
+        let introScene, introCamera, introRenderer, ms3TextGroup;
 
         function initIntro3D() {
             const container = document.getElementById('canvas-container');
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.z = 5;
+            introScene = new THREE.Scene();
+            introCamera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+            introCamera.position.z = 6;
 
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            container.appendChild(renderer.domElement);
+            introRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            introRenderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(introRenderer.domElement);
 
-            // Crear un objeto 3D futurista (Torus Knot) para representar el logo en 3D
-            const geometry = new THREE.TorusKnotGeometry(1.2, 0.35, 120, 16);
-            const material = new THREE.MeshStandardMaterial({ 
-                color: 0x9333ea, 
-                roughness: 0.2, 
-                metalness: 0.8,
-                emissive: 0x4f46e5,
-                emissiveIntensity: 0.4
+            const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+            introScene.add(ambientLight);
+
+            const pointLight = new THREE.PointLight(0xa855f7, 3, 50);
+            pointLight.position.set(0, 5, 5);
+            introScene.add(pointLight);
+
+            // Cargar fuente tipográfica para generar las letras "MS3" en 3D volumétrico real
+            const fontLoader = new THREE.FontLoader();
+            fontLoader.load('https://threejs.org/examples/fonts/helvetiker_bold.typeface.json', function (font) {
+                const textGeometry = new THREE.TextGeometry('MS3', {
+                    font: font,
+                    size: 1.4,
+                    height: 0.35,
+                    curveSegments: 12,
+                    bevelEnabled: true,
+                    bevelThickness: 0.05,
+                    bevelSize: 0.03,
+                    bevelOffset: 0,
+                    bevelSegments: 5
+                });
+
+                textGeometry.center(); // Centrar el texto para que gire sobre su propio eje perfecto
+
+                const textMaterial = new THREE.MeshStandardMaterial({
+                    color: 0xc084fc,
+                    roughness: 0.1,
+                    metalness: 0.9,
+                    emissive: 0x6b21a8,
+                    emissiveIntensity: 0.5
+                });
+
+                ms3TextGroup = new THREE.Mesh(textGeometry, textMaterial);
+                introScene.add(ms3TextGroup);
             });
-            logoMesh = new THREE.Mesh(geometry, material);
-            scene.add(logoMesh);
 
-            const light = new THREE.PointLight(0xffffff, 2, 50);
-            light.position.set(5, 5, 5);
-            scene.add(light);
-
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-            scene.add(ambientLight);
-
-            animateIntro();
+            animateIntro3D();
         }
 
-        function animateIntro() {
-            requestAnimationFrame(animateIntro);
-            if(logoMesh) {
-                logoMesh.rotation.x += 0.01;
-                logoMesh.rotation.y += 0.015;
+        function animateIntro3D() {
+            requestAnimationFrame(animateIntro3D);
+            if (ms3TextGroup) {
+                ms3TextGroup.rotation.y += 0.012; // Giro en 360 grados constante sobre su propio eje
+                ms3TextGroup.rotation.x = Math.sin(Date.now() * 0.002) * 0.15; // Suave balanceo futurista
             }
-            renderer.render(scene, camera);
+            if(introRenderer) introRenderer.render(introScene, introCamera);
         }
 
+        // Efecto de apagado y transición al presionar ingresar
         function enterApp() {
             const intro = document.getElementById('intro-screen');
             const main = document.getElementById('main-app');
+            
+            // Efecto de apagado cinematográfico
+            intro.style.transform = 'scale(1.1)';
+            intro.style.filter = 'brightness(3)';
             intro.style.opacity = '0';
+            
             setTimeout(() => {
                 intro.style.display = 'none';
                 main.style.opacity = '1';
-            }, 1000);
+            }, 800);
         }
 
         window.onload = initIntro3D;
 
-        // 2. Lógica del Reproductor VR 360° Interactivo
+        // 2. Sistema de Pestañas Interactivas
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            // Actualizar estilos del sidebar
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-purple-600/20', 'text-purple-400', 'border', 'border-purple-500/30', 'font-medium');
+                btn.classList.add('text-gray-400');
+            });
+            if(btnElement && btnElement.classList.contains('nav-btn')) {
+                btnElement.classList.add('bg-purple-600/20', 'text-purple-400', 'border', 'border-purple-500/30', 'font-medium');
+                btnElement.classList.remove('text-gray-400');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function handleSearch(e) {
+            if(e.key === 'Enter') {
+                alert('Buscando: ' + e.target.value);
+            }
+        }
+
+        // 3. Reproductor VR 360° Interactivo
         let vrScene, vrCamera, vrRenderer, isDragging = false, previousMousePosition = { x: 0, y: 0 };
 
         function openVRExperience(title) {
@@ -245,8 +388,7 @@
 
         function closeVRPlayer() {
             document.getElementById('vr-player-modal').classList.add('hidden');
-            const viewport = document.getElementById('vr-viewport');
-            viewport.innerHTML = ''; // Limpiar render anterior
+            document.getElementById('vr-viewport').innerHTML = '';
         }
 
         function initVRViewer() {
@@ -260,44 +402,38 @@
             vrRenderer.setSize(container.clientWidth, container.clientHeight);
             container.appendChild(vrRenderer.domElement);
 
-            // Crear una esfera gigante invertida para proyectar el entorno virtual 360°
             const geometry = new THREE.SphereGeometry(500, 60, 40);
-            geometry.scale(-1, 1, 1); // Invertir para ver desde adentro
+            geometry.scale(-1, 1, 1);
 
-            // Usamos una textura espacial de ejemplo de alta calidad
             const textureLoader = new THREE.TextureLoader();
-            const texture = textureLoader.load('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=2000&q=80', () => {
+            textureLoader.load('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=2000&q=80', () => {
                 vrRenderer.render(vrScene, vrCamera);
             });
 
-            const material = new THREE.MeshBasicMaterial({ map: texture });
+            const material = new THREE.MeshBasicMaterial({ 
+                map: textureLoader.load('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=2000&q=80') 
+            });
             const sphere = new THREE.Mesh(geometry, material);
             vrScene.add(sphere);
 
             vrCamera.position.set(0, 0, 0.1);
 
-            // Controles de mouse / toque para girar la cámara en 360 grados
             container.addEventListener('mousedown', (e) => { isDragging = true; previousMousePosition = { x: e.clientX, y: e.clientY }; });
             container.addEventListener('mousemove', (e) => {
                 if (!isDragging) return;
                 const deltaX = e.clientX - previousMousePosition.x;
                 const deltaY = e.clientY - previousMousePosition.y;
-
                 vrCamera.rotation.y += deltaX * 0.005;
                 vrCamera.rotation.x += deltaY * 0.005;
-
                 previousMousePosition = { x: e.clientX, y: e.clientY };
             });
             window.addEventListener('mouseup', () => { isDragging = false; });
 
-            // Soporte para giroscopio en celulares (Realidad Virtual móvil)
             if (window.DeviceOrientationEvent) {
                 window.addEventListener('deviceorientation', (event) => {
                     if(event.alpha && event.beta) {
-                        let beta = THREE.MathUtils.degToRad(event.beta);
-                        let gamma = THREE.MathUtils.degToRad(event.gamma);
-                        vrCamera.rotation.x = beta - Math.PI / 2;
-                        vrCamera.rotation.y = gamma;
+                        vrCamera.rotation.x = THREE.MathUtils.degToRad(event.beta) - Math.PI / 2;
+                        vrCamera.rotation.y = THREE.MathUtils.degToRad(event.gamma);
                     }
                 });
             }
