@@ -15,8 +15,8 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #05050c; }
         ::-webkit-scrollbar-thumb { background: #db2777; border-radius: 3px; }
-        .glow-pink { text-shadow: 0 0 30px rgba(236, 72, 153, 0.9), 0 0 60px rgba(56, 189, 248, 0.7); }
-        .glow-box { box-shadow: 0 0 40px rgba(219, 39, 119, 0.6), 0 0 20px rgba(56, 189, 248, 0.5); }
+        .glow-pink { text-shadow: 0 0 30px rgba(236, 72, 153, 0.9), 0 0 60px rgba(168, 85, 247, 0.7); }
+        .glow-box { box-shadow: 0 0 40px rgba(219, 39, 119, 0.6), 0 0 20px rgba(168, 85, 247, 0.5); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         #space-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
@@ -30,7 +30,7 @@
 
     <div id="intro-screen" class="fixed inset-0 z-50 bg-[#030307] flex flex-col items-center justify-between py-6 px-4 transition-all duration-1000">
         <div class="text-center pt-2">
-            <span class="text-[10px] sm:text-xs text-sky-400 tracking-[0.4em] uppercase font-bold glow-pink">EXPERIENCIA INMERSIVA</span>
+            <span class="text-[10px] sm:text-xs text-pink-400 tracking-[0.4em] uppercase font-bold glow-pink">EXPERIENCIA INMERSIVA</span>
         </div>
         
         <div id="canvas-container" class="w-full max-w-2xl h-[48vh] sm:h-[58vh] flex items-center justify-center relative my-auto"></div>
@@ -38,10 +38,10 @@
         <div class="w-full max-w-sm flex flex-col items-center pb-2">
             <p class="text-pink-300 text-[11px] sm:text-xs tracking-[0.3em] uppercase mb-4 font-extrabold glow-pink text-center">MÁS ALLÁ DE LO QUE VES</p>
             <div class="flex flex-col sm:flex-row gap-3 w-full">
-                <button onclick="enterApp()" class="w-full py-3.5 sm:py-4 bg-gradient-to-r from-pink-600 via-purple-600 to-sky-500 rounded-2xl font-extrabold text-xs sm:text-sm tracking-wider hover:opacity-90 transition transform hover:scale-105 glow-box cursor-pointer">
+                <button onclick="enterApp()" class="w-full py-3.5 sm:py-4 bg-gradient-to-r from-pink-600 via-purple-600 to-sky-400 rounded-2xl font-extrabold text-xs sm:text-sm tracking-wider hover:opacity-90 transition transform hover:scale-105 glow-box cursor-pointer">
                     INGRESAR AL MUNDO MS3
                 </button>
-                <button onclick="openAuthModal()" class="w-full py-3.5 sm:py-4 bg-white/10 hover:bg-white/20 border border-sky-400/40 rounded-2xl font-bold text-xs sm:text-sm tracking-wider transition backdrop-blur cursor-pointer text-sky-300 text-center">
+                <button onclick="openAuthModal()" class="w-full py-3.5 sm:py-4 bg-white/10 hover:bg-white/20 border border-pink-500/40 rounded-2xl font-bold text-xs sm:text-sm tracking-wider transition backdrop-blur cursor-pointer text-pink-300 text-center">
                     <i class="fa-solid fa-user-lock mr-2"></i> INICIAR SESIÓN / REGISTRO
                 </button>
             </div>
@@ -53,7 +53,7 @@
             <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
             
             <div id="auth-form-container">
-                <h3 class="text-2xl font-black mb-2 bg-gradient-to-r from-pink-400 via-purple-400 to-sky-400 bg-clip-text text-transparent">Cuenta MS3</h3>
+                <h3 class="text-2xl font-black mb-2 bg-gradient-to-r from-pink-400 via-purple-400 to-sky-300 bg-clip-text text-transparent">Cuenta MS3</h3>
                 <p class="text-xs text-gray-400 mb-6">Inicia sesión con tu correo o regístrate para mantener tu cuenta abierta.</p>
                 
                 <form onsubmit="handleUserLoginOrRegister(event)" class="space-y-4">
@@ -65,14 +65,14 @@
                         <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1">Contraseña</label>
                         <input type="password" id="user-pass-input" required class="w-full bg-[#030307] border border-pink-500/30 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-pink-500" placeholder="••••••••">
                     </div>
-                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-pink-600 to-sky-500 hover:opacity-90 font-extrabold text-xs rounded-xl transition cursor-pointer shadow-lg shadow-pink-600/30">
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-pink-600 via-purple-600 to-sky-400 hover:opacity-90 font-extrabold text-xs rounded-xl transition cursor-pointer shadow-lg shadow-pink-600/30">
                         ACCEDER / REGISTRARSE
                     </button>
                 </form>
             </div>
 
             <div id="auth-session-container" class="hidden text-center py-4">
-                <div id="session-avatar" class="w-16 h-16 bg-gradient-to-tr from-pink-500 via-purple-600 to-sky-500 rounded-full flex items-center justify-center font-black text-2xl mx-auto mb-4 shadow-lg shadow-pink-500/40">U</div>
+                <div id="session-avatar" class="w-16 h-16 bg-gradient-to-tr from-pink-500 via-purple-600 to-sky-400 rounded-full flex items-center justify-center font-black text-2xl mx-auto mb-4 shadow-lg shadow-pink-500/40">U</div>
                 <h3 class="text-xl font-bold mb-1" id="session-email-display">usuario@correo.com</h3>
                 <p class="text-xs text-pink-400 mb-6 font-semibold">Sesión Activa • Plan MS3</p>
                 <button onclick="handleLogout()" class="w-full py-3 bg-red-600/20 hover:bg-red-600/30 border border-red-500/40 text-red-300 font-extrabold text-xs rounded-xl transition cursor-pointer">
@@ -86,7 +86,7 @@
         
         <aside class="hidden md:flex flex-col w-64 bg-[#05050c]/95 backdrop-blur-xl border-r border-pink-500/15 p-6 sticky top-0 h-screen">
             <div class="flex items-center space-x-2 mb-10">
-                <span class="text-2xl font-black tracking-wider bg-gradient-to-r from-pink-500 via-purple-400 to-sky-400 bg-clip-text text-transparent glow-pink">MS3</span>
+                <span class="text-2xl font-black tracking-wider bg-gradient-to-r from-pink-500 via-purple-400 to-sky-300 bg-clip-text text-transparent glow-pink">MS3</span>
             </div>
             <div class="text-[10px] text-pink-400/70 font-semibold tracking-widest mb-4">MÁS ALLÁ DE LO QUE VES</div>
             
@@ -101,10 +101,10 @@
                 <button onclick="switchTab('milista', this)" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition cursor-pointer"><i class="fa-solid fa-list"></i><span>Mi lista</span></button>
             </nav>
 
-            <div class="p-4 bg-gradient-to-br from-pink-950/40 via-purple-950/40 to-sky-950/40 border border-pink-500/20 rounded-2xl text-center shadow-lg shadow-pink-950/30">
+            <div class="p-4 bg-gradient-to-br from-pink-950/40 via-purple-950/40 to-indigo-950/40 border border-pink-500/20 rounded-2xl text-center shadow-lg shadow-pink-950/30">
                 <p class="text-xs font-bold text-pink-300 mb-1">PULSERA NFC DE REGALO</p>
                 <p class="text-[10px] text-gray-400 mb-3">Suscripción mensual accesible</p>
-                <button onclick="switchTab('suscripcion', null)" class="w-full py-2 bg-gradient-to-r from-pink-600 via-purple-600 to-sky-500 hover:opacity-90 text-xs font-bold rounded-xl transition shadow-md shadow-pink-600/30 cursor-pointer">SUBSCRIBITE AHORA</button>
+                <button onclick="switchTab('suscripcion', null)" class="w-full py-2 bg-gradient-to-r from-pink-600 via-purple-600 to-sky-400 hover:opacity-90 text-xs font-bold rounded-xl transition shadow-md shadow-pink-600/30 cursor-pointer">SUBSCRIBITE AHORA</button>
             </div>
         </aside>
 
@@ -118,7 +118,7 @@
                     <button onclick="openVRExperience('MS3 Hub Inmersivo')" class="hidden sm:flex items-center space-x-2 px-3.5 py-1.5 bg-pink-600/20 border border-pink-500/40 rounded-full text-xs font-semibold text-pink-300 hover:bg-pink-600/30 transition cursor-pointer shadow-md shadow-pink-600/25">
                         <i class="fa-solid fa-vr-cardboard"></i><span>Modo VR</span>
                     </button>
-                    <div id="user-profile-btn" onclick="openAuthModal()" class="w-9 h-9 rounded-full bg-gradient-to-tr from-pink-500 via-purple-600 to-sky-500 flex items-center justify-center font-bold text-xs cursor-pointer shadow-lg shadow-pink-500/40 border border-pink-400/40 hover:scale-105 transition flex-shrink-0" title="Perfil / Iniciar Sesión">
+                    <div id="user-profile-btn" onclick="openAuthModal()" class="w-9 h-9 rounded-full bg-gradient-to-tr from-pink-500 via-purple-600 to-sky-400 flex items-center justify-center font-bold text-xs cursor-pointer shadow-lg shadow-pink-500/40 border border-pink-400/40 hover:scale-105 transition flex-shrink-0" title="Perfil / Iniciar Sesión">
                         A
                     </div>
                 </div>
@@ -130,14 +130,14 @@
                         <div class="absolute inset-0 bg-cover bg-center opacity-35 mix-blend-luminosity" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1600&q=80')"></div>
                         <div class="absolute inset-0 bg-gradient-to-r from-[#030307] via-[#030307]/70 to-transparent"></div>
                         <div class="relative z-10 max-w-xl">
-                            <span class="text-[11px] font-bold tracking-widest text-sky-400 mb-2 block">EXPERIENCIA INMERSIVA MS3</span>
+                            <span class="text-[11px] font-bold tracking-widest text-pink-400 mb-2 block">EXPERIENCIA INMERSIVA MS3</span>
                             <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-4">TU MUNDO.<br>TUS REGLAS.</h2>
                             <p class="text-gray-300 text-xs sm:text-sm md:text-base mb-6 leading-relaxed">Disfrutá miles de títulos en 2D, Realidad Virtual y nuestra pulsera NFC inteligente con cargo mensual cancelable.</p>
                             <div class="flex flex-wrap gap-3">
-                                <button onclick="openVRExperience('The Expanse')" class="flex items-center space-x-2 px-5 py-3 bg-gradient-to-r from-pink-600 via-purple-600 to-sky-500 rounded-xl font-bold text-xs sm:text-sm hover:opacity-90 transition shadow-lg shadow-pink-600/40 cursor-pointer">
+                                <button onclick="openVRExperience('The Expanse')" class="flex items-center space-x-2 px-5 py-3 bg-gradient-to-r from-pink-600 via-purple-600 to-sky-400 rounded-xl font-bold text-xs sm:text-sm hover:opacity-90 transition shadow-lg shadow-pink-600/40 cursor-pointer">
                                     <i class="fa-solid fa-play"></i><span>Ver ahora</span>
                                 </button>
-                                <button onclick="switchTab('suscripcion', null)" class="flex items-center space-x-2 px-5 py-3 bg-white/10 hover:bg-white/20 border border-sky-400/40 text-sky-300 rounded-xl font-bold text-xs sm:text-sm transition backdrop-blur cursor-pointer">
+                                <button onclick="switchTab('suscripcion', null)" class="flex items-center space-x-2 px-5 py-3 bg-white/10 hover:bg-white/20 border border-pink-500/40 text-pink-300 rounded-xl font-bold text-xs sm:text-sm transition backdrop-blur cursor-pointer">
                                     <i class="fa-solid fa-gift"></i><span>Pulsera NFC de Regalo</span>
                                 </button>
                             </div>
@@ -148,7 +148,7 @@
                 <section class="px-4 sm:px-6 md:px-10 mb-10">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-base sm:text-lg font-bold">Continuar viendo</h3>
-                        <span class="text-[10px] sm:text-xs text-sky-400 font-semibold"><i class="fa-solid fa-arrows-left-right mr-1"></i> Desliza</span>
+                        <span class="text-[10px] sm:text-xs text-pink-400 font-semibold"><i class="fa-solid fa-arrows-left-right mr-1"></i> Desliza</span>
                     </div>
                     <div class="flex space-x-4 overflow-x-auto no-scrollbar pb-4 cursor-grab active:cursor-grabbing">
                         <div onclick="openVRExperience('The Expanse')" class="min-w-[180px] sm:min-w-[240px] group bg-[#070714] border border-pink-500/10 rounded-2xl overflow-hidden hover:border-pink-500/50 transition flex-shrink-0">
@@ -160,8 +160,8 @@
                         </div>
                         <div onclick="openVRExperience('Blade Runner 2049')" class="min-w-[180px] sm:min-w-[240px] group bg-[#070714] border border-pink-500/10 rounded-2xl overflow-hidden hover:border-pink-500/50 transition flex-shrink-0">
                             <div class="relative h-32 sm:h-36 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=500&q=80')">
-                                <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/70 backdrop-blur text-[10px] font-bold rounded text-sky-300 border border-sky-500/30">2D</span>
-                                <div class="absolute bottom-0 inset-x-0 h-1 bg-white/20"><div class="w-[65%] h-full bg-sky-500"></div></div>
+                                <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/70 backdrop-blur text-[10px] font-bold rounded text-purple-300 border border-purple-500/30">2D</span>
+                                <div class="absolute bottom-0 inset-x-0 h-1 bg-white/20"><div class="w-[65%] h-full bg-purple-500"></div></div>
                             </div>
                             <div class="p-3"><h4 class="text-xs font-bold truncate">BLADE RUNNER 2049</h4><span class="text-[10px] text-gray-500">65% completado</span></div>
                         </div>
@@ -180,14 +180,14 @@
                     <div class="flex space-x-4 overflow-x-auto no-scrollbar pb-4">
                         <div onclick="openVRExperience('Cyber City 360')" class="min-w-[240px] sm:min-w-[300px] bg-[#070714] p-3 rounded-2xl border border-pink-500/10 cursor-pointer hover:border-pink-500/50 transition flex-shrink-0">
                             <div class="h-36 sm:h-40 bg-cover bg-center rounded-xl mb-3 relative" style="background-image: url('https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?auto=format&fit=crop&w=500&q=80')">
-                                <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition"><i class="fa-solid fa-play text-2xl text-sky-400"></i></div>
+                                <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition"><i class="fa-solid fa-play text-2xl text-pink-400"></i></div>
                             </div>
                             <h4 class="font-bold text-xs sm:text-sm">Cyber City 360°</h4>
                             <p class="text-[10px] sm:text-xs text-gray-400">Ciencia Ficción • 4K VR</p>
                         </div>
                         <div onclick="openVRExperience('Deep Space Odyssey')" class="min-w-[240px] sm:min-w-[300px] bg-[#070714] p-3 rounded-2xl border border-pink-500/10 cursor-pointer hover:border-pink-500/50 transition flex-shrink-0">
                             <div class="h-36 sm:h-40 bg-cover bg-center rounded-xl mb-3 relative" style="background-image: url('https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=500&q=80')">
-                                <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition"><i class="fa-solid fa-play text-2xl text-sky-400"></i></div>
+                                <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition"><i class="fa-solid fa-play text-2xl text-pink-400"></i></div>
                             </div>
                             <h4 class="font-bold text-xs sm:text-sm">Deep Space Odyssey</h4>
                             <p class="text-[10px] sm:text-xs text-gray-400">Documental • VR</p>
@@ -209,7 +209,7 @@
 
             <div id="tab-tendencias" class="tab-content p-4 sm:p-6 md:p-10">
                 <h2 class="text-xl sm:text-2xl font-bold mb-2">Tendencias Globales MS3</h2>
-                <p class="text-xs text-sky-400 mb-6">Lo más visto de la semana y adelantos rápidos.</p>
+                <p class="text-xs text-pink-400 mb-6">Lo más visto de la semana y adelantos rápidos.</p>
             </div>
 
             <div id="tab-en2d" class="tab-content p-4 sm:p-6 md:p-10">
@@ -236,12 +236,12 @@
                 <div class="max-w-4xl mx-auto">
                     
                     <div id="sub-info-view" class="bg-gradient-to-br from-pink-950/40 via-purple-950/40 to-sky-950/40 border border-pink-500/30 rounded-3xl p-6 sm:p-8 md:p-12 shadow-2xl mb-10">
-                        <span class="text-[10px] sm:text-xs font-bold tracking-widest text-sky-400 mb-2 block uppercase">Suscripción Mensual con Cargo Recurrente</span>
+                        <span class="text-[10px] sm:text-xs font-bold tracking-widest text-pink-400 mb-2 block uppercase">Suscripción Mensual con Cargo Recurrente</span>
                         <h2 class="text-2xl sm:text-3xl md:text-4xl font-black mb-4">Pulsera NFC MS3 de Regalo</h2>
                         <p class="text-gray-300 text-xs sm:text-sm md:text-base mb-6 leading-relaxed">
-                            Acceso ilimitado mensual por solo <strong class="text-sky-300">$6.499 ARS/mes</strong> (precio optimizado contemplando costo de pulsera de silicona con chip NFC + envío prioritario y margen operativo sustentable). Puedes cancelar cuando quieras. Destino CVU oficial: <code class="bg-black/50 px-2 py-1 rounded text-sky-300 font-mono text-[11px]">0000003100076636444961</code>.
+                            Acceso ilimitado mensual por solo <strong class="text-pink-300">$6.499 ARS/mes</strong> (precio optimizado contemplando costo de pulsera de silicona con chip NFC + envío prioritario y margen operativo sustentable). Puedes cancelar cuando quieras. Destino CVU oficial: <code class="bg-black/50 px-2 py-1 rounded text-pink-300 font-mono text-[11px]">0000003100076636444961</code>.
                         </p>
-                        <button onclick="showCheckoutView()" class="w-full py-4 bg-gradient-to-r from-pink-600 via-purple-600 to-sky-500 hover:opacity-90 font-extrabold text-xs sm:text-sm rounded-2xl shadow-xl shadow-pink-600/40 transition cursor-pointer">
+                        <button onclick="showCheckoutView()" class="w-full py-4 bg-gradient-to-r from-pink-600 via-purple-600 to-sky-400 hover:opacity-90 font-extrabold text-xs sm:text-sm rounded-2xl shadow-xl shadow-pink-600/40 transition cursor-pointer">
                             ¡COMPLETAR DATOS DE SUSCRIPCIÓN Y FACTURA!
                         </button>
                     </div>
@@ -250,7 +250,7 @@
                         
                         <div class="lg:col-span-7 bg-[#070714] border border-pink-500/30 rounded-3xl p-6 md:p-8 shadow-2xl">
                             <div class="flex justify-between items-center mb-6">
-                                <h3 class="text-base sm:text-lg font-black text-sky-300">Suscripción Mensual MS3</h3>
+                                <h3 class="text-base sm:text-lg font-black text-pink-300">Suscripción Mensual MS3</h3>
                                 <button onclick="backToSubInfo()" class="text-xs text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-arrow-left mr-1"></i> Volver</button>
                             </div>
                             <form onsubmit="processPaymentAndSendWhatsApp(event)" class="space-y-4">
@@ -287,7 +287,7 @@
                                     <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1">Número de Tarjeta / CVU de Extracción</label>
                                     <input type="text" id="pay-tarjeta" required class="w-full bg-[#030307] border border-pink-500/30 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-pink-500" placeholder="XXXX XXXX XXXX XXXX">
                                 </div>
-                                <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-pink-600 to-sky-500 hover:opacity-90 font-extrabold text-xs rounded-xl shadow-lg shadow-pink-600/30 transition cursor-pointer mt-2">
+                                <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-pink-600 via-purple-600 to-sky-400 hover:opacity-90 font-extrabold text-xs rounded-xl shadow-lg shadow-pink-600/30 transition cursor-pointer mt-2">
                                     CONFIRMAR SUSCRIPCIÓN Y ENVIAR A WHATSAPP
                                 </button>
                             </form>
@@ -296,23 +296,23 @@
                         <div class="lg:col-span-5 bg-[#030307] border border-pink-500/40 rounded-3xl p-6 shadow-2xl flex flex-col justify-between">
                             <div>
                                 <div class="flex justify-between items-center border-b border-white/10 pb-4 mb-4">
-                                    <span class="font-black text-sky-400 tracking-wider text-xs sm:text-sm">FACTURA MS3 (MENSUAL)</span>
+                                    <span class="font-black text-pink-400 tracking-wider text-xs sm:text-sm">FACTURA MS3 (MENSUAL)</span>
                                     <span class="text-[9px] text-gray-400">CVU: 00000031...</span>
                                 </div>
                                 <div class="space-y-3 text-xs text-gray-300 mb-6">
                                     <div class="flex justify-between"><span>Titular:</span> <span id="factura-nombre" class="font-bold text-white">-</span></div>
                                     <div class="flex justify-between"><span>Ubicación:</span> <span id="factura-direccion" class="font-bold text-white">-</span></div>
                                     <div class="flex justify-between"><span>Teléfono:</span> <span id="factura-telefono" class="font-bold text-white">-</span></div>
-                                    <div class="flex justify-between"><span>Medio:</span> <span id="factura-medio" class="font-bold text-sky-300">Tarjeta Visa</span></div>
+                                    <div class="flex justify-between"><span>Medio:</span> <span id="factura-medio" class="font-bold text-pink-300">Tarjeta Visa</span></div>
                                 </div>
                                 <div class="border-t border-white/10 pt-4 space-y-2 text-xs">
                                     <div class="flex justify-between text-gray-400"><span>Cuota Mensual MS3 + Pulsera NFC:</span> <span>$6.499 ARS</span></div>
                                     <div class="flex justify-between text-gray-400"><span>Envío de pulsera:</span> <span>INCLUIDO</span></div>
-                                    <div class="flex justify-between text-base font-black text-white pt-2 border-t border-white/10"><span>Total Mensual:</span> <span class="text-sky-400">$6.499 ARS</span></div>
+                                    <div class="flex justify-between text-base font-black text-white pt-2 border-t border-white/10"><span>Total Mensual:</span> <span class="text-pink-400">$6.499 ARS</span></div>
                                 </div>
                             </div>
                             <div class="mt-6 bg-pink-950/20 border border-pink-500/20 rounded-xl p-3 text-center">
-                                <p class="text-[10px] text-sky-300"><i class="fa-solid fa-circle-check mr-1"></i> Cargo mensual recurrente hasta cancelar la suscripción.</p>
+                                <p class="text-[10px] text-pink-300"><i class="fa-solid fa-circle-check mr-1"></i> Cargo mensual recurrente hasta cancelar la suscripción.</p>
                             </div>
                         </div>
 
@@ -325,7 +325,7 @@
 
     <footer class="border-t border-pink-500/15 bg-[#05050c] py-6 px-6 text-center z-30 relative">
         <p class="text-xs text-gray-400 mb-2">Atención al Cliente y Soporte Técnico MS3:</p>
-        <p class="text-sm sm:text-base font-extrabold text-sky-400 mb-4 font-mono tracking-wider">+54 3541 201963</p>
+        <p class="text-sm sm:text-base font-extrabold text-pink-400 mb-4 font-mono tracking-wider">+54 3541 201963</p>
         <a href="https://wa.me/543541201963?text=Hola,%20necesito%20soporte%20con%20la%20suscripción%20MS3" target="_blank" class="inline-flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:opacity-90 text-xs font-bold rounded-xl transition shadow-lg shadow-emerald-600/30 cursor-pointer">
             <i class="fa-brands fa-whatsapp text-sm"></i><span>CONTACTAR POR WHATSAPP</span>
         </a>
@@ -334,7 +334,7 @@
     <div id="vr-player-modal" class="fixed inset-0 z-50 bg-black hidden flex flex-col">
         <div class="absolute top-4 left-4 right-4 z-20 flex justify-between items-center bg-black/50 backdrop-blur-md px-4 sm:px-6 py-3 rounded-2xl border border-pink-500/20">
             <div>
-                <span class="text-[10px] text-sky-400 font-bold">MODO INMERSIVO 360° VR</span>
+                <span class="text-[10px] text-pink-400 font-bold">MODO INMERSIVO 360° VR</span>
                 <h3 id="vr-title" class="text-xs sm:text-base font-extrabold">Título de la Experiencia</h3>
             </div>
             <button onclick="closeVRPlayer()" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition cursor-pointer">
@@ -377,7 +377,7 @@
 
             const starsMaterial = new THREE.PointsMaterial({
                 size: 0.08,
-                color: 0x38bdf8,
+                color: 0xec4899,
                 transparent: true,
                 opacity: 0.8
             });
@@ -403,7 +403,7 @@
             spaceRenderer.render(spaceScene, spaceCamera);
         }
 
-        // 2. Logotipo MS3 en 3D Ancho y Holográfico (Degradé Violeta, Rosa y Celeste con Luces Dinámicas)
+        // 2. Logotipo MS3 en 3D Ancho y Holográfico (Predominio Violeta y Rosa intenso, con destello sutil celeste)
         let introScene, introCamera, introRenderer, ms3TextMesh;
 
         function initIntro3D() {
@@ -419,29 +419,28 @@
             introRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             container.appendChild(introRenderer.domElement);
 
-            // Sistema de iluminación futurista multidireccional con colores cian, rosa y violeta
-            const ambientLight = new THREE.AmbientLight(0xffffff, 1.8);
+            // Sistema de luces enfocado fuertemente en tonos fucsia/rosa y violeta profundo, con toque celeste sutil
+            const ambientLight = new THREE.AmbientLight(0xffffff, 1.6);
             introScene.add(ambientLight);
 
-            const pinkLight = new THREE.PointLight(0xec4899, 25, 60);
-            pinkLight.position.set(-6, 4, 6);
-            introScene.add(pinkLight);
+            const hotPinkLight = new THREE.PointLight(0xec4899, 30, 60);
+            hotPinkLight.position.set(-6, 4, 6);
+            introScene.add(hotPinkLight);
 
-            const cyanLight = new THREE.PointLight(0x38bdf8, 25, 60);
-            cyanLight.position.set(6, -4, 6);
-            introScene.add(cyanLight);
+            const deepPurpleLight = new THREE.PointLight(0x8b5cf6, 30, 60);
+            deepPurpleLight.position.set(6, -4, 6);
+            introScene.add(deepPurpleLight);
 
-            const purpleLight = new THREE.PointLight(0x8b5cf6, 20, 60);
-            purpleLight.position.set(0, 6, 8);
-            introScene.add(purpleLight);
+            const softSkyLight = new THREE.PointLight(0x38bdf8, 12, 60);
+            softSkyLight.position.set(0, 7, 8);
+            introScene.add(softSkyLight);
 
             const fontLoader = new THREE.FontLoader();
             fontLoader.load('https://threejs.org/examples/fonts/helvetiker_bold.typeface.json', function (font) {
-                // Configuración de geometría 3D con extrusión profunda (ancho 3D real)
                 const textGeometry = new THREE.TextGeometry('MS3', {
                     font: font,
                     size: 2.8,
-                    height: 1.1, // Gran espesor/ancho en 3D
+                    height: 1.1, // Ancho 3D sólido y robusto
                     curveSegments: 16,
                     bevelEnabled: true,
                     bevelThickness: 0.22,
@@ -451,15 +450,15 @@
 
                 textGeometry.center();
 
-                // Material con brillo futurista metálico/translúcido reflejando degradé rosado, celeste y violeta
+                // Material brillante con tonos dominantes violeta y rosa, y reflejo de acento celeste
                 const textMaterial = new THREE.MeshPhysicalMaterial({
-                    color: 0x38bdf8,
+                    color: 0xd946ef, // Tono base fucsia/violeta intenso
                     roughness: 0.08,
-                    metalness: 0.85,
-                    transmission: 0.25,
+                    metalness: 0.82,
+                    transmission: 0.2,
                     ior: 1.6,
-                    emissive: 0xec4899,
-                    emissiveIntensity: 0.45,
+                    emissive: 0x7c3aed, // Emisión violeta brillante
+                    emissiveIntensity: 0.5,
                     reflectivity: 1.0,
                     clearcoat: 1.0,
                     clearcoatRoughness: 0.1
@@ -482,9 +481,8 @@
         function animateIntro3D() {
             requestAnimationFrame(animateIntro3D);
             if (ms3TextMesh) {
-                // Giro completo de 360 grados continuo sobre su propio eje Y
+                // Rotación fluida en 360 grados sobre su propio eje
                 ms3TextMesh.rotation.y += 0.014;
-                // Leve oscilación en X y Z para darle dinamismo holográfico inmersivo
                 ms3TextMesh.rotation.x = Math.sin(Date.now() * 0.0012) * 0.15;
                 ms3TextMesh.rotation.z = Math.cos(Date.now() * 0.001) * 0.05;
             }
