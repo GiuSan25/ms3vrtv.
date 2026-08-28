@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MS3 - Multiverso Inmersivo VR</title>
+    <title>MS3 - Multiverso Inmersivo VR Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS3DRenderer.js"></script>
@@ -11,7 +11,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
         
-        * { -webkit-tap-highlight-color: transparent; }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
         
         body, html { 
             margin: 0; padding: 0; overflow: hidden; background-color: #030208; 
@@ -70,7 +70,7 @@
 
         .neon-box-purple {
             border: 2px solid rgba(168, 85, 247, 0.5); box-shadow: 0 0 25px rgba(138, 43, 226, 0.25), inset 0 0 20px rgba(138, 43, 226, 0.15);
-            border-radius: 24px; background: rgba(12, 10, 25, 0.92); backdrop-filter: blur(16px);
+            border-radius: 24px; background: rgba(12, 10, 25, 0.95); backdrop-filter: blur(16px);
         }
 
         .netflix-grid {
@@ -93,11 +93,39 @@
         }
 
         #video-modal, #preview-modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.94); z-index: 2000;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 2000;
             display: none; justify-content: center; align-items: center; flex-direction: column; padding: 20px; pointer-events: auto;
         }
-        #video-modal video { width: 100%; max-width: 900px; border-radius: 12px; box-shadow: 0 0 30px rgba(168, 85, 247, 0.5); }
-        .modal-close-btn { margin-top: 20px; padding: 10px 25px; background: #a855f7; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer; }
+
+        /* Estilos avanzados para los modales de reproducción inmersiva y 2D en pantalla gigante */
+        .cinema-screen-container {
+            position: relative; width: 100%; max-width: 1000px; background: #000; border-radius: 16px; 
+            overflow: hidden; box-shadow: 0 0 50px rgba(168, 85, 247, 0.6); border: 2px solid rgba(168, 85, 247, 0.8);
+        }
+        .cinema-screen-container video { width: 100%; height: auto; display: block; max-height: 75vh; }
+
+        .vr-theater-container {
+            position: relative; width: 100%; max-width: 1000px; height: 550px; background: #05030d; border-radius: 16px;
+            overflow: hidden; box-shadow: 0 0 50px rgba(138, 43, 226, 0.8); border: 2px solid rgba(168, 85, 247, 0.8);
+            display: flex; justify-content: center; align-items: center; perspective: 1200px;
+        }
+        .vr-immersive-viewport {
+            width: 80%; height: 80%; border-radius: 12px; overflow: hidden; position: relative;
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.5); transform-style: preserve-3d;
+            animation: vrFloatEffect 6s ease-in-out infinite alternate;
+        }
+        .vr-immersive-viewport video { width: 100%; height: 100%; object-fit: cover; }
+        @keyframes vrFloatEffect {
+            0% { transform: rotateX(2deg) rotateY(-3deg) scale(0.98); }
+            100% { transform: rotateX(-2deg) rotateY(3deg) scale(1.02); }
+        }
+
+        .modal-close-btn { 
+            margin-top: 20px; padding: 12px 30px; background: linear-gradient(135deg, #a855f7, #6366f1); 
+            color: #fff; font-weight: 900; border-radius: 12px; cursor: pointer; box-shadow: 0 0 20px rgba(168,85,247,0.6);
+            border: none; text-transform: uppercase; letter-spacing: 1px; transition: transform 0.2s;
+        }
+        .modal-close-btn:hover { transform: scale(1.05); }
     </style>
 </head>
 <body>
@@ -132,6 +160,7 @@
 
     <div id="preview-modal">
         <div class="neon-box-purple p-8 max-w-lg w-full flex flex-col gap-5 relative">
+            <span id="preview-tag" class="text-xs font-black tracking-widest text-purple-400 uppercase">FORMATO INMERSIVO</span>
             <h2 id="preview-title" class="text-3xl font-black text-white drop-shadow-[0_0_15px_rgba(168,85,247,0.8)]">Título del Programa</h2>
             <p id="preview-desc" class="text-gray-300 text-base leading-relaxed">Descripción detallada del contenido inmersivo VR exclusivo del multiverso.</p>
             <div class="flex gap-4 mt-2">
@@ -142,7 +171,8 @@
     </div>
 
     <div id="video-modal">
-        <video id="active-video" controls autoplay playsinline></video>
+        <div id="video-wrapper-container" class="w-full flex justify-center items-center flex-col">
+            </div>
         <button class="modal-close-btn interactive-btn" onclick="closeVideo()">Cerrar Reproductor</button>
     </div>
 
@@ -556,14 +586,14 @@
                         <p class="text-gray-200 text-base mt-2 max-w-xl leading-relaxed">Experiencia inmersiva 360° en vivo transmitida directamente desde el núcleo del Multiverso MS3.</p>
                     </div>
                     <div class="flex gap-4">
-                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')" class="interactive-btn bg-white text-black px-8 py-3 rounded-2xl font-black text-lg shadow-[0_0_25px_rgba(255,255,255,0.8)]">REPRODUCIR AHORA</button>
+                        <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', 'live')" class="interactive-btn bg-white text-black px-8 py-3 rounded-2xl font-black text-lg shadow-[0_0_25px_rgba(255,255,255,0.8)]">REPRODUCIR AHORA</button>
                     </div>
                 </div>
 
                 <div class="w-full grid grid-cols-3 gap-6">
                     <button onclick="openVRProgramsMultiverse(event)" class="interactive-btn neon-box-purple py-5 text-purple-300 font-black text-lg text-center rounded-2xl">PROGRAMAS VR</button>
-                    <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')" class="interactive-btn neon-box-purple py-5 text-purple-300 font-black text-lg text-center rounded-2xl">PROGRAMAS 2D</button>
-                    <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')" class="interactive-btn neon-box-purple py-5 text-purple-300 font-black text-lg text-center rounded-2xl">CANAL EN VIVO</button>
+                    <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', '2d')" class="interactive-btn neon-box-purple py-5 text-purple-300 font-black text-lg text-center rounded-2xl">PROGRAMAS 2D</button>
+                    <button onclick="openVideo('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', 'live')" class="interactive-btn neon-box-purple py-5 text-purple-300 font-black text-lg text-center rounded-2xl">CANAL EN VIVO</button>
                 </div>
             `;
 
@@ -599,19 +629,19 @@
                     </div>
                     
                     <div class="netflix-grid">
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Cyberpunk City 2099', 'Recorre las calles iluminadas por neón de una metrópolis futurista.', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')">
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Cyberpunk City 2099', 'Recorre las calles iluminadas por neón de una metrópolis futurista.', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', 'vr')">
                             <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=500&auto=format&fit=crop" alt="Cyberpunk">
-                            <div class="card-info"><h4 class="text-white text-xs font-bold">Cyberpunk 2099</h4><p class="text-purple-300 text-[10px]">Interactivo</p></div>
+                            <div class="card-info"><h4 class="text-white text-xs font-bold">Cyberpunk 2099</h4><p class="text-purple-300 text-[10px]">Interactivo VR</p></div>
                         </div>
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Viaje a Marte 360', 'Explora las dunas rojas y bases espaciales de la próxima frontera.', 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')">
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Viaje a Marte 360', 'Explora las dunas rojas y bases espaciales de la próxima frontera.', 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', 'vr')">
                             <img src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=500&auto=format&fit=crop" alt="Marte">
                             <div class="card-info"><h4 class="text-white text-xs font-bold">Viaje a Marte</h4><p class="text-purple-300 text-[10px]">VR 360°</p></div>
                         </div>
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Estación Espacial ISS', 'Vive un día completo flotando en órbita terrestre.', 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4')">
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Estación Espacial ISS', 'Vive un día completo flotando en órbita terrestre.', 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', 'vr')">
                             <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=500&auto=format&fit=crop" alt="ISS">
-                            <div class="card-info"><h4 class="text-white text-xs font-bold">Estación ISS</h4><p class="text-purple-300 text-[10px]">Inmersivo</p></div>
+                            <div class="card-info"><h4 class="text-white text-xs font-bold">Estación ISS</h4><p class="text-purple-300 text-[10px]">Inmersivo VR</p></div>
                         </div>
-                        <div class="netflix-card interactive-btn" onclick="openPreview('Bosque Bioluminiscente', 'Un santuario natural alienígena interactivo.', 'https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')">
+                        <div class="netflix-card interactive-btn" onclick="openPreview('Bosque Bioluminiscente', 'Un santuario natural alienígena interactivo.', 'https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?q=80&w=500&auto=format&fit=crop', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', 'vr')">
                             <img src="https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?q=80&w=500&auto=format&fit=crop" alt="Bosque">
                             <div class="card-info"><h4 class="text-white text-xs font-bold">Bosque Místico</h4><p class="text-purple-300 text-[10px]">Relax VR</p></div>
                         </div>
@@ -787,10 +817,13 @@
             isInAboutSection = false;
         }
 
-        function openPreview(title, desc, imgUrl, videoUrl) {
-            selectedVideoData = videoUrl;
+        let currentVideoType = '2d';
+
+        function openPreview(title, desc, imgUrl, videoUrl, type = 'vr') {
+            selectedVideoData = { url: videoUrl, type: type };
             document.getElementById('preview-title').innerText = title;
             document.getElementById('preview-desc').innerText = desc;
+            document.getElementById('preview-tag').innerText = type === 'vr' ? 'FORMATO REALIDAD VIRTUAL INMERSIVO' : 'FORMATO CINE 2D';
             document.getElementById('preview-modal').style.display = 'flex';
         }
 
@@ -801,23 +834,43 @@
         function playFromPreview() {
             closePreviewModal();
             if (selectedVideoData) {
-                openVideo(selectedVideoData);
+                openVideo(selectedVideoData.url, selectedVideoData.type);
             }
         }
 
-        function openVideo(url) {
+        function openVideo(url, type = '2d') {
+            currentVideoType = type;
             const modal = document.getElementById('video-modal');
-            const video = document.getElementById('active-video');
-            video.src = url;
+            const wrapper = document.getElementById('video-wrapper-container');
+            
+            if (type === 'vr') {
+                wrapper.innerHTML = `
+                    <div class="vr-theater-container">
+                        <div class="vr-immersive-viewport">
+                            <video id="active-video" controls autoplay playsinline src="${url}"></video>
+                        </div>
+                    </div>
+                `;
+            } else {
+                wrapper.innerHTML = `
+                    <div class="cinema-screen-container">
+                        <video id="active-video" controls autoplay playsinline src="${url}"></video>
+                    </div>
+                `;
+            }
+            
             modal.style.display = 'flex';
-            video.play();
+            const activeVid = document.getElementById('active-video');
+            if (activeVid) activeVid.play();
         }
 
         function closeVideo() {
             const modal = document.getElementById('video-modal');
-            const video = document.getElementById('active-video');
-            video.pause();
-            video.src = '';
+            const activeVid = document.getElementById('active-video');
+            if (activeVid) {
+                activeVid.pause();
+                activeVid.src = '';
+            }
             modal.style.display = 'none';
         }
 
