@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
         body { font-family: 'Outfit', sans-serif; background-color: #030307; color: #ffffff; overflow-x: hidden; }
@@ -26,18 +28,17 @@
 
     <canvas id="space-bg"></canvas>
 
-    <!-- PANTALLA DE BIENVENIDA CON TU VIDEO DE LOGO -->
     <div id="intro-screen" class="fixed inset-0 z-50 bg-[#030307] flex flex-col items-center justify-between py-6 px-4 transition-all duration-1000">
         <div class="text-center pt-2">
             <span class="text-[10px] sm:text-xs text-pink-400 tracking-[0.4em] uppercase font-bold glow-pink">EXPERIENCIA INMERSIVA</span>
         </div>
         
         <div class="w-full max-w-2xl h-[48vh] sm:h-[58vh] flex items-center justify-center relative my-auto overflow-hidden rounded-3xl">
-            <video autoplay loop muted playsinline class="w-full h-full object-contain filter drop-shadow-[0_0_35px_rgba(217,70,239,0.8)]">
-                <source src="logo-ms3.mp4" type="video/mp4">
-                Tu navegador no soporta videos.
-            </video>
-        </div>
+    <video autoplay loop muted playsinline class="w-full h-full object-contain filter drop-shadow-[0_0_35px_rgba(217,70,239,0.8)]">
+        <source src="logo-ms3.mp4" type="video/mp4">
+        Tu navegador no soporta videos.
+    </video>
+</div>
         
         <div class="w-full max-w-sm flex flex-col items-center pb-2">
             <p class="text-pink-300 text-[11px] sm:text-xs tracking-[0.3em] uppercase mb-4 font-extrabold glow-pink text-center">MÁS ALLÁ DE LO QUE VES</p>
@@ -52,7 +53,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE AUTENTICACIÓN -->
     <div id="auth-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="bg-[#070714] border border-pink-500/30 rounded-3xl p-6 sm:p-8 max-w-md w-full relative shadow-2xl glow-box">
             <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -87,7 +87,6 @@
         </div>
     </div>
 
-    <!-- APLICACIÓN PRINCIPAL -->
     <div id="main-app" class="opacity-0 transition-opacity duration-1000 flex min-h-screen">
         
         <aside class="hidden md:flex flex-col w-64 bg-[#05050c]/95 backdrop-blur-xl border-r border-pink-500/15 p-6 sticky top-0 h-screen">
@@ -409,6 +408,92 @@
             spaceRenderer.render(spaceScene, spaceCamera);
         }
 
+        // 2. Logotipo MS3 en 3D Ancho y Holográfico (Predominio Violeta y Rosa intenso, con destello sutil celeste)
+        let introScene, introCamera, introRenderer, ms3TextMesh;
+
+        function initIntro3D() {
+            const container = document.getElementById('canvas-container');
+            if(!container) return;
+
+            introScene = new THREE.Scene();
+            introCamera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            introCamera.position.z = 14;
+
+            introRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            introRenderer.setSize(container.clientWidth, container.clientHeight);
+            introRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(introRenderer.domElement);
+
+            // Sistema de luces enfocado fuertemente en tonos fucsia/rosa y violeta profundo, con toque celeste sutil
+            const ambientLight = new THREE.AmbientLight(0xffffff, 1.6);
+            introScene.add(ambientLight);
+
+            const hotPinkLight = new THREE.PointLight(0xec4899, 30, 60);
+            hotPinkLight.position.set(-6, 4, 6);
+            introScene.add(hotPinkLight);
+
+            const deepPurpleLight = new THREE.PointLight(0x8b5cf6, 30, 60);
+            deepPurpleLight.position.set(6, -4, 6);
+            introScene.add(deepPurpleLight);
+
+            const softSkyLight = new THREE.PointLight(0x38bdf8, 12, 60);
+            softSkyLight.position.set(0, 7, 8);
+            introScene.add(softSkyLight);
+
+            const fontLoader = new THREE.FontLoader();
+            fontLoader.load('https://threejs.org/examples/fonts/helvetiker_bold.typeface.json', function (font) {
+                const textGeometry = new THREE.TextGeometry('MS3', {
+                    font: font,
+                    size: 2.8,
+                    height: 1.1, // Ancho 3D sólido y robusto
+                    curveSegments: 16,
+                    bevelEnabled: true,
+                    bevelThickness: 0.22,
+                    bevelSize: 0.12,
+                    bevelSegments: 8
+                });
+
+                textGeometry.center();
+
+                // Material brillante con tonos dominantes violeta y rosa, y reflejo de acento celeste
+                const textMaterial = new THREE.MeshPhysicalMaterial({
+                    color: 0xd946ef, // Tono base fucsia/violeta intenso
+                    roughness: 0.08,
+                    metalness: 0.82,
+                    transmission: 0.2,
+                    ior: 1.6,
+                    emissive: 0x7c3aed, // Emisión violeta brillante
+                    emissiveIntensity: 0.5,
+                    reflectivity: 1.0,
+                    clearcoat: 1.0,
+                    clearcoatRoughness: 0.1
+                });
+
+                ms3TextMesh = new THREE.Mesh(textGeometry, textMaterial);
+                introScene.add(ms3TextMesh);
+            });
+
+            animateIntro3D();
+
+            window.addEventListener('resize', () => {
+                if(!container) return;
+                introCamera.aspect = container.clientWidth / container.clientHeight;
+                introCamera.updateProjectionMatrix();
+                introRenderer.setSize(container.clientWidth, container.clientHeight);
+            });
+        }
+
+        function animateIntro3D() {
+            requestAnimationFrame(animateIntro3D);
+            if (ms3TextMesh) {
+                // Rotación fluida en 360 grados sobre su propio eje
+                ms3TextMesh.rotation.y += 0.014;
+                ms3TextMesh.rotation.x = Math.sin(Date.now() * 0.0012) * 0.15;
+                ms3TextMesh.rotation.z = Math.cos(Date.now() * 0.001) * 0.05;
+            }
+            if(introRenderer) introRenderer.render(introScene, introCamera);
+        }
+
         function enterApp() {
             const intro = document.getElementById('intro-screen');
             const main = document.getElementById('main-app');
@@ -425,6 +510,7 @@
 
         window.onload = () => {
             initSpaceBackground();
+            initIntro3D();
             setupCarouselsDrag();
             checkExistingSession();
         };
