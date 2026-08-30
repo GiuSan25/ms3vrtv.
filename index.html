@@ -33,12 +33,12 @@
             <span class="text-[10px] sm:text-xs text-pink-400 tracking-[0.4em] uppercase font-bold glow-pink">EXPERIENCIA INMERSIVA</span>
         </div>
         
-      <div class="w-full max-w-2xl h-[48vh] sm:h-[58vh] flex items-center justify-center relative my-auto overflow-hidden rounded-3xl">
-    <video autoplay loop muted playsinline class="w-full h-full object-contain filter drop-shadow-[0_0_35px_rgba(217,70,239,0.4)]">
-        <source src="ms3media/ms3logo.mp4" type="video/mp4">
-        Tu navegador no soporta vídeos.
-    </video>
-</div>
+        <div class="w-full max-w-2xl h-[48vh] sm:h-[58vh] flex items-center justify-center relative my-auto overflow-hidden rounded-3xl">
+            <video autoplay loop muted playsinline class="w-full h-full object-contain filter drop-shadow-[0_0_35px_rgba(217,70,239,0.8)]">
+                <source src="./ms3media/ms3logo.mp4" type="video/mp4">
+                Tu navegador no soporta la reproducción de videos.
+            </video>
+        </div>
         
         <div class="w-full max-w-sm flex flex-col items-center pb-2">
             <p class="text-pink-300 text-[11px] sm:text-xs tracking-[0.3em] uppercase mb-4 font-extrabold glow-pink text-center">MÁS ALLÁ DE LO QUE VES</p>
@@ -408,11 +408,6 @@
             spaceRenderer.render(spaceScene, spaceCamera);
         }
 
-        // 2. Función vacía para evitar errores de referencia por el logo en video
-        function initIntro3D() {
-            return;
-        }
-
         function enterApp() {
             const intro = document.getElementById('intro-screen');
             const main = document.getElementById('main-app');
@@ -429,7 +424,6 @@
 
         window.onload = () => {
             initSpaceBackground();
-            initIntro3D();
             setupCarouselsDrag();
             checkExistingSession();
         };
