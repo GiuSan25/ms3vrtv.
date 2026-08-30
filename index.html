@@ -3,304 +3,672 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MS3 VR TV | Experiencia Inmersiva 3D</title>
+    <title>MS3 - Más allá de lo que ves</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
     <style>
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            background-color: #05020a;
-            color: #ffffff;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(147, 51, 234, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.1) 0%, transparent 60%);
-            min-height: 100vh;
-        }
-        
-        /* Header / Navbar */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 40px;
-            z-index: 1000;
-            background: rgba(5, 2, 10, 0.7);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .logo-text {
-            font-size: 1.8rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #3b82f6, #9333ea, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
-            letter-spacing: 2px;
-        }
-        nav a {
-            color: #d1d5db;
-            text-decoration: none;
-            margin-left: 30px;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-        nav a:hover {
-            color: #ec4899;
-            text-shadow: 0 0 10px rgba(236, 72, 153, 0.8);
-        }
-
-        /* Hero Section with Video Logo */
-        .hero {
-            position: relative;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 0 20px;
-        }
-        
-        .video-logo-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            pointer-events: none; /* no controls, unpausable */
-        }
-        
-        .video-logo-container video {
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            object-fit: cover;
-            filter: drop-shadow(0 0 30px rgba(147, 51, 234, 0.6));
-            opacity: 0.85;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            max-width: 800px;
-            pointer-events: auto;
-            background: rgba(5, 2, 10, 0.5);
-            padding: 40px;
-            border-radius: 24px;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        h1 {
-            font-size: 3.5rem;
-            font-weight: 900;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #60a5fa, #c084fc, #f472b6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(192, 132, 252, 0.4);
-        }
-        p.subtitle {
-            font-size: 1.2rem;
-            color: #d1d5db;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-        .btn-group {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-        }
-        .btn {
-            padding: 14px 32px;
-            border-radius: 50px;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            border: none;
-            font-size: 1rem;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #3b82f6, #9333ea, #ec4899);
-            color: white;
-            box-shadow: 0 10px 25px -5px rgba(147, 51, 234, 0.5);
-        }
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px -5px rgba(236, 72, 153, 0.7);
-        }
-        .btn-outline {
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-        }
-        .btn-outline:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.4);
-            transform: translateY(-3px);
-        }
-
-        /* Features / Glass Mirror Section */
-        .features {
-            padding: 100px 40px;
-            position: relative;
-            z-index: 2;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 60px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #fff, #a78bfa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
-        }
-        .card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(16px);
-            border-radius: 20px;
-            padding: 40px;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #ec4899, transparent);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-        .card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(236, 72, 153, 0.3);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(147, 51, 234, 0.15);
-        }
-        .card:hover::before {
-            opacity: 1;
-        }
-        .card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: #f3f4f6;
-        }
-        .card p {
-            color: #9ca3af;
-            line-height: 1.6;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 40px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            color: #6b7280;
-            font-size: 0.9rem;
-            position: relative;
-            z-index: 2;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Outfit', sans-serif; background-color: #030307; color: #ffffff; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #05050c; }
+        ::-webkit-scrollbar-thumb { background: #db2777; border-radius: 3px; }
+        .glow-pink { text-shadow: 0 0 30px rgba(236, 72, 153, 0.9), 0 0 60px rgba(168, 85, 247, 0.7); }
+        .glow-box { box-shadow: 0 0 40px rgba(219, 39, 119, 0.6), 0 0 20px rgba(168, 85, 247, 0.5); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        #space-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body>
+<body class="bg-[#030307] text-white selection:bg-pink-600 selection:text-white">
 
-    <header>
-        <div class="logo-text">MS3 VR TV</div>
-        <nav>
-            <a href="#inicio">Inicio</a>
-            <a href="#experiencia">Experiencia 3D</a>
-            <a href="#vr">Modo VR</a>
-            <a href="#contacto">Contacto</a>
-        </nav>
-    </header>
+    <canvas id="space-bg"></canvas>
 
-    <section class="hero" id="inicio">
-        <!-- Video en bucle automático como fondo/logo ininterrumpido -->
-        <div class="video-logo-container">
-            <video autoplay muted loop playsinline id="bg-video">
-                <source src="ms3logo.mp4.mp4" type="video/mp4">
-                Tu navegador no soporta videos HTML5.
-            </video>
+    <div id="intro-screen" class="fixed inset-0 z-50 bg-[#030307] flex flex-col items-center justify-between py-6 px-4 transition-all duration-1000">
+        <div class="text-center pt-2">
+            <span class="text-[10px] sm:text-xs text-pink-400 tracking-[0.4em] uppercase font-bold glow-pink">EXPERIENCIA INMERSIVA</span>
         </div>
         
-        <div class="hero-content">
-            <h1>El Futuro del Streaming 3D y VR</h1>
-            <p class="subtitle">Explora contenidos inmersivos con tu logo animado en alta definición, efectos de vidrio espejado y gradientes de neón.</p>
-            <div class="btn-group">
-                <button class="btn btn-primary" onclick="alert('Iniciando experiencia MS3 VR TV...')">Iniciar Experiencia</button>
-                <a href="#experiencia" class="btn btn-outline">Saber Más</a>
+        <div class="w-full max-w-2xl h-[48vh] sm:h-[58vh] flex items-center justify-center relative my-auto overflow-hidden rounded-3xl">
+    <video autoplay loop muted playsinline class="w-full h-full object-contain filter drop-shadow-[0_0_35px_rgba(217,70,239,0.8)]">
+        <source src="./ms3media/ms3logo.mp4" type="video/mp4">
+    </video>
+</div>
+        
+        <div class="w-full max-w-sm flex flex-col items-center pb-2">
+            <p class="text-pink-300 text-[11px] sm:text-xs tracking-[0.3em] uppercase mb-4 font-extrabold glow-pink text-center">MÁS ALLÁ DE LO QUE VES</p>
+            <div class="flex flex-col sm:flex-row gap-3 w-full">
+                <button onclick="enterApp()" class="w-full py-3.5 sm:py-4 bg-gradient-to-r from-pink-600 via-purple-600 to-sky-400 rounded-2xl font-extrabold text-xs sm:text-sm tracking-wider hover:opacity-90 transition transform hover:scale-105 glow-box cursor-pointer">
+                    INGRESAR AL MUNDO MS3
+                </button>
+                <button onclick="openAuthModal()" class="w-full py-3.5 sm:py-4 bg-white/10 hover:bg-white/20 border border-pink-500/40 rounded-2xl font-bold text-xs sm:text-sm tracking-wider transition backdrop-blur cursor-pointer text-pink-300 text-center">
+                    <i class="fa-solid fa-user-lock mr-2"></i> INICIAR SESIÓN / REGISTRO
+                </button>
             </div>
         </div>
-    </section>
+    </div>
 
-    <section class="features" id="experiencia">
-        <h2 class="section-title">Tecnología Inmersiva de Vanguardia</h2>
-        <div class="grid">
-            <div class="card">
-                <h3>Identidad Visual MS3</h3>
-                <p>Logotipo tridimensional integrado en bucle continuo de alta fidelidad que define la identidad futurista de la plataforma.</p>
+    <div id="auth-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-[#070714] border border-pink-500/30 rounded-3xl p-6 sm:p-8 max-w-md w-full relative shadow-2xl glow-box">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            
+            <div id="auth-form-container">
+                <h3 class="text-2xl font-black mb-2 bg-gradient-to-r from-pink-400 via-purple-400 to-sky-300 bg-clip-text text-transparent">Cuenta MS3</h3>
+                <p class="text-xs text-gray-400 mb-6">Inicia sesión con tu correo o regístrate para mantener tu cuenta abierta.</p>
+                
+                <form onsubmit="handleUserLoginOrRegister(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1">Correo Electrónico</label>
+                        <input type="email" id="user-email-input" required class="w-full bg-[#030307] border border-pink-500/30 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-pink-500" placeholder="tu@correo.com">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1">Contraseña</label>
+                        <input type="password" id="user-pass-input" required class="w-full bg-[#030307] border border-pink-500/30 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-pink-500" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-pink-600 via-purple-600 to-sky-400 hover:opacity-90 font-extrabold text-xs rounded-xl transition cursor-pointer shadow-lg shadow-pink-600/30">
+                        ACCEDER / REGISTRARSE
+                    </button>
+                </form>
             </div>
-            <div class="card">
-                <h3>Multimedia 360° VR</h3>
-                <p>Reproducción de contenido audiovisual en entornos virtuales envolventes compatibles con dispositivos móviles y visores VR.</p>
-            </div>
-            <div class="card">
-                <h3>Diseño Neón Espejado</h3>
-                <p>Interfaz visual inspirada en la estética cibernética con gradientes de color violeta, rosa y celeste sobre fondos espaciales profundos.</p>
+
+            <div id="auth-session-container" class="hidden text-center py-4">
+                <div id="session-avatar" class="w-16 h-16 bg-gradient-to-tr from-pink-500 via-purple-600 to-sky-400 rounded-full flex items-center justify-center font-black text-2xl mx-auto mb-4 shadow-lg shadow-pink-500/40">U</div>
+                <h3 class="text-xl font-bold mb-1" id="session-email-display">usuario@correo.com</h3>
+                <p class="text-xs text-pink-400 mb-6 font-semibold">Sesión Activa • Plan MS3</p>
+                <button onclick="handleLogout()" class="w-full py-3 bg-red-600/20 hover:bg-red-600/30 border border-red-500/40 text-red-300 font-extrabold text-xs rounded-xl transition cursor-pointer">
+                    CERRAR SESIÓN
+                </button>
             </div>
         </div>
-    </section>
+    </div>
 
-    <footer>
-        <p>&copy; 2026 MS3 VR TV. Todos los derechos reservados.</p>
+    <div id="main-app" class="opacity-0 transition-opacity duration-1000 flex min-h-screen">
+        
+        <aside class="hidden md:flex flex-col w-64 bg-[#05050c]/95 backdrop-blur-xl border-r border-pink-500/15 p-6 sticky top-0 h-screen">
+            <div class="flex items-center space-x-2 mb-10">
+                <span class="text-2xl font-black tracking-wider bg-gradient-to-r from-pink-500 via-purple-400 to-sky-300 bg-clip-text text-transparent glow-pink">MS3</span>
+            </div>
+            <div class="text-[10px] text-pink-400/70 font-semibold tracking-widest mb-4">MÁS ALLÁ DE LO QUE VES</div>
+            
+            <nav class="space-y-2 flex-1">
+                <button onclick="switchTab('inicio', this)" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-pink-600/20 text-pink-300 border border-pink-500/30 font-medium transition cursor-pointer"><i class="fa-solid fa-house"></i><span>Inicio</span></button>
+                <button onclick="switchTab('explorar', this)" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition cursor-pointer"><i class="fa-solid fa-compass"></i><span>Explorar</span></button>
+                <button onclick="switchTab('tendencias', this)" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition cursor-pointer"><i class="fa-solid fa-fire"></i><span>Tendencias & Reels</span></button>
+                <button onclick="switchTab('en2d', this)" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition cursor-pointer"><i class="fa-solid fa-desktop"></i><span>En 2D</span></button>
+                <button onclick="switchTab('envr', this)" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition cursor-pointer"><i class="fa-solid fa-vr-cardboard"></i><span>En Realidad Virtual</span></button>
+                <button onclick="switchTab('peliculas', this)" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition cursor-pointer"><i class="fa-solid fa-film"></i><span>Películas</span></button>
+                <button onclick="switchTab('series', this)" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition cursor-pointer"><i class="fa-solid fa-tv"></i><span>Series</span></button>
+                <button onclick="switchTab('milista', this)" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition cursor-pointer"><i class="fa-solid fa-list"></i><span>Mi lista</span></button>
+            </nav>
+
+            <div class="p-4 bg-gradient-to-br from-pink-950/40 via-purple-950/40 to-indigo-950/40 border border-pink-500/20 rounded-2xl text-center shadow-lg shadow-pink-950/30">
+                <p class="text-xs font-bold text-pink-300 mb-1">PULSERA NFC DE REGALO</p>
+                <p class="text-[10px] text-gray-400 mb-3">Suscripción mensual accesible</p>
+                <button onclick="switchTab('suscripcion', null)" class="w-full py-2 bg-gradient-to-r from-pink-600 via-purple-600 to-sky-400 hover:opacity-90 text-xs font-bold rounded-xl transition shadow-md shadow-pink-600/30 cursor-pointer">SUBSCRIBITE AHORA</button>
+            </div>
+        </aside>
+
+        <main class="flex-1 pb-24 md:pb-10">
+            <header class="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-pink-500/15 bg-[#030307]/85 backdrop-blur-md sticky top-0 z-30">
+                <div class="flex items-center bg-[#070714] border border-pink-500/25 rounded-full px-4 py-2 w-44 sm:w-64 md:w-96 shadow-inner">
+                    <i class="fa-solid fa-magnifying-glass text-pink-400 mr-2 text-sm"></i>
+                    <input type="text" id="search-input" placeholder="Buscar programas..." onkeyup="handleSearch(event)" class="bg-transparent border-none outline-none text-xs w-full text-white placeholder-gray-500">
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="openVRExperience('MS3 Hub Inmersivo')" class="hidden sm:flex items-center space-x-2 px-3.5 py-1.5 bg-pink-600/20 border border-pink-500/40 rounded-full text-xs font-semibold text-pink-300 hover:bg-pink-600/30 transition cursor-pointer shadow-md shadow-pink-600/25">
+                        <i class="fa-solid fa-vr-cardboard"></i><span>Modo VR</span>
+                    </button>
+                    <div id="user-profile-btn" onclick="openAuthModal()" class="w-9 h-9 rounded-full bg-gradient-to-tr from-pink-500 via-purple-600 to-sky-400 flex items-center justify-center font-bold text-xs cursor-pointer shadow-lg shadow-pink-500/40 border border-pink-400/40 hover:scale-105 transition flex-shrink-0" title="Perfil / Iniciar Sesión">
+                        A
+                    </div>
+                </div>
+            </header>
+
+            <div id="tab-inicio" class="tab-content active">
+                <section class="p-4 sm:p-6 md:p-10">
+                    <div class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-pink-950/40 via-purple-950/40 to-sky-950/40 border border-pink-500/20 p-6 sm:p-8 md:p-14 flex flex-col justify-center min-h-[380px] sm:min-h-[420px] shadow-2xl">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-35 mix-blend-luminosity" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1600&q=80')"></div>
+                        <div class="absolute inset-0 bg-gradient-to-r from-[#030307] via-[#030307]/70 to-transparent"></div>
+                        <div class="relative z-10 max-w-xl">
+                            <span class="text-[11px] font-bold tracking-widest text-pink-400 mb-2 block">EXPERIENCIA INMERSIVA MS3</span>
+                            <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-4">TU MUNDO.<br>TUS REGLAS.</h2>
+                            <p class="text-gray-300 text-xs sm:text-sm md:text-base mb-6 leading-relaxed">Disfrutá miles de títulos en 2D, Realidad Virtual y nuestra pulsera NFC inteligente con cargo mensual cancelable.</p>
+                            <div class="flex flex-wrap gap-3">
+                                <button onclick="openVRExperience('The Expanse')" class="flex items-center space-x-2 px-5 py-3 bg-gradient-to-r from-pink-600 via-purple-600 to-sky-400 rounded-xl font-bold text-xs sm:text-sm hover:opacity-90 transition shadow-lg shadow-pink-600/40 cursor-pointer">
+                                    <i class="fa-solid fa-play"></i><span>Ver ahora</span>
+                                </button>
+                                <button onclick="switchTab('suscripcion', null)" class="flex items-center space-x-2 px-5 py-3 bg-white/10 hover:bg-white/20 border border-pink-500/40 text-pink-300 rounded-xl font-bold text-xs sm:text-sm transition backdrop-blur cursor-pointer">
+                                    <i class="fa-solid fa-gift"></i><span>Pulsera NFC de Regalo</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="px-4 sm:px-6 md:px-10 mb-10">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-base sm:text-lg font-bold">Continuar viendo</h3>
+                        <span class="text-[10px] sm:text-xs text-pink-400 font-semibold"><i class="fa-solid fa-arrows-left-right mr-1"></i> Desliza</span>
+                    </div>
+                    <div class="flex space-x-4 overflow-x-auto no-scrollbar pb-4 cursor-grab active:cursor-grabbing">
+                        <div onclick="openVRExperience('The Expanse')" class="min-w-[180px] sm:min-w-[240px] group bg-[#070714] border border-pink-500/10 rounded-2xl overflow-hidden hover:border-pink-500/50 transition flex-shrink-0">
+                            <div class="relative h-32 sm:h-36 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=500&q=80')">
+                                <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/70 backdrop-blur text-[10px] font-bold rounded text-pink-300 border border-pink-500/30">VR</span>
+                                <div class="absolute bottom-0 inset-x-0 h-1 bg-white/20"><div class="w-[75%] h-full bg-pink-500"></div></div>
+                            </div>
+                            <div class="p-3"><h4 class="text-xs font-bold truncate">THE EXPANSE</h4><span class="text-[10px] text-gray-500">75% completado</span></div>
+                        </div>
+                        <div onclick="openVRExperience('Blade Runner 2049')" class="min-w-[180px] sm:min-w-[240px] group bg-[#070714] border border-pink-500/10 rounded-2xl overflow-hidden hover:border-pink-500/50 transition flex-shrink-0">
+                            <div class="relative h-32 sm:h-36 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=500&q=80')">
+                                <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/70 backdrop-blur text-[10px] font-bold rounded text-purple-300 border border-purple-500/30">2D</span>
+                                <div class="absolute bottom-0 inset-x-0 h-1 bg-white/20"><div class="w-[65%] h-full bg-purple-500"></div></div>
+                            </div>
+                            <div class="p-3"><h4 class="text-xs font-bold truncate">BLADE RUNNER 2049</h4><span class="text-[10px] text-gray-500">65% completado</span></div>
+                        </div>
+                        <div onclick="openVRExperience('Everest')" class="min-w-[180px] sm:min-w-[240px] group bg-[#070714] border border-pink-500/10 rounded-2xl overflow-hidden hover:border-pink-500/50 transition flex-shrink-0">
+                            <div class="relative h-32 sm:h-36 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=500&q=80')">
+                                <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/70 backdrop-blur text-[10px] font-bold rounded text-pink-300 border border-pink-500/30">VR</span>
+                                <div class="absolute bottom-0 inset-x-0 h-1 bg-white/20"><div class="w-[40%] h-full bg-pink-500"></div></div>
+                            </div>
+                            <div class="p-3"><h4 class="text-xs font-bold truncate">EVEREST</h4><span class="text-[10px] text-gray-500">40% completado</span></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="px-4 sm:px-6 md:px-10 mb-10">
+                    <h3 class="text-base sm:text-lg font-bold mb-4">Galería de Videos Inmersivos MS3</h3>
+                    <div class="flex space-x-4 overflow-x-auto no-scrollbar pb-4">
+                        <div onclick="openVRExperience('Cyber City 360')" class="min-w-[240px] sm:min-w-[300px] bg-[#070714] p-3 rounded-2xl border border-pink-500/10 cursor-pointer hover:border-pink-500/50 transition flex-shrink-0">
+                            <div class="h-36 sm:h-40 bg-cover bg-center rounded-xl mb-3 relative" style="background-image: url('https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?auto=format&fit=crop&w=500&q=80')">
+                                <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition"><i class="fa-solid fa-play text-2xl text-pink-400"></i></div>
+                            </div>
+                            <h4 class="font-bold text-xs sm:text-sm">Cyber City 360°</h4>
+                            <p class="text-[10px] sm:text-xs text-gray-400">Ciencia Ficción • 4K VR</p>
+                        </div>
+                        <div onclick="openVRExperience('Deep Space Odyssey')" class="min-w-[240px] sm:min-w-[300px] bg-[#070714] p-3 rounded-2xl border border-pink-500/10 cursor-pointer hover:border-pink-500/50 transition flex-shrink-0">
+                            <div class="h-36 sm:h-40 bg-cover bg-center rounded-xl mb-3 relative" style="background-image: url('https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=500&q=80')">
+                                <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition"><i class="fa-solid fa-play text-2xl text-pink-400"></i></div>
+                            </div>
+                            <h4 class="font-bold text-xs sm:text-sm">Deep Space Odyssey</h4>
+                            <p class="text-[10px] sm:text-xs text-gray-400">Documental • VR</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div id="tab-explorar" class="tab-content p-4 sm:p-6 md:p-10">
+                <h2 class="text-xl sm:text-2xl font-bold mb-6">Explorar Catálogo General</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div onclick="openVRExperience('Dune 2021')" class="bg-[#070714] p-4 rounded-2xl border border-pink-500/10 cursor-pointer hover:border-pink-500/50 transition">
+                        <div class="h-32 sm:h-40 bg-cover bg-center rounded-xl mb-3" style="background-image: url('https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?auto=format&fit=crop&w=400&q=80')"></div>
+                        <h4 class="font-bold text-xs sm:text-sm">DUNE</h4>
+                        <p class="text-[10px] sm:text-xs text-gray-400">Ciencia Ficción • 2D/VR</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-tendencias" class="tab-content p-4 sm:p-6 md:p-10">
+                <h2 class="text-xl sm:text-2xl font-bold mb-2">Tendencias Globales MS3</h2>
+                <p class="text-xs text-pink-400 mb-6">Lo más visto de la semana y adelantos rápidos.</p>
+            </div>
+
+            <div id="tab-en2d" class="tab-content p-4 sm:p-6 md:p-10">
+                <h2 class="text-xl sm:text-2xl font-bold mb-6">Contenido Estándar en 2D</h2>
+            </div>
+
+            <div id="tab-envr" class="tab-content p-4 sm:p-6 md:p-10">
+                <h2 class="text-xl sm:text-2xl font-bold mb-2">Experiencias Inmersivas VR</h2>
+            </div>
+
+            <div id="tab-peliculas" class="tab-content p-4 sm:p-6 md:p-10">
+                <h2 class="text-xl sm:text-2xl font-bold mb-6">Películas Seleccionadas</h2>
+            </div>
+
+            <div id="tab-series" class="tab-content p-4 sm:p-6 md:p-10">
+                <h2 class="text-xl sm:text-2xl font-bold mb-6">Series Exclusivas MS3</h2>
+            </div>
+
+            <div id="tab-milista" class="tab-content p-4 sm:p-6 md:p-10">
+                <h2 class="text-xl sm:text-2xl font-bold mb-2">Mi Perfil y Lista Guardada</h2>
+            </div>
+
+            <div id="tab-suscripcion" class="tab-content p-4 sm:p-6 md:p-10">
+                <div class="max-w-4xl mx-auto">
+                    
+                    <div id="sub-info-view" class="bg-gradient-to-br from-pink-950/40 via-purple-950/40 to-sky-950/40 border border-pink-500/30 rounded-3xl p-6 sm:p-8 md:p-12 shadow-2xl mb-10">
+                        <span class="text-[10px] sm:text-xs font-bold tracking-widest text-pink-400 mb-2 block uppercase">Suscripción Mensual con Cargo Recurrente</span>
+                        <h2 class="text-2xl sm:text-3xl md:text-4xl font-black mb-4">Pulsera NFC MS3 de Regalo</h2>
+                        <p class="text-gray-300 text-xs sm:text-sm md:text-base mb-6 leading-relaxed">
+                            Acceso ilimitado mensual por solo <strong class="text-pink-300">$6.499 ARS/mes</strong> (precio optimizado contemplando costo de pulsera de silicona con chip NFC + envío prioritario y margen operativo sustentable). Puedes cancelar cuando quieras. Destino CVU oficial: <code class="bg-black/50 px-2 py-1 rounded text-pink-300 font-mono text-[11px]">0000003100076636444961</code>.
+                        </p>
+                        <button onclick="showCheckoutView()" class="w-full py-4 bg-gradient-to-r from-pink-600 via-purple-600 to-sky-400 hover:opacity-90 font-extrabold text-xs sm:text-sm rounded-2xl shadow-xl shadow-pink-600/40 transition cursor-pointer">
+                            ¡COMPLETAR DATOS DE SUSCRIPCIÓN Y FACTURA!
+                        </button>
+                    </div>
+
+                    <div id="sub-checkout-view" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        
+                        <div class="lg:col-span-7 bg-[#070714] border border-pink-500/30 rounded-3xl p-6 md:p-8 shadow-2xl">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-base sm:text-lg font-black text-pink-300">Suscripción Mensual MS3</h3>
+                                <button onclick="backToSubInfo()" class="text-xs text-gray-400 hover:text-white cursor-pointer"><i class="fa-solid fa-arrow-left mr-1"></i> Volver</button>
+                            </div>
+                            <form onsubmit="processPaymentAndSendWhatsApp(event)" class="space-y-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1">Nombre</label>
+                                        <input type="text" id="pay-nombre" required oninput="updateFactura()" class="w-full bg-[#030307] border border-pink-500/30 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-pink-500" placeholder="Tu nombre">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1">Apellido</label>
+                                        <input type="text" id="pay-apellido" required oninput="updateFactura()" class="w-full bg-[#030307] border border-pink-500/30 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-pink-500" placeholder="Tu apellido">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1">Dirección / Ubicación de Entrega</label>
+                                        <input type="text" id="pay-direccion" required oninput="updateFactura()" class="w-full bg-[#030307] border border-pink-500/30 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-pink-500" placeholder="Calle, Número, Ciudad">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1">Número Telefónico</label>
+                                        <input type="tel" id="pay-telefono" required oninput="updateFactura()" class="w-full bg-[#030307] border border-pink-500/30 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-pink-500" placeholder="+54 ...">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1">Medio de Pago</label>
+                                    <select id="pay-medio" onchange="updateFactura()" class="w-full bg-[#030307] border border-pink-500/30 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-pink-500">
+                                        <option value="Tarjeta Visa">Tarjeta Visa</option>
+                                        <option value="Tarjeta Mastercard">Tarjeta Mastercard</option>
+                                        <option value="Mercado Pago (CVU)">Mercado Pago / CVU</option>
+                                        <option value="Transferencia Bancaria">Transferencia Bancaria</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1">Número de Tarjeta / CVU de Extracción</label>
+                                    <input type="text" id="pay-tarjeta" required class="w-full bg-[#030307] border border-pink-500/30 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-pink-500" placeholder="XXXX XXXX XXXX XXXX">
+                                </div>
+                                <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-pink-600 via-purple-600 to-sky-400 hover:opacity-90 font-extrabold text-xs rounded-xl shadow-lg shadow-pink-600/30 transition cursor-pointer mt-2">
+                                    CONFIRMAR SUSCRIPCIÓN Y ENVIAR A WHATSAPP
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="lg:col-span-5 bg-[#030307] border border-pink-500/40 rounded-3xl p-6 shadow-2xl flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-center border-b border-white/10 pb-4 mb-4">
+                                    <span class="font-black text-pink-400 tracking-wider text-xs sm:text-sm">FACTURA MS3 (MENSUAL)</span>
+                                    <span class="text-[9px] text-gray-400">CVU: 00000031...</span>
+                                </div>
+                                <div class="space-y-3 text-xs text-gray-300 mb-6">
+                                    <div class="flex justify-between"><span>Titular:</span> <span id="factura-nombre" class="font-bold text-white">-</span></div>
+                                    <div class="flex justify-between"><span>Ubicación:</span> <span id="factura-direccion" class="font-bold text-white">-</span></div>
+                                    <div class="flex justify-between"><span>Teléfono:</span> <span id="factura-telefono" class="font-bold text-white">-</span></div>
+                                    <div class="flex justify-between"><span>Medio:</span> <span id="factura-medio" class="font-bold text-pink-300">Tarjeta Visa</span></div>
+                                </div>
+                                <div class="border-t border-white/10 pt-4 space-y-2 text-xs">
+                                    <div class="flex justify-between text-gray-400"><span>Cuota Mensual MS3 + Pulsera NFC:</span> <span>$6.499 ARS</span></div>
+                                    <div class="flex justify-between text-gray-400"><span>Envío de pulsera:</span> <span>INCLUIDO</span></div>
+                                    <div class="flex justify-between text-base font-black text-white pt-2 border-t border-white/10"><span>Total Mensual:</span> <span class="text-pink-400">$6.499 ARS</span></div>
+                                </div>
+                            </div>
+                            <div class="mt-6 bg-pink-950/20 border border-pink-500/20 rounded-xl p-3 text-center">
+                                <p class="text-[10px] text-pink-300"><i class="fa-solid fa-circle-check mr-1"></i> Cargo mensual recurrente hasta cancelar la suscripción.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <footer class="border-t border-pink-500/15 bg-[#05050c] py-6 px-6 text-center z-30 relative">
+        <p class="text-xs text-gray-400 mb-2">Atención al Cliente y Soporte Técnico MS3:</p>
+        <p class="text-sm sm:text-base font-extrabold text-pink-400 mb-4 font-mono tracking-wider">+54 3541 201963</p>
+        <a href="https://wa.me/543541201963?text=Hola,%20necesito%20soporte%20con%20la%20suscripción%20MS3" target="_blank" class="inline-flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:opacity-90 text-xs font-bold rounded-xl transition shadow-lg shadow-emerald-600/30 cursor-pointer">
+            <i class="fa-brands fa-whatsapp text-sm"></i><span>CONTACTAR POR WHATSAPP</span>
+        </a>
     </footer>
 
+    <div id="vr-player-modal" class="fixed inset-0 z-50 bg-black hidden flex flex-col">
+        <div class="absolute top-4 left-4 right-4 z-20 flex justify-between items-center bg-black/50 backdrop-blur-md px-4 sm:px-6 py-3 rounded-2xl border border-pink-500/20">
+            <div>
+                <span class="text-[10px] text-pink-400 font-bold">MODO INMERSIVO 360° VR</span>
+                <h3 id="vr-title" class="text-xs sm:text-base font-extrabold">Título de la Experiencia</h3>
+            </div>
+            <button onclick="closeVRPlayer()" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition cursor-pointer">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        <div id="vr-viewport" class="flex-1 w-full h-full cursor-grab"></div>
+    </div>
+
+    <nav class="md:hidden fixed bottom-0 inset-x-0 bg-[#05050c]/95 backdrop-blur-lg border-t border-pink-500/15 flex justify-around py-3 z-40">
+        <button onclick="switchTab('inicio', this)" class="mobile-nav-btn flex flex-col items-center text-pink-400 cursor-pointer"><i class="fa-solid fa-house text-sm"></i><span class="text-[10px] mt-1">Inicio</span></button>
+        <button onclick="switchTab('explorar', this)" class="mobile-nav-btn flex flex-col items-center text-gray-400 cursor-pointer"><i class="fa-solid fa-compass text-sm"></i><span class="text-[10px] mt-1">Explorar</span></button>
+        <button onclick="switchTab('tendencias', this)" class="mobile-nav-btn flex flex-col items-center text-gray-400 cursor-pointer"><i class="fa-solid fa-fire text-sm"></i><span class="text-[10px] mt-1">Tendencias</span></button>
+        <button onclick="switchTab('suscripcion', null)" class="mobile-nav-btn flex flex-col items-center text-gray-400 cursor-pointer"><i class="fa-solid fa-gift text-sm"></i><span class="text-[10px] mt-1">Pulsera</span></button>
+        <button onclick="openAuthModal()" class="mobile-nav-btn flex flex-col items-center text-gray-400 cursor-pointer"><i class="fa-solid fa-user text-sm"></i><span class="text-[10px] mt-1">Perfil</span></button>
+    </nav>
+
     <script>
-        // Asegurar que el video no se pueda pausar por interacción del usuario
-        const video = document.getElementById('bg-video');
-        video.addEventListener('click', (e) => {
+        // 1. Fondo de Espacio Estrellado
+        let spaceScene, spaceCamera, spaceRenderer, starsMesh;
+
+        function initSpaceBackground() {
+            const canvas = document.getElementById('space-bg');
+            spaceScene = new THREE.Scene();
+            spaceCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            spaceCamera.position.z = 5;
+
+            spaceRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            spaceRenderer.setSize(window.innerWidth, window.innerHeight);
+
+            const starsGeometry = new THREE.BufferGeometry();
+            const starsCount = 2000;
+            const posArray = new Float32Array(starsCount * 3);
+
+            for(let i = 0; i < starsCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 50;
+            }
+
+            starsGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+            const starsMaterial = new THREE.PointsMaterial({
+                size: 0.08,
+                color: 0xec4899,
+                transparent: true,
+                opacity: 0.8
+            });
+
+            starsMesh = new THREE.Points(starsGeometry, starsMaterial);
+            spaceScene.add(starsMesh);
+
+            animateSpace();
+
+            window.addEventListener('resize', () => {
+                spaceCamera.aspect = window.innerWidth / window.innerHeight;
+                spaceCamera.updateProjectionMatrix();
+                spaceRenderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        function animateSpace() {
+            requestAnimationFrame(animateSpace);
+            if(starsMesh) {
+                starsMesh.rotation.y -= 0.0006;
+                starsMesh.rotation.x -= 0.0003;
+            }
+            spaceRenderer.render(spaceScene, spaceCamera);
+        }
+
+        // 2. Logotipo MS3 en 3D Ancho y Holográfico (Predominio Violeta y Rosa intenso, con destello sutil celeste)
+        let introScene, introCamera, introRenderer, ms3TextMesh;
+
+        function initIntro3D() {
+            const container = document.getElementById('canvas-container');
+            if(!container) return;
+
+            introScene = new THREE.Scene();
+            introCamera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            introCamera.position.z = 14;
+
+            introRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            introRenderer.setSize(container.clientWidth, container.clientHeight);
+            introRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(introRenderer.domElement);
+
+            // Sistema de luces enfocado fuertemente en tonos fucsia/rosa y violeta profundo, con toque celeste sutil
+            const ambientLight = new THREE.AmbientLight(0xffffff, 1.6);
+            introScene.add(ambientLight);
+
+            const hotPinkLight = new THREE.PointLight(0xec4899, 30, 60);
+            hotPinkLight.position.set(-6, 4, 6);
+            introScene.add(hotPinkLight);
+
+            const deepPurpleLight = new THREE.PointLight(0x8b5cf6, 30, 60);
+            deepPurpleLight.position.set(6, -4, 6);
+            introScene.add(deepPurpleLight);
+
+            const softSkyLight = new THREE.PointLight(0x38bdf8, 12, 60);
+            softSkyLight.position.set(0, 7, 8);
+            introScene.add(softSkyLight);
+
+            const fontLoader = new THREE.FontLoader();
+            fontLoader.load('https://threejs.org/examples/fonts/helvetiker_bold.typeface.json', function (font) {
+                const textGeometry = new THREE.TextGeometry('MS3', {
+                    font: font,
+                    size: 2.8,
+                    height: 1.1, // Ancho 3D sólido y robusto
+                    curveSegments: 16,
+                    bevelEnabled: true,
+                    bevelThickness: 0.22,
+                    bevelSize: 0.12,
+                    bevelSegments: 8
+                });
+
+                textGeometry.center();
+
+                // Material brillante con tonos dominantes violeta y rosa, y reflejo de acento celeste
+                const textMaterial = new THREE.MeshPhysicalMaterial({
+                    color: 0xd946ef, // Tono base fucsia/violeta intenso
+                    roughness: 0.08,
+                    metalness: 0.82,
+                    transmission: 0.2,
+                    ior: 1.6,
+                    emissive: 0x7c3aed, // Emisión violeta brillante
+                    emissiveIntensity: 0.5,
+                    reflectivity: 1.0,
+                    clearcoat: 1.0,
+                    clearcoatRoughness: 0.1
+                });
+
+                ms3TextMesh = new THREE.Mesh(textGeometry, textMaterial);
+                introScene.add(ms3TextMesh);
+            });
+
+            animateIntro3D();
+
+            window.addEventListener('resize', () => {
+                if(!container) return;
+                introCamera.aspect = container.clientWidth / container.clientHeight;
+                introCamera.updateProjectionMatrix();
+                introRenderer.setSize(container.clientWidth, container.clientHeight);
+            });
+        }
+
+        function animateIntro3D() {
+            requestAnimationFrame(animateIntro3D);
+            if (ms3TextMesh) {
+                // Rotación fluida en 360 grados sobre su propio eje
+                ms3TextMesh.rotation.y += 0.014;
+                ms3TextMesh.rotation.x = Math.sin(Date.now() * 0.0012) * 0.15;
+                ms3TextMesh.rotation.z = Math.cos(Date.now() * 0.001) * 0.05;
+            }
+            if(introRenderer) introRenderer.render(introScene, introCamera);
+        }
+
+        function enterApp() {
+            const intro = document.getElementById('intro-screen');
+            const main = document.getElementById('main-app');
+            
+            intro.style.transform = 'scale(1.15)';
+            intro.style.filter = 'brightness(3.5)';
+            intro.style.opacity = '0';
+            
+            setTimeout(() => {
+                intro.style.display = 'none';
+                main.style.opacity = '1';
+            }, 800);
+        }
+
+        window.onload = () => {
+            initSpaceBackground();
+            initIntro3D();
+            setupCarouselsDrag();
+            checkExistingSession();
+        };
+
+        // 3. Pestañas
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-pink-600/20', 'text-pink-300', 'border', 'border-pink-500/30', 'font-medium');
+                btn.classList.add('text-gray-400');
+            });
+            if(btnElement && btnElement.classList.contains('nav-btn')) {
+                btnElement.classList.add('bg-pink-600/20', 'text-pink-300', 'border', 'border-pink-500/30', 'font-medium');
+                btnElement.classList.remove('text-gray-400');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 4. Autenticación y Sesión Abierta
+        function openAuthModal() {
+            document.getElementById('auth-modal').classList.remove('hidden');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+
+        function handleUserLoginOrRegister(e) {
             e.preventDefault();
-            if (video.paused) {
-                video.play();
+            const email = document.getElementById('user-email-input').value;
+            localStorage.setItem('ms3_user_email', email);
+            updateSessionUI(email);
+            closeAuthModal();
+            enterApp();
+        }
+
+        function checkExistingSession() {
+            const savedEmail = localStorage.getItem('ms3_user_email');
+            if(savedEmail) {
+                updateSessionUI(savedEmail);
             }
-        });
-        // Forzar reproducción constante ante cualquier evento de blur o cambio de pestaña
-        setInterval(() => {
-            if (video.paused) {
-                video.play().catch(() => {});
-            }
-        }, 1000);
+        }
+
+        function updateSessionUI(email) {
+            const initial = email[0].toUpperCase();
+            document.getElementById('user-profile-btn').innerText = initial;
+            document.getElementById('session-email-display').innerText = email;
+            document.getElementById('session-avatar').innerText = initial;
+            document.getElementById('auth-form-container').classList.add('hidden');
+            document.getElementById('auth-session-container').classList.remove('hidden');
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('ms3_user_email');
+            document.getElementById('user-profile-btn').innerText = 'A';
+            document.getElementById('auth-form-container').classList.remove('hidden');
+            document.getElementById('auth-session-container').classList.add('hidden');
+            closeAuthModal();
+            alert('Sesión cerrada correctamente.');
+        }
+
+        // 5. Suscripción y Factura
+        function showCheckoutView() {
+            document.getElementById('sub-info-view').classList.add('hidden');
+            document.getElementById('sub-checkout-view').classList.remove('hidden');
+        }
+
+        function backToSubInfo() {
+            document.getElementById('sub-checkout-view').classList.add('hidden');
+            document.getElementById('sub-info-view').classList.remove('hidden');
+        }
+
+        function updateFactura() {
+            const nombre = document.getElementById('pay-nombre').value || '-';
+            const apellido = document.getElementById('pay-apellido').value || '';
+            const direccion = document.getElementById('pay-direccion').value || '-';
+            const telefono = document.getElementById('pay-telefono').value || '-';
+            const medio = document.getElementById('pay-medio').value;
+
+            document.getElementById('factura-nombre').innerText = nombre + ' ' + apellido;
+            document.getElementById('factura-direccion').innerText = direccion;
+            document.getElementById('factura-telefono').innerText = telefono;
+            document.getElementById('factura-medio').innerText = medio;
+        }
+
+        function processPaymentAndSendWhatsApp(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('pay-nombre').value;
+            const apellido = document.getElementById('pay-apellido').value;
+            const direccion = document.getElementById('pay-direccion').value;
+            const telefono = document.getElementById('pay-telefono').value;
+            const medio = document.getElementById('pay-medio').value;
+            const tarjeta = document.getElementById('pay-tarjeta').value;
+
+            const mensajeWa = `Hola, realicé mi suscripción mensual MS3 ($6.499 ARS/mes):%0A*Nombre:* ${nombre} ${apellido}%0A*Dirección:* ${direccion}%0A*Teléfono:* ${telefono}%0A*Medio:* ${medio}%0A*CVU Destino:* 0000003100076636444961%0A¡Por favor enviar mi pulsera NFC de regalo!`;
+            
+            alert('¡Suscripción procesada! Redirigiendo al WhatsApp de atención al cliente (+54 3541 201963) con el reporte automático...');
+            window.open(`https://wa.me/543541201963?text=${mensajeWa}`, '_blank');
+        }
+
+        // 6. Carruseles y VR
+        function setupCarouselsDrag() {
+            const sliders = document.querySelectorAll('.overflow-x-auto');
+            sliders.forEach(slider => {
+                let isDown = false, startX, scrollLeft;
+                slider.addEventListener('mousedown', (e) => { isDown = true; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
+                slider.addEventListener('mouseleave', () => { isDown = false; });
+                slider.addEventListener('mouseup', () => { isDown = false; });
+                slider.addEventListener('mousemove', (e) => {
+                    if(!isDown) return;
+                    e.preventDefault();
+                    slider.scrollLeft = scrollLeft - ((e.pageX - slider.offsetLeft) - startX) * 2;
+                });
+            });
+        }
+
+        function handleSearch(e) {
+            if(e.key === 'Enter') alert('Buscando: ' + e.target.value);
+        }
+
+        let vrScene, vrCamera, vrRenderer, isDragging = false, previousMousePosition = { x: 0, y: 0 };
+        function openVRExperience(title) {
+            document.getElementById('vr-title').innerText = title;
+            document.getElementById('vr-player-modal').classList.remove('hidden');
+            const container = document.getElementById('vr-viewport');
+            container.innerHTML = '';
+            vrScene = new THREE.Scene();
+            vrCamera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            vrRenderer = new THREE.WebGLRenderer({ antialias: true });
+            vrRenderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(vrRenderer.domElement);
+            const geometry = new THREE.SphereGeometry(500, 60, 40);
+            geometry.scale(-1, 1, 1);
+            const textureLoader = new THREE.TextureLoader();
+            const material = new THREE.MeshBasicMaterial({ map: textureLoader.load('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=2000&q=80') });
+            vrScene.add(new THREE.Mesh(geometry, material));
+            vrCamera.position.set(0, 0, 0.1);
+            container.addEventListener('mousedown', (e) => { isDragging = true; previousMousePosition = { x: e.clientX, y: e.clientY }; });
+            container.addEventListener('mousemove', (e) => {
+                if(!isDragging) return;
+                vrCamera.rotation.y += (e.clientX - previousMousePosition.x) * 0.005;
+                vrCamera.rotation.x += (e.clientY - previousMousePosition.y) * 0.005;
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+            window.addEventListener('mouseup', () => { isDragging = false; });
+            animateVR();
+        }
+
+        function closeVRPlayer() {
+            document.getElementById('vr-player-modal').classList.add('hidden');
+        }
+
+        function animateVR() {
+            if(document.getElementById('vr-player-modal').classList.contains('hidden')) return;
+            requestAnimationFrame(animateVR);
+            if(vrRenderer) vrRenderer.render(vrScene, vrCamera);
+        }
     </script>
 </body>
 </html>
