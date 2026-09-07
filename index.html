@@ -43,7 +43,13 @@
         <div class="w-full max-w-sm flex flex-col items-center pb-2">
             <p class="text-pink-300 text-[11px] sm:text-xs tracking-[0.3em] uppercase mb-4 font-extrabold glow-pink text-center">MÁS ALLÁ DE LO QUE VES</p>
             <div class="flex flex-col sm:flex-row gap-3 w-full">
-                <button onclick="enterApp()" class="w-full py-3.5 sm:py-4 bg-gradient-to-r from-pink-600 via-purple-600 to-sky-400 rounded-2xl font-extrabold text-xs sm:text-sm tracking-wider hover:opacity-90 transition transform hover:scale-105 glow-box cursor-pointer">
+                <!--boton de google-->
+                <button onclick="loginwithGoogle()" class="w-full py-3.5 sm:py-4 bg-gradient-to-r from-pink-600 via-purple-600 to-sky-400 rounded-2xl font-extrabold text-xs sm:text-sm tracking-wider hover:opacity-90 transition transform hover:scale-105 glow-box cursor-pointer">
+                    <i class="fa-brands fa-google"></i>REGISTRARSE CON email</i>
+                    </button>
+                    <!--Boton de registro / correo -->
+                    <button onclick="openAuthModal()" class="w-full py-3.5 sm:py-4 bg-white/10 hover:bg-white border border-pink-500/40 rounded-2xl font-extrabold text-xs sm:text-sm flex items-center justify-center text-white transition"></button>
+                    </div>
                     INGRESAR AL MUNDO MS3
                 </button>
                 <button onclick="openAuthModal()" class="w-full py-3.5 sm:py-4 bg-white/10 hover:bg-white/20 border border-pink-500/40 rounded-2xl font-bold text-xs sm:text-sm tracking-wider transition backdrop-blur cursor-pointer text-pink-300 text-center">
