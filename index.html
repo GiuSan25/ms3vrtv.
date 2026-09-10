@@ -196,7 +196,7 @@
 
                     <!-- Tarjeta 2: Cyber City 360° (Con ID de YouTube) -->
                     <div onclick="openVRDetails('./ms3media/vedettehorizontal.png', 'Explora mundos digitales interactivos y escenarios urbanos futuristas en 360 grados.', 'y3qO1OL5nRg')" class="bg-[#070714] border border-pink-500/30 rounded-2xl overflow-hidden hover:border-pink-500 transition cursor-pointer group shadow-xl flex flex-col">
-                        <div class="relative h-48 bg-cover bg-center" style="background-image: url('./ms3media/vedettehorizontal.png');">
+                        <div class="relative h-48 bg-cover bg-center" style="background-image: url('https://youtu.be/y3qO1OL5nRg?si=Zxw-UCAse31NSyig');">
                             <span class="absolute top-3 right-3 px-2.5 py-1 bg-purple-600/90 text-white text-[10px] font-extrabold rounded-lg tracking-wider border border-purple-400/40 shadow-lg">VR 4K</span>
                             <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
                                 <span class="w-12 h-12 bg-pink-600/80 rounded-full flex items-center justify-center text-white shadow-lg"><i class="fa-solid fa-play ml-0.5"></i></span>
@@ -572,10 +572,66 @@
 
         let currentProgram = { title: '', img: '', desc: '', youtubeId: '' };
 
-        function openVRDetails(title, imgUrl, desc, youtubeId) {
-            currentProgram = { title: title, img: imgUrl, desc: desc, youtubeId: youtubeId || '' };
-            document.getElementById('vr-modal-title').innerText = title;
-            document.getElementById('vr-modal-desc').innerText = desc;
+        // Variable global para recordar qué programa o video se seleccionó
+let currentProgram = { title: '', img: '', desc: '', youtubeId: '' };
+
+// 1. Función que abre la ventana de detalles (la de la imagen 5 con la imagen fija)
+function openVRDetails(title, imgUrl, desc, youtubeId) {
+    currentProgram = { title: title, img: imgUrl, desc: desc, youtubeId: youtubeId || '' };
+    
+    document.getElementById('vr-modal-title').innerText = title;
+    document.getElementById('vr-modal-desc').innerText = desc;
+    
+    const modalImgContainer = document.getElementById('vr-modal-img');
+    if (modalImgContainer) {
+        // Muestra la imagen fija en el modal de detalles, NO el video todavía
+        modalImgContainer.innerHTML = `<img src="${imgUrl}" class="w-full h-full object-cover rounded-lg" alt="${title}">`;
+    }
+
+    const modal = document.getElementById('vr-details-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+}
+
+// 2. Función que enciende el reproductor de Realidad Virtual / 360 grados
+function openVRPlayer(youtubeId) {
+    const playerModal = document.getElementById('vr-player-modal');
+    if (!playerModal) return;
+
+    playerModal.classList.remove('hidden');
+    playerModal.classList.add('flex');
+
+    const viewportLeft = document.getElementById('vr-viewport-left');
+    const viewportRight = document.getElementById('vr-viewport-right');
+
+    // Inserta el iframe de YouTube adaptado para los visores 360
+    const ytIframe = `<iframe class="w-full h-full border-0" src="https://www.youtube.com/embed/${youtubeId}?autoplay=1&enablejsapi=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+
+    if (viewportLeft) viewportLeft.innerHTML = ytIframe;
+    if (viewportRight) viewportRight.innerHTML = ytIframe;
+}
+
+// 3. Conecta el botón "REPRODUCIR" del modal para que lance el visor 360
+document.addEventListener('DOMContentLoaded', () => {
+    // Buscamos el botón de reproducir dentro de la ventana de detalles
+    const playButtons = document.querySelectorAll('#vr-details-modal button');
+    
+    playButtons.forEach(btn => {
+        // Si el botón contiene la palabra REPRODUCIR o el ícono de play
+        if (btn.innerText.includes('REPRODUCIR') || btn.querySelector('.fa-play')) {
+            btn.addEventListener('click', () => {
+                if (currentProgram.youtubeId) {
+                    // Cierra la ventana de detalles
+                    document.getElementById('vr-details-modal').classList.add('hidden');
+                    // Abre el reproductor 360 de YouTube
+                    openVRPlayer(currentProgram.youtubeId);
+                }
+            });
+        }
+    });
+});
             
             const modalImgContainer = document.getElementById('vr-modal-img');
             
