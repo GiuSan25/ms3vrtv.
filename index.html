@@ -573,29 +573,24 @@
         let currentProgram = { title: '', img: '', desc: '', youtubeId: '' };
 
         function openVRDetails(title, imgUrl, desc, youtubeId) {
-            currentProgram = { title: title, img: imgUrl, desc: desc, youtubeId: youtubeId || '' };
-            document.getElementById('vr-modal-title').innerText = title;
-            document.getElementById('vr-modal-desc').innerText = desc;
-            
-            const modalImgContainer = document.getElementById('vr-modal-img');
-            
-            if (youtubeId) {
-                modalImgContainer.innerHTML = `
-                    <iframe 
-                        width="100%" 
-                        height="100%" 
-                        src="https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&enablejsapi=1&rel=0" 
-                        title="YouTube video player" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                        referrerpolicy="strict-origin-when-cross-origin" 
-                        allowfullscreen 
-                        style="position: absolute; top: 0; left: 0; border: 0;">
-                    </iframe>`;
-            } else {
-                modalImgContainer.innerHTML = '';
-                modalImgContainer.style.backgroundImage = `url('${imgUrl}')`;
-            }
+    currentProgram = { title: title, img: imgUrl, desc: desc, youtubeId: youtubeId || '' };
+    
+    document.getElementById('vr-modal-title').innerText = title;
+    document.getElementById('vr-modal-desc').innerText = desc;
+    
+    const modalImgContainer = document.getElementById('vr-modal-img');
+    if (modalImgContainer) {
+        // Muestra únicamente la imagen estática/miniatura en el modal de detalles
+        modalImgContainer.innerHTML = `<img src="${imgUrl}" class="w-full h-full object-cover rounded-lg" alt="${title}">`;
+        modalImgContainer.style.backgroundImage = '';
+    }
+
+    const detailsModal = document.getElementById('vr-details-modal');
+    if (detailsModal) {
+        detailsModal.classList.remove('hidden');
+        detailsModal.classList.add('flex');
+    }
+}
             
             document.getElementById('vr-details-modal').classList.remove('hidden');
         }
