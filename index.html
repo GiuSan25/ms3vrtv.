@@ -193,13 +193,13 @@
                     </div>
 
                     <!-- Tarjeta 2: Cyber City 360° -->
-                    <div onclick="openVRDetails('Cyber City 360°', './ms3media/vedettehorizontal.png', 'Explora mundos digitales interactivos y escenarios urbanos futuristas en 360 grados.', 'AQUI_VA_EL_ID_DE_YOUTUBE')" class="bg-[#070714] border border-pink-500/30 rounded-2xl overflow-hidden hover:border-pink-500 transition cursor-pointer group shadow-xl flex flex-col">
-    <div class="relative h-48 bg-cover bg-center" style="background-image: url('./ms3media/vedettehorizontal.png');">
-        <span class="absolute top-3 right-3 px-2.5 py-1 bg-purple-600/90 text-white text-[10px] font-extrabold rounded-lg tracking-wider border border-purple-400/40 shadow-lg">VR 4K</span>
-        <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
-            <span class="w-12 h-12 bg-pink-600/80 rounded-full flex items-center justify-center text-white shadow-lg"><i class="fa-solid fa-play ml-0.5"></i></span>
-        </div>
-    </div>
+                    <div onclick="openVRDetails('Cyber City 360°', './ms3media/vedettehorizontal.png', 'Explora mundos digitales interactivos y escenarios urbanos futuristas en 360 grados.', 'y3qO1OL5nRg')" class="bg-[#070714] border border-pink-500/30 rounded-2xl overflow-hidden hover:border-pink-500 transition cursor-pointer group shadow-xl flex flex-col">
+                        <div class="relative h-48 bg-cover bg-center" style="background-image: url('./ms3media/vedettehorizontal.png');">
+                            <span class="absolute top-3 right-3 px-2.5 py-1 bg-purple-600/90 text-white text-[10px] font-extrabold rounded-lg tracking-wider border border-purple-400/40 shadow-lg">VR 4K</span>
+                            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                                <span class="w-12 h-12 bg-pink-600/80 rounded-full flex items-center justify-center text-white shadow-lg"><i class="fa-solid fa-play ml-0.5"></i></span>
+                            </div>
+                        </div>
                         <div class="p-4 flex-1 flex flex-col justify-between">
                             <div>
                                 <span class="text-[10px] text-purple-400 font-bold uppercase tracking-wider">Ciencia Ficción</span>
@@ -570,34 +570,30 @@
 
         let currentProgram = { title: '', img: '', desc: '', youtubeId: '' };
 
-       function openVRDetails(title, imgUrl, desc, youtubeId) {
-    currentProgram = { title: title, img: imgUrl, desc: desc, youtubeId: youtubeId || '' };
-    currentYouTubeId = youtubeId || '';
-    
-    document.getElementById('vr-modal-title').innerText = title;
-    document.getElementById('vr-modal-desc').innerText = desc;
-    
-    const modalImgContainer = document.getElementById('vr-modal-img');
-    
-    if (youtubeId) {
-        modalImgContainer.innerHTML = `
-            <iframe 
-                width="100%" 
-                height="100%" 
-                src="https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&enablejsapi=1&rel=0" 
-                title="YouTube video player" 
-                frameborder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowfullscreen 
-                style="position: absolute; top: 0; left: 0; border: 0;">
-            </iframe>`;
-    } else {
-        modalImgContainer.innerHTML = '';
-        modalImgContainer.style.backgroundImage = `url('${imgUrl}')`;
-    }
-    
-    document.getElementById('vr-details-modal').classList.remove('hidden');
-}
+        function openVRDetails(title, imgUrl, desc, youtubeId) {
+            currentProgram = { title: title, img: imgUrl, desc: desc, youtubeId: youtubeId || '' };
+            document.getElementById('vr-modal-title').innerText = title;
+            document.getElementById('vr-modal-desc').innerText = desc;
+            
+            const modalImgContainer = document.getElementById('vr-modal-img');
+            
+            if (youtubeId) {
+                modalImgContainer.innerHTML = `
+                    <iframe 
+                        width="100%" 
+                        height="100%" 
+                        src="https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&enablejsapi=1&rel=0" 
+                        title="YouTube video player" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        referrerpolicy="strict-origin-when-cross-origin" 
+                        allowfullscreen 
+                        style="position: absolute; top: 0; left: 0; border: 0;">
+                    </iframe>`;
+            } else {
+                modalImgContainer.innerHTML = '';
+                modalImgContainer.style.backgroundImage = `url('${imgUrl}')`;
+            }
             
             document.getElementById('vr-details-modal').classList.remove('hidden');
         }
