@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reproductor VR Interactivo</title>
+    <title>MS3 - La Nueva Televisión Inmersiva</title>
     <style>
         * {
             box-sizing: border-box;
@@ -13,22 +13,119 @@
         body, html {
             width: 100%;
             height: 100%;
-            font-family: sans-serif;
-            background-color: #0b0b0b;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0b0614;
             color: #fff;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
-        /* Sección Principal de Inicio */
-        .hero-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
+        /* Barra de Navegación Superior */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            background: linear-gradient(180deg, rgba(11,6,20,0.9) 0%, rgba(11,6,20,0) 100%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: #fff;
+            background: linear-gradient(90deg, #fff, #b19fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .top-icons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            color: #b19fff;
+            font-size: 1.2rem;
+        }
+
+        .profile-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
             display: flex;
             align-items: center;
-            justify-content: flex-start;
-            padding: 50px;
-            background: url('img/portada-placeholder.jpg') no-repeat center center/cover;
+            justify-content: center;
+            color: white;
+        }
+
+        /* Menú de Pestañas (Inicio, Programas VR, etc.) */
+        .sub-nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 20px;
+            margin-top: 70px;
+            background-color: #0b0614;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.9rem;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8a859b;
+            cursor: pointer;
+            text-decoration: none;
+            gap: 4px;
+        }
+
+        .nav-item.active {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .nav-item.active::after {
+            content: '';
+            width: 20px;
+            height: 3px;
+            background-color: #ff2a6d;
+            border-radius: 2px;
+            margin-top: 2px;
+        }
+
+        /* Contenido Principal */
+        .main-content {
+            padding: 20px;
+            padding-bottom: 90px;
+        }
+
+        /* Sección Destacado (Hero) */
+        .section-title {
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            color: #8a859b;
+            margin-bottom: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .hero-banner {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: url('img/destacado-portada.jpg') no-repeat center center/cover;
+            border: 1px solid rgba(255, 42, 109, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         .hero-overlay {
@@ -37,63 +134,147 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, rgba(0,0,0,0.85) 20%, rgba(0,0,0,0.3) 100%);
+            background: linear-gradient(180deg, rgba(0,0,0,0.1) 30%, rgba(11,6,20,0.95) 100%);
             z-index: 1;
         }
 
-        .hero-content {
+        .hero-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(120, 50, 255, 0.6);
+            backdrop-filter: blur(5px);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            z-index: 2;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .hero-details {
             position: relative;
             z-index: 2;
-            max-width: 600px;
         }
 
-        .hero-content h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
+        .hero-details h2 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
 
-        .hero-content p {
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-            color: #ccc;
-            line-height: 1.5;
-        }
-
-        .button-group {
+        .hero-buttons {
             display: flex;
-            gap: 15px;
+            gap: 10px;
         }
 
         .btn {
-            padding: 12px 30px;
-            font-size: 1rem;
+            padding: 8px 22px;
+            border-radius: 8px;
+            font-size: 0.9rem;
             font-weight: bold;
-            border: none;
-            border-radius: 5px;
             cursor: pointer;
-            transition: background 0.3s;
+            border: none;
         }
 
         .btn-primary {
-            background-color: #e50914;
-            color: #fff;
-        }
-
-        .btn-primary:hover {
-            background-color: #b20710;
+            background-color: #fff;
+            color: #000;
         }
 
         .btn-secondary {
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.15);
             color: #fff;
             backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
-        .btn-secondary:hover {
-            background-color: rgba(255, 255, 255, 0.4);
+        /* Filas de Contenido Deslizables */
+        .row-section {
+            margin-top: 30px;
         }
 
-        /* Contenedor del Reproductor de Video (Pantalla Completa) */
+        .row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .row-header span {
+            font-size: 0.75rem;
+            color: #a855f7;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+        }
+
+        .cards-slider {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scrollbar-width: none; /* Firefox */
+        }
+
+        .cards-slider::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+
+        .card {
+            flex: 0 0 180px;
+            height: 110px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            background-color: #1a1528;
+            border: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: scale(1.03);
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.85) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 8px;
+        }
+
+        .card-title {
+            font-size: 0.8rem;
+            font-weight: bold;
+            line-height: 1.1;
+        }
+
+        .card-tag {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            font-size: 0.6rem;
+            background: rgba(11, 6, 20, 0.7);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #d8b4fe;
+        }
+
+        /* Reproductor Pantalla Completa + VR Mode (Heredado de tu requerimiento anterior) */
         .player-fullscreen-container {
             position: fixed;
             top: 0;
@@ -106,125 +287,202 @@
             justify-content: center;
             align-items: center;
         }
-
-        .player-fullscreen-container.active {
-            display: flex;
-        }
-
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        /* Modo Gafas VR (Pantalla Partida Estéreo) */
-        .vr-split video {
-            width: 50% !important;
-            height: 100%;
-            float: left;
-        }
-        .vr-split {
-            display: flex !important;
-            justify-content: space-between;
-        }
-
-        /* Controles Dinámicos Superiores/Inferiores */
+        .player-fullscreen-container.active { display: flex; }
+        video { width: 100%; height: 100%; object-fit: contain; }
+        .vr-split video { width: 50% !important; height: 100%; float: left; }
+        .vr-split { display: flex !important; justify-content: space-between; }
+        
         .player-controls {
-            position: absolute;
-            top: 0;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10000; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .player-controls.hidden { opacity: 0; pointer-events: none; }
+        .control-top { position: absolute; top: 20px; right: 20px; pointer-events: auto; }
+        .close-btn {
+            background: rgba(0, 0, 0, 0.6); color: white; border: 2px solid white;
+            font-size: 1.2rem; width: 40px; height: 40px; border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .control-bottom {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 10px; pointer-events: auto; background: rgba(0, 0, 0, 0.6);
+            padding: 8px 16px; border-radius: 20px; backdrop-filter: blur(5px);
+        }
+        .control-btn { background: transparent; color: white; border: none; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
+
+        /* Barra de Navegación Inferior Móvil */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            z-index: 10000;
-            pointer-events: none; /* Permite hacer clic a través si no hay controles */
-            transition: opacity 0.3s ease;
-        }
-
-        .player-controls.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .control-top {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            pointer-events: auto;
-        }
-
-        .close-btn {
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            border: 2px solid white;
-            font-size: 1.5rem;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            cursor: pointer;
+            background-color: #0b0614;
             display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            z-index: 1000;
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
+            color: #8a859b;
+            font-size: 0.7rem;
+            text-decoration: none;
+            gap: 4px;
         }
 
-        .control-bottom {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 15px;
-            pointer-events: auto;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 10px 20px;
-            border-radius: 30px;
-            backdrop-filter: blur(5px);
-        }
-
-        .control-btn {
-            background: transparent;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
+        .bottom-nav-item.active {
+            color: #ff2a6d;
         }
     </style>
 </head>
 <body>
 
-    <!-- Sección de Inicio (Hero) -->
-    <section class="hero-container" id="heroSection">
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <h1>Experiencia Inmersiva</h1>
-            <p>Sumérgete en una nueva dimensión visual con soporte completo para reproducción en pantalla grande y modo estereoscópico para gafas VR.</p>
-            <div class="button-group">
-                <button class="btn btn-primary" id="watchNowBtn">Ver Ahora</button>
-                <button class="btn btn-secondary" id="addListBtn">Agregar a la lista</button>
+    <!-- Barra Superior -->
+    <div class="top-nav">
+        <div class="logo">MS3</div>
+        <div class="top-icons">
+            <div class="profile-icon">👤</div>
+            <div>⚙️</div>
+            <div>📶</div>
+        </div>
+    </div>
+
+    <!-- Pestañas de Navegación Secundaria -->
+    <div class="sub-nav">
+        <a class="nav-item active">Inicio</a>
+        <a class="nav-item">Programas VR</a>
+        <a class="nav-item">Directos</a>
+        <a class="nav-item">Mi Lista</a>
+        <a class="nav-item">Búsqueda</a>
+    </div>
+
+    <!-- Contenido Principal Estilo App de Streaming -->
+    <div class="main-content">
+        
+        <!-- Destacado -->
+        <div class="section-title">Destacado</div>
+        <div class="hero-banner" id="heroBanner">
+            <div class="hero-overlay"></div>
+            <div class="hero-badge">MS3 EXCLUSIVO</div>
+            <div class="hero-details">
+                <h2>MS3 LIVE: EL CONCIERTO DEL SIGLO</h2>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" id="watchNowBtn">VER AHORA</button>
+                    <button class="btn btn-secondary">INFO</button>
+                </div>
             </div>
         </div>
-    </section>
 
-    <!-- Contenedor del Reproductor Oculto por Defecto -->
+        <!-- Tendencias Ahora -->
+        <div class="row-section">
+            <div class="row-header">
+                <div class="section-title" style="margin-bottom:0;">Tendencias Ahora</div>
+                <span>VER MÁS &gt;</span>
+            </div>
+            <div class="cards-slider">
+                <div class="card" onclick="openPlayer()">
+                    <img src="img/card1.jpg" alt="VR">
+                    <span class="card-tag">360°</span>
+                    <div class="card-overlay">
+                        <div class="card-title">Código VR: Investigación</div>
+                    </div>
+                </div>
+                <div class="card" onclick="openPlayer()">
+                    <img src="img/card2.jpg" alt="VR">
+                    <span class="card-tag">360°</span>
+                    <div class="card-overlay">
+                        <div class="card-title">Planeta 360</div>
+                    </div>
+                </div>
+                <div class="card" onclick="openPlayer()">
+                    <img src="img/card3.jpg" alt="VR">
+                    <span class="card-tag">360°</span>
+                    <div class="card-overlay">
+                        <div class="card-title">El Estudio Central</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Noticias Inmersivas -->
+        <div class="row-section">
+            <div class="row-header">
+                <div class="section-title" style="margin-bottom:0;">Noticias Inmersivas</div>
+                <span>VER MÁS &gt;</span>
+            </div>
+            <div class="cards-slider">
+                <div class="card" onclick="openPlayer()">
+                    <img src="img/card2.jpg" alt="VR">
+                    <span class="card-tag">360°</span>
+                    <div class="card-overlay">
+                        <div class="card-title">Planeta 360</div>
+                    </div>
+                </div>
+                <div class="card" onclick="openPlayer()">
+                    <img src="img/card3.jpg" alt="VR">
+                    <span class="card-tag">360°</span>
+                    <div class="card-overlay">
+                        <div class="card-title">El Estudio Central</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cine VR -->
+        <div class="row-section">
+            <div class="row-header">
+                <div class="section-title" style="margin-bottom:0;">Cine VR</div>
+                <span>VER MÁS &gt;</span>
+            </div>
+            <div class="cards-slider">
+                <div class="card" onclick="openPlayer()">
+                    <img src="img/card1.jpg" alt="VR">
+                    <span class="card-tag">360°</span>
+                    <div class="card-overlay">
+                        <div class="card-title">Cine VR Terror</div>
+                    </div>
+                </div>
+                <div class="card" onclick="openPlayer()">
+                    <img src="img/card2.jpg" alt="VR">
+                    <span class="card-tag">360°</span>
+                    <div class="card-overlay">
+                        <div class="card-title">Planeta 360</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Reproductor Oculto para Pantalla Completa / VR / Subtítulos -->
     <div class="player-fullscreen-container" id="playerContainer">
         <video id="mainVideo" crossorigin="anonymous">
-            <source src="tu-video-360-o-normal.mp4" type="video/mp4">
-            <!-- Pista de subtítulos opcional -->
-            <track src="subtitulos-es.vtt" kind="subtitles" srclang="es" label="Español">
-            Tu navegador no soporta el elemento de video.
+            <source src="tu-video-360.mp4" type="video/mp4">
+            <track src="subtitulos.vtt" kind="subtitles" srclang="es" label="Español">
         </video>
-
-        <!-- Capa de Controles Interactivos -->
         <div class="player-controls" id="playerControls">
             <div class="control-top">
-                <button class="close-btn" id="closeBtn" title="Salir">✕</button>
+                <button class="close-btn" id="closeBtn">✕</button>
             </div>
             <div class="control-bottom">
                 <button class="control-btn" id="playPauseBtn">Pausar</button>
                 <button class="control-btn" id="subtitlesBtn">Subtítulos: OFF</button>
-                <button class="control-btn" id="vrModeBtn">Modo VR (Pantalla Partida)</button>
+                <button class="control-btn" id="vrModeBtn">Modo VR</button>
             </div>
         </div>
+    </div>
+
+    <!-- Barra de Navegación Inferior -->
+    <div class="bottom-nav">
+        <a class="bottom-nav-item active">🏠<br>Inicio</a>
+        <a class="bottom-nav-item">🥽<br>Programas VR</a>
+        <a class="bottom-nav-item">📡<br>Directos</a>
+        <a class="bottom-nav-item">📑<br>Mi Lista</a>
+        <a class="bottom-nav-item">🔍<br>Búsqueda</a>
     </div>
 
     <script>
@@ -237,46 +495,26 @@
         const subtitlesBtn = document.getElementById('subtitlesBtn');
         const vrModeBtn = document.getElementById('vrModeBtn');
 
-        let controlsTimeout;
-
-        // 1. Reproducir video en pantalla completa al presionar "Ver Ahora"
-        watchNowBtn.addEventListener('click', () => {
+        function openPlayer() {
             playerContainer.classList.add('active');
             mainVideo.play();
-            
-            // Solicitar pantalla completa del navegador si es compatible
-            if (playerContainer.requestFullscreen) {
-                playerContainer.requestFullscreen();
-            } else if (playerContainer.webkitRequestFullscreen) {
-                playerContainer.webkitRequestFullscreen();
-            }
-        });
+            if (playerContainer.requestFullscreen) playerContainer.requestFullscreen();
+        }
 
-        // 2. Cerrar reproductor y salir
-        const closePlayer = () => {
+        watchNowBtn.addEventListener('click', openPlayer);
+
+        closeBtn.addEventListener('click', () => {
             mainVideo.pause();
             mainVideo.currentTime = 0;
-            playerContainer.classList.remove('active');
-            playerContainer.classList.remove('vr-split');
-            if (document.exitFullscreen) {
-                document.exitFullscreen().catch(() => {});
-            }
-        };
-
-        closeBtn.addEventListener('click', closePlayer);
-
-        // 3. Ocultar/Mostrar controles al tocar la pantalla
-        const toggleControls = () => {
-            playerControls.classList.toggle('hidden');
-        };
-
-        playerContainer.addEventListener('click', (e) => {
-            // Evitar que los clics en los botones disparen el ocultamiento inmediato
-            if(e.target.tagName === 'BUTTON') return;
-            toggleControls();
+            playerContainer.classList.remove('active', 'vr-split');
+            if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
         });
 
-        // 4. Controles de Reproducción (Play/Pause)
+        playerContainer.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') return;
+            playerControls.classList.toggle('hidden');
+        });
+
         playPauseBtn.addEventListener('click', () => {
             if (mainVideo.paused) {
                 mainVideo.play();
@@ -287,11 +525,8 @@
             }
         });
 
-        // 5. Activar / Desactivar Subtítulos
         const textTracks = mainVideo.textTracks;
-        if (textTracks && textTracks.length > 0) {
-            textTracks[0].mode = 'hidden'; // Inicialmente ocultos
-        }
+        if (textTracks && textTracks.length > 0) textTracks[0].mode = 'hidden';
 
         subtitlesBtn.addEventListener('click', () => {
             if (textTracks && textTracks.length > 0) {
@@ -304,18 +539,13 @@
                     subtitlesBtn.textContent = "Subtítulos: ON";
                 }
             } else {
-                alert("No hay subtítulos disponibles para este video.");
+                alert("No hay subtítulos cargados.");
             }
         });
 
-        // 6. Partido de pantalla para Gafas VR (Esterescópico básico)
         vrModeBtn.addEventListener('click', () => {
             playerContainer.classList.toggle('vr-split');
-            if(playerContainer.classList.contains('vr-split')) {
-                vrModeBtn.textContent = "Modo Normal";
-            } else {
-                vrModeBtn.textContent = "Modo VR (Pantalla Partida)";
-            }
+            vrModeBtn.textContent = playerContainer.classList.contains('vr-split') ? "Modo Normal" : "Modo VR";
         });
     </script>
 </body>
