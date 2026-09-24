@@ -19,7 +19,7 @@
             overflow-x: hidden;
         }
 
-        /* Pantalla de Bienvenida con Fondo Negro y Video Gigante sin Bordes */
+        /* Pantalla de Bienvenida con Fondo Negro y Video Logo */
         .welcome-screen {
             position: fixed;
             top: 0;
@@ -43,22 +43,17 @@
 
         .welcome-logo-container {
             position: relative;
-            margin-bottom: 35px;
+            margin-bottom: 25px;
             text-align: center;
-            width: 550px; /* Tamaño mucho más grande */
+            width: 550px;
             max-width: 90vw;
         }
 
-        /* Video gigante sin bordes ni sombras de colores */
+        /* Estilo para el video del logo en el centro */
         .welcome-logo-video {
             width: 100%;
             height: auto;
             object-fit: contain;
-            border: none;
-            outline: none;
-            background: transparent;
-            box-shadow: none;
-            filter: none;
         }
 
         .google-login-btn {
@@ -400,11 +395,12 @@
 </head>
 <body>
 
-    <!-- Pantalla de Bienvenida con Fondo Negro y Video Logo Gigante sin Bordes -->
+    <!-- Pantalla de Bienvenida con Fondo Negro y Video Logo -->
     <div class="welcome-screen" id="welcomeScreen">
         <div class="welcome-logo-container">
+            <!-- Video del logo centrado en la bienvenida -->
             <video class="welcome-logo-video" autoplay muted loop playsinline>
-                <source src="logo-video.mp4" type="video/mp4">
+                <source src="ms3media/ms3logo.mp4.mp4" type="video/mp4">
                 Tu navegador no soporta videos.
             </video>
         </div>
