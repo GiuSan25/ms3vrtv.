@@ -219,6 +219,7 @@
             justify-content: flex-end;
             padding: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 25px;
         }
 
         .hero-overlay {
@@ -453,7 +454,7 @@
     <!-- Contenedor Principal (App) -->
     <div class="app-container" id="appContainer">
         
-        <!-- Barra Superior -->
+        <!-- Barra Superior (Sin icono de señal) -->
         <div class="top-nav">
             <div class="logo" id="logoHomeBtn">MS3</div>
             <div class="top-icons">
@@ -471,7 +472,7 @@
             <button class="nav-item" data-target="tabBusqueda">Búsqueda</button>
         </div>
 
-        <!-- VISTA 1: INICIO -->
+        <!-- VISTA 1: INICIO (Con todos los carruseles integrados) -->
         <div class="content-section active" id="tabInicio">
             <div class="section-title">Destacado</div>
             <div class="hero-banner">
@@ -486,6 +487,7 @@
                 </div>
             </div>
 
+            <!-- Carrusel 1: Tendencias Ahora -->
             <div class="row-section">
                 <div class="row-header">
                     <div class="section-title" style="margin-bottom:0;">Tendencias Ahora</div>
@@ -508,11 +510,68 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Carrusel 2: Programas VR -->
+            <div class="row-section">
+                <div class="row-header">
+                    <div class="section-title" style="margin-bottom:0;">Programas VR</div>
+                </div>
+                <div class="cards-slider">
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">🚀</div>
+                        <span class="card-tag">Ciencia</span>
+                        <div class="card-overlay"><div class="card-title">Viaje Intergaláctico</div></div>
+                    </div>
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">🌊</div>
+                        <span class="card-tag">Naturaleza</span>
+                        <div class="card-overlay"><div class="card-title">Océanos Profundos 360</div></div>
+                    </div>
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">⚡</div>
+                        <span class="card-tag">Cyber</span>
+                        <div class="card-overlay"><div class="card-title">Cyber Dimension</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carrusel 3: Directos -->
+            <div class="row-section">
+                <div class="row-header">
+                    <div class="section-title" style="margin-bottom:0;">Directos</div>
+                </div>
+                <div class="cards-slider">
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">🔴</div>
+                        <span class="card-tag">EN VIVO</span>
+                        <div class="card-overlay"><div class="card-title">Estudio Principal Live</div></div>
+                    </div>
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">🔴</div>
+                        <span class="card-tag">EN VIVO</span>
+                        <div class="card-overlay"><div class="card-title">Concierto Inmersivo Streaming</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carrusel 4: Mi Lista -->
+            <div class="row-section">
+                <div class="row-header">
+                    <div class="section-title" style="margin-bottom:0;">Mi Lista</div>
+                </div>
+                <div class="cards-slider">
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">✨</div>
+                        <span class="card-tag">Guardado</span>
+                        <div class="card-overlay"><div class="card-title">Magia Inmersiva</div></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- VISTA 2: PROGRAMAS VR -->
+        <!-- VISTA 2: PROGRAMAS VR (Pestaña individual completa) -->
         <div class="content-section" id="tabProgramas">
-            <div class="section-title">Catálogo de Programas VR</div>
+            <div class="section-title">Catálogo Completo de Programas VR</div>
             <div class="cards-grid">
                 <div class="card" onclick="openPlayer()">
                     <div class="card-bg">🚀</div>
@@ -532,7 +591,7 @@
             </div>
         </div>
 
-        <!-- VISTA 3: DIRECTOS -->
+        <!-- VISTA 3: DIRECTOS (Pestaña individual completa) -->
         <div class="content-section" id="tabDirectos">
             <div class="section-title">Transmisiones en Vivo 360°</div>
             <div class="cards-grid">
@@ -549,7 +608,7 @@
             </div>
         </div>
 
-        <!-- VISTA 4: MI LISTA -->
+        <!-- VISTA 4: MI LISTA (Pestaña individual completa) -->
         <div class="content-section" id="tabMiLista">
             <div class="section-title">Tus Videos Guardados</div>
             <div class="cards-grid">
@@ -598,7 +657,6 @@
     </div>
 
     <script>
-        // Control de Pantalla de Bienvenida y Login
         const welcomeScreen = document.getElementById('welcomeScreen');
         const appContainer = document.getElementById('appContainer');
         const googleLoginBtn = document.getElementById('googleLoginBtn');
@@ -608,7 +666,6 @@
             appContainer.classList.add('active');
         });
 
-        // Funcionalidad de Pestañas Superiores (Navegación completa)
         const navItems = document.querySelectorAll('.sub-nav .nav-item');
         const contentSections = document.querySelectorAll('.content-section');
 
@@ -623,26 +680,21 @@
             });
         });
 
-        // Botón Logo Home
         document.getElementById('logoHomeBtn').addEventListener('click', () => {
+            navItems.forEach(nav => nav.navLinks?.classList?.remove('active'));
             navItems.forEach(nav => nav.classList.remove('active'));
             contentSections.forEach(section => section.classList.remove('active'));
             navItems[0].classList.add('active');
             document.getElementById('tabInicio').classList.add('active');
         });
 
-        // Botones de la barra superior derecha
         document.getElementById('profileBtn').addEventListener('click', () => {
             alert('Perfil de usuario: Conectado como Administrador MS3.');
         });
         document.getElementById('settingsBtn').addEventListener('click', () => {
             alert('Panel de Ajustes de la plataforma abierto.');
         });
-        document.getElementById('connectionBtn').addEventListener('click', () => {
-            alert('Estado de Red: Conexión VR de alta velocidad estable (5G / Wi-Fi 6).');
-        });
 
-        // Lógica del Reproductor de Video (Pantalla completa / VR)
         const watchNowBtn = document.getElementById('watchNowBtn');
         const playerContainer = document.getElementById('playerContainer');
         const mainVideo = document.getElementById('mainVideo');
