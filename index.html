@@ -91,7 +91,7 @@
             height: 20px;
         }
 
-        /* Contenedor Principal de la App (Oculto hasta iniciar sesión) */
+        /* Contenedor Principal de la App */
         .app-container {
             display: none;
         }
@@ -145,7 +145,7 @@
             font-size: 0.9rem;
         }
 
-        /* Menú de Pestañas */
+        /* Menú de Pestañas Superior */
         .sub-nav {
             display: flex;
             justify-content: space-around;
@@ -189,7 +189,7 @@
         /* Contenido Principal */
         .main-content {
             padding: 20px;
-            padding-bottom: 100px;
+            padding-bottom: 50px; /* Sin espacio excesivo abajo al quitar la barra */
         }
 
         .section-title {
@@ -399,35 +399,6 @@
             padding: 8px 16px; border-radius: 20px; backdrop-filter: blur(5px);
         }
         .control-btn { background: transparent; color: white; border: none; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
-
-        /* Barra de Navegación Inferior */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #0b0614;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            z-index: 1000;
-        }
-
-        .bottom-nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #8a859b;
-            font-size: 0.7rem;
-            text-decoration: none;
-            gap: 4px;
-            background: none;
-            border: none;
-            cursor: pointer;
-        }
-
-        .bottom-nav-item.active { color: #ff2a6d; }
     </style>
 </head>
 <body>
@@ -595,15 +566,6 @@
 
         </div>
 
-        <!-- Barra de Navegación Inferior -->
-        <div class="bottom-nav">
-            <button class="bottom-nav-item active">🏠<br>Inicio</button>
-            <button class="bottom-nav-item" onclick="alert('Programas VR')">🥽<br>Programas VR</button>
-            <button class="bottom-nav-item" onclick="alert('Directos')">📡<br>Directos</button>
-            <button class="bottom-nav-item" onclick="alert('Mi Lista')">📑<br>Mi Lista</button>
-            <button class="bottom-nav-item" onclick="alert('Búsqueda')">🔍<br>Búsqueda</button>
-        </div>
-
     </div>
 
     <!-- Reproductor Multimedia (Pantalla Completa / VR / Subtítulos) -->
@@ -626,7 +588,6 @@
     </div>
 
     <script>
-        // Lógica de Inicio de Sesión simulado con Google
         const welcomeScreen = document.getElementById('welcomeScreen');
         const appContainer = document.getElementById('appContainer');
         const googleLoginBtn = document.getElementById('googleLoginBtn');
@@ -636,7 +597,6 @@
             appContainer.classList.add('active');
         });
 
-        // Lógica del Reproductor
         const watchNowBtn = document.getElementById('watchNowBtn');
         const playerContainer = document.getElementById('playerContainer');
         const mainVideo = document.getElementById('mainVideo');
@@ -665,13 +625,11 @@
             }
         });
 
-        // Mostrar/Ocultar controles al tocar la pantalla del reproductor
         playerContainer.addEventListener('click', (e) => {
             if (e.target.tagName === 'BUTTON') return;
             playerControls.classList.toggle('hidden');
         });
 
-        // Play / Pause
         playPauseBtn.addEventListener('click', () => {
             if (mainVideo.paused) {
                 mainVideo.play();
@@ -682,7 +640,6 @@
             }
         });
 
-        // Subtítulos
         const textTracks = mainVideo.textTracks;
         if (textTracks && textTracks.length > 0) textTracks[0].mode = 'hidden';
 
@@ -701,7 +658,6 @@
             }
         });
 
-        // Modo VR (Pantalla Partida Estéreo)
         vrModeBtn.addEventListener('click', () => {
             playerContainer.classList.toggle('vr-split');
             vrModeBtn.textContent = playerContainer.classList.contains('vr-split') ? "Modo Normal" : "Modo VR";
