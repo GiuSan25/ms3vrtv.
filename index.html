@@ -19,13 +19,94 @@
             overflow-x: hidden;
         }
 
+        /* Pantalla de Bienvenida / Login Futurista */
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, #1c103b 0%, #0b0614 100%);
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .welcome-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .welcome-logo-container {
+            position: relative;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .welcome-logo {
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #fff, #b19fff, #ff2a6d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 42, 109, 0.4);
+        }
+
+        .welcome-subtitle {
+            color: #a855f7;
+            font-size: 1rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .google-login-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #ffffff;
+            color: #1f1f1f;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .google-login-btn:hover {
+            background: #f1f1f1;
+            transform: scale(1.05);
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Contenedor Principal de la App (Oculto hasta iniciar sesión) */
+        .app-container {
+            display: none;
+        }
+
+        .app-container.active {
+            display: block;
+        }
+
         /* Barra de Navegación Superior */
         .top-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 20px 24px;
-            background: linear-gradient(180deg, rgba(11,6,20,0.9) 0%, rgba(11,6,20,0) 100%);
+            background: linear-gradient(180deg, rgba(11,6,20,0.95) 0%, rgba(11,6,20,0) 100%);
             position: fixed;
             top: 0;
             left: 0;
@@ -37,10 +118,10 @@
             font-size: 1.8rem;
             font-weight: 900;
             letter-spacing: 1px;
-            color: #fff;
             background: linear-gradient(90deg, #fff, #b19fff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            cursor: pointer;
         }
 
         .top-icons {
@@ -49,6 +130,7 @@
             align-items: center;
             color: #b19fff;
             font-size: 1.2rem;
+            cursor: pointer;
         }
 
         .profile-icon {
@@ -60,9 +142,10 @@
             align-items: center;
             justify-content: center;
             color: white;
+            font-size: 0.9rem;
         }
 
-        /* Menú de Pestañas (Inicio, Programas VR, etc.) */
+        /* Menú de Pestañas */
         .sub-nav {
             display: flex;
             justify-content: space-around;
@@ -71,6 +154,7 @@
             background-color: #0b0614;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             font-size: 0.9rem;
+            overflow-x: auto;
         }
 
         .nav-item {
@@ -81,6 +165,11 @@
             cursor: pointer;
             text-decoration: none;
             gap: 4px;
+            white-space: nowrap;
+            padding: 0 10px;
+            background: none;
+            border: none;
+            font-size: 0.9rem;
         }
 
         .nav-item.active {
@@ -100,10 +189,9 @@
         /* Contenido Principal */
         .main-content {
             padding: 20px;
-            padding-bottom: 90px;
+            padding-bottom: 100px;
         }
 
-        /* Sección Destacado (Hero) */
         .section-title {
             font-size: 0.85rem;
             letter-spacing: 1.5px;
@@ -113,13 +201,14 @@
             text-transform: uppercase;
         }
 
+        /* Banner Destacado */
         .hero-banner {
             position: relative;
             width: 100%;
             height: 280px;
             border-radius: 16px;
             overflow: hidden;
-            background: url('img/destacado-portada.jpg') no-repeat center center/cover;
+            background: linear-gradient(135deg, #2b1055, #7597de);
             border: 1px solid rgba(255, 42, 109, 0.3);
             display: flex;
             flex-direction: column;
@@ -177,13 +266,11 @@
             font-weight: bold;
             cursor: pointer;
             border: none;
+            transition: opacity 0.2s;
         }
 
-        .btn-primary {
-            background-color: #fff;
-            color: #000;
-        }
-
+        .btn:hover { opacity: 0.85; }
+        .btn-primary { background-color: #fff; color: #000; }
         .btn-secondary {
             background-color: rgba(255, 255, 255, 0.15);
             color: #fff;
@@ -191,7 +278,7 @@
             border: 1px solid rgba(255,255,255,0.2);
         }
 
-        /* Filas de Contenido Deslizables */
+        /* Filas y Carruseles */
         .row-section {
             margin-top: 30px;
         }
@@ -215,12 +302,10 @@
             gap: 12px;
             overflow-x: auto;
             padding-bottom: 10px;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
         }
 
-        .cards-slider::-webkit-scrollbar {
-            display: none; /* Chrome/Safari */
-        }
+        .cards-slider::-webkit-scrollbar { display: none; }
 
         .card {
             flex: 0 0 180px;
@@ -231,17 +316,22 @@
             background-color: #1a1528;
             border: 1px solid rgba(255,255,255,0.08);
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s, border-color 0.2s;
         }
 
         .card:hover {
             transform: scale(1.03);
+            border-color: rgba(255, 42, 109, 0.5);
         }
 
-        .card img {
+        .card-bg {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            background: linear-gradient(135deg, #151025, #3c2a6d);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
         }
 
         .card-overlay {
@@ -250,7 +340,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.85) 100%);
+            background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.85) 100%);
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -274,7 +364,7 @@
             color: #d8b4fe;
         }
 
-        /* Reproductor Pantalla Completa + VR Mode (Heredado de tu requerimiento anterior) */
+        /* Reproductor de Video en Pantalla Completa y VR */
         .player-fullscreen-container {
             position: fixed;
             top: 0;
@@ -282,7 +372,7 @@
             width: 100vw;
             height: 100vh;
             background-color: #000;
-            z-index: 9999;
+            z-index: 99999;
             display: none;
             justify-content: center;
             align-items: center;
@@ -294,7 +384,7 @@
         
         .player-controls {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 10000; pointer-events: none; transition: opacity 0.3s ease;
+            z-index: 100000; pointer-events: none; transition: opacity 0.3s ease;
         }
         .player-controls.hidden { opacity: 0; pointer-events: none; }
         .control-top { position: absolute; top: 20px; right: 20px; pointer-events: auto; }
@@ -310,7 +400,7 @@
         }
         .control-btn { background: transparent; color: white; border: none; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
 
-        /* Barra de Navegación Inferior Móvil */
+        /* Barra de Navegación Inferior */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -332,137 +422,196 @@
             font-size: 0.7rem;
             text-decoration: none;
             gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
         }
 
-        .bottom-nav-item.active {
-            color: #ff2a6d;
-        }
+        .bottom-nav-item.active { color: #ff2a6d; }
     </style>
 </head>
 <body>
 
-    <!-- Barra Superior -->
-    <div class="top-nav">
-        <div class="logo">MS3</div>
-        <div class="top-icons">
-            <div class="profile-icon">👤</div>
-            <div>⚙️</div>
-            <div>📶</div>
+    <!-- Pantalla de Bienvenida Futurista -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-logo-container">
+            <div class="welcome-logo">MS3</div>
+            <div class="welcome-subtitle">La Nueva Televisión Inmersiva</div>
         </div>
+        <button class="google-login-btn" id="googleLoginBtn">
+            <svg class="google-icon" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.14C3.15 21.32 7.23 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.62H1.18C.43 8.14 0 9.87 0 12s.43 3.86 1.18 5.38l4.09-3.14z"/>
+                <path fill="#EA4335" d="M12 4.75c1.76 0 3.34.61 4.58 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.15 2.68 1.18 6.62l4.09 3.14c.95-2.85 3.6-4.96 6.73-4.96z"/>
+            </svg>
+            Iniciar sesión con Google
+        </button>
     </div>
 
-    <!-- Pestañas de Navegación Secundaria -->
-    <div class="sub-nav">
-        <a class="nav-item active">Inicio</a>
-        <a class="nav-item">Programas VR</a>
-        <a class="nav-item">Directos</a>
-        <a class="nav-item">Mi Lista</a>
-        <a class="nav-item">Búsqueda</a>
-    </div>
-
-    <!-- Contenido Principal Estilo App de Streaming -->
-    <div class="main-content">
+    <!-- Contenedor Principal (App) -->
+    <div class="app-container" id="appContainer">
         
-        <!-- Destacado -->
-        <div class="section-title">Destacado</div>
-        <div class="hero-banner" id="heroBanner">
-            <div class="hero-overlay"></div>
-            <div class="hero-badge">MS3 EXCLUSIVO</div>
-            <div class="hero-details">
-                <h2>MS3 LIVE: EL CONCIERTO DEL SIGLO</h2>
-                <div class="hero-buttons">
-                    <button class="btn btn-primary" id="watchNowBtn">VER AHORA</button>
-                    <button class="btn btn-secondary">INFO</button>
-                </div>
+        <!-- Barra Superior -->
+        <div class="top-nav">
+            <div class="logo" id="logoHome">MS3</div>
+            <div class="top-icons">
+                <div class="profile-icon" title="Mi Cuenta">GV</div>
+                <div title="Ajustes" onclick="alert('Configuración abierta')">⚙️</div>
+                <div title="Estado de Conexión" onclick="alert('Conexión VR Estable')">📶</div>
             </div>
         </div>
 
-        <!-- Tendencias Ahora -->
-        <div class="row-section">
-            <div class="row-header">
-                <div class="section-title" style="margin-bottom:0;">Tendencias Ahora</div>
-                <span>VER MÁS &gt;</span>
-            </div>
-            <div class="cards-slider">
-                <div class="card" onclick="openPlayer()">
-                    <img src="img/card1.jpg" alt="VR">
-                    <span class="card-tag">360°</span>
-                    <div class="card-overlay">
-                        <div class="card-title">Código VR: Investigación</div>
-                    </div>
-                </div>
-                <div class="card" onclick="openPlayer()">
-                    <img src="img/card2.jpg" alt="VR">
-                    <span class="card-tag">360°</span>
-                    <div class="card-overlay">
-                        <div class="card-title">Planeta 360</div>
-                    </div>
-                </div>
-                <div class="card" onclick="openPlayer()">
-                    <img src="img/card3.jpg" alt="VR">
-                    <span class="card-tag">360°</span>
-                    <div class="card-overlay">
-                        <div class="card-title">El Estudio Central</div>
-                    </div>
-                </div>
-            </div>
+        <!-- Pestañas de Navegación -->
+        <div class="sub-nav">
+            <button class="nav-item active">Inicio</button>
+            <button class="nav-item" onclick="alert('Sección Programas VR')">Programas VR</button>
+            <button class="nav-item" onclick="alert('Sección Directos')">Directos</button>
+            <button class="nav-item" onclick="alert('Sección Mi Lista')">Mi Lista</button>
+            <button class="nav-item" onclick="alert('Sección Búsqueda')">Búsqueda</button>
         </div>
 
-        <!-- Noticias Inmersivas -->
-        <div class="row-section">
-            <div class="row-header">
-                <div class="section-title" style="margin-bottom:0;">Noticias Inmersivas</div>
-                <span>VER MÁS &gt;</span>
-            </div>
-            <div class="cards-slider">
-                <div class="card" onclick="openPlayer()">
-                    <img src="img/card2.jpg" alt="VR">
-                    <span class="card-tag">360°</span>
-                    <div class="card-overlay">
-                        <div class="card-title">Planeta 360</div>
-                    </div>
-                </div>
-                <div class="card" onclick="openPlayer()">
-                    <img src="img/card3.jpg" alt="VR">
-                    <span class="card-tag">360°</span>
-                    <div class="card-overlay">
-                        <div class="card-title">El Estudio Central</div>
+        <!-- Contenido -->
+        <div class="main-content">
+            
+            <!-- Destacado -->
+            <div class="section-title">Destacado</div>
+            <div class="hero-banner">
+                <div class="hero-overlay"></div>
+                <div class="hero-badge">MS3 EXCLUSIVO</div>
+                <div class="hero-details">
+                    <h2>MS3 LIVE: EL CONCIERTO DEL SIGLO</h2>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" id="watchNowBtn">VER AHORA</button>
+                        <button class="btn btn-secondary" onclick="alert('Información detallada del evento')">INFO</button>
                     </div>
                 </div>
             </div>
+
+            <!-- Fila 1: Tendencias Ahora -->
+            <div class="row-section">
+                <div class="row-header">
+                    <div class="section-title" style="margin-bottom:0;">Tendencias Ahora</div>
+                    <span onclick="alert('Ver más tendencias')">VER MÁS &gt;</span>
+                </div>
+                <div class="cards-slider">
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">🌌</div>
+                        <span class="card-tag">360°</span>
+                        <div class="card-overlay"><div class="card-title">Código VR: Investigación</div></div>
+                    </div>
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">🪐</div>
+                        <span class="card-tag">360°</span>
+                        <div class="card-overlay"><div class="card-title">Planeta 360</div></div>
+                    </div>
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">🎬</div>
+                        <span class="card-tag">360°</span>
+                        <div class="card-overlay"><div class="card-title">El Estudio Central</div></div>
+                    </div>
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">⚡</div>
+                        <span class="card-tag">360°</span>
+                        <div class="card-overlay"><div class="card-title">Cyber Dimension</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila 2: Noticias Inmersivas -->
+            <div class="row-section">
+                <div class="row-header">
+                    <div class="section-title" style="margin-bottom:0;">Noticias Inmersivas</div>
+                    <span onclick="alert('Ver más noticias')">VER MÁS &gt;</span>
+                </div>
+                <div class="cards-slider">
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">🌍</div>
+                        <span class="card-tag">360°</span>
+                        <div class="card-overlay"><div class="card-title">Global 360 News</div></div>
+                    </div>
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">📡</div>
+                        <span class="card-tag">360°</span>
+                        <div class="card-overlay"><div class="card-title">Reportaje Orbital</div></div>
+                    </div>
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">🏙️</div>
+                        <span class="card-tag">360°</span>
+                        <div class="card-overlay"><div class="card-title">Metrópolis Futura</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila 3: Cine VR -->
+            <div class="row-section">
+                <div class="row-header">
+                    <div class="section-title" style="margin-bottom:0;">Cine VR</div>
+                    <span onclick="alert('Ver más cine VR')">VER MÁS &gt;</span>
+                </div>
+                <div class="cards-slider">
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">😱</div>
+                        <span class="card-tag">Terror</span>
+                        <div class="card-overlay"><div class="card-title">Cine VR Terror</div></div>
+                    </div>
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">🚀</div>
+                        <span class="card-tag">Sci-Fi</span>
+                        <div class="card-overlay"><div class="card-title">Odisea Espacial</div></div>
+                    </div>
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">⚔️</div>
+                        <span class="card-tag">Acción</span>
+                        <div class="card-overlay"><div class="card-title">Fuego Cruzado VR</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila 4: Originales MS3 -->
+            <div class="row-section">
+                <div class="row-header">
+                    <div class="section-title" style="margin-bottom:0;">Originales MS3</div>
+                    <span onclick="alert('Ver más originales')">VER MÁS &gt;</span>
+                </div>
+                <div class="cards-slider">
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">🔥</div>
+                        <span class="card-tag">Exclusivo</span>
+                        <div class="card-overlay"><div class="card-title">El Arte del Espectáculo</div></div>
+                    </div>
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">💃</div>
+                        <span class="card-tag">Exclusivo</span>
+                        <div class="card-overlay"><div class="card-title">Detrás del Escenario</div></div>
+                    </div>
+                    <div class="card" onclick="openPlayer()">
+                        <div class="card-bg">✨</div>
+                        <span class="card-tag">Exclusivo</span>
+                        <div class="card-overlay"><div class="card-title">Magia Inmersiva</div></div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <!-- Cine VR -->
-        <div class="row-section">
-            <div class="row-header">
-                <div class="section-title" style="margin-bottom:0;">Cine VR</div>
-                <span>VER MÁS &gt;</span>
-            </div>
-            <div class="cards-slider">
-                <div class="card" onclick="openPlayer()">
-                    <img src="img/card1.jpg" alt="VR">
-                    <span class="card-tag">360°</span>
-                    <div class="card-overlay">
-                        <div class="card-title">Cine VR Terror</div>
-                    </div>
-                </div>
-                <div class="card" onclick="openPlayer()">
-                    <img src="img/card2.jpg" alt="VR">
-                    <span class="card-tag">360°</span>
-                    <div class="card-overlay">
-                        <div class="card-title">Planeta 360</div>
-                    </div>
-                </div>
-            </div>
+        <!-- Barra de Navegación Inferior -->
+        <div class="bottom-nav">
+            <button class="bottom-nav-item active">🏠<br>Inicio</button>
+            <button class="bottom-nav-item" onclick="alert('Programas VR')">🥽<br>Programas VR</button>
+            <button class="bottom-nav-item" onclick="alert('Directos')">📡<br>Directos</button>
+            <button class="bottom-nav-item" onclick="alert('Mi Lista')">📑<br>Mi Lista</button>
+            <button class="bottom-nav-item" onclick="alert('Búsqueda')">🔍<br>Búsqueda</button>
         </div>
 
     </div>
 
-    <!-- Reproductor Oculto para Pantalla Completa / VR / Subtítulos -->
+    <!-- Reproductor Multimedia (Pantalla Completa / VR / Subtítulos) -->
     <div class="player-fullscreen-container" id="playerContainer">
         <video id="mainVideo" crossorigin="anonymous">
             <source src="tu-video-360.mp4" type="video/mp4">
             <track src="subtitulos.vtt" kind="subtitles" srclang="es" label="Español">
+            Tu navegador no soporta el formato de video.
         </video>
         <div class="player-controls" id="playerControls">
             <div class="control-top">
@@ -476,16 +625,18 @@
         </div>
     </div>
 
-    <!-- Barra de Navegación Inferior -->
-    <div class="bottom-nav">
-        <a class="bottom-nav-item active">🏠<br>Inicio</a>
-        <a class="bottom-nav-item">🥽<br>Programas VR</a>
-        <a class="bottom-nav-item">📡<br>Directos</a>
-        <a class="bottom-nav-item">📑<br>Mi Lista</a>
-        <a class="bottom-nav-item">🔍<br>Búsqueda</a>
-    </div>
-
     <script>
+        // Lógica de Inicio de Sesión simulado con Google
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const appContainer = document.getElementById('appContainer');
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+
+        googleLoginBtn.addEventListener('click', () => {
+            welcomeScreen.classList.add('hidden');
+            appContainer.classList.add('active');
+        });
+
+        // Lógica del Reproductor
         const watchNowBtn = document.getElementById('watchNowBtn');
         const playerContainer = document.getElementById('playerContainer');
         const mainVideo = document.getElementById('mainVideo');
@@ -497,8 +648,10 @@
 
         function openPlayer() {
             playerContainer.classList.add('active');
-            mainVideo.play();
-            if (playerContainer.requestFullscreen) playerContainer.requestFullscreen();
+            mainVideo.play().catch(() => {});
+            if (playerContainer.requestFullscreen) {
+                playerContainer.requestFullscreen().catch(() => {});
+            }
         }
 
         watchNowBtn.addEventListener('click', openPlayer);
@@ -507,14 +660,18 @@
             mainVideo.pause();
             mainVideo.currentTime = 0;
             playerContainer.classList.remove('active', 'vr-split');
-            if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch(() => {});
+            }
         });
 
+        // Mostrar/Ocultar controles al tocar la pantalla del reproductor
         playerContainer.addEventListener('click', (e) => {
             if (e.target.tagName === 'BUTTON') return;
             playerControls.classList.toggle('hidden');
         });
 
+        // Play / Pause
         playPauseBtn.addEventListener('click', () => {
             if (mainVideo.paused) {
                 mainVideo.play();
@@ -525,6 +682,7 @@
             }
         });
 
+        // Subtítulos
         const textTracks = mainVideo.textTracks;
         if (textTracks && textTracks.length > 0) textTracks[0].mode = 'hidden';
 
@@ -539,10 +697,11 @@
                     subtitlesBtn.textContent = "Subtítulos: ON";
                 }
             } else {
-                alert("No hay subtítulos cargados.");
+                alert("No hay subtítulos cargados en este video de demostración.");
             }
         });
 
+        // Modo VR (Pantalla Partida Estéreo)
         vrModeBtn.addEventListener('click', () => {
             playerContainer.classList.toggle('vr-split');
             vrModeBtn.textContent = playerContainer.classList.contains('vr-split') ? "Modo Normal" : "Modo VR";
