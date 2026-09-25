@@ -3,709 +3,992 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MS3 - Plataforma de Realidad Virtual y Streaming 360°</title>
+    <title>MS3 - La Nueva Televisión Inmersiva</title>
     <style>
-        :root {
-            --primary-color: #0f172a;
-            --accent-color: #38bdf8;
-            --accent-hover: #0ea5e9;
-            --bg-dark: #090d16;
-            --card-bg: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
-        }
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+        body, html {
+            width: 100%;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #000000;
+            color: #fff;
             overflow-x: hidden;
         }
 
-        /* Header Principal */
-        header {
-            background-color: var(--primary-color);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            z-index: 100;
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--accent-color), #6366f1);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-            color: #fff;
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
-        }
-
-        .logo-text h1 {
-            font-size: 1.25rem;
-            letter-spacing: 1px;
-            color: var(--text-main);
-        }
-
-        .logo-text span {
-            font-size: 0.75rem;
-            color: var(--accent-color);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        /* Controles Header & Ajustes */
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            position: relative;
-        }
-
-        .btn-icon {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-icon:hover {
-            background: var(--border-color);
-            border-color: var(--accent-color);
-            transform: rotate(30deg);
-        }
-
-        /* Menú Desplegable de Ajustes */
-        .settings-dropdown {
-            position: absolute;
-            top: 60px;
-            right: 0;
-            width: 260px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-            z-index: 1000;
-            animation: fadeIn 0.2s ease-in-out;
-        }
-
-        .settings-dropdown.active {
-            display: flex;
-        }
-
-        .settings-header {
-            padding: 12px 16px;
-            background: rgba(0,0,0,0.2);
-            font-size: 0.85rem;
-            font-weight: bold;
-            color: var(--text-muted);
-            border-bottom: 1px solid var(--border-color);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .settings-item {
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--text-main);
-            background: none;
-            border: none;
-            width: 100%;
-            text-align: left;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-size: 0.95rem;
-        }
-
-        .settings-item:hover {
-            background-color: rgba(56, 189, 248, 0.1);
-            color: var(--accent-color);
-        }
-
-        /* Workspace Principal */
-        main {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            height: calc(100vh - 73px);
-        }
-
-        @media (max-width: 900px) {
-            main {
-                grid-template-columns: 1fr;
-                height: auto;
-            }
-        }
-
-        /* Panel Lateral de Control */
-        .sidebar-panel {
-            background-color: var(--primary-color);
-            border-right: 1px solid var(--border-color);
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            overflow-y: auto;
-        }
-
-        .panel-section h3 {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-        }
-
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .control-group label {
-            font-size: 0.85rem;
-            color: var(--text-main);
-        }
-
-        select, input[type="text"], textarea {
-            background: var(--bg-dark);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        select:focus, input:focus, textarea:focus {
-            border-color: var(--accent-color);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent-color), #0284c7);
-            color: #0f172a;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: opacity 0.2s, transform 0.1s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-primary:hover {
-            opacity: 0.9;
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
-        }
-
-        /* Visor Central de VR / 360 */
-        .viewport-container {
-            background-color: var(--bg-dark);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .vr-screen {
-            flex: 1;
-            position: relative;
-            background: radial-gradient(circle at center, #1e293b 0%, #090d16 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            perspective: 1000px;
-        }
-
-        .vr-simulation-box {
-            width: 80%;
-            height: 70%;
-            border: 2px dashed var(--border-color);
-            border-radius: 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(5px);
-            text-align: center;
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .vr-simulation-box svg {
-            width: 64px;
-            height: 64px;
-            fill: var(--accent-color);
-            margin-bottom: 15px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.08); opacity: 1; filter: drop-shadow(0 0 10px var(--accent-color)); }
-            100% { transform: scale(1); opacity: 0.8; }
-        }
-
-        /* Modales Dinámicos (Términos, IA, Nosotros) */
-        .modal-overlay {
+        /* Pantalla de Bienvenida */
+        .welcome-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            padding: 20px;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-content {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            width: 100%;
-            max-width: 700px;
-            max-height: 85vh;
+            background-color: #000000;
+            z-index: 99999;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            overflow: hidden;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
         }
 
-        .modal-header {
-            padding: 1.25rem 1.5rem;
-            background-color: var(--primary-color);
-            border-bottom: 1px solid var(--border-color);
+        .welcome-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .welcome-logo-container {
+            position: relative;
+            margin-bottom: 35px;
+            text-align: center;
+            width: 550px;
+            max-width: 90vw;
+        }
+
+        .welcome-logo-video {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            border: none;
+            outline: none;
+            background: transparent;
+        }
+
+        .google-login-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #ffffff;
+            color: #1f1f1f;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .google-login-btn:hover {
+            background: #f1f1f1;
+            transform: scale(1.05);
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Contenedor Principal */
+        .app-container {
+            display: none;
+        }
+
+        .app-container.active {
+            display: block;
+        }
+
+        /* Barra Superior */
+        .top-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 20px 24px;
+            background: linear-gradient(180deg, rgba(11,6,20,0.95) 0%, rgba(11,6,20,0) 100%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
         }
 
-        .modal-header h2 {
-            font-size: 1.2rem;
-            color: var(--accent-color);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1.5rem;
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #fff, #b19fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             cursor: pointer;
-            transition: color 0.2s;
         }
 
-        .modal-close:hover {
-            color: var(--text-main);
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-            overflow-y: auto;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: #cbd5e1;
-        }
-
-        /* Estilo específico para IA Assistant */
-        .ai-chat-box {
+        .top-icons {
             display: flex;
-            flex-direction: column;
-            height: 400px;
-        }
-
-        .ai-messages {
-            flex: 1;
-            background: var(--bg-dark);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-
-        .ai-msg {
-            padding: 10px 14px;
-            border-radius: 10px;
-            max-width: 80%;
-            font-size: 0.9rem;
-        }
-
-        .ai-msg.bot {
-            background: rgba(56, 189, 248, 0.15);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            color: var(--text-main);
-            align-self: flex-start;
-        }
-
-        .ai-msg.user {
-            background: var(--accent-color);
-            color: #0f172a;
-            align-self: flex-end;
-            font-weight: 500;
-        }
-
-        .ai-input-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .ai-input-row input {
-            flex: 1;
-        }
-
-        /* Estilo para plantilla Nosotros */
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
-            margin-top: 15px;
+            align-items: center;
+            color: #b19fff;
+            font-size: 1.2rem;
+            cursor: pointer;
         }
 
-        .team-card {
-            background: var(--bg-dark);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            transition: transform 0.3s, border-color 0.3s;
-        }
-
-        .team-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-color);
-        }
-
-        .team-avatar {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, var(--accent-color), #6366f1);
+        .profile-icon {
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            margin: 0 auto 15px auto;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 1.5rem;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        /* Menú de Pestañas Superior */
+        .sub-nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 20px;
+            margin-top: 70px;
+            background-color: #0b0614;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8a859b;
+            cursor: pointer;
+            text-decoration: none;
+            gap: 4px;
+            white-space: nowrap;
+            padding: 0 10px;
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .nav-item.active {
             color: #fff;
+            font-weight: bold;
         }
 
-        .team-card h4 {
-            color: var(--text-main);
-            margin-bottom: 5px;
-            font-size: 1.05rem;
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            width: 20px;
+            height: 3px;
+            background-color: #ff2a6d;
+            border-radius: 2px;
         }
 
-        .team-card p {
-            color: var(--accent-color);
+        /* Vistas de Contenido Dinámicas */
+        .content-section {
+            display: none;
+            padding: 20px;
+            padding-bottom: 50px;
+            background-color: #0b0614;
+            min-height: calc(100vh - 130px);
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .section-title {
             font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            color: #8a859b;
+            margin-bottom: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Banner Destacado */
+        .hero-banner {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #2b1055, #7597de);
+            border: 1px solid rgba(255, 42, 109, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 25px;
         }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0.1) 30%, rgba(11,6,20,0.95) 100%);
+            z-index: 1;
+        }
+
+        .hero-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(120, 50, 255, 0.6);
+            backdrop-filter: blur(5px);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            z-index: 2;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .hero-details {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-details h2 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 22px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover { opacity: 0.85; }
+        .btn-primary { background-color: #fff; color: #000; }
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .btn-danger {
+            background-color: rgba(255, 42, 109, 0.2);
+            color: #ff2a6d;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 42, 109, 0.4);
+        }
+
+        /* Carruseles y Cuadrículas */
+        .row-section {
+            margin-top: 30px;
+        }
+
+        .row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .cards-slider {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scrollbar-width: none;
+        }
+
+        .cards-slider::-webkit-scrollbar { display: none; }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            flex: 0 0 180px;
+            height: 110px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            background-color: #1a1528;
+            border: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .cards-grid .card {
+            width: 100%;
+            height: 120px;
+        }
+
+        .card:hover {
+            transform: scale(1.03);
+            border-color: rgba(255, 42, 109, 0.5);
+        }
+
+        .card-bg {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #151025, #3c2a6d);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.85) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 8px;
+        }
+
+        .card-title {
+            font-size: 0.8rem;
+            font-weight: bold;
+            line-height: 1.1;
+        }
+
+        .card-tag {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            font-size: 0.6rem;
+            background: rgba(11, 6, 20, 0.7);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #d8b4fe;
+        }
+
+        /* Botón de eliminación rápido integrado en tarjeta de "Mi Lista" */
+        .card-remove-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #ff2a6d;
+            border: 1px solid rgba(255, 42, 109, 0.4);
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .card-remove-btn:hover {
+            background: #ff2a6d;
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        /* MODAL DE PREVISIÓN */
+        .preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .preview-modal.active {
+            display: flex;
+        }
+
+        .preview-content {
+            background: #151022;
+            width: 100%;
+            max-width: 550px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            position: relative;
+            animation: modalPop 0.3s ease;
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .preview-header-img {
+            width: 100%;
+            height: 240px;
+            background: linear-gradient(135deg, #2b1055, #a855f7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: relative;
+        }
+
+        .preview-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-body {
+            padding: 20px;
+        }
+
+        .preview-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .preview-desc {
+            font-size: 0.9rem;
+            color: #b8b2cb;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .preview-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .preview-actions .btn {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Reproductor de Video Fullscreen / VR */
+        .player-fullscreen-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000;
+            z-index: 99999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .player-fullscreen-container.active { display: flex; }
+        video#mainVideo { width: 100%; height: 100%; object-fit: contain; }
+        .vr-split video#mainVideo { width: 50% !important; height: 100%; float: left; }
+        .vr-split { display: flex !important; justify-content: space-between; }
+        
+        .player-controls {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 100000; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .player-controls.hidden { opacity: 0; pointer-events: none; }
+        .control-top { position: absolute; top: 20px; right: 20px; pointer-events: auto; }
+        .close-btn {
+            background: rgba(0, 0, 0, 0.6); color: white; border: 2px solid white;
+            font-size: 1.2rem; width: 40px; height: 40px; border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .control-bottom {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 10px; pointer-events: auto; background: rgba(0, 0, 0, 0.6);
+            padding: 8px 16px; border-radius: 20px; backdrop-filter: blur(5px);
+        }
+        .control-btn { background: transparent; color: white; border: none; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- Header Principal -->
-    <header>
-        <div class="logo-container">
-            <div class="logo-icon">MS3</div>
-            <div class="logo-text">
-                <h1>MS3 La Nueva Televisión</h1>
-                <span>WebXR & 360° Platform</span>
+    <!-- Pantalla de Bienvenida -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-logo-container">
+            <video class="welcome-logo-video" autoplay muted loop playsinline>
+                <source src="logo-video.mp4" type="video/mp4">
+                Tu navegador no soporta videos.
+            </video>
+        </div>
+        <button class="google-login-btn" id="googleLoginBtn">
+            <svg class="google-icon" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.14C3.15 21.32 7.23 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.62H1.18C.43 8.14 0 9.87 0 12s.43 3.86 1.18 5.38l4.09-3.14z"/>
+                <path fill="#EA4335" d="M12 4.75c1.76 0 3.34.61 4.58 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.15 2.68 1.18 6.62l4.09 3.14c.95-2.85 3.6-4.96 6.73-4.96z"/>
+            </svg>
+            Iniciar sesión con Google
+        </button>
+    </div>
+
+    <!-- Contenedor Principal (App) -->
+    <div class="app-container" id="appContainer">
+        
+        <!-- Barra Superior -->
+        <div class="top-nav">
+            <div class="logo" id="logoHomeBtn">MS3</div>
+            <div class="top-icons">
+                <div class="profile-icon" id="profileBtn" title="Mi Cuenta">GV</div>
+                <div id="settingsBtn" title="Ajustes">⚙️</div>
             </div>
         </div>
 
-        <div class="header-actions">
-            <!-- Botón de Ajustes -->
-            <button class="btn-icon" id="settingsBtn" title="Ajustes y Menú" aria-label="Ajustes">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 m0 0l-2.09 1.15a2 2 0 0 1-2.22-.22l-.12-.12a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2h-.09a2 2 0 0 1-2-2v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.12.12a2 2 0 0 1-2.22.22L2.6 18.9a2 2 0 0 1-.22-2.22l.12-.12a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2v-.09a2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 .22-2.22l1.15-2.09a2 2 0 0 1 2.22-.22l.12.12a1.65 1.65 0 0 0 1.82.33H11a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2h.09a2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.12-.12a2 2 0 0 1 2.22-.22l1.15 2.09a2 2 0 0 1-.22 2.22l-.12.12a1.65 1.65 0 0 0-.33 1.82V11a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2v.09a2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-            </button>
+        <!-- Pestañas de Navegación -->
+        <div class="sub-nav">
+            <button class="nav-item active" data-target="tabInicio">Inicio</button>
+            <button class="nav-item" data-target="tabProgramas">Programas VR</button>
+            <button class="nav-item" data-target="tabDirectos">Directos</button>
+            <button class="nav-item" data-target="tabMiLista">Mi Lista</button>
+            <button class="nav-item" data-target="tabBusqueda">Búsqueda</button>
+        </div>
 
-            <!-- Menú Desplegable de Ajustes -->
-            <div class="settings-dropdown" id="settingsDropdown">
-                <div class="settings-header">Configuración y Menú</div>
-                <button class="settings-item" id="menuTerms">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                    Términos y Condiciones
-                </button>
-                <button class="settings-item" id="menuAiHelp">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-                    Ayuda con Inteligencia Artificial
-                </button>
-                <button class="settings-item" id="menuAbout">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                    Nosotros (Creadores MS3)
-                </button>
+        <!-- VISTA 1: INICIO -->
+        <div class="content-section active" id="tabInicio">
+            <div class="section-title">Destacado</div>
+            <div class="hero-banner">
+                <div class="hero-overlay"></div>
+                <div class="hero-badge">MS3 EXCLUSIVO</div>
+                <div class="hero-details">
+                    <h2>MS3 LIVE: EL CONCIERTO DEL SIGLO</h2>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" onclick="openPlayer()">VER AHORA</button>
+                        <button class="btn btn-secondary" onclick="openPreview('MS3 LIVE: EL CONCIERTO DEL SIGLO', '🚀', 'Disfruta de este concierto único transmitido con audio espacial y cámaras de 360 grados directamente desde el escenario principal.')">INFO</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carrusel 1: Tendencias Ahora -->
+            <div class="row-section">
+                <div class="row-header"><div class="section-title" style="margin-bottom:0;">Tendencias Ahora</div></div>
+                <div class="cards-slider">
+                    <div class="card" onclick="openPreview('Código VR: Investigación', '🌌', 'Inmersión profunda en los secretos de la realidad virtual y los entornos interactivos del futuro.')"><div class="card-bg">🌌</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Código VR: Investigación</div></div></div>
+                    <div class="card" onclick="openPreview('Planeta 360', '🪐', 'Explora los paisajes más exóticos y lejanos capturados en resolución total de 360 grados.')"><div class="card-bg">🪐</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Planeta 360</div></div></div>
+                    <div class="card" onclick="openPreview('El Estudio Central', '🎬', 'Detrás de escena de las producciones más ambiciosas de la cadena MS3.')"><div class="card-bg">🎬</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">El Estudio Central</div></div></div>
+                    <div class="card" onclick="openPreview('Realidades Paralelas', '🔮', 'Un viaje psicodélico y visual a través de dimensiones generadas por ordenador.')"><div class="card-bg">🔮</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Realidades Paralelas</div></div></div>
+                    <div class="card" onclick="openPreview('Cyber Pulse', '⚡', 'Música electrónica y efectos visuales vibrantes en formato inmersivo único.')"><div class="card-bg">⚡</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Cyber Pulse</div></div></div>
+                    <div class="card" onclick="openPreview('Vuelo Cenital', '🚁', 'Vistas aéreas panorámicas capturadas con drones de última generación 360.')"><div class="card-bg">🚁</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Vuelo Cenital</div></div></div>
+                    <div class="card" onclick="openPreview('Neón Sessions', '💡', 'Sesiones nocturnas de arte urbano y luces de neón inmersivas.')"><div class="card-bg">💡</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Neón Sessions</div></div></div>
+                    <div class="card" onclick="openPreview('Abismo Azul', '🌊', 'Exploración de fosas marinas inexploradas en plena libertad virtual.')"><div class="card-bg">🌊</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Abismo Azul</div></div></div>
+                    <div class="card" onclick="openPreview('Fuego Vivo', '🔥', 'Efectos pirotécnicos extremos reproducidos en riguroso 360°.')"><div class="card-bg">🔥</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Fuego Vivo</div></div></div>
+                    <div class="card" onclick="openPreview('Cristal Inmersivo', '💎', 'Estructuras geométricas complejas y reflejos ópticos interactivos.')"><div class="card-bg">💎</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Cristal Inmersivo</div></div></div>
+                    <div class="card" onclick="openPreview('Mutación Genética', '🧬', 'Documental interactivo sobre la evolución biológica digital.')"><div class="card-bg">🧬</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Mutación Genética</div></div></div>
+                    <div class="card" onclick="openPreview('Teatro 360', '🎭', 'Artes escénicas en primera fila con sonido binaural avanzado.')"><div class="card-bg">🎭</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Teatro 360</div></div></div>
+                    <div class="card" onclick="openPreview('Ares Base', '🚀', 'La vida cotidiana de los primeros colonos en el planeta rojo.')"><div class="card-bg">🚀</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Ares Base</div></div></div>
+                    <div class="card" onclick="openPreview('Blanco Móvil', '🎯', 'Pruebas de precisión visual y reflejos en entornos virtuales dinámicos.')"><div class="card-bg">🎯</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Blanco Móvil</div></div></div>
+                    <div class="card" onclick="openPreview('Vortex Total', '🌀', 'Una experiencia psicodélica total diseñada para desconectar de la realidad.')"><div class="card-bg">🌀</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Vortex Total</div></div></div>
+                </div>
+            </div>
+
+            <!-- Carrusel 2: Programas VR -->
+            <div class="row-section">
+                <div class="row-header"><div class="section-title" style="margin-bottom:0;">Programas VR</div></div>
+                <div class="cards-slider">
+                    <div class="card" onclick="openPreview('Viaje Intergaláctico', '🚀', 'Surca la galaxia a velocidad warp en una experiencia interactiva espacial.')"><div class="card-bg">🚀</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Viaje Intergaláctico</div></div></div>
+                    <div class="card" onclick="openPreview('Océanos Profundos 360', '🌊', 'Sumérgete junto a la fauna marina en las profundidades del océano.')"><div class="card-bg">🌊</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Océanos Profundos 360</div></div></div>
+                    <div class="card" onclick="openPreview('Cyber Dimension', '⚡', 'Ciudades futuristas con neones y tecnología punta a tu alcance.')"><div class="card-bg">⚡</div><span class="card-tag">Cyber</span><div class="card-overlay"><div class="card-title">Cyber Dimension</div></div></div>
+                    <div class="card" onclick="openPreview('Núcleo Terrestre', '🌋', 'Un descenso extremo hacia las entrañas geológicas del planeta.')"><div class="card-bg">🌋</div><span class="card-tag">Geología</span><div class="card-overlay"><div class="card-title">Núcleo Terrestre</div></div></div>
+                    <div class="card" onclick="openPreview('Estación Orbital', '🛰️', 'Vistas privilegiadas de la Tierra desde la órbita internacional.')"><div class="card-bg">🛰️</div><span class="card-tag">Espacio</span><div class="card-overlay"><div class="card-title">Estación Orbital</div></div></div>
+                    <div class="card" onclick="openPreview('Era Jurásica VR', '🦖', 'Recreación fidedigna de dinosaurios en su hábitat natural.')"><div class="card-bg">🦖</div><span class="card-tag">Historia</span><div class="card-overlay"><div class="card-title">Era Jurásica VR</div></div></div>
+                    <div class="card" onclick="openPreview('Microcosmos', '🔬', 'Un recorrido a escala microscópica por reacciones celulares.')"><div class="card-bg">🔬</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Microcosmos</div></div></div>
+                    <div class="card" onclick="openPreview('Metrópolis 2100', '🏙️', 'Urbanismo avanzado y arquitectura futurista interactiva.')"><div class="card-bg">🏙️</div><span class="card-tag">Urbano</span><div class="card-overlay"><div class="card-title">Metrópolis 2100</div></div></div>
+                    <div class="card" onclick="openPreview('Bosque Ancestral', '🌲', 'Paseos relajantes por reservas naturales vírgenes con sonido envolvente.')"><div class="card-bg">🌲</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Bosque Ancestral</div></div></div>
+                    <div class="card" onclick="openPreview('Fórmula Extrema VR', '🏎️', 'Velocidad de vértigo desde la perspectiva del piloto en pista.')"><div class="card-bg">🏎️</div><span class="card-tag">Deporte</span><div class="card-overlay"><div class="card-title">Fórmula Extrema VR</div></div></div>
+                    <div class="card" onclick="openPreview('Galería Abstracta', '🎨', 'Obras de arte tridimensionales que cobran vida a tu alrededor.')"><div class="card-bg">🎨</div><span class="card-tag">Arte</span><div class="card-overlay"><div class="card-title">Galería Abstracta</div></div></div>
+                    <div class="card" onclick="openPreview('Castillos Medievales', '🏰', 'Recorrido histórico por fortalezas europeas legendarias.')"><div class="card-bg">🏰</div><span class="card-tag">Historia</span><div class="card-overlay"><div class="card-title">Castillos Medievales</div></div></div>
+                    <div class="card" onclick="openPreview('Defensas Quánticas', '🛡️', 'Estrategias de seguridad digital explicadas en entornos inmersivos.')"><div class="card-bg">🛡️</div><span class="card-tag">Acción</span><div class="card-overlay"><div class="card-title">Defensas Quánticas</div></div></div>
+                    <div class="card" onclick="openPreview('Laboratorio Secreto', '🧪', 'Experimentos tecnológicos de vanguardia a puerta cerrada.')"><div class="card-bg">🧪</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Laboratorio Secreto</div></div></div>
+                    <div class="card" onclick="openPreview('Oráculo Virtual', '🔮', 'Consultas interactivas con inteligencia artificial avanzada.')"><div class="card-bg">🔮</div><span class="card-tag">Místico</span><div class="card-overlay"><div class="card-title">Oráculo Virtual</div></div></div>
+                </div>
+            </div>
+
+            <!-- Carrusel 3: Directos -->
+            <div class="row-section">
+                <div class="row-header"><div class="section-title" style="margin-bottom:0;">Directos</div></div>
+                <div class="cards-slider">
+                    <div class="card" onclick="openPreview('Estudio Principal Live', '🔴', 'Transmisión en directo desde el set principal con interacción en tiempo real.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Estudio Principal Live</div></div></div>
+                    <div class="card" onclick="openPreview('Concierto Inmersivo Streaming', '🔴', 'Música en directo optimizada para pantallas envolventes.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Concierto Inmersivo Streaming</div></div></div>
+                    <div class="card" onclick="openPreview('Noticias MS3 Global', '🔴', 'Actualidad internacional cubierta por corresponsales en 360°.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Noticias MS3 Global</div></div></div>
+                    <div class="card" onclick="openPreview('Debate Tecnológico VR', '🔴', 'Expertos discutiendo el futuro del metaverso y las tecnologías XR.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Debate Tecnológico VR</div></div></div>
+                    <div class="card" onclick="openPreview('Sunset Session Live', '🔴', 'Música electrónica al atardecer desde playas paradisíacas.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Sunset Session Live</div></div></div>
+                    <div class="card" onclick="openPreview('Gaming Arena Inmersivo', '🔴', 'Torneos de eSports transmitidos desde dentro de los mapas de juego.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Gaming Arena Inmersivo</div></div></div>
+                    <div class="card" onclick="openPreview('Masterclass de Arte Digital', '🔴', 'Creación de entornos 3D en directo con los mejores artistas.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Masterclass de Arte Digital</div></div></div>
+                    <div class="card" onclick="openPreview('Cocktail Lounge Virtual', '🔴', 'Espacio de networking y charlas distendidas en formato virtual.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Cocktail Lounge Virtual</div></div></div>
+                    <div class="card" onclick="openPreview('Entrevistas Exclusivas MS3', '🔴', 'Charlas íntimas con figuras destacadas del entretenimiento.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Entrevistas Exclusivas MS3</div></div></div>
+                    <div class="card" onclick="openPreview('Festival de Cine 360', '🔴', 'Proyecciones especiales y alfombra roja interactiva.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Festival de Cine 360</div></div></div>
+                    <div class="card" onclick="openPreview('Pasarela de Moda XR', '🔴', 'Desfiles de alta costura con escenografías virtuales cambiantes.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Pasarela de Moda XR</div></div></div>
+                    <div class="card" onclick="openPreview('Stand Up Comedy Inmersivo', '🔴', 'Humor en directo sintiendo la reacción del público a tu alrededor.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Stand Up Comedy Inmersivo</div></div></div>
+                    <div class="card" onclick="openPreview('Quantum Talks Live', '🔴', 'Conferencias magistrales sobre física cuántica y computación.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Quantum Talks Live</div></div></div>
+                    <div class="card" onclick="openPreview('Yoga y Meditación 360', '🔴', 'Sesiones guiadas de bienestar en entornos naturales virtuales.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Yoga y Meditación 360</div></div></div>
+                    <div class="card" onclick="openPreview('Cierre de Transmisión Diario', '🔴', 'Resumen nocturno y despedida oficial de la programación.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Cierre de Transmisión Diario</div></div></div>
+                </div>
+            </div>
+
+            <!-- Carrusel 4: Mi Lista -->
+            <div class="row-section">
+                <div class="row-header"><div class="section-title" style="margin-bottom:0;">Mi Lista</div></div>
+                <div class="cards-slider" id="homeMyListSlider">
+                    <!-- Elementos iniciales autogenerados con botón de eliminar -->
+                </div>
             </div>
         </div>
-    </header>
 
-    <!-- Workspace Principal -->
-    <main>
-        <aside class="sidebar-panel">
-            <div class="panel-section">
-                <h3>Controles WebXR</h3>
-                <div class="control-group">
-                    <label for="cameraMode">Modo de Cámara 360°</label>
-                    <select id="cameraMode">
-                        <option value="orbit">Control Orbital Interactivo</option>
-                        <option value="gyro">Giroscopio (Dispositivos Móviles)</option>
-                        <option value="vr">Modo Casco VR (Stereo)</option>
-                    </select>
+        <!-- VISTA 2: PROGRAMAS VR -->
+        <div class="content-section" id="tabProgramas">
+            <div class="section-title">Catálogo Completo de Programas VR</div>
+            <div class="cards-grid">
+                <div class="card" onclick="openPreview('Viaje Intergaláctico', '🚀', 'Surca la galaxia a velocidad warp en una experiencia interactiva espacial.')"><div class="card-bg">🚀</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Viaje Intergaláctico</div></div></div>
+                <div class="card" onclick="openPreview('Océanos Profundos 360', '🌊', 'Sumérgete junto a la fauna marina en las profundidades del océano.')"><div class="card-bg">🌊</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Océanos Profundos 360</div></div></div>
+                <div class="card" onclick="openPreview('Cyber Dimension', '⚡', 'Ciudades futuristas con neones y tecnología punta a tu alcance.')"><div class="card-bg">⚡</div><span class="card-tag">Cyber</span><div class="card-overlay"><div class="card-title">Cyber Dimension</div></div></div>
+                <div class="card" onclick="openPreview('Núcleo Terrestre', '🌋', 'Un descenso extremo hacia las entrañas geológicas del planeta.')"><div class="card-bg">🌋</div><span class="card-tag">Geología</span><div class="card-overlay"><div class="card-title">Núcleo Terrestre</div></div></div>
+                <div class="card" onclick="openPreview('Estación Orbital', '🛰️', 'Vistas privilegiadas de la Tierra desde la órbita internacional.')"><div class="card-bg">🛰️</div><span class="card-tag">Espacio</span><div class="card-overlay"><div class="card-title">Estación Orbital</div></div></div>
+                <div class="card" onclick="openPreview('Era Jurásica VR', '🦖', 'Recreación fidedigna de dinosaurios en su hábitat natural.')"><div class="card-bg">🦖</div><span class="card-tag">Historia</span><div class="card-overlay"><div class="card-title">Era Jurásica VR</div></div></div>
+                <div class="card" onclick="openPreview('Microcosmos', '🔬', 'Un recorrido a escala microscópica por reacciones celulares.')"><div class="card-bg">🔬</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Microcosmos</div></div></div>
+                <div class="card" onclick="openPreview('Metrópolis 2100', '🏙️', 'Urbanismo avanzado y arquitectura futurista interactiva.')"><div class="card-bg">🏙️</div><span class="card-tag">Urbano</span><div class="card-overlay"><div class="card-title">Metrópolis 2100</div></div></div>
+                <div class="card" onclick="openPreview('Bosque Ancestral', '🌲', 'Paseos relajantes por reservas naturales vírgenes con sonido envolvente.')"><div class="card-bg">🌲</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Bosque Ancestral</div></div></div>
+                <div class="card" onclick="openPreview('Fórmula Extrema VR', '🏎️', 'Velocidad de vértigo desde la perspectiva del piloto en pista.')"><div class="card-bg">🏎️</div><span class="card-tag">Deporte</span><div class="card-overlay"><div class="card-title">Fórmula Extrema VR</div></div></div>
+                <div class="card" onclick="openPreview('Galería Abstracta', '🎨', 'Obras de arte tridimensionales que cobran vida a tu alrededor.')"><div class="card-bg">🎨</div><span class="card-tag">Arte</span><div class="card-overlay"><div class="card-title">Galería Abstracta</div></div></div>
+                <div class="card" onclick="openPreview('Castillos Medievales', '🏰', 'Recorrido histórico por fortalezas europeas legendarias.')"><div class="card-bg">🏰</div><span class="card-tag">Historia</span><div class="card-overlay"><div class="card-title">Castillos Medievales</div></div></div>
+                <div class="card" onclick="openPreview('Defensas Quánticas', '🛡️', 'Estrategias de seguridad digital explicadas en entornos inmersivos.')"><div class="card-bg">🛡️</div><span class="card-tag">Acción</span><div class="card-overlay"><div class="card-title">Defensas Quánticas</div></div></div>
+                <div class="card" onclick="openPreview('Laboratorio Secreto', '🧪', 'Experimentos tecnológicos de vanguardia a puerta cerrada.')"><div class="card-bg">🧪</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Laboratorio Secreto</div></div></div>
+                <div class="card" onclick="openPreview('Oráculo Virtual', '🔮', 'Consultas interactivas con inteligencia artificial avanzada.')"><div class="card-bg">🔮</div><span class="card-tag">Místico</span><div class="card-overlay"><div class="card-title">Oráculo Virtual</div></div></div>
+            </div>
+        </div>
+
+        <!-- VISTA 3: DIRECTOS -->
+        <div class="content-section" id="tabDirectos">
+            <div class="section-title">Transmisiones en Vivo 360°</div>
+            <div class="cards-grid">
+                <div class="card" onclick="openPreview('Estudio Principal Live', '🔴', 'Transmisión en directo desde el set principal con interacción en tiempo real.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Estudio Principal Live</div></div></div>
+                <div class="card" onclick="openPreview('Concierto Inmersivo Streaming', '🔴', 'Música en directo optimizada para pantallas envolventes.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Concierto Inmersivo Streaming</div></div></div>
+                <div class="card" onclick="openPreview('Noticias MS3 Global', '🔴', 'Actualidad internacional cubierta por corresponsales en 360°.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Noticias MS3 Global</div></div></div>
+                <div class="card" onclick="openPreview('Debate Tecnológico VR', '🔴', 'Expertos discutiendo el futuro del metaverso y las tecnologías XR.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Debate Tecnológico VR</div></div></div>
+                <div class="card" onclick="openPreview('Sunset Session Live', '🔴', 'Música electrónica al atardecer desde playas paradisíacas.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Sunset Session Live</div></div></div>
+                <div class="card" onclick="openPreview('Gaming Arena Inmersivo', '🔴', 'Torneos de eSports transmitidos desde dentro de los mapas de juego.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Gaming Arena Inmersivo</div></div></div>
+                <div class="card" onclick="openPreview('Masterclass de Arte Digital', '🔴', 'Creación de entornos 3D en directo con los mejores artistas.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Masterclass de Arte Digital</div></div></div>
+                <div class="card" onclick="openPreview('Cocktail Lounge Virtual', '🔴', 'Espacio de networking y charlas distendidas en formato virtual.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Cocktail Lounge Virtual</div></div></div>
+                <div class="card" onclick="openPreview('Entrevistas Exclusivas MS3', '🔴', 'Charlas íntimas con figuras destacadas del entretenimiento.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Entrevistas Exclusivas MS3</div></div></div>
+                <div class="card" onclick="openPreview('Festival de Cine 360', '🔴', 'Proyecciones especiales y alfombra roja interactiva.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Festival de Cine 360</div></div></div>
+                <div class="card" onclick="openPreview('Pasarela de Moda XR', '🔴', 'Desfiles de alta costura con escenografías virtuales cambiantes.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Pasarela de Moda XR</div></div></div>
+                <div class="card" onclick="openPreview('Stand Up Comedy Inmersivo', '🔴', 'Humor en directo sintiendo la reacción del público a tu alrededor.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Stand Up Comedy Inmersivo</div></div></div>
+                <div class="card" onclick="openPreview('Quantum Talks Live', '🔴', 'Conferencias magistrales sobre física cuántica y computación.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Quantum Talks Live</div></div></div>
+                <div class="card" onclick="openPreview('Yoga y Meditación 360', '🔴', 'Sesiones guiadas de bienestar en entornos naturales virtuales.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Yoga y Meditación 360</div></div></div>
+                <div class="card" onclick="openPreview('Cierre de Transmisión Diario', '🔴', 'Resumen nocturno y despedida oficial de la programación.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Cierre de Transmisión Diario</div></div></div>
+            </div>
+        </div>
+
+        <!-- VISTA 4: MI LISTA -->
+        <div class="content-section" id="tabMiLista">
+            <div class="section-title">Tus Videos Guardados en el Perfil</div>
+            <div class="cards-grid" id="gridMyList">
+                <!-- Se poblará dinámicamente con JavaScript -->
+            </div>
+        </div>
+
+        <!-- VISTA 5: BÚSQUEDA -->
+        <div class="content-section" id="tabBusqueda">
+            <div class="search-bar-container">
+                <input type="text" class="search-input" placeholder="Buscar programas, 360°, directos...">
+            </div>
+            <div class="section-title">Resultados Populares</div>
+            <div class="cards-grid">
+                <div class="card" onclick="openPreview('Global 360 News', '🌍', 'Noticias internacionales cubiertas en formato inmersivo de 360 grados.')">
+                    <div class="card-bg">🌍</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Global 360 News</div></div>
                 </div>
-                <div class="control-group">
-                    <label for="streamQuality">Calidad de Streaming</label>
-                    <select id="streamQuality">
-                        <option value="4k">4K Ultra HD (360°)</option>
-                        <option value="1080">1080p Full HD</option>
-                        <option value="720">720p HD (Ahorro de Datos)</option>
-                    </select>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODAL DE PREVISUALIZACIÓN -->
+    <div class="preview-modal" id="previewModal">
+        <div class="preview-content">
+            <div class="preview-header-img" id="modalImg">
+                🚀
+                <button class="preview-close" id="closeModalBtn">✕</button>
+            </div>
+            <div class="preview-body">
+                <div class="preview-title" id="modalTitle">Título del Programa</div>
+                <div class="preview-desc" id="modalDesc">Descripción detallada del contenido audiovisual inmersivo...</div>
+                <div class="preview-actions">
+                    <button class="btn btn-primary" id="modalPlayBtn">▶ Reproducir</button>
+                    <button class="btn btn-secondary" id="modalAddListBtn">+ Agregar a mi lista</button>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <div class="panel-section">
-                <h3>Acciones del Workspace</h3>
-                <button class="btn-primary" id="launchStreamBtn">Iniciar Transmisión WebXR</button>
+    <!-- Reproductor Multimedia Fullscreen / VR -->
+    <div class="player-fullscreen-container" id="playerContainer">
+        <video id="mainVideo" crossorigin="anonymous">
+            <source src="tu-video-360.mp4" type="video/mp4">
+            Tu navegador no soporta el formato de video.
+        </video>
+        <div class="player-controls" id="playerControls">
+            <div class="control-top">
+                <button class="close-btn" id="closePlayerBtn">✕</button>
             </div>
-        </aside>
-
-        <section class="viewport-container">
-            <div class="vr-screen">
-                <div class="vr-simulation-box">
-                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-                    <h2>Entorno Virtual MS3 Activo</h2>
-                    <p style="color: var(--text-muted); margin-top: 8px; font-size: 0.9rem;">Utilice el menú superior de ajustes para consultar Términos, Ayuda IA o conocer a los Creadores.</p>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Modales Genéricos -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Título</h2>
-                <button class="modal-close" id="modalClose">&times;</button>
-            </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Contenido dinámico inyectado por JS -->
+            <div class="control-bottom">
+                <button class="control-btn" id="playPauseBtn">Pausar</button>
+                <button class="control-btn" id="subtitlesBtn">Subtítulos: OFF</button>
+                <button class="control-btn" id="vrModeBtn">Modo VR</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Elementos UI
-        const settingsBtn = document.getElementById('settingsBtn');
-        const settingsDropdown = document.getElementById('settingsDropdown');
-        const modalOverlay = document.getElementById('modalOverlay');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalBody = document.getElementById('modalBody');
-        const modalClose = document.getElementById('modalClose');
+        // Arreglo centralizado para gestionar la lista de favoritos dinámicamente
+        let myList = [
+            { title: 'Magia Inmersiva', icon: '✨', desc: 'Tu contenido guardado favorito listo para reproducir.' },
+            { title: 'Favorito Estelar', icon: '⭐', desc: 'Producciones de culto marcadas por tu perfil.' },
+            { title: 'Documental Pendiente', icon: '📌', desc: 'Investigaciones especiales listas para tu tiempo libre.' },
+            { title: 'Ideas Creativas 360', icon: '💡', desc: 'Inspiración para tus propios proyectos audiovisuales.' },
+            { title: 'Concierto Acústico VR', icon: '🎵', desc: 'Sesiones íntimas de música en directo.' },
+            { title: 'Especial de Efectos', icon: '⚡', desc: 'Demostraciones técnicas de CGI y postproducción.' },
+            { title: 'Relajación Submarina', icon: '🌊', desc: 'Paisajes marinos para calmar la tensión diaria.' },
+            { title: 'Lanzamiento Cohete', icon: '🚀', desc: 'Hitos espaciales grabados desde la plataforma de despegue.' },
+            { title: 'Premios MS3 2026', icon: '🏆', desc: 'Gala de reconocimiento a la innovación televisiva.' },
+            { title: 'Top Recientes', icon: '🔥', desc: 'Lo más visto por la comunidad global esta semana.' },
+            { title: 'Obra Teatral Rouge', icon: '🎭', desc: 'Espectáculo exclusivo de transformismo y cabaret.' },
+            { title: 'Demo WebXR Pro', icon: '🕶️', desc: 'Herramientas de desarrollo de interfaces inmersivas.' },
+            { title: 'Diseño de Modos', icon: '🎨', desc: 'Conceptos de estética y branding corporativo.' },
+            { title: 'Paisajes Irlandeses', icon: '🍀', desc: 'Recorridos turísticos por los valles más verdes del mundo.' },
+            { title: 'Especiales del Mes', icon: '💖', desc: 'Selección editorial curada por la dirección de arte.' }
+        ];
 
-        // Botones del menú
-        const menuTerms = document.getElementById('menuTerms');
-        const menuAiHelp = document.getElementById('menuAiHelp');
-        const menuAbout = document.getElementById('menuAbout');
+        // Función para renderizar "Mi Lista" en la cuadrícula completa y en el carrusel de inicio
+        function renderMyList() {
+            const gridMyList = document.getElementById('gridMyList');
+            const homeSlider = document.getElementById('homeMyListSlider');
+            
+            const htmlContent = myList.map((item, index) => `
+                <div class="card" onclick="openPreview('${item.title}', '${item.icon}', '${item.desc}')">
+                    <button class="card-remove-btn" onclick="event.stopPropagation(); removeFromList(${index})" title="Eliminar de mi lista">✕</button>
+                    <div class="card-bg">${item.icon}</div>
+                    <span class="card-tag">Guardado</span>
+                    <div class="card-overlay"><div class="card-title">${item.title}</div></div>
+                </div>
+            `).join('');
 
-        // Toggle menú ajustes
-        settingsBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            settingsDropdown.classList.toggle('active');
-        });
+            gridMyList.innerHTML = htmlContent;
+            homeSlider.innerHTML = htmlContent;
+        }
 
-        // Cerrar menú al hacer clic fuera
-        window.addEventListener('click', () => {
-            settingsDropdown.classList.remove('active');
-        });
-
-        settingsDropdown.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-
-        // Contenidos de los modales
-        const contents = {
-            terms: {
-                title: "Términos y Condiciones - MS3",
-                html: `
-                    <p>Bienvenido a <strong>MS3 La Nueva Televisión</strong>. Al utilizar nuestra plataforma de streaming en 360° y tecnologías WebXR, usted acepta los siguientes términos y condiciones de uso:</p><br>
-                    <p><strong>1. Uso de la Plataforma:</strong> MS3 proporciona herramientas interactivas y visualización inmersiva. Queda prohibida la redistribución no autorizada del contenido multimedia provisto.</p><br>
-                    <p><strong>2. Propiedad Intelectual:</strong> Todos los diseños, interfaces, códigos y contenidos asociados a MS3 y sus líneas de desarrollo están protegidos por derechos de autor.</p><br>
-                    <p><strong>3. Privacidad:</strong> Sus preferencias de navegación y configuración en tiempo real se almacenan localmente para garantizar la mejor experiencia de realidad virtual.</p>
-                `
-            },
-            aiHelp: {
-                title: "Asistente de IA - Soporte MS3",
-                html: `
-                    <div class="ai-chat-box">
-                        <div class="ai-messages" id="aiMessages">
-                            <div class="ai-msg bot">¡Hola! Soy tu asistente de Inteligencia Artificial para MS3. ¿Tienes dudas sobre cómo usar la plataforma, configurar el streaming 360° o sobre WebXR? Escríbeme aquí.</div>
-                        </div>
-                        <div class="ai-input-row">
-                            <input type="text" id="aiUserInput" placeholder="Ej: ¿Cómo configuro el modo giroscopio?">
-                            <button class="btn-primary" id="aiSendBtn" style="padding: 10px 20px;">Enviar</button>
-                        </div>
-                    </div>
-                `
-            },
-            about: {
-                title: "Nosotros - Creadores de MS3",
-                html: `
-                    <p>Conoce al equipo multidisciplinario detrás del desarrollo, diseño y dirección de <strong>MS3 La Nueva Televisión</strong>:</p>
-                    <div class="team-grid">
-                        <div class="team-card">
-                            <div class="team-avatar">GV</div>
-                            <h4>Giuliana Valenzuela</h4>
-                            <p>Dirección de Marketing & Conceptualización</p>
-                        </div>
-                        <div class="team-card">
-                            <div class="team-avatar">MS</div>
-                            <h4>Equipo Técnico MS3</h4>
-                            <p>Desarrollo WebXR & Streaming 360°</p>
-                        </div>
-                        <div class="team-card">
-                            <div class="team-avatar">AI</div>
-                            <h4>Asesoría Creativa</h4>
-                            <p>Producción de Contenidos & Escenografía</p>
-                        </div>
-                    </div>
-                `
-            }
-        };
-
-        // Funciones para abrir modales
-        function openModal(type) {
-            settingsDropdown.classList.remove('active');
-            modalTitle.innerHTML = contents[type].title;
-            modalBody.innerHTML = contents[type].html;
-            modalOverlay.classList.add('active');
-
-            // Si es IA, inicializar lógica de chat de ejemplo
-            if (type === 'aiHelp') {
-                initAiChat();
+        // Eliminar elemento de la lista por índice
+        function removeFromList(index) {
+            const removed = myList.splice(index, 1);
+            renderMyList();
+            // Si el modal está abierto para este programa, actualizar los botones del modal
+            if (previewModal.classList.contains('active') && modalTitle.textContent === removed[0].title) {
+                updateModalButtonsState();
             }
         }
 
-        menuTerms.addEventListener('click', () => openModal('terms'));
-        menuAiHelp.addEventListener('click', () => openModal('aiHelp'));
-        menuAbout.addEventListener('click', () => openModal('about'));
+        // Inicializar renderizado al cargar
+        document.addEventListener('DOMContentLoaded', renderMyList);
 
-        modalClose.addEventListener('click', () => {
-            modalOverlay.classList.remove('active');
+        // Transición de Bienvenida
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const appContainer = document.getElementById('appContainer');
+        document.getElementById('googleLoginBtn').addEventListener('click', () => {
+            welcomeScreen.classList.add('hidden');
+            appContainer.classList.add('active');
         });
 
-        modalOverlay.addEventListener('click', (e) => {
-            if (e.target === modalOverlay) {
-                modalOverlay.classList.remove('active');
-            }
-        });
+        // Navegación de Pestañas
+        const navItems = document.querySelectorAll('.sub-nav .nav-item');
+        const contentSections = document.querySelectorAll('.content-section');
 
-        // Lógica interactiva del chat de IA de ayuda
-        function initAiChat() {
-            const sendBtn = document.getElementById('aiSendBtn');
-            const userInput = document.getElementById('aiUserInput');
-            const aiMessages = document.getElementById('aiMessages');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                navItems.forEach(nav => nav.classList.remove('active'));
+                contentSections.forEach(section => section.classList.remove('active'));
 
-            if (!sendBtn) return;
-
-            function handleSend() {
-                const text = userInput.value.trim();
-                if (!text) return;
-
-                // Mensaje usuario
-                const userDiv = document.createElement('div');
-                userDiv.className = 'ai-msg user';
-                userDiv.textContent = text;
-                aiMessages.appendChild(userDiv);
-                userInput.value = '';
-                aiMessages.scrollTop = aiMessages.scrollHeight;
-
-                // Respuesta simulada de IA
-                setTimeout(() => {
-                    const botDiv = document.createElement('div');
-                    botDiv.className = 'ai-msg bot';
-                    
-                    let reply = "Para utilizar correctamente MS3, asegúrate de seleccionar el modo de cámara adecuado en el panel lateral. Si experimentas problemas con WebXR, comprueba que tu navegador soporte aceleración por hardware.";
-                    const lower = text.toLowerCase();
-                    if (lower.includes('giroscopio') || lower.includes('movil') || lower.includes('móvil')) {
-                        reply = "El modo giroscopio te permite mover tu dispositivo móvil para explorar la transmisión 360° de forma nativa.";
-                    } else if (lower.includes('streaming') || lower.includes('calidad')) {
-                        reply = "Puedes alternar entre resoluciones desde el panel izquierdo. Recomendamos 4K solo con conexiones estables.";
-                    }
-
-                    botDiv.textContent = reply;
-                    aiMessages.appendChild(botDiv);
-                    aiMessages.scrollTop = aiMessages.scrollHeight;
-                }, 600);
-            }
-
-            sendBtn.addEventListener('click', handleSend);
-            userInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') handleSend();
+                item.classList.add('active');
+                document.getElementById(item.getAttribute('data-target')).classList.add('active');
             });
+        });
+
+        document.getElementById('logoHomeBtn').addEventListener('click', () => {
+            navItems.forEach(nav => nav.classList.remove('active'));
+            contentSections.forEach(section => section.classList.remove('active'));
+            navItems[0].classList.add('active');
+            document.getElementById('tabInicio').classList.add('active');
+        });
+
+        document.getElementById('profileBtn').addEventListener('click', () => {
+            alert('Perfil de usuario: Conectado como Administrador MS3.');
+        });
+        document.getElementById('settingsBtn').addEventListener('click', () => {
+            alert('Panel de Ajustes de la plataforma abierto.');
+        });
+
+        // Lógica del Modal de Previsualización
+        const previewModal = document.getElementById('previewModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalImg = document.getElementById('modalImg');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalPlayBtn = document.getElementById('modalPlayBtn');
+        const modalAddListBtn = document.getElementById('modalAddListBtn');
+
+        let currentProgram = { title: '', icon: '', desc: '' };
+
+        function isItemInList(title) {
+            return myList.some(item => item.title === title);
         }
+
+        function updateModalButtonsState() {
+            if (isItemInList(currentProgram.title)) {
+                modalAddListBtn.textContent = "✓ En mi lista (Eliminar)";
+                modalAddListBtn.className = "btn btn-danger";
+            } else {
+                modalAddListBtn.textContent = "+ Agregar a mi lista";
+                modalAddListBtn.className = "btn btn-secondary";
+            }
+        }
+
+        function openPreview(title, icon, desc) {
+            currentProgram = { title, icon, desc };
+            modalTitle.textContent = title;
+            modalImg.innerHTML = icon + '<button class="preview-close" onclick="closePreview()">✕</button>';
+            modalDesc.textContent = desc;
+            updateModalButtonsState();
+            previewModal.classList.add('active');
+        }
+
+        function closePreview() {
+            previewModal.classList.remove('active');
+        }
+
+        closeModalBtn.addEventListener('click', closePreview);
+        previewModal.addEventListener('click', (e) => {
+            if (e.target === previewModal) closePreview();
+        });
+
+        // Botón Reproducir desde el Modal
+        modalPlayBtn.addEventListener('click', () => {
+            closePreview();
+            openPlayer();
+        });
+
+        // Alternar Agregar / Eliminar desde el Modal dinámicamente
+        modalAddListBtn.addEventListener('click', () => {
+            const existsIndex = myList.findIndex(item => item.title === currentProgram.title);
+            
+            if (existsIndex >= 0) {
+                // Si ya está, se elimina
+                myList.splice(existsIndex, 1);
+                alert(`¡"${currentProgram.title}" se eliminó de tu lista!`);
+            } else {
+                // Si no está, se agrega
+                myList.push({ ...currentProgram });
+                alert(`¡"${currentProgram.title}" se agregó exitosamente a tu lista!`);
+            }
+
+            renderMyList();
+            updateModalButtonsState();
+            closePreview();
+        });
+
+        // Reproductor Multimedia Fullscreen / VR
+        const playerContainer = document.getElementById('playerContainer');
+        const mainVideo = document.getElementById('mainVideo');
+        const closePlayerBtn = document.getElementById('closePlayerBtn');
+        const playerControls = document.getElementById('playerControls');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const subtitlesBtn = document.getElementById('subtitlesBtn');
+        const vrModeBtn = document.getElementById('vrModeBtn');
+
+        function openPlayer() {
+            playerContainer.classList.add('active');
+            mainVideo.play().catch(() => {});
+            if (playerContainer.requestFullscreen) {
+                playerContainer.requestFullscreen().catch(() => {});
+            }
+        }
+
+        closePlayerBtn.addEventListener('click', () => {
+            mainVideo.pause();
+            mainVideo.currentTime = 0;
+            playerContainer.classList.remove('active', 'vr-split');
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch(() => {});
+            }
+        });
+
+        playerContainer.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') return;
+            playerControls.classList.toggle('hidden');
+        });
+
+        playPauseBtn.addEventListener('click', () => {
+            if (mainVideo.paused) {
+                mainVideo.play();
+                playPauseBtn.textContent = "Pausar";
+            } else {
+                mainVideo.pause();
+                playPauseBtn.textContent = "Reproducir";
+            }
+        });
+
+        const textTracks = mainVideo.textTracks;
+        if (textTracks && textTracks.length > 0) textTracks[0].mode = 'hidden';
+
+        subtitlesBtn.addEventListener('click', () => {
+            if (textTracks && textTracks.length > 0) {
+                const track = textTracks[0];
+                if (track.mode === 'showing') {
+                    track.mode = 'hidden';
+                    subtitlesBtn.textContent = "Subtítulos: OFF";
+                } else {
+                    track.mode = 'showing';
+                    subtitlesBtn.textContent = "Subtítulos: ON";
+                }
+            } else {
+                alert("No hay subtítulos cargados en este video de demostración.");
+            }
+        });
+
+        vrModeBtn.addEventListener('click', () => {
+            playerContainer.classList.toggle('vr-split');
+            vrModeBtn.textContent = playerContainer.classList.contains('vr-split') ? "Modo Normal" : "Modo VR";
+        });
     </script>
 </body>
 </html>
