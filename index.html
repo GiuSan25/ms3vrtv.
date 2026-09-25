@@ -281,7 +281,7 @@
             border: 1px solid rgba(255,255,255,0.2);
         }
 
-        /* Carruseles y Cuadriculas */
+        /* Carruseles y Cuadrículas */
         .row-section {
             margin-top: 30px;
         }
@@ -371,7 +371,7 @@
             color: #d8b4fe;
         }
 
-        /* MODAL DE PREVISIÓN (Detalle al hacer clic en tarjeta) */
+        /* MODAL DE PREVISIÓN */
         .preview-modal {
             position: fixed;
             top: 0;
@@ -547,7 +547,7 @@
             <button class="nav-item" data-target="tabBusqueda">Búsqueda</button>
         </div>
 
-        <!-- VISTA 1: INICIO -->
+        <!-- VISTA 1: INICIO (Con 15+ elementos por carrusel) -->
         <div class="content-section active" id="tabInicio">
             <div class="section-title">Destacado</div>
             <div class="hero-banner">
@@ -562,102 +562,158 @@
                 </div>
             </div>
 
-            <!-- Carrusel 1: Tendencias Ahora -->
+            <!-- Carrusel 1: Tendencias Ahora (15+ elementos) -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Tendencias Ahora</div></div>
                 <div class="cards-slider">
-                    <div class="card" onclick="openPreview('Código VR: Investigación', '🌌', 'Una inmersión profunda en los secretos de la realidad virtual y los entornos interactivos del futuro.')">
-                        <div class="card-bg">🌌</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Código VR: Investigación</div></div>
-                    </div>
-                    <div class="card" onclick="openPreview('Planeta 360', '🪐', 'Explora los paisajes más exóticos y lejanos capturados en resolución total de 360 grados.')">
-                        <div class="card-bg">🪐</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Planeta 360</div></div>
-                    </div>
-                    <div class="card" onclick="openPreview('El Estudio Central', '🎬', 'Detrás de escena de las producciones más ambiciosas de la cadena MS3.')">
-                        <div class="card-bg">🎬</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">El Estudio Central</div></div>
-                    </div>
-                    <div class="card" onclick="openPreview('Realidades Paralelas', '🔮', 'Un viaje psicodélico y visual a través de dimensiones generadas por ordenador.')">
-                        <div class="card-bg">🔮</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Realidades Paralelas</div></div>
-                    </div>
-                    <div class="card" onclick="openPreview('Cyber Pulse', '⚡', 'La música electrónica y los efectos visuales más vibrantes en un formato inmersivo único.')">
-                        <div class="card-bg">⚡</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Cyber Pulse</div></div>
-                    </div>
+                    <div class="card" onclick="openPreview('Código VR: Investigación', '🌌', 'Inmersión profunda en los secretos de la realidad virtual y los entornos interactivos del futuro.')"><div class="card-bg">🌌</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Código VR: Investigación</div></div></div>
+                    <div class="card" onclick="openPreview('Planeta 360', '🪐', 'Explora los paisajes más exóticos y lejanos capturados en resolución total de 360 grados.')"><div class="card-bg">🪐</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Planeta 360</div></div></div>
+                    <div class="card" onclick="openPreview('El Estudio Central', '🎬', 'Detrás de escena de las producciones más ambiciosas de la cadena MS3.')"><div class="card-bg">🎬</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">El Estudio Central</div></div></div>
+                    <div class="card" onclick="openPreview('Realidades Paralelas', '🔮', 'Un viaje psicodélico y visual a través de dimensiones generadas por ordenador.')"><div class="card-bg">🔮</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Realidades Paralelas</div></div></div>
+                    <div class="card" onclick="openPreview('Cyber Pulse', '⚡', 'Música electrónica y efectos visuales vibrantes en formato inmersivo único.')"><div class="card-bg">⚡</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Cyber Pulse</div></div></div>
+                    <div class="card" onclick="openPreview('Vuelo Cenital', '🚁', 'Vistas aéreas panorámicas capturadas con drones de última generación 360.')"><div class="card-bg">🚁</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Vuelo Cenital</div></div></div>
+                    <div class="card" onclick="openPreview('Neón Sessions', '💡', 'Sesiones nocturnas de arte urbano y luces de neón inmersivas.')"><div class="card-bg">💡</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Neón Sessions</div></div></div>
+                    <div class="card" onclick="openPreview('Abismo Azul', '🌊', 'Exploración de fosas marinas inexploradas en plena libertad virtual.')"><div class="card-bg">🌊</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Abismo Azul</div></div></div>
+                    <div class="card" onclick="openPreview('Fuego Vivo', '🔥', 'Efectos pirotécnicos extremos reproducidos en riguroso 360°.')"><div class="card-bg">🔥</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Fuego Vivo</div></div></div>
+                    <div class="card" onclick="openPreview('Cristal Inmersivo', '💎', 'Estructuras geométricas complejas y reflejos ópticos interactivos.')"><div class="card-bg">💎</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Cristal Inmersivo</div></div></div>
+                    <div class="card" onclick="openPreview('Mutación Genética', '🧬', 'Documental interactivo sobre la evolución biológica digital.')"><div class="card-bg">🧬</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Mutación Genética</div></div></div>
+                    <div class="card" onclick="openPreview('Teatro 360', '🎭', 'Artes escénicas en primera fila con sonido binaural avanzado.')"><div class="card-bg">🎭</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Teatro 360</div></div></div>
+                    <div class="card" onclick="openPreview('Ares Base', '🚀', 'La vida cotidiana de los primeros colonos en el planeta rojo.')"><div class="card-bg">🚀</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Ares Base</div></div></div>
+                    <div class="card" onclick="openPreview('Blanco Móvil', '🎯', 'Pruebas de precisión visual y reflejos en entornos virtuales dinámicos.')"><div class="card-bg">🎯</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Blanco Móvil</div></div></div>
+                    <div class="card" onclick="openPreview('Vortex Total', '🌀', 'Una experiencia psicodélica total diseñada para desconectar de la realidad.')"><div class="card-bg">🌀</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Vortex Total</div></div></div>
                 </div>
             </div>
 
-            <!-- Carrusel 2: Programas VR -->
+            <!-- Carrusel 2: Programas VR (15+ elementos) -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Programas VR</div></div>
                 <div class="cards-slider">
-                    <div class="card" onclick="openPreview('Viaje Intergaláctico', '🚀', 'Surca la galaxia a velocidad warp en una experiencia interactiva espacial sin precedentes.')">
-                        <div class="card-bg">🚀</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Viaje Intergaláctico</div></div>
-                    </div>
-                    <div class="card" onclick="openPreview('Océanos Profundos 360', '🌊', 'Sumérgete junto a la fauna marina más imponente en las profundidades del océano.')">
-                        <div class="card-bg">🌊</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Océanos Profundos 360</div></div>
-                    </div>
-                    <div class="card" onclick="openPreview('Cyber Dimension', '⚡', 'Ciudades futuristas con neones y tecnología punta al alcance de tu mano.')">
-                        <div class="card-bg">⚡</div><span class="card-tag">Cyber</span><div class="card-overlay"><div class="card-title">Cyber Dimension</div></div>
-                    </div>
+                    <div class="card" onclick="openPreview('Viaje Intergaláctico', '🚀', 'Surca la galaxia a velocidad warp en una experiencia interactiva espacial.')"><div class="card-bg">🚀</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Viaje Intergaláctico</div></div></div>
+                    <div class="card" onclick="openPreview('Océanos Profundos 360', '🌊', 'Sumérgete junto a la fauna marina en las profundidades del océano.')"><div class="card-bg">🌊</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Océanos Profundos 360</div></div></div>
+                    <div class="card" onclick="openPreview('Cyber Dimension', '⚡', 'Ciudades futuristas con neones y tecnología punta a tu alcance.')"><div class="card-bg">⚡</div><span class="card-tag">Cyber</span><div class="card-overlay"><div class="card-title">Cyber Dimension</div></div></div>
+                    <div class="card" onclick="openPreview('Núcleo Terrestre', '🌋', 'Un descenso extremo hacia las entrañas geológicas del planeta.')"><div class="card-bg">🌋</div><span class="card-tag">Geología</span><div class="card-overlay"><div class="card-title">Núcleo Terrestre</div></div></div>
+                    <div class="card" onclick="openPreview('Estación Orbital', '🛰️', 'Vistas privilegiadas de la Tierra desde la órbita internacional.')"><div class="card-bg">🛰️</div><span class="card-tag">Espacio</span><div class="card-overlay"><div class="card-title">Estación Orbital</div></div></div>
+                    <div class="card" onclick="openPreview('Era Jurásica VR', '🦖', 'Recreación fidedigna de dinosaurios en su hábitat natural.')"><div class="card-bg">🦖</div><span class="card-tag">Historia</span><div class="card-overlay"><div class="card-title">Era Jurásica VR</div></div></div>
+                    <div class="card" onclick="openPreview('Microcosmos', '🔬', 'Un recorrido a escala microscópica por reacciones celulares.')"><div class="card-bg">🔬</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Microcosmos</div></div></div>
+                    <div class="card" onclick="openPreview('Metrópolis 2100', '🏙️', 'Urbanismo avanzado y arquitectura futurista interactiva.')"><div class="card-bg">🏙️</div><span class="card-tag">Urbano</span><div class="card-overlay"><div class="card-title">Metrópolis 2100</div></div></div>
+                    <div class="card" onclick="openPreview('Bosque Ancestral', '🌲', 'Paseos relajantes por reservas naturales vírgenes con sonido envolvente.')"><div class="card-bg">🌲</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Bosque Ancestral</div></div></div>
+                    <div class="card" onclick="openPreview('Fórmula Extrema VR', '🏎️', 'Velocidad de vértigo desde la perspectiva del piloto en pista.')"><div class="card-bg">🏎️</div><span class="card-tag">Deporte</span><div class="card-overlay"><div class="card-title">Fórmula Extrema VR</div></div></div>
+                    <div class="card" onclick="openPreview('Galería Abstracta', '🎨', 'Obras de arte tridimensionales que cobran vida a tu alrededor.')"><div class="card-bg">🎨</div><span class="card-tag">Arte</span><div class="card-overlay"><div class="card-title">Galería Abstracta</div></div></div>
+                    <div class="card" onclick="openPreview('Castillos Medievales', '🏰', 'Recorrido histórico por fortalezas europeas legendarias.')"><div class="card-bg">🏰</div><span class="card-tag">Historia</span><div class="card-overlay"><div class="card-title">Castillos Medievales</div></div></div>
+                    <div class="card" onclick="openPreview('Defensas Quánticas', '🛡️', 'Estrategias de seguridad digital explicadas en entornos inmersivos.')"><div class="card-bg">🛡️</div><span class="card-tag">Acción</span><div class="card-overlay"><div class="card-title">Defensas Quánticas</div></div></div>
+                    <div class="card" onclick="openPreview('Laboratorio Secreto', '🧪', 'Experimentos tecnológicos de vanguardia a puerta cerrada.')"><div class="card-bg">🧪</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Laboratorio Secreto</div></div></div>
+                    <div class="card" onclick="openPreview('Oráculo Virtual', '🔮', 'Consultas interactivas con inteligencia artificial avanzada.')"><div class="card-bg">🔮</div><span class="card-tag">Místico</span><div class="card-overlay"><div class="card-title">Oráculo Virtual</div></div></div>
                 </div>
             </div>
 
-            <!-- Carrusel 3: Directos -->
+            <!-- Carrusel 3: Directos (15+ elementos) -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Directos</div></div>
                 <div class="cards-slider">
-                    <div class="card" onclick="openPreview('Estudio Principal Live', '🔴', 'Transmisión en directo desde el set principal con interacción en tiempo real.')">
-                        <div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Estudio Principal Live</div></div>
-                    </div>
-                    <div class="card" onclick="openPreview('Concierto Inmersivo Streaming', '🔴', 'Música en directo optimizada para cascos y pantallas envolventes.')">
-                        <div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Concierto Inmersivo Streaming</div></div>
-                    </div>
+                    <div class="card" onclick="openPreview('Estudio Principal Live', '🔴', 'Transmisión en directo desde el set principal con interacción en tiempo real.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Estudio Principal Live</div></div></div>
+                    <div class="card" onclick="openPreview('Concierto Inmersivo Streaming', '🔴', 'Música en directo optimizada para pantallas envolventes.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Concierto Inmersivo Streaming</div></div></div>
+                    <div class="card" onclick="openPreview('Noticias MS3 Global', '🔴', 'Actualidad internacional cubierta por corresponsales en 360°.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Noticias MS3 Global</div></div></div>
+                    <div class="card" onclick="openPreview('Debate Tecnológico VR', '🔴', 'Expertos discutiendo el futuro del metaverso y las tecnologías XR.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Debate Tecnológico VR</div></div></div>
+                    <div class="card" onclick="openPreview('Sunset Session Live', '🔴', 'Música electrónica al atardecer desde playas paradisíacas.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Sunset Session Live</div></div></div>
+                    <div class="card" onclick="openPreview('Gaming Arena Inmersivo', '🔴', 'Torneos de eSports transmitidos desde dentro de los mapas de juego.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Gaming Arena Inmersivo</div></div></div>
+                    <div class="card" onclick="openPreview('Masterclass de Arte Digital', '🔴', 'Creación de entornos 3D en directo con los mejores artistas.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Masterclass de Arte Digital</div></div></div>
+                    <div class="card" onclick="openPreview('Cocktail Lounge Virtual', '🔴', 'Espacio de networking y charlas distendidas en formato virtual.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Cocktail Lounge Virtual</div></div></div>
+                    <div class="card" onclick="openPreview('Entrevistas Exclusivas MS3', '🔴', 'Charlas íntimas con figuras destacadas del entretenimiento.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Entrevistas Exclusivas MS3</div></div></div>
+                    <div class="card" onclick="openPreview('Festival de Cine 360', '🔴', 'Proyecciones especiales y alfombra roja interactiva.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Festival de Cine 360</div></div></div>
+                    <div class="card" onclick="openPreview('Pasarela de Moda XR', '🔴', 'Desfiles de alta costura con escenografías virtuales cambiantes.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Pasarela de Moda XR</div></div></div>
+                    <div class="card" onclick="openPreview('Stand Up Comedy Inmersivo', '🔴', 'Humor en directo sintiendo la reacción del público a tu alrededor.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Stand Up Comedy Inmersivo</div></div></div>
+                    <div class="card" onclick="openPreview('Quantum Talks Live', '🔴', 'Conferencias magistrales sobre física cuántica y computación.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Quantum Talks Live</div></div></div>
+                    <div class="card" onclick="openPreview('Yoga y Meditación 360', '🔴', 'Sesiones guiadas de bienestar en entornos naturales virtuales.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Yoga y Meditación 360</div></div></div>
+                    <div class="card" onclick="openPreview('Cierre de Transmisión Diario', '🔴', 'Resumen nocturno y despedida oficial de la programación.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Cierre de Transmisión Diario</div></div></div>
                 </div>
             </div>
 
-            <!-- Carrusel 4: Mi Lista -->
+            <!-- Carrusel 4: Mi Lista (15+ elementos predeterminados) -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Mi Lista</div></div>
                 <div class="cards-slider" id="homeMyListSlider">
-                    <!-- Elementos agregados dinámicamente aparecerán aquí -->
-                    <div class="card" onclick="openPreview('Magia Inmersiva', '✨', 'Tu contenido guardado favorito listo para reproducir cuando quieras.')">
-                        <div class="card-bg">✨</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Magia Inmersiva</div></div>
-                    </div>
+                    <div class="card" onclick="openPreview('Magia Inmersiva', '✨', 'Tu contenido guardado favorito listo para reproducir.')"><div class="card-bg">✨</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Magia Inmersiva</div></div></div>
+                    <div class="card" onclick="openPreview('Favorito Estelar', '⭐', 'Producciones de culto marcadas por tu perfil.')"><div class="card-bg">⭐</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Favorito Estelar</div></div></div>
+                    <div class="card" onclick="openPreview('Documental Pendiente', '📌', 'Investigaciones especiales listas para tu tiempo libre.')"><div class="card-bg">📌</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Documental Pendiente</div></div></div>
+                    <div class="card" onclick="openPreview('Ideas Creativas 360', '💡', 'Inspiración para tus propios proyectos audiovisuales.')"><div class="card-bg">💡</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Ideas Creativas 360</div></div></div>
+                    <div class="card" onclick="openPreview('Concierto Acústico VR', '🎵', 'Sesiones íntimas de música en directo.')"><div class="card-bg">🎵</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Concierto Acústico VR</div></div></div>
+                    <div class="card" onclick="openPreview('Especial de Efectos', '⚡', 'Demostraciones técnicas de CGI y postproducción.')"><div class="card-bg">⚡</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Especial de Efectos</div></div></div>
+                    <div class="card" onclick="openPreview('Relajación Submarina', '🌊', 'Paisajes marinos para calmar la tensión diaria.')"><div class="card-bg">🌊</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Relajación Submarina</div></div></div>
+                    <div class="card" onclick="openPreview('Lanzamiento Cohete', '🚀', 'Hitos espaciales grabados desde la plataforma de despegue.')"><div class="card-bg">🚀</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Lanzamiento Cohete</div></div></div>
+                    <div class="card" onclick="openPreview('Premios MS3 2026', '🏆', 'Gala de reconocimiento a la innovación televisiva.')"><div class="card-bg">🏆</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Premios MS3 2026</div></div></div>
+                    <div class="card" onclick="openPreview('Top Recientes', '🔥', 'Lo más visto por la comunidad global esta semana.')"><div class="card-bg">🔥</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Top Recientes</div></div></div>
+                    <div class="card" onclick="openPreview('Obra Teatral Rouge', '🎭', 'Espectáculo exclusivo de transformismo y cabaret.')"><div class="card-bg">🎭</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Obra Teatral Rouge</div></div></div>
+                    <div class="card" onclick="openPreview('Demo WebXR Pro', '🕶️', 'Herramientas de desarrollo de interfaces inmersivas.')"><div class="card-bg">🕶️</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Demo WebXR Pro</div></div></div>
+                    <div class="card" onclick="openPreview('Diseño de Modos', '🎨', 'Conceptos de estética y branding corporativo.')"><div class="card-bg">🎨</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Diseño de Modos</div></div></div>
+                    <div class="card" onclick="openPreview('Paisajes Irlandeses', '🍀', 'Recorridos turísticos por los valles más verdes del mundo.')"><div class="card-bg">🍀</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Paisajes Irlandeses</div></div></div>
+                    <div class="card" onclick="openPreview('Especiales del Mes', '💖', 'Selección editorial curada por la dirección de arte.')"><div class="card-bg">💖</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Especiales del Mes</div></div></div>
                 </div>
             </div>
         </div>
 
-        <!-- VISTA 2: PROGRAMAS VR -->
+        <!-- VISTA 2: PROGRAMAS VR (Cuadrícula completa de 15+ elementos) -->
         <div class="content-section" id="tabProgramas">
             <div class="section-title">Catálogo Completo de Programas VR</div>
             <div class="cards-grid">
-                <div class="card" onclick="openPreview('Viaje Intergaláctico', '🚀', 'Surca la galaxia a velocidad warp en una experiencia interactiva espacial sin precedentes.')">
-                    <div class="card-bg">🚀</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Viaje Intergaláctico</div></div>
-                </div>
-                <div class="card" onclick="openPreview('Océanos Profundos 360', '🌊', 'Sumérgete junto a la fauna marina más imponente en las profundidades del océano.')">
-                    <div class="card-bg">🌊</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Océanos Profundos 360</div></div>
-                </div>
-                <div class="card" onclick="openPreview('Cyber Dimension', '⚡', 'Ciudades futuristas con neones y tecnología punta al alcance de tu mano.')">
-                    <div class="card-bg">⚡</div><span class="card-tag">Cyber</span><div class="card-overlay"><div class="card-title">Cyber Dimension</div></div>
-                </div>
+                <div class="card" onclick="openPreview('Viaje Intergaláctico', '🚀', 'Surca la galaxia a velocidad warp en una experiencia interactiva espacial.')"><div class="card-bg">🚀</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Viaje Intergaláctico</div></div></div>
+                <div class="card" onclick="openPreview('Océanos Profundos 360', '🌊', 'Sumérgete junto a la fauna marina en las profundidades del océano.')"><div class="card-bg">🌊</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Océanos Profundos 360</div></div></div>
+                <div class="card" onclick="openPreview('Cyber Dimension', '⚡', 'Ciudades futuristas con neones y tecnología punta a tu alcance.')"><div class="card-bg">⚡</div><span class="card-tag">Cyber</span><div class="card-overlay"><div class="card-title">Cyber Dimension</div></div></div>
+                <div class="card" onclick="openPreview('Núcleo Terrestre', '🌋', 'Un descenso extremo hacia las entrañas geológicas del planeta.')"><div class="card-bg">🌋</div><span class="card-tag">Geología</span><div class="card-overlay"><div class="card-title">Núcleo Terrestre</div></div></div>
+                <div class="card" onclick="openPreview('Estación Orbital', '🛰️', 'Vistas privilegiadas de la Tierra desde la órbita internacional.')"><div class="card-bg">🛰️</div><span class="card-tag">Espacio</span><div class="card-overlay"><div class="card-title">Estación Orbital</div></div></div>
+                <div class="card" onclick="openPreview('Era Jurásica VR', '🦖', 'Recreación fidedigna de dinosaurios en su hábitat natural.')"><div class="card-bg">🦖</div><span class="card-tag">Historia</span><div class="card-overlay"><div class="card-title">Era Jurásica VR</div></div></div>
+                <div class="card" onclick="openPreview('Microcosmos', '🔬', 'Un recorrido a escala microscópica por reacciones celulares.')"><div class="card-bg">🔬</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Microcosmos</div></div></div>
+                <div class="card" onclick="openPreview('Metrópolis 2100', '🏙️', 'Urbanismo avanzado y arquitectura futurista interactiva.')"><div class="card-bg">🏙️</div><span class="card-tag">Urbano</span><div class="card-overlay"><div class="card-title">Metrópolis 2100</div></div></div>
+                <div class="card" onclick="openPreview('Bosque Ancestral', '🌲', 'Paseos relajantes por reservas naturales vírgenes con sonido envolvente.')"><div class="card-bg">🌲</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Bosque Ancestral</div></div></div>
+                <div class="card" onclick="openPreview('Fórmula Extrema VR', '🏎️', 'Velocidad de vértigo desde la perspectiva del piloto en pista.')"><div class="card-bg">🏎️</div><span class="card-tag">Deporte</span><div class="card-overlay"><div class="card-title">Fórmula Extrema VR</div></div></div>
+                <div class="card" onclick="openPreview('Galería Abstracta', '🎨', 'Obras de arte tridimensionales que cobran vida a tu alrededor.')"><div class="card-bg">🎨</div><span class="card-tag">Arte</span><div class="card-overlay"><div class="card-title">Galería Abstracta</div></div></div>
+                <div class="card" onclick="openPreview('Castillos Medievales', '🏰', 'Recorrido histórico por fortalezas europeas legendarias.')"><div class="card-bg">🏰</div><span class="card-tag">Historia</span><div class="card-overlay"><div class="card-title">Castillos Medievales</div></div></div>
+                <div class="card" onclick="openPreview('Defensas Quánticas', '🛡️', 'Estrategias de seguridad digital explicadas en entornos inmersivos.')"><div class="card-bg">🛡️</div><span class="card-tag">Acción</span><div class="card-overlay"><div class="card-title">Defensas Quánticas</div></div></div>
+                <div class="card" onclick="openPreview('Laboratorio Secreto', '🧪', 'Experimentos tecnológicos de vanguardia a puerta cerrada.')"><div class="card-bg">🧪</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Laboratorio Secreto</div></div></div>
+                <div class="card" onclick="openPreview('Oráculo Virtual', '🔮', 'Consultas interactivas con inteligencia artificial avanzada.')"><div class="card-bg">🔮</div><span class="card-tag">Místico</span><div class="card-overlay"><div class="card-title">Oráculo Virtual</div></div></div>
             </div>
         </div>
 
-        <!-- VISTA 3: DIRECTOS -->
+        <!-- VISTA 3: DIRECTOS (Cuadrícula completa de 15+ elementos) -->
         <div class="content-section" id="tabDirectos">
             <div class="section-title">Transmisiones en Vivo 360°</div>
             <div class="cards-grid">
-                <div class="card" onclick="openPreview('Estudio Principal Live', '🔴', 'Transmisión en directo desde el set principal con interacción en tiempo real.')">
-                    <div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Estudio Principal Live</div></div>
-                </div>
+                <div class="card" onclick="openPreview('Estudio Principal Live', '🔴', 'Transmisión en directo desde el set principal con interacción en tiempo real.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Estudio Principal Live</div></div></div>
+                <div class="card" onclick="openPreview('Concierto Inmersivo Streaming', '🔴', 'Música en directo optimizada para pantallas envolventes.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Concierto Inmersivo Streaming</div></div></div>
+                <div class="card" onclick="openPreview('Noticias MS3 Global', '🔴', 'Actualidad internacional cubierta por corresponsales en 360°.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Noticias MS3 Global</div></div></div>
+                <div class="card" onclick="openPreview('Debate Tecnológico VR', '🔴', 'Expertos discutiendo el futuro del metaverso y las tecnologías XR.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Debate Tecnológico VR</div></div></div>
+                <div class="card" onclick="openPreview('Sunset Session Live', '🔴', 'Música electrónica al atardecer desde playas paradisíacas.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Sunset Session Live</div></div></div>
+                <div class="card" onclick="openPreview('Gaming Arena Inmersivo', '🔴', 'Torneos de eSports transmitidos desde dentro de los mapas de juego.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Gaming Arena Inmersivo</div></div></div>
+                <div class="card" onclick="openPreview('Masterclass de Arte Digital', '🔴', 'Creación de entornos 3D en directo con los mejores artistas.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Masterclass de Arte Digital</div></div></div>
+                <div class="card" onclick="openPreview('Cocktail Lounge Virtual', '🔴', 'Espacio de networking y charlas distendidas en formato virtual.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Cocktail Lounge Virtual</div></div></div>
+                <div class="card" onclick="openPreview('Entrevistas Exclusivas MS3', '🔴', 'Charlas íntimas con figuras destacadas del entretenimiento.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Entrevistas Exclusivas MS3</div></div></div>
+                <div class="card" onclick="openPreview('Festival de Cine 360', '🔴', 'Proyecciones especiales y alfombra roja interactiva.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Festival de Cine 360</div></div></div>
+                <div class="card" onclick="openPreview('Pasarela de Moda XR', '🔴', 'Desfiles de alta costura con escenografías virtuales cambiantes.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Pasarela de Moda XR</div></div></div>
+                <div class="card" onclick="openPreview('Stand Up Comedy Inmersivo', '🔴', 'Humor en directo sintiendo la reacción del público a tu alrededor.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Stand Up Comedy Inmersivo</div></div></div>
+                <div class="card" onclick="openPreview('Quantum Talks Live', '🔴', 'Conferencias magistrales sobre física cuántica y computación.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Quantum Talks Live</div></div></div>
+                <div class="card" onclick="openPreview('Yoga y Meditación 360', '🔴', 'Sesiones guiadas de bienestar en entornos naturales virtuales.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Yoga y Meditación 360</div></div></div>
+                <div class="card" onclick="openPreview('Cierre de Transmisión Diario', '🔴', 'Resumen nocturno y despedida oficial de la programación.')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Cierre de Transmisión Diario</div></div></div>
             </div>
         </div>
 
-        <!-- VISTA 4: MI LISTA -->
+        <!-- VISTA 4: MI LISTA (Cuadrícula completa de 15+ elementos iniciales) -->
         <div class="content-section" id="tabMiLista">
             <div class="section-title">Tus Videos Guardados en el Perfil</div>
             <div class="cards-grid" id="gridMyList">
-                <div class="card" onclick="openPreview('Magia Inmersiva', '✨', 'Tu contenido guardado favorito listo para reproducir cuando quieras.')">
-                    <div class="card-bg">✨</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Magia Inmersiva</div></div>
-                </div>
+                <div class="card" onclick="openPreview('Magia Inmersiva', '✨', 'Tu contenido guardado favorito listo para reproducir.')"><div class="card-bg">✨</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Magia Inmersiva</div></div></div>
+                <div class="card" onclick="openPreview('Favorito Estelar', '⭐', 'Producciones de culto marcadas por tu perfil.')"><div class="card-bg">⭐</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Favorito Estelar</div></div></div>
+                <div class="card" onclick="openPreview('Documental Pendiente', '📌', 'Investigaciones especiales listas para tu tiempo libre.')"><div class="card-bg">📌</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Documental Pendiente</div></div></div>
+                <div class="card" onclick="openPreview('Ideas Creativas 360', '💡', 'Inspiración para tus propios proyectos audiovisuales.')"><div class="card-bg">💡</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Ideas Creativas 360</div></div></div>
+                <div class="card" onclick="openPreview('Concierto Acústico VR', '🎵', 'Sesiones íntimas de música en directo.')"><div class="card-bg">🎵</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Concierto Acústico VR</div></div></div>
+                <div class="card" onclick="openPreview('Especial de Efectos', '⚡', 'Demostraciones técnicas de CGI y postproducción.')"><div class="card-bg">⚡</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Especial de Efectos</div></div></div>
+                <div class="card" onclick="openPreview('Relajación Submarina', '🌊', 'Paisajes marinos para calmar la tensión diaria.')"><div class="card-bg">🌊</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Relajación Submarina</div></div></div>
+                <div class="card" onclick="openPreview('Lanzamiento Cohete', '🚀', 'Hitos espaciales grabados desde la plataforma de despegue.')"><div class="card-bg">🚀</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Lanzamiento Cohete</div></div></div>
+                <div class="card" onclick="openPreview('Premios MS3 2026', '🏆', 'Gala de reconocimiento a la innovación televisiva.')"><div class="card-bg">🏆</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Premios MS3 2026</div></div></div>
+                <div class="card" onclick="openPreview('Top Recientes', '🔥', 'Lo más visto por la comunidad global esta semana.')"><div class="card-bg">🔥</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Top Recientes</div></div></div>
+                <div class="card" onclick="openPreview('Obra Teatral Rouge', '🎭', 'Espectáculo exclusivo de transformismo y cabaret.')"><div class="card-bg">🎭</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Obra Teatral Rouge</div></div></div>
+                <div class="card" onclick="openPreview('Demo WebXR Pro', '🕶️', 'Herramientas de desarrollo de interfaces inmersivas.')"><div class="card-bg">🕶️</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Demo WebXR Pro</div></div></div>
+                <div class="card" onclick="openPreview('Diseño de Modos', '🎨', 'Conceptos de estética y branding corporativo.')"><div class="card-bg">🎨</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Diseño de Modos</div></div></div>
+                <div class="card" onclick="openPreview('Paisajes Irlandeses', '🍀', 'Recorridos turísticos por los valles más verdes del mundo.')"><div class="card-bg">🍀</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Paisajes Irlandeses</div></div></div>
+                <div class="card" onclick="openPreview('Especiales del Mes', '💖', 'Selección editorial curada por la dirección de arte.')"><div class="card-bg">💖</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Especiales del Mes</div></div></div>
             </div>
         </div>
 
@@ -676,7 +732,7 @@
 
     </div>
 
-    <!-- MODAL DE PREVISUALIZACIÓN (Miniatura, Descripción, Botones) -->
+    <!-- MODAL DE PREVISUALIZACIÓN -->
     <div class="preview-modal" id="previewModal">
         <div class="preview-content">
             <div class="preview-header-img" id="modalImg">
@@ -763,7 +819,6 @@
         function openPreview(title, icon, desc) {
             currentProgram = { title, icon, desc };
             modalTitle.textContent = title;
-            modalImg.firstChild.nodeValue = ''; // limpiar texto plano previo si lo hay
             modalImg.innerHTML = icon + '<button class="preview-close" onclick="closePreview()">✕</button>';
             modalDesc.textContent = desc;
             previewModal.classList.add('active');
@@ -784,9 +839,8 @@
             openPlayer();
         });
 
-        // Botón Agregar a mi lista (Automático a Perfil Personalizado)
+        // Botón Agregar a mi lista (Automático al perfil personalizado)
         modalAddListBtn.addEventListener('click', () => {
-            // Verificar si ya está en la lista para evitar duplicados visuales
             const gridMyList = document.getElementById('gridMyList');
             
             const newCard = document.createElement('div');
@@ -802,7 +856,7 @@
             alert(`¡"${currentProgram.title}" se agregó exitosamente a tu lista personalizada!`);
             closePreview();
             
-            // Opcionalmente redirigir a la pestaña de Mi Lista para ver el resultado instantáneo
+            // Redirigir a la pestaña de Mi Lista para ver el resultado instantáneo
             navItems.forEach(nav => nav.classList.remove('active'));
             contentSections.forEach(section => section.classList.remove('active'));
             document.querySelector('[data-target="tabMiLista"]').classList.add('active');
