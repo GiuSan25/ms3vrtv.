@@ -619,7 +619,7 @@
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Programas VR</div></div>
                 <div class="cards-slider">
-                    <div class="card" onclick="openPreview('Viaje Intergaláctico', '🚀', 'Surca la galaxia a velocidad warp en una experiencia interactiva espacial.')"><div class="card-bg">🚀</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Viaje Intergaláctico</div></div></div>
+                    <div class="card" onclick="openPreview('Buscando a la futura vedette', 'Surca la galaxia a velocidad warp en una experiencia interactiva espacial'https://youtu.be/RCT0Kw5cqXQ?si=8kB6_gb0iyDwXQKj')"><div class="card-bg">🚀</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Viaje Intergaláctico</div></div></div>
                     <div class="card" onclick="openPreview('Océanos Profundos 360', '🌊', 'Sumérgete junto a la fauna marina en las profundidades del océano.')"><div class="card-bg">🌊</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Océanos Profundos 360</div></div></div>
                     <div class="card" onclick="openPreview('Cyber Dimension', '⚡', 'Ciudades futuristas con neones y tecnología punta a tu alcance.')"><div class="card-bg">⚡</div><span class="card-tag">Cyber</span><div class="card-overlay"><div class="card-title">Cyber Dimension</div></div></div>
                     <div class="card" onclick="openPreview('Núcleo Terrestre', '🌋', 'Un descenso extremo hacia las entrañas geológicas del planeta.')"><div class="card-bg">🌋</div><span class="card-tag">Geología</span><div class="card-overlay"><div class="card-title">Núcleo Terrestre</div></div></div>
@@ -883,23 +883,34 @@
             }
         }
 
-        function openPreview(title, icon, desc) {
-            currentProgram = { title, icon, desc };
-            modalTitle.textContent = title;
-            modalImg.innerHTML = icon + '<button class="preview-close" onclick="closePreview()">✕</button>';
-            modalDesc.textContent = desc;
-            updateModalButtonsState();
-            previewModal.classList.add('active');
-        }
+        function openPreview(title, icon, desc, videoUrl) {
+    currentProgram = { title, icon, desc, videoUrl };
+    modalTitle.textContent = title;
+    modalImg.innerHTML = icon + '<button class="preview-close" onclick="closePreview()">&times;</button>';
+    modalDesc.textContent = desc;
+    updateModalButtonsState();
+    previewModal.classList.add('active');
 
-        function closePreview() {
-            previewModal.classList.remove('active');
+    // Preparamos el contenedor multimedia dentro del modal si existe un área de reproducción
+    const mediaContainer = document.getElementById('media-container');
+    if (mediaContainer) {
+        if (videoUrl && (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be'))) {
+            let embedUrl = videoUrl;
+            if (videoUrl.includes('watch?v=')) {
+                embedUrl = videoUrl.replace('watch?v=', 'embed/');
+            } else if (videoUrl.includes('youtu.be/')) {
+                embedUrl = videoUrl.replace('youtu.be/', 'www.youtube.com/embed/');
+            }
+            mediaContainer.innerHTML = `<iframe width="100%" height="100%" src="${embedUrl}?autoplay=1" title="${title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 10px;"></iframe>`;
+        } else if (videoUrl) {
+            mediaContainer.innerHTML = `<video width="100%" height="100%" controls autoplay style="object-fit: cover; border-radius: 10px;"><source src="${videoUrl}" type="video/mp4">Tu navegador no soporta video.</video>`;
         }
+    }
+}
 
-        closeModalBtn.addEventListener('click', closePreview);
-        previewModal.addEventListener('click', (e) => {
-            if (e.target === previewModal) closePreview();
-        });
+function closePreview() {
+    previewModal.classList.remove('active');
+}
 
         // Botón Reproducir desde el Modal
         modalPlayBtn.addEventListener('click', () => {
