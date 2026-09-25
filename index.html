@@ -56,8 +56,6 @@
             border: none;
             outline: none;
             background: transparent;
-            box-shadow: none;
-            filter: none;
         }
 
         .google-login-btn {
@@ -373,24 +371,101 @@
             color: #d8b4fe;
         }
 
-        /* Buscador interactivo */
-        .search-bar-container {
+        /* MODAL DE PREVISIÓN (Detalle al hacer clic en tarjeta) */
+        .preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .preview-modal.active {
+            display: flex;
+        }
+
+        .preview-content {
+            background: #151022;
+            width: 100%;
+            max-width: 550px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            position: relative;
+            animation: modalPop 0.3s ease;
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .preview-header-img {
+            width: 100%;
+            height: 240px;
+            background: linear-gradient(135deg, #2b1055, #a855f7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: relative;
+        }
+
+        .preview-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-body {
+            padding: 20px;
+        }
+
+        .preview-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .preview-desc {
+            font-size: 0.9rem;
+            color: #b8b2cb;
+            line-height: 1.5;
             margin-bottom: 25px;
         }
 
-        .search-input {
-            width: 100%;
-            padding: 14px 20px;
-            border-radius: 10px;
-            background-color: #1a1528;
-            border: 1px solid rgba(255,255,255,0.15);
-            color: white;
-            font-size: 1rem;
-            outline: none;
+        .preview-actions {
+            display: flex;
+            gap: 12px;
         }
 
-        .search-input:focus {
-            border-color: #a855f7;
+        .preview-actions .btn {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         /* Reproductor de Video Fullscreen / VR */
@@ -436,7 +511,7 @@
     <div class="welcome-screen" id="welcomeScreen">
         <div class="welcome-logo-container">
             <video class="welcome-logo-video" autoplay muted loop playsinline>
-                <source src="ms3media/ms3logo.mp4.mp4" type="video/mp4">
+                <source src="logo-video.mp4" type="video/mp4">
                 Tu navegador no soporta videos.
             </video>
         </div>
@@ -472,7 +547,7 @@
             <button class="nav-item" data-target="tabBusqueda">Búsqueda</button>
         </div>
 
-        <!-- VISTA 1: INICIO (Con 15+ elementos en cada carrusel) -->
+        <!-- VISTA 1: INICIO -->
         <div class="content-section active" id="tabInicio">
             <div class="section-title">Destacado</div>
             <div class="hero-banner">
@@ -481,164 +556,108 @@
                 <div class="hero-details">
                     <h2>MS3 LIVE: EL CONCIERTO DEL SIGLO</h2>
                     <div class="hero-buttons">
-                        <button class="btn btn-primary" id="watchNowBtn">VER AHORA</button>
-                        <button class="btn btn-secondary" onclick="alert('Evento exclusivo transmitido en 360 grados con audio espacial.')">INFO</button>
+                        <button class="btn btn-primary" onclick="openPlayer()">VER AHORA</button>
+                        <button class="btn btn-secondary" onclick="openPreview('MS3 LIVE: EL CONCIERTO DEL SIGLO', '🚀', 'Disfruta de este concierto único transmitido con audio espacial y cámaras de 360 grados directamente desde el escenario principal.')">INFO</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Carrusel 1: Tendencias Ahora (15 elementos) -->
+            <!-- Carrusel 1: Tendencias Ahora -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Tendencias Ahora</div></div>
                 <div class="cards-slider">
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🌌</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Código VR: Investigación</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🪐</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Planeta 360</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🎬</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">El Estudio Central</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔮</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Realidades Paralelas</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">⚡</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Cyber Pulse</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🚁</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Vuelo Cenital</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">💡</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Neón Sessions</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🌊</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Abismo Azul</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔥</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Fuego Vivo</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">💎</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Cristal Inmersivo</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🧬</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Mutación Genética</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🎭</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Teatro 360</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🚀</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Ares Base</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🎯</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Blanco Móvil</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🌀</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Vortex Total</div></div></div>
+                    <div class="card" onclick="openPreview('Código VR: Investigación', '🌌', 'Una inmersión profunda en los secretos de la realidad virtual y los entornos interactivos del futuro.')">
+                        <div class="card-bg">🌌</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Código VR: Investigación</div></div>
+                    </div>
+                    <div class="card" onclick="openPreview('Planeta 360', '🪐', 'Explora los paisajes más exóticos y lejanos capturados en resolución total de 360 grados.')">
+                        <div class="card-bg">🪐</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Planeta 360</div></div>
+                    </div>
+                    <div class="card" onclick="openPreview('El Estudio Central', '🎬', 'Detrás de escena de las producciones más ambiciosas de la cadena MS3.')">
+                        <div class="card-bg">🎬</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">El Estudio Central</div></div>
+                    </div>
+                    <div class="card" onclick="openPreview('Realidades Paralelas', '🔮', 'Un viaje psicodélico y visual a través de dimensiones generadas por ordenador.')">
+                        <div class="card-bg">🔮</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Realidades Paralelas</div></div>
+                    </div>
+                    <div class="card" onclick="openPreview('Cyber Pulse', '⚡', 'La música electrónica y los efectos visuales más vibrantes en un formato inmersivo único.')">
+                        <div class="card-bg">⚡</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Cyber Pulse</div></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Carrusel 2: Programas VR (15 elementos) -->
+            <!-- Carrusel 2: Programas VR -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Programas VR</div></div>
                 <div class="cards-slider">
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🚀</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Viaje Intergaláctico</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🌊</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Océanos Profundos 360</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">⚡</div><span class="card-tag">Cyber</span><div class="card-overlay"><div class="card-title">Cyber Dimension</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🌋</div><span class="card-tag">Geología</span><div class="card-overlay"><div class="card-title">Núcleo Terrestre</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🛰️</div><span class="card-tag">Espacio</span><div class="card-overlay"><div class="card-title">Estación Orbital</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🦖</div><span class="card-tag">Historia</span><div class="card-overlay"><div class="card-title">Era Jurásica VR</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔬</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Microcosmos</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🏙️</div><span class="card-tag">Urbano</span><div class="card-overlay"><div class="card-title">Metrópolis 2100</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🌲</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Bosque Ancestral</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🏎️</div><span class="card-tag">Deporte</span><div class="card-overlay"><div class="card-title">Fórmula Extrema VR</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🎨</div><span class="card-tag">Arte</span><div class="card-overlay"><div class="card-title">Galería Abstracta</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🏰</div><span class="card-tag">Historia</span><div class="card-overlay"><div class="card-title">Castillos Medievales</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🛡️</div><span class="card-tag">Acción</span><div class="card-overlay"><div class="card-title">Defensas Quánticas</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🧪</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Laboratorio Secreto</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔮</div><span class="card-tag">Místico</span><div class="card-overlay"><div class="card-title">Oráculo Virtual</div></div></div>
+                    <div class="card" onclick="openPreview('Viaje Intergaláctico', '🚀', 'Surca la galaxia a velocidad warp en una experiencia interactiva espacial sin precedentes.')">
+                        <div class="card-bg">🚀</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Viaje Intergaláctico</div></div>
+                    </div>
+                    <div class="card" onclick="openPreview('Océanos Profundos 360', '🌊', 'Sumérgete junto a la fauna marina más imponente en las profundidades del océano.')">
+                        <div class="card-bg">🌊</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Océanos Profundos 360</div></div>
+                    </div>
+                    <div class="card" onclick="openPreview('Cyber Dimension', '⚡', 'Ciudades futuristas con neones y tecnología punta al alcance de tu mano.')">
+                        <div class="card-bg">⚡</div><span class="card-tag">Cyber</span><div class="card-overlay"><div class="card-title">Cyber Dimension</div></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Carrusel 3: Directos (15 elementos) -->
+            <!-- Carrusel 3: Directos -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Directos</div></div>
                 <div class="cards-slider">
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Estudio Principal Live</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Concierto Inmersivo Streaming</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Noticias MS3 Global</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Debate Tecnológico VR</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Sunset Session Live</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Gaming Arena Inmersivo</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Masterclass de Arte Digital</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Cocktail Lounge Virtual</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Entrevistas Exclusivas MS3</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Festival de Cine 360</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Pasarela de Moda XR</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Stand Up Comedy Inmersivo</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Quantum Talks Live</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Yoga y Meditación 360</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Cierre de Transmisión Diario</div></div></div>
+                    <div class="card" onclick="openPreview('Estudio Principal Live', '🔴', 'Transmisión en directo desde el set principal con interacción en tiempo real.')">
+                        <div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Estudio Principal Live</div></div>
+                    </div>
+                    <div class="card" onclick="openPreview('Concierto Inmersivo Streaming', '🔴', 'Música en directo optimizada para cascos y pantallas envolventes.')">
+                        <div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Concierto Inmersivo Streaming</div></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Carrusel 4: Mi Lista (15 elementos) -->
+            <!-- Carrusel 4: Mi Lista -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Mi Lista</div></div>
-                <div class="cards-slider">
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">✨</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Magia Inmersiva</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">⭐</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Favorito Estelar</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">📌</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Documental Pendiente</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">💡</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Ideas Creativas 360</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🎵</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Concierto Acústico VR</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">⚡</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Especial de Efectos</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🌊</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Relajación Submarina</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🚀</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Lanzamiento Cohete</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🏆</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Premios MS3 2026</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🔥</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Top Recientes</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🎭</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Obra Teatral Rouge</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🕶️</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Demo WebXR Pro</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🎨</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Diseño de Modos</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">🍀</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Paisajes Irlandeses</div></div></div>
-                    <div class="card" onclick="openPlayer()"><div class="card-bg">💖</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Especiales del Mes</div></div></div>
+                <div class="cards-slider" id="homeMyListSlider">
+                    <!-- Elementos agregados dinámicamente aparecerán aquí -->
+                    <div class="card" onclick="openPreview('Magia Inmersiva', '✨', 'Tu contenido guardado favorito listo para reproducir cuando quieras.')">
+                        <div class="card-bg">✨</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Magia Inmersiva</div></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- VISTA 2: PROGRAMAS VR (Cuadrícula completa con 15+ elementos) -->
+        <!-- VISTA 2: PROGRAMAS VR -->
         <div class="content-section" id="tabProgramas">
             <div class="section-title">Catálogo Completo de Programas VR</div>
             <div class="cards-grid">
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🚀</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Viaje Intergaláctico</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🌊</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Océanos Profundos 360</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">⚡</div><span class="card-tag">Cyber</span><div class="card-overlay"><div class="card-title">Cyber Dimension</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🌋</div><span class="card-tag">Geología</span><div class="card-overlay"><div class="card-title">Núcleo Terrestre</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🛰️</div><span class="card-tag">Espacio</span><div class="card-overlay"><div class="card-title">Estación Orbital</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🦖</div><span class="card-tag">Historia</span><div class="card-overlay"><div class="card-title">Era Jurásica VR</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🔬</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Microcosmos</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🏙️</div><span class="card-tag">Urbano</span><div class="card-overlay"><div class="card-title">Metrópolis 2100</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🌲</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Bosque Ancestral</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🏎️</div><span class="card-tag">Deporte</span><div class="card-overlay"><div class="card-title">Fórmula Extrema VR</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🎨</div><span class="card-tag">Arte</span><div class="card-overlay"><div class="card-title">Galería Abstracta</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🏰</div><span class="card-tag">Historia</span><div class="card-overlay"><div class="card-title">Castillos Medievales</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🛡️</div><span class="card-tag">Acción</span><div class="card-overlay"><div class="card-title">Defensas Quánticas</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🧪</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Laboratorio Secreto</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🔮</div><span class="card-tag">Místico</span><div class="card-overlay"><div class="card-title">Oráculo Virtual</div></div></div>
+                <div class="card" onclick="openPreview('Viaje Intergaláctico', '🚀', 'Surca la galaxia a velocidad warp en una experiencia interactiva espacial sin precedentes.')">
+                    <div class="card-bg">🚀</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Viaje Intergaláctico</div></div>
+                </div>
+                <div class="card" onclick="openPreview('Océanos Profundos 360', '🌊', 'Sumérgete junto a la fauna marina más imponente en las profundidades del océano.')">
+                    <div class="card-bg">🌊</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Océanos Profundos 360</div></div>
+                </div>
+                <div class="card" onclick="openPreview('Cyber Dimension', '⚡', 'Ciudades futuristas con neones y tecnología punta al alcance de tu mano.')">
+                    <div class="card-bg">⚡</div><span class="card-tag">Cyber</span><div class="card-overlay"><div class="card-title">Cyber Dimension</div></div>
+                </div>
             </div>
         </div>
 
-        <!-- VISTA 3: DIRECTOS (Cuadrícula completa con 15+ elementos) -->
+        <!-- VISTA 3: DIRECTOS -->
         <div class="content-section" id="tabDirectos">
             <div class="section-title">Transmisiones en Vivo 360°</div>
             <div class="cards-grid">
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Estudio Principal Live</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Concierto Inmersivo Streaming</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Noticias MS3 Global</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Debate Tecnológico VR</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Sunset Session Live</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Gaming Arena Inmersivo</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Masterclass de Arte Digital</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Cocktail Lounge Virtual</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Entrevistas Exclusivas MS3</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Festival de Cine 360</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Pasarela de Moda XR</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Stand Up Comedy Inmersivo</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Quantum Talks Live</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Yoga y Meditación 360</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Cierre de Transmisión Diario</div></div></div>
+                <div class="card" onclick="openPreview('Estudio Principal Live', '🔴', 'Transmisión en directo desde el set principal con interacción en tiempo real.')">
+                    <div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Estudio Principal Live</div></div>
+                </div>
             </div>
         </div>
 
-        <!-- VISTA 4: MI LISTA (Cuadrícula completa con 15+ elementos) -->
+        <!-- VISTA 4: MI LISTA -->
         <div class="content-section" id="tabMiLista">
-            <div class="section-title">Tus Videos Guardados</div>
-            <div class="cards-grid">
-                <div class="card" onclick="openPlayer()"><div class="card-bg">✨</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Magia Inmersiva</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">⭐</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Favorito Estelar</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">📌</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Documental Pendiente</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">💡</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Ideas Creativas 360</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🎵</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Concierto Acústico VR</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">⚡</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Especial de Efectos</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🌊</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Relajación Submarina</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🚀</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Lanzamiento Cohete</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🏆</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Premios MS3 2026</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🔥</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Top Recientes</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🎭</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Obra Teatral Rouge</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🕶️</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Demo WebXR Pro</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🎨</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Diseño de Modos</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">🍀</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Paisajes Irlandeses</div></div></div>
-                <div class="card" onclick="openPlayer()"><div class="card-bg">💖</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Especiales del Mes</div></div></div>
+            <div class="section-title">Tus Videos Guardados en el Perfil</div>
+            <div class="cards-grid" id="gridMyList">
+                <div class="card" onclick="openPreview('Magia Inmersiva', '✨', 'Tu contenido guardado favorito listo para reproducir cuando quieras.')">
+                    <div class="card-bg">✨</div><span class="card-tag">Guardado</span><div class="card-overlay"><div class="card-title">Magia Inmersiva</div></div>
+                </div>
             </div>
         </div>
 
@@ -649,26 +668,41 @@
             </div>
             <div class="section-title">Resultados Populares</div>
             <div class="cards-grid">
-                <div class="card" onclick="openPlayer()">
-                    <div class="card-bg">🌍</div>
-                    <span class="card-tag">360°</span>
-                    <div class="card-overlay"><div class="card-title">Global 360 News</div></div>
+                <div class="card" onclick="openPreview('Global 360 News', '🌍', 'Noticias internacionales cubiertas en formato inmersivo de 360 grados.')">
+                    <div class="card-bg">🌍</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Global 360 News</div></div>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <!-- Reproductor Multimedia -->
+    <!-- MODAL DE PREVISUALIZACIÓN (Miniatura, Descripción, Botones) -->
+    <div class="preview-modal" id="previewModal">
+        <div class="preview-content">
+            <div class="preview-header-img" id="modalImg">
+                🚀
+                <button class="preview-close" id="closeModalBtn">✕</button>
+            </div>
+            <div class="preview-body">
+                <div class="preview-title" id="modalTitle">Título del Programa</div>
+                <div class="preview-desc" id="modalDesc">Descripción detallada del contenido audiovisual inmersivo...</div>
+                <div class="preview-actions">
+                    <button class="btn btn-primary" id="modalPlayBtn">▶ Reproducir</button>
+                    <button class="btn btn-secondary" id="modalAddListBtn">+ Agregar a mi lista</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reproductor Multimedia Fullscreen / VR -->
     <div class="player-fullscreen-container" id="playerContainer">
         <video id="mainVideo" crossorigin="anonymous">
             <source src="tu-video-360.mp4" type="video/mp4">
-            <track src="subtitulos.vtt" kind="subtitles" srclang="es" label="Español">
             Tu navegador no soporta el formato de video.
         </video>
         <div class="player-controls" id="playerControls">
             <div class="control-top">
-                <button class="close-btn" id="closeBtn">✕</button>
+                <button class="close-btn" id="closePlayerBtn">✕</button>
             </div>
             <div class="control-bottom">
                 <button class="control-btn" id="playPauseBtn">Pausar</button>
@@ -679,15 +713,15 @@
     </div>
 
     <script>
+        // Transición de Bienvenida
         const welcomeScreen = document.getElementById('welcomeScreen');
         const appContainer = document.getElementById('appContainer');
-        const googleLoginBtn = document.getElementById('googleLoginBtn');
-
-        googleLoginBtn.addEventListener('click', () => {
+        document.getElementById('googleLoginBtn').addEventListener('click', () => {
             welcomeScreen.classList.add('hidden');
             appContainer.classList.add('active');
         });
 
+        // Navegación de Pestañas
         const navItems = document.querySelectorAll('.sub-nav .nav-item');
         const contentSections = document.querySelectorAll('.content-section');
 
@@ -697,8 +731,7 @@
                 contentSections.forEach(section => section.classList.remove('active'));
 
                 item.classList.add('active');
-                const targetId = item.getAttribute('data-target');
-                document.getElementById(targetId).classList.add('active');
+                document.getElementById(item.getAttribute('data-target')).classList.add('active');
             });
         });
 
@@ -716,10 +749,70 @@
             alert('Panel de Ajustes de la plataforma abierto.');
         });
 
-        const watchNowBtn = document.getElementById('watchNowBtn');
+        // Lógica del Modal de Previsualización
+        const previewModal = document.getElementById('previewModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalImg = document.getElementById('modalImg');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalPlayBtn = document.getElementById('modalPlayBtn');
+        const modalAddListBtn = document.getElementById('modalAddListBtn');
+
+        let currentProgram = { title: '', icon: '', desc: '' };
+
+        function openPreview(title, icon, desc) {
+            currentProgram = { title, icon, desc };
+            modalTitle.textContent = title;
+            modalImg.firstChild.nodeValue = ''; // limpiar texto plano previo si lo hay
+            modalImg.innerHTML = icon + '<button class="preview-close" onclick="closePreview()">✕</button>';
+            modalDesc.textContent = desc;
+            previewModal.classList.add('active');
+        }
+
+        function closePreview() {
+            previewModal.classList.remove('active');
+        }
+
+        closeModalBtn.addEventListener('click', closePreview);
+        previewModal.addEventListener('click', (e) => {
+            if (e.target === previewModal) closePreview();
+        });
+
+        // Botón Reproducir desde el Modal
+        modalPlayBtn.addEventListener('click', () => {
+            closePreview();
+            openPlayer();
+        });
+
+        // Botón Agregar a mi lista (Automático a Perfil Personalizado)
+        modalAddListBtn.addEventListener('click', () => {
+            // Verificar si ya está en la lista para evitar duplicados visuales
+            const gridMyList = document.getElementById('gridMyList');
+            
+            const newCard = document.createElement('div');
+            newCard.className = 'card';
+            newCard.setAttribute('onclick', `openPreview('${currentProgram.title}', '${currentProgram.icon}', '${currentProgram.desc}')`);
+            newCard.innerHTML = `
+                <div class="card-bg">${currentProgram.icon}</div>
+                <span class="card-tag">Guardado</span>
+                <div class="card-overlay"><div class="card-title">${currentProgram.title}</div></div>
+            `;
+            gridMyList.appendChild(newCard);
+
+            alert(`¡"${currentProgram.title}" se agregó exitosamente a tu lista personalizada!`);
+            closePreview();
+            
+            // Opcionalmente redirigir a la pestaña de Mi Lista para ver el resultado instantáneo
+            navItems.forEach(nav => nav.classList.remove('active'));
+            contentSections.forEach(section => section.classList.remove('active'));
+            document.querySelector('[data-target="tabMiLista"]').classList.add('active');
+            document.getElementById('tabMiLista').classList.add('active');
+        });
+
+        // Reproductor Multimedia Fullscreen / VR
         const playerContainer = document.getElementById('playerContainer');
         const mainVideo = document.getElementById('mainVideo');
-        const closeBtn = document.getElementById('closeBtn');
+        const closePlayerBtn = document.getElementById('closePlayerBtn');
         const playerControls = document.getElementById('playerControls');
         const playPauseBtn = document.getElementById('playPauseBtn');
         const subtitlesBtn = document.getElementById('subtitlesBtn');
@@ -733,9 +826,7 @@
             }
         }
 
-        watchNowBtn.addEventListener('click', openPlayer);
-
-        closeBtn.addEventListener('click', () => {
+        closePlayerBtn.addEventListener('click', () => {
             mainVideo.pause();
             mainVideo.currentTime = 0;
             playerContainer.classList.remove('active', 'vr-split');
