@@ -574,7 +574,7 @@
             gap: 8px;
         }
 
-        /* Reproductor Propio 360° VR nativo */
+        /* Reproductor Propio 360° VR nativo con archivo local */
         .player-fullscreen-container {
             position: fixed;
             top: 0;
@@ -676,7 +676,7 @@
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Tendencias Ahora</div></div>
                 <div class="cards-slider">
-                    <!-- Tarjeta "Buscando a la futura vedette" con archivo local 360 -->
+                    <!-- Tarjeta "Buscando a la futura vedette" con vedettehorizontal.png y reproductor local 360 -->
                     <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° propia grabada con Gear 360. Arrastra con el mouse o mueve tu celular con total libertad de movimiento.', 'ms3media/vedette360_web.mp4')">
                         <div class="card-bg" style="background-image: url('ms3media/vedettehorizontal.png');"></div>
                         <span class="card-tag">360° Pro</span>
@@ -745,7 +745,7 @@
         </div>
     </div>
 
-    <!-- Visor Esférico Propio 360° / VR nativo -->
+    <!-- Visor Esférico Propio 360° (Nativo sin interfaz de YouTube) -->
     <div class="player-fullscreen-container" id="playerContainer">
         <div id="panorama"></div>
         <div class="player-controls" id="playerControls">
@@ -785,22 +785,17 @@
 
         document.addEventListener('DOMContentLoaded', renderMyList);
 
-     // Transición de Bienvenida segura
-        window.addEventListener('load', () => {
-            const welcomeScreen = document.getElementById('welcomeScreen');
-            const appContainer = document.getElementById('appContainer');
-            const enterBtn = document.getElementById('enterBtn');
-            
-            if (enterBtn) {
-                enterBtn.addEventListener('click', () => {
-                    if (welcomeScreen) welcomeScreen.classList.add('fade-out-elegant');
-                    if (appContainer) appContainer.classList.add('active');
-                    setTimeout(() => {
-                        if (welcomeScreen) welcomeScreen.style.display = 'none';
-                    }, 1200);
-                });
-            }
+        // Transición de Bienvenida
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const appContainer = document.getElementById('appContainer');
+        document.getElementById('enterBtn').addEventListener('click', () => {
+            welcomeScreen.classList.add('fade-out-elegant');
+            appContainer.classList.add('active');
+            setTimeout(() => {
+                welcomeScreen.style.display = 'none';
+            }, 1200);
         });
+
         // Pestañas
         const navItems = document.querySelectorAll('.sub-nav .nav-item');
         const contentSections = document.querySelectorAll('.content-section');
@@ -873,59 +868,39 @@
             closePreview();
         });
 
-        // Visor Propio 360° / VR nativo con soporte optimizado para .mp4 local y autoplay seguro
+        // Visor Propio 360° / VR nativo configurado con tu archivo local (.mp4)
         const playerContainer = document.getElementById('playerContainer');
         const closePlayerBtn = document.getElementById('closePlayerBtn');
         const playerControls = document.getElementById('playerControls');
         const gyroBtn = document.getElementById('gyroBtn');
         let viewerInstance = null;
 
-       function openPlayer(videoUrl) {
+        function openPlayer(videoUrl) {
             playerContainer.classList.add('active');
             if (playerContainer.requestFullscreen) {
                 playerContainer.requestFullscreen().catch(() => {});
             }
 
-            const panoramaDiv = document.getElementById('panorama');
-            // Limpiamos cualquier instancia anterior de Pannellum para que no salte el cartel de error
-            panoramaDiv.innerHTML = ''; 
-
-            let isLocalVideo = videoUrl && (videoUrl.includes('.mp4') || videoUrl.includes('ms3media/'));
-
-            if (isLocalVideo) {
-                // Reproductor nativo fluido para celular y PC
-                panoramaDiv.innerHTML = `
-                    <video src="${videoUrl}" controls autoplay playsinline loop style="width:100%; height:100%; object-fit:contain; background:#000;"></video>
-                `;
-            } else {
-                panoramaDiv.innerHTML = `<iframe src="${videoUrl}" style="width:100%; height:100%; border:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-            }
-        }
             setTimeout(() => {
                 if (viewerInstance) {
                     viewerInstance.destroy();
                 }
                 
+                // Si es un enlace de YouTube usa tipo iframe/embed, si es archivo local usa tipo video esférico equirectangular
                 let isLocalVideo = videoUrl && videoUrl.includes('.mp4');
 
                 if (isLocalVideo) {
-                    // Configuración nativa corregida para archivos de video local en Pannellum
                     viewerInstance = pannellum.viewer('panorama', {
                         "type": "equirectangular",
-                        "panorama": videoUrl,
                         "video": [videoUrl],
                         "autoLoad": true,
                         "autoplay": true,
                         "loop": true,
-                        "muted": true,
                         "compass": true,
                         "hfov": 100
                     });
                 } else {
-                    document.getElementById('panorama').innerHTML = `<iframe src="${videoUrl}" style="width:100%; height:100%; border:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-                }
-            }, 200);
-        }
+                    // Fallback para enlaces web externos
                     document.getElementById('panorama').innerHTML = `<iframe src="${videoUrl}" style="width:100%; height:100%; border:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
                 }
             }, 200);
