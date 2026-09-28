@@ -886,6 +886,26 @@
                     viewerInstance.destroy();
                 }
                 
+                // Forzamos la ruta exacta de tu video si no viene especificada correctamente
+                const finalSource = (videoSource && !videoSource.includes('youtu')) ? videoSource : 'ms3media/vedette360_web.mp4';
+
+                viewerInstance = pannellum.viewer('panorama', {
+                    "type": "video",
+                    "sources": [finalSource],
+                    "autoLoad": true,
+                    "autoplay": true,
+                    "loop": true,
+                    "compass": true,
+                    "hfov": 100
+                });
+            }, 200);
+        }
+
+            setTimeout(() => {
+                if (viewerInstance) {
+                    viewerInstance.destroy();
+                }
+                
                 // Si la fuente es un link de YouTube o externo, manejamos fallback; si es tu archivo local mp4, usa type: video
                 if (videoSource.includes('youtu')) {
                     viewerInstance = pannellum.viewer('panorama', {
