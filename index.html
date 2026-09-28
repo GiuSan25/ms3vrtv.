@@ -19,7 +19,7 @@
             overflow-x: hidden;
         }
 
-        /* Pantalla de Bienvenida - Fondo Neón Tridimensional 3D */
+        /* Pantalla de Bienvenida - Fondo Neón Tridimensional 3D con figuras flotantes */
         .welcome-screen {
             position: fixed;
             top: 0;
@@ -27,12 +27,8 @@
             width: 100vw;
             height: 100vh;
             background: #000000;
-            background-image: 
-                radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.15) 0%, transparent 60%),
-                linear-gradient(rgba(255, 42, 109, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
-            background-size: 100% 100%, 40px 40px, 40px 40px;
-            perspective: 1000px;
+            perspective: 1200px;
+            overflow: hidden;
             z-index: 99999;
             display: flex;
             flex-direction: column;
@@ -47,20 +43,65 @@
             visibility: hidden;
         }
 
+        /* Contenedor de figuras geométricas tridimensionales espejadas flotantes */
+        .geometric-bg-3d {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            transform-style: preserve-3d;
+        }
+
+        .geo-shape {
+            position: absolute;
+            background: linear-gradient(135deg, rgba(255, 42, 109, 0.15), rgba(0, 243, 255, 0.15));
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2), inset 0 0 15px rgba(255, 42, 109, 0.2);
+            backdrop-filter: blur(2px);
+            animation: floatAndSpin 12s infinite linear;
+        }
+
+        /* Diferentes formas geométricas y tiempos de animación */
+        .shape-1 { width: 80px; height: 80px; top: 15%; left: 10%; border-radius: 12px; animation-duration: 15s; }
+        .shape-2 { width: 100px; height: 60px; top: 70%; left: 15%; clip-path: polygon(50% 0%, 100% 100%, 0% 100%); animation-duration: 18s; animation-direction: reverse; }
+        .shape-3 { width: 70px; height: 70px; top: 20%; right: 12%; border-radius: 50%; animation-duration: 14s; }
+        .shape-4 { width: 120px; height: 120px; bottom: 15%; right: 18%; transform: rotate(45deg); animation-duration: 20s; }
+        .shape-5 { width: 90px; height: 90px; top: 45%; left: 5%; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); animation-duration: 16s; }
+        .shape-6 { width: 110px; height: 110px; top: 35% right: 8%; border-radius: 20px; animation-duration: 22s; animation-direction: reverse; }
+
+        @keyframes floatAndSpin {
+            0% {
+                transform: translateZ(-200px) rotateX(0deg) rotateY(0deg) translateY(0px);
+                opacity: 0.2;
+            }
+            50% {
+                transform: translateZ(100px) rotateX(180deg) rotateY(180deg) translateY(-30px);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateZ(-200px) rotateX(360deg) rotateY(360deg) translateY(0px);
+                opacity: 0.2;
+            }
+        }
+
         .welcome-logo-container {
             position: relative;
             margin-bottom: 35px;
             text-align: center;
             width: 550px;
             max-width: 90vw;
+            z-index: 2;
             transform: translateZ(50px);
-            filter: drop-shadow(0 0 25px rgba(255, 42, 109, 0.4));
-            animation: float3D 4s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 30px rgba(0, 243, 255, 0.4));
+            animation: floatLogo 4s ease-in-out infinite alternate;
         }
 
-        @keyframes float3D {
+        @keyframes floatLogo {
             0% { transform: translateY(0px) rotateX(0deg); }
-            100% { transform: translateY(-10px) rotateX(5deg); }
+            100% { transform: translateY(-8px) rotateX(3deg); }
         }
 
         .welcome-logo-video {
@@ -87,7 +128,7 @@
             box-shadow: 0 0 25px rgba(0, 243, 255, 0.4), 0 0 50px rgba(255, 42, 109, 0.2);
             transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
             position: relative;
-            z-index: 10;
+            z-index: 2;
         }
 
         .google-login-btn:hover {
@@ -517,7 +558,7 @@
             gap: 8px;
         }
 
-        /* Reproductor de Video Fullscreen / VR (Soporta Iframe de YouTube y modo VR estéreo) */
+        /* Reproductor de Video Fullscreen / VR */
         .player-fullscreen-container {
             position: fixed;
             top: 0;
@@ -546,7 +587,6 @@
             border: none;
         }
 
-        /* Modo VR Estéreo Split Screen (Dos vistas divididas para visores VR) */
         .vr-split .player-frame-wrapper {
             display: flex;
             width: 100%;
@@ -580,8 +620,18 @@
 </head>
 <body>
 
-    <!-- Pantalla de Bienvenida con Efectos Neón Tridimensionales -->
+    <!-- Pantalla de Bienvenida con Figuras Tridimensionales Espejadas Flotantes -->
     <div class="welcome-screen" id="welcomeScreen">
+        <!-- Fondo 3D con figuras geométricas flotantes y giratorias -->
+        <div class="geometric-bg-3d">
+            <div class="geo-shape shape-1"></div>
+            <div class="geo-shape shape-2"></div>
+            <div class="geo-shape shape-3"></div>
+            <div class="geo-shape shape-4"></div>
+            <div class="geo-shape shape-5"></div>
+            <div class="geo-shape shape-6"></div>
+        </div>
+
         <div class="welcome-logo-container">
             <video class="welcome-logo-video" autoplay muted loop playsinline>
                 <source src="ms3media/ms3logo.mp4.mp4" type="video/mp4">
@@ -699,11 +749,9 @@
         </div>
     </div>
 
-    <!-- Reproductor Multimedia Fullscreen / VR (Realidad Virtual Estéreo) -->
+    <!-- Reproductor Multimedia Fullscreen / VR -->
     <div class="player-fullscreen-container" id="playerContainer">
-        <div class="player-frame-wrapper" id="playerFrameWrapper">
-            <!-- El iframe del reproductor VR se inyecta dinámicamente aquí -->
-        </div>
+        <div class="player-frame-wrapper" id="playerFrameWrapper"></div>
         <div class="player-controls" id="playerControls">
             <div class="control-top">
                 <button class="close-btn" id="closePlayerBtn">✕</button>
@@ -785,7 +833,6 @@
             modalImg.innerHTML = icon + '<button class="preview-close" onclick="closePreview()">✕</button>';
             modalDesc.textContent = desc;
             
-            // Comprobación de estado en lista
             if (myList.some(item => item.title === title)) {
                 modalAddListBtn.textContent = "✓ En mi lista (Eliminar)";
                 modalAddListBtn.className = "btn btn-danger";
@@ -834,7 +881,6 @@
                 }
             }
 
-            // Para simular Realidad Virtual (VR Estéreo), generamos doble iframe idéntico lado a lado
             playerFrameWrapper.innerHTML = `
                 <iframe src="${embedUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 <iframe src="${embedUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display:none;" id="vrSecondFrame"></iframe>
