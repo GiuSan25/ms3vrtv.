@@ -889,17 +889,23 @@
                 let isLocalVideo = videoUrl && videoUrl.includes('.mp4');
 
                 if (isLocalVideo) {
+                    // Configuración nativa corregida para archivos de video local en Pannellum
                     viewerInstance = pannellum.viewer('panorama', {
                         "type": "equirectangular",
+                        "panorama": videoUrl,
                         "video": [videoUrl],
                         "autoLoad": true,
                         "autoplay": true,
                         "loop": true,
-                        "muted": true, // Soluciona bloqueos de reproducción automática en navegadores
+                        "muted": true,
                         "compass": true,
                         "hfov": 100
                     });
                 } else {
+                    document.getElementById('panorama').innerHTML = `<iframe src="${videoUrl}" style="width:100%; height:100%; border:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+                }
+            }, 200);
+        }
                     document.getElementById('panorama').innerHTML = `<iframe src="${videoUrl}" style="width:100%; height:100%; border:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
                 }
             }, 200);
