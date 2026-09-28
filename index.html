@@ -681,7 +681,6 @@
                         <div class="card-bg" style="background-image: url('ms3media/vedettehorizontal.png');"></div>
                         <span class="card-tag">360° Pro</span>
                         <div class="card-overlay"><div class="card-title">Buscando a la futura vedette</div></div>
-                        <button class="btn btn-primary" onclick="openPlayer('ms3media/vedette360_web')">▶ REPRODUCIR</button>
                     </div>
                     <div class="card" onclick="openPreview('Planeta 360', '🪐', 'Explora los paisajes más exóticos y lejanos capturados en resolución total de 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🪐</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Planeta 360</div></div></div>
                     <div class="card" onclick="openPreview('El Estudio Central', '🎬', 'Detrás de escena de las producciones más ambiciosas de la cadena MS3.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🎬</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">El Estudio Central</div></div></div>
@@ -854,10 +853,9 @@
         }
 
         modalPlayBtn.addEventListener('click', () => {
-    closePreview();
-    // Aquí le indicamos que abra directamente tu video local en 360°
-    openPlayer('ms3media/vedette360_web.mp4');
-});
+            closePreview();
+            openPlayer(currentProgram.url);
+        });
 
         modalAddListBtn.addEventListener('click', () => {
             const existsIndex = myList.findIndex(item => item.title === currentProgram.title);
