@@ -19,7 +19,7 @@
             overflow-x: hidden;
         }
 
-        /* Pantalla de Bienvenida - Fondo Neón con Pantallas 3D Flotantes */
+        /* Pantalla de Bienvenida - Fondo Neón con Pantallas 3D Flotantes y Efecto Esfera */
         .welcome-screen {
             position: fixed;
             top: 0;
@@ -35,12 +35,14 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+            transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.8s ease;
         }
 
-        .welcome-screen.hidden {
+        /* Animación de ingreso a esfera tridimensional */
+        .welcome-screen.sphere-entering {
+            transform: scale(0) rotate(360deg);
+            border-radius: 50%;
             opacity: 0;
-            visibility: hidden;
         }
 
         /* Video de bienvenida ubicado en el fondo estricto */
@@ -78,7 +80,6 @@
             transform-style: preserve-3d;
         }
 
-        /* Estilo de pantallas de TV futuristas flotantes (sin imágenes, marcos translúcidos de neón) */
         .tv-screen-3d {
             position: absolute;
             background: rgba(10, 5, 20, 0.45);
@@ -89,7 +90,6 @@
             animation: floatScreens 16s infinite linear;
         }
 
-        /* Línea simulada de interfaz de programa en la pantalla */
         .tv-screen-3d::after {
             content: '';
             position: absolute;
@@ -102,7 +102,6 @@
             box-shadow: 0 0 8px rgba(255, 42, 109, 0.8);
         }
 
-        /* Posiciones y tamaños de las múltiples pantallas en órbita tridimensional */
         .screen-1 { width: 140px; height: 90px; top: 15%; left: 8%; animation-duration: 18s; }
         .screen-2 { width: 160px; height: 100px; top: 62%; left: 10%; animation-duration: 22s; animation-direction: reverse; }
         .screen-3 { width: 130px; height: 85px; top: 18%; right: 10%; animation-duration: 15s; }
@@ -125,34 +124,31 @@
             }
         }
 
-        .google-login-btn {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: #ffffff;
-            color: #1f1f1f;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 30px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 0 25px rgba(0, 243, 255, 0.4), 0 0 50px rgba(255, 42, 109, 0.2);
-            transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+        /* Botón Neón INGRESAR */
+        .neon-enter-btn {
             position: absolute;
             bottom: 12vh;
             z-index: 10;
+            background: transparent;
+            color: #00f3ff;
+            border: 2px solid #00f3ff;
+            padding: 16px 40px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            cursor: pointer;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4), inset 0 0 15px rgba(0, 243, 255, 0.2);
+            transition: all 0.3s ease;
         }
 
-        .google-login-btn:hover {
-            background: #f1f1f1;
-            transform: scale(1.05);
-            box-shadow: 0 0 35px rgba(0, 243, 255, 0.8), 0 0 70px rgba(255, 42, 109, 0.4);
-        }
-
-        .google-icon {
-            width: 20px;
-            height: 20px;
+        .neon-enter-btn:hover {
+            background: #00f3ff;
+            color: #000000;
+            box-shadow: 0 0 35px #00f3ff, 0 0 70px rgba(255, 42, 109, 0.6);
+            transform: scale(1.08);
+            text-shadow: none;
         }
 
         /* Contenedor Principal */
@@ -633,7 +629,7 @@
 </head>
 <body>
 
-    <!-- Pantalla de Bienvenida -->
+    <!-- Pantalla de Bienvenida con Efecto Esfera 3D -->
     <div class="welcome-screen" id="welcomeScreen">
         <!-- Video en el fondo -->
         <div class="welcome-logo-container">
@@ -643,7 +639,7 @@
             </video>
         </div>
 
-        <!-- Pantallas virtuales 3D flotando por DELANTE del video en órbita -->
+        <!-- Pantallas virtuales 3D flotando por DELANTE del video -->
         <div class="geometric-bg-3d">
             <div class="tv-screen-3d screen-1"></div>
             <div class="tv-screen-3d screen-2"></div>
@@ -653,15 +649,8 @@
             <div class="tv-screen-3d screen-6"></div>
         </div>
 
-        <button class="google-login-btn" id="googleLoginBtn">
-            <svg class="google-icon" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
-                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.14C3.15 21.32 7.23 24 12 24z"/>
-                <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.62H1.18C.43 8.14 0 9.87 0 12s.43 3.86 1.18 5.38l4.09-3.14z"/>
-                <path fill="#EA4335" d="M12 4.75c1.76 0 3.34.61 4.58 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.15 2.68 1.18 6.62l4.09 3.14c.95-2.85 3.6-4.96 6.73-4.96z"/>
-            </svg>
-            Iniciar sesión con Google
-        </button>
+        <!-- Botón Neón Ingresar -->
+        <button class="neon-enter-btn" id="enterBtn">INGRESAR</button>
     </div>
 
     <!-- Contenedor Principal (App) -->
@@ -804,12 +793,15 @@
 
         document.addEventListener('DOMContentLoaded', renderMyList);
 
-        // Bienvenida Login
+        // Transición de Bienvenida con efecto esfera 3D
         const welcomeScreen = document.getElementById('welcomeScreen');
         const appContainer = document.getElementById('appContainer');
-        document.getElementById('googleLoginBtn').addEventListener('click', () => {
-            welcomeScreen.classList.add('hidden');
-            appContainer.classList.add('active');
+        document.getElementById('enterBtn').addEventListener('click', () => {
+            welcomeScreen.classList.add('sphere-entering');
+            setTimeout(() => {
+                welcomeScreen.style.display = 'none';
+                appContainer.classList.add('active');
+            }, 750);
         });
 
         // Pestañas
