@@ -827,7 +827,7 @@
         let currentProgram = { title: '', icon: '', desc: '', url: '' };
 
         function openPreview(title, icon, desc, videoUrl) {
-            currentProgram = { title, icon, desc, url: videoUrl || 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' };
+            currentProgram = { title: title, icon: icon, desc: desc, url: videoUrl };
             modalTitle.textContent = title;
             modalImg.innerHTML = icon + '<button class="preview-close" onclick="closePreview()">✕</button>';
             if (icon.includes('vedettehorizontal.png')) {
