@@ -785,17 +785,20 @@
 
         document.addEventListener('DOMContentLoaded', renderMyList);
 
-        // Transición de Bienvenida
+     // Transición de Bienvenida
         const welcomeScreen = document.getElementById('welcomeScreen');
         const appContainer = document.getElementById('appContainer');
-        document.getElementById('enterBtn').addEventListener('click', () => {
-            welcomeScreen.classList.add('fade-out-elegant');
-            appContainer.classList.add('active');
-            setTimeout(() => {
-                welcomeScreen.style.display = 'none';
-            }, 1200);
-        });
-
+        const enterBtn = document.getElementById('enterBtn');
+        
+        if (enterBtn && welcomeScreen && appContainer) {
+            enterBtn.addEventListener('click', () => {
+                welcomeScreen.classList.add('fade-out-elegant');
+                appContainer.classList.add('active');
+                setTimeout(() => {
+                    welcomeScreen.style.display = 'none';
+                }, 1200);
+            });
+        }
         // Pestañas
         const navItems = document.querySelectorAll('.sub-nav .nav-item');
         const contentSections = document.querySelectorAll('.content-section');
