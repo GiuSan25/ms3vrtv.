@@ -19,7 +19,7 @@
             overflow-x: hidden;
         }
 
-        /* Pantalla de Bienvenida - Fondo Neón con Pantallas 3D Flotantes y Efecto Esfera */
+        /* Pantalla de Bienvenida - Fondo Neón con Pantallas 3D Flotantes */
         .welcome-screen {
             position: fixed;
             top: 0;
@@ -35,14 +35,15 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.8s ease;
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), filter 1.2s ease;
         }
 
-        /* Animación de ingreso a esfera tridimensional */
-        .welcome-screen.sphere-entering {
-            transform: scale(0) rotate(360deg);
-            border-radius: 50%;
+        /* Transición de desaparición elegante y fluida */
+        .welcome-screen.fade-out-elegant {
             opacity: 0;
+            transform: scale(1.15);
+            filter: blur(10px);
+            pointer-events: none;
         }
 
         /* Video de bienvenida ubicado en el fondo estricto */
@@ -154,10 +155,13 @@
         /* Contenedor Principal */
         .app-container {
             display: none;
+            opacity: 0;
+            transition: opacity 1s ease;
         }
 
         .app-container.active {
             display: block;
+            opacity: 1;
         }
 
         /* Barra Superior */
@@ -629,7 +633,7 @@
 </head>
 <body>
 
-    <!-- Pantalla de Bienvenida con Efecto Esfera 3D -->
+    <!-- Pantalla de Bienvenida con Desaparición Elegante -->
     <div class="welcome-screen" id="welcomeScreen">
         <!-- Video en el fondo -->
         <div class="welcome-logo-container">
@@ -793,15 +797,15 @@
 
         document.addEventListener('DOMContentLoaded', renderMyList);
 
-        // Transición de Bienvenida con efecto esfera 3D
+        // Transición de Bienvenida con desaparición elegante
         const welcomeScreen = document.getElementById('welcomeScreen');
         const appContainer = document.getElementById('appContainer');
         document.getElementById('enterBtn').addEventListener('click', () => {
-            welcomeScreen.classList.add('sphere-entering');
+            welcomeScreen.classList.add('fade-out-elegant');
+            appContainer.classList.add('active');
             setTimeout(() => {
                 welcomeScreen.style.display = 'none';
-                appContainer.classList.add('active');
-            }, 750);
+            }, 1200);
         });
 
         // Pestañas
