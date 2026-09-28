@@ -64,13 +64,12 @@
             animation: floatAndSpin 12s infinite linear;
         }
 
-        /* Diferentes formas geométricas y tiempos de animación */
         .shape-1 { width: 80px; height: 80px; top: 15%; left: 10%; border-radius: 12px; animation-duration: 15s; }
         .shape-2 { width: 100px; height: 60px; top: 70%; left: 15%; clip-path: polygon(50% 0%, 100% 100%, 0% 100%); animation-duration: 18s; animation-direction: reverse; }
         .shape-3 { width: 70px; height: 70px; top: 20%; right: 12%; border-radius: 50%; animation-duration: 14s; }
         .shape-4 { width: 120px; height: 120px; bottom: 15%; right: 18%; transform: rotate(45deg); animation-duration: 20s; }
         .shape-5 { width: 90px; height: 90px; top: 45%; left: 5%; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); animation-duration: 16s; }
-        .shape-6 { width: 110px; height: 110px; top: 35% right: 8%; border-radius: 20px; animation-duration: 22s; animation-direction: reverse; }
+        .shape-6 { width: 110px; height: 110px; top: 35%; right: 8%; border-radius: 20px; animation-duration: 22s; animation-direction: reverse; }
 
         @keyframes floatAndSpin {
             0% {
@@ -95,7 +94,6 @@
             max-width: 90vw;
             z-index: 2;
             transform: translateZ(50px);
-            filter: drop-shadow(0 0 30px rgba(0, 243, 255, 0.4));
             animation: floatLogo 4s ease-in-out infinite alternate;
         }
 
@@ -104,13 +102,15 @@
             100% { transform: translateY(-8px) rotateX(3deg); }
         }
 
+        /* Video de bienvenida totalmente limpio sin bordes ni recuadros */
         .welcome-logo-video {
             width: 100%;
             height: auto;
             object-fit: contain;
-            border: none;
-            outline: none;
-            background: transparent;
+            border: none !important;
+            outline: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
         }
 
         .google-login-btn {
@@ -622,7 +622,6 @@
 
     <!-- Pantalla de Bienvenida con Figuras Tridimensionales Espejadas Flotantes -->
     <div class="welcome-screen" id="welcomeScreen">
-        <!-- Fondo 3D con figuras geométricas flotantes y giratorias -->
         <div class="geometric-bg-3d">
             <div class="geo-shape shape-1"></div>
             <div class="geo-shape shape-2"></div>
