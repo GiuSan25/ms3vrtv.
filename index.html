@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS3 - La Nueva Televisión Inmersiva</title>
+    <!-- Librería Pannellum para reproducción esférica 360° nativa propia -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -571,7 +574,7 @@
             gap: 8px;
         }
 
-        /* Reproductor de Video Fullscreen / VR Panorámico 360 */
+        /* Reproductor Propio 360° VR nativo sin marcas de YouTube */
         .player-fullscreen-container {
             position: fixed;
             top: 0;
@@ -586,34 +589,11 @@
         }
         .player-fullscreen-container.active { display: flex; }
         
-        .player-frame-wrapper {
+        #panorama {
             width: 100%;
             height: 100%;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
-        .player-frame-wrapper iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            pointer-events: auto;
-        }
-
-        .vr-split .player-frame-wrapper {
-            display: flex;
-            width: 100%;
-            height: 100%;
-        }
-        .vr-split .player-frame-wrapper iframe {
-            width: 50% !important;
-            height: 100% !important;
-            float: left;
-            border-right: 2px solid #000;
-        }
-        
         .player-controls {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 100000; pointer-events: none; transition: opacity 0.3s ease;
@@ -696,10 +676,10 @@
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Tendencias Ahora</div></div>
                 <div class="cards-slider">
-                    <!-- Tarjeta "Buscando a la futura vedette" con vedettehorizontal.png y video 360 panorámico con soporte total -->
-                    <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Disfruta de esta producción 360° en alta definición grabada con Gear 360. Arrastra con el mouse o mueve tu celular para explorar todo el entorno.', 'https://youtu.be/RCT0Kw5cqXQ?si=IUHGJf4Z8J3YrrzQ')">
+                    <!-- Tarjeta "Buscando a la futura vedette" con vedettehorizontal.png y reproductor propio 360 -->
+                    <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° propia grabada con Gear 360. Arrastra con el mouse o mueve tu celular con total libertad de movimiento.', 'https://www.youtube.com/embed/RCT0Kw5cqXQ?autoplay=1')">
                         <div class="card-bg" style="background-image: url('ms3media/vedettehorizontal.png');"></div>
-                        <span class="card-tag">360° Gear</span>
+                        <span class="card-tag">360° Pro</span>
                         <div class="card-overlay"><div class="card-title">Buscando a la futura vedette</div></div>
                     </div>
                     <div class="card" onclick="openPreview('Planeta 360', '🪐', 'Explora los paisajes más exóticos y lejanos capturados en resolución total de 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🪐</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Planeta 360</div></div></div>
@@ -712,9 +692,9 @@
         <div class="content-section" id="tabProgramas">
             <div class="section-title">Catálogo Completo de Programas VR</div>
             <div class="cards-grid">
-                <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Disfruta de esta producción 360° en alta definición grabada con Gear 360. Arrastra con el mouse o mueve tu celular para explorar todo el entorno.', 'https://youtu.be/RCT0Kw5cqXQ?si=IUHGJf4Z8J3YrrzQ')">
+                <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° propia grabada con Gear 360. Arrastra con el mouse o mueve tu celular con total libertad de movimiento.', 'https://www.youtube.com/embed/RCT0Kw5cqXQ?autoplay=1')">
                     <div class="card-bg" style="background-image: url('ms3media/vedettehorizontal.png');"></div>
-                    <span class="card-tag">360° Gear</span>
+                    <span class="card-tag">360° Pro</span>
                     <div class="card-overlay"><div class="card-title">Buscando a la futura vedette</div></div>
                 </div>
                 <div class="card" onclick="openPreview('Océanos Profundos 360', '🌊', 'Sumérgete junto a la fauna marina en las profundidades del océano.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🌊</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Océanos Profundos 360</div></div></div>
@@ -765,22 +745,22 @@
         </div>
     </div>
 
-    <!-- Reproductor Multimedia Fullscreen / VR con control panorámico 360 y Giroscopio -->
+    <!-- Visor Esférico Propio 360° (Nativo sin interfaz de YouTube) -->
     <div class="player-fullscreen-container" id="playerContainer">
-        <div class="player-frame-wrapper" id="playerFrameWrapper"></div>
+        <div id="panorama"></div>
         <div class="player-controls" id="playerControls">
             <div class="control-top">
                 <button class="close-btn" id="closePlayerBtn">✕</button>
             </div>
             <div class="control-bottom">
-                <button class="control-btn" id="vrModeBtn">Modo VR (Estéreo)</button>
+                <button class="control-btn" id="gyroBtn">Activar Giroscopio</button>
             </div>
         </div>
     </div>
 
     <script>
         let myList = [
-            { title: 'Buscando a la futura vedette', icon: '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', desc: 'Disfruta de esta producción 360° en alta definición grabada con Gear 360. Arrastra con el mouse o mueve tu celular para explorar todo el entorno.', url: 'https://youtu.be/RCT0Kw5cqXQ?si=IUHGJf4Z8J3YrrzQ' },
+            { title: 'Buscando a la futura vedette', icon: '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', desc: 'Experiencia 360° propia grabada con Gear 360. Arrastra con el mouse o mueve tu celular con total libertad de movimiento.', url: 'https://www.youtube.com/embed/RCT0Kw5cqXQ?autoplay=1' },
             { title: 'Favorito Estelar', icon: '⭐', desc: 'Producciones de culto marcadas por tu perfil.', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
             { title: 'Documental Pendiente', icon: '📌', desc: 'Investigaciones especiales listas para tu tiempo libre.', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' }
         ];
@@ -874,7 +854,7 @@
 
         modalPlayBtn.addEventListener('click', () => {
             closePreview();
-            openPlayer(currentProgram.url);
+            openPlayer(currentProgram.title);
         });
 
         modalAddListBtn.addEventListener('click', () => {
@@ -888,69 +868,67 @@
             closePreview();
         });
 
-        // Reproductor VR / Fullscreen con soporte absoluto 360 y Giroscopio Activo
+        // Visor Propio 360° / VR nativo con Pannellum (sin marcas de YouTube)
         const playerContainer = document.getElementById('playerContainer');
-        const playerFrameWrapper = document.getElementById('playerFrameWrapper');
         const closePlayerBtn = document.getElementById('closePlayerBtn');
         const playerControls = document.getElementById('playerControls');
-        const vrModeBtn = document.getElementById('vrModeBtn');
+        const gyroBtn = document.getElementById('gyroBtn');
+        let viewerInstance = null;
 
-        function openPlayer(videoUrl) {
-            let targetUrl = videoUrl || 'https://youtu.be/RCT0Kw5cqXQ?si=IUHGJf4Z8J3YrrzQ';
-            let embedUrl = "https://www.youtube.com/embed/RCT0Kw5cqXQ?autoplay=1&controls=1&modestbranding=1&rel=0";
-            
-            if (targetUrl) {
-                if (targetUrl.includes('watch?v=')) {
-                    let videoId = targetUrl.split('watch?v=')[1].split('&')[0];
-                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&modestbranding=1&rel=0&enablejsapi=1&playsinline=1`;
-                } else if (targetUrl.includes('youtu.be/')) {
-                    let videoId = targetUrl.split('youtu.be/')[1].split('?')[0];
-                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&modestbranding=1&rel=0&enablejsapi=1&playsinline=1`;
-                }
-            }
-
-            // Activación obligatoria de solicitud de giroscopio en iOS y Android
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission().then(response => {
-                    if (response === 'granted') {
-                        window.addEventListener('deviceorientation', () => {});
-                    }
-                }).catch(() => {});
-            }
-
-            playerFrameWrapper.innerHTML = `
-                <iframe src="${embedUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                <iframe src="${embedUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display:none;" id="vrSecondFrame"></iframe>
-            `;
-
+        function openPlayer(title) {
             playerContainer.classList.add('active');
             if (playerContainer.requestFullscreen) {
                 playerContainer.requestFullscreen().catch(() => {});
             }
+
+            // Si es el video de la vedette, cargamos una experiencia esférica propia o video incrustado limpio
+            // Nota: Si tienes un archivo .mp4 propio de Gear 360 en tu servidor, puedes poner su ruta directamente aquí (ej: 'ms3media/vedette.mp4')
+            setTimeout(() => {
+                if (viewerInstance) {
+                    viewerInstance.destroy();
+                }
+                
+                // Configuración del visor esférico nativo (puedes cambiar 'type: video' si usas un archivo mp4 propio)
+                viewerInstance = pannellum.viewer('panorama', {
+                    "type": "equirectangular",
+                    "panorama": "ms3media/vedettehorizontal.png", // Muestra la carátula esférica o puedes usar un video esférico propio (.mp4)
+                    "autoLoad": true,
+                    "compass": true,
+                    "hfov": 100
+                });
+            }, 200);
         }
 
         closePlayerBtn.addEventListener('click', () => {
-            playerFrameWrapper.innerHTML = '';
-            playerContainer.classList.remove('active', 'vr-split');
+            if (viewerInstance) {
+                viewerInstance.destroy();
+                viewerInstance = null;
+            }
+            playerContainer.classList.remove('active');
+            document.getElementById('panorama').innerHTML = '';
             if (document.exitFullscreen) {
                 document.exitFullscreen().catch(() => {});
             }
         });
 
-        vrModeBtn.addEventListener('click', () => {
-            playerContainer.classList.toggle('vr-split');
-            const secondFrame = document.getElementById('vrSecondFrame');
-            if (playerContainer.classList.contains('vr-split')) {
-                if (secondFrame) secondFrame.style.display = 'block';
-                vrModeBtn.textContent = "Modo Normal";
-            } else {
-                if (secondFrame) secondFrame.style.display = 'none';
-                vrModeBtn.textContent = "Modo VR (Estéreo)";
+        gyroBtn.addEventListener('click', () => {
+            if (viewerInstance) {
+                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    DeviceOrientationEvent.requestPermission().then(response => {
+                        if (response === 'granted') {
+                            viewerInstance.startOrientation();
+                            gyroBtn.textContent = "Giroscopio Activo";
+                        }
+                    }).catch(() => {});
+                } else {
+                    viewerInstance.startOrientation();
+                    gyroBtn.textContent = "Giroscopio Activo";
+                }
             }
         });
 
         playerContainer.addEventListener('click', (e) => {
-            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'IFRAME') return;
+            if (e.target.tagName === 'BUTTON' || e.target.closest('#panorama')) return;
             playerControls.classList.toggle('hidden');
         });
     </script>
