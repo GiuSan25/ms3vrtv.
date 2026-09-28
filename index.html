@@ -854,9 +854,10 @@
         }
 
         modalPlayBtn.addEventListener('click', () => {
-            closePreview();
-            openPlayer(currentProgram.url);
-        });
+    closePreview();
+    // Aquí le indicamos que abra directamente tu video local en 360°
+    openPlayer('ms3media/vedette360_web.mp4');
+});
 
         modalAddListBtn.addEventListener('click', () => {
             const existsIndex = myList.findIndex(item => item.title === currentProgram.title);
