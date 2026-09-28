@@ -677,7 +677,7 @@
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Tendencias Ahora</div></div>
                 <div class="cards-slider">
                     <!-- Tarjeta "Buscando a la futura vedette" con vedettehorizontal.png y reproductor propio 360 -->
-                    <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° propia grabada con Gear 360. Arrastra con el mouse o mueve tu celular con total libertad de movimiento.', 'https://www.youtube.com/embed/RCT0Kw5cqXQ?autoplay=1')">
+                    <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° propia grabada con Gear 360. Arrastra con el mouse o mueve tu celular con total libertad de movimiento.', 'ms3media/vedette360_web.mp4')">
                         <div class="card-bg" style="background-image: url('ms3media/vedettehorizontal.png');"></div>
                         <span class="card-tag">360° Pro</span>
                         <div class="card-overlay"><div class="card-title">Buscando a la futura vedette</div></div>
@@ -692,7 +692,7 @@
         <div class="content-section" id="tabProgramas">
             <div class="section-title">Catálogo Completo de Programas VR</div>
             <div class="cards-grid">
-                <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° propia grabada con Gear 360. Arrastra con el mouse o mueve tu celular con total libertad de movimiento.', 'https://www.youtube.com/embed/RCT0Kw5cqXQ?autoplay=1')">
+                <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° propia grabada con Gear 360. Arrastra con el mouse o mueve tu celular con total libertad de movimiento.', 'ms3media/vedette360_web.mp4')">
                     <div class="card-bg" style="background-image: url('ms3media/vedettehorizontal.png');"></div>
                     <span class="card-tag">360° Pro</span>
                     <div class="card-overlay"><div class="card-title">Buscando a la futura vedette</div></div>
@@ -760,7 +760,7 @@
 
     <script>
         let myList = [
-            { title: 'Buscando a la futura vedette', icon: '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', desc: 'Experiencia 360° propia grabada con Gear 360. Arrastra con el mouse o mueve tu celular con total libertad de movimiento.', url: 'https://www.youtube.com/embed/RCT0Kw5cqXQ?autoplay=1' },
+            { title: 'Buscando a la futura vedette', icon: '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', desc: 'Experiencia 360° propia grabada con Gear 360. Arrastra con el mouse o mueve tu celular con total libertad de movimiento.', url: 'ms3media/vedette360_web.mp4' },
             { title: 'Favorito Estelar', icon: '⭐', desc: 'Producciones de culto marcadas por tu perfil.', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
             { title: 'Documental Pendiente', icon: '📌', desc: 'Investigaciones especiales listas para tu tiempo libre.', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' }
         ];
@@ -854,7 +854,7 @@
 
         modalPlayBtn.addEventListener('click', () => {
             closePreview();
-            openPlayer(currentProgram.title);
+            openPlayer(currentProgram.url);
         });
 
         modalAddListBtn.addEventListener('click', () => {
@@ -868,34 +868,44 @@
             closePreview();
         });
 
-        // Visor Propio 360° / VR nativo con Pannellum (sin marcas de YouTube)
+        // Visor Propio 360° / VR nativo con Pannellum (soporte de video local MP4)
         const playerContainer = document.getElementById('playerContainer');
         const closePlayerBtn = document.getElementById('closePlayerBtn');
         const playerControls = document.getElementById('playerControls');
         const gyroBtn = document.getElementById('gyroBtn');
         let viewerInstance = null;
 
-        function openPlayer(title) {
+        function openPlayer(videoSource) {
             playerContainer.classList.add('active');
             if (playerContainer.requestFullscreen) {
                 playerContainer.requestFullscreen().catch(() => {});
             }
 
-            // Si es el video de la vedette, cargamos una experiencia esférica propia o video incrustado limpio
-            // Nota: Si tienes un archivo .mp4 propio de Gear 360 en tu servidor, puedes poner su ruta directamente aquí (ej: 'ms3media/vedette.mp4')
             setTimeout(() => {
                 if (viewerInstance) {
                     viewerInstance.destroy();
                 }
                 
-                // Configuración del visor esférico nativo (puedes cambiar 'type: video' si usas un archivo mp4 propio)
-                viewerInstance = pannellum.viewer('panorama', {
-                    "type": "equirectangular",
-                    "panorama": "ms3media/vedettehorizontal.png", // Muestra la carátula esférica o puedes usar un video esférico propio (.mp4)
-                    "autoLoad": true,
-                    "compass": true,
-                    "hfov": 100
-                });
+                // Si la fuente es un link de YouTube o externo, manejamos fallback; si es tu archivo local mp4, usa type: video
+                if (videoSource.includes('youtu')) {
+                    viewerInstance = pannellum.viewer('panorama', {
+                        "type": "equirectangular",
+                        "panorama": "ms3media/vedettehorizontal.png",
+                        "autoLoad": true,
+                        "compass": true,
+                        "hfov": 100
+                    });
+                } else {
+                    viewerInstance = pannellum.viewer('panorama', {
+                        "type": "video",
+                        "sources": [videoSource],
+                        "autoLoad": true,
+                        "autoplay": true,
+                        "loop": true,
+                        "compass": true,
+                        "hfov": 100
+                    });
+                }
             }, 200);
         }
 
