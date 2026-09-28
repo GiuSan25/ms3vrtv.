@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS3 - La Nueva Televisión Inmersiva</title>
-    <!-- Librería Pannellum para reproducción esférica 360° nativa propia -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -111,18 +108,9 @@
         .screen-6 { width: 150px; height: 95px; top: 32%; right: 5%; animation-duration: 19s; animation-direction: reverse; }
 
         @keyframes floatScreens {
-            0% {
-                transform: translateZ(-300px) rotateX(0deg) rotateY(0deg) translateY(0px);
-                opacity: 0.25;
-            }
-            50% {
-                transform: translateZ(280px) rotateX(180deg) rotateY(180deg) translateY(-35px);
-                opacity: 0.8;
-            }
-            100% {
-                transform: translateZ(-300px) rotateX(360deg) rotateY(360deg) translateY(0px);
-                opacity: 0.25;
-            }
+            0% { transform: translateZ(-300px) rotateX(0deg) rotateY(0deg) translateY(0px); opacity: 0.25; }
+            50% { transform: translateZ(280px) rotateX(180deg) rotateY(180deg) translateY(-35px); opacity: 0.8; }
+            100% { transform: translateZ(-300px) rotateX(360deg) rotateY(360deg) translateY(0px); opacity: 0.25; }
         }
 
         .neon-enter-btn {
@@ -274,7 +262,7 @@
         }
 
         /* Banner Destacado */
-       .hero-banner {
+        .hero-banner {
             position: relative;
             width: 100%;
             height: 430px;
@@ -574,7 +562,7 @@
             gap: 8px;
         }
 
-        /* Reproductor Propio 360° VR nativo sin marcas de YouTube */
+        /* Reproductor Nativo de Video HTML5 Pantalla Completa */
         .player-fullscreen-container {
             position: fixed;
             top: 0;
@@ -589,28 +577,32 @@
         }
         .player-fullscreen-container.active { display: flex; }
         
-        #panorama {
+        #nativeVideoPlayer {
             width: 100%;
             height: 100%;
+            object-fit: contain;
+            outline: none;
         }
 
-        .player-controls {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 100000; pointer-events: none; transition: opacity 0.3s ease;
+        .player-top-bar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100000;
         }
-        .player-controls.hidden { opacity: 0; pointer-events: none; }
-        .control-top { position: absolute; top: 20px; right: 20px; pointer-events: auto; }
         .close-btn {
-            background: rgba(0, 0, 0, 0.6); color: white; border: 2px solid white;
-            font-size: 1.2rem; width: 40px; height: 40px; border-radius: 50%;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: 2px solid white;
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .control-bottom {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 10px; pointer-events: auto; background: rgba(0, 0, 0, 0.6);
-            padding: 8px 16px; border-radius: 20px; backdrop-filter: blur(5px);
-        }
-        .control-btn { background: transparent; color: white; border: none; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -676,14 +668,13 @@
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Tendencias Ahora</div></div>
                 <div class="cards-slider">
-                    <!-- Tarjeta "Buscando a la futura vedette" con vedettehorizontal.png y reproductor propio 360 -->
-                    <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° propia grabada con Gear 360. Arrastra con el mouse o mueve tu celular con total libertad de movimiento.', 'ms3media/vedette360_web.mp4')">
+                    <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° propia grabada con Gear 360.', 'ms3media/vedette360_web.mp4')">
                         <div class="card-bg" style="background-image: url('ms3media/vedettehorizontal.png');"></div>
                         <span class="card-tag">360° Pro</span>
                         <div class="card-overlay"><div class="card-title">Buscando a la futura vedette</div></div>
                     </div>
-                    <div class="card" onclick="openPreview('Planeta 360', '🪐', 'Explora los paisajes más exóticos y lejanos capturados en resolución total de 360 grados.', 'ms3media/vedette360_web.mp4')"><div class="card-bg">🪐</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Planeta 360</div></div></div>
-                    <div class="card" onclick="openPreview('El Estudio Central', '🎬', 'Detrás de escena de las producciones más ambiciosas de la cadena MS3.', 'ms3media/vedette360_web.mp4')"><div class="card-bg">🎬</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">El Estudio Central</div></div></div>
+                    <div class="card" onclick="openPreview('Planeta 360', '🪐', 'Explora los paisajes más exóticos y lejanos.', 'ms3media/vedette360_web.mp4')"><div class="card-bg">🪐</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Planeta 360</div></div></div>
+                    <div class="card" onclick="openPreview('El Estudio Central', '🎬', 'Detrás de escena de las producciones más ambiciosas.', 'ms3media/vedette360_web.mp4')"><div class="card-bg">🎬</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">El Estudio Central</div></div></div>
                 </div>
             </div>
         </div>
@@ -692,12 +683,12 @@
         <div class="content-section" id="tabProgramas">
             <div class="section-title">Catálogo Completo de Programas VR</div>
             <div class="cards-grid">
-                <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° propia grabada con Gear 360. Arrastra con el mouse o mueve tu celular con total libertad de movimiento.', 'ms3media/vedette360_web.mp4')">
+                <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° propia grabada con Gear 360.', 'ms3media/vedette360_web.mp4')">
                     <div class="card-bg" style="background-image: url('ms3media/vedettehorizontal.png');"></div>
                     <span class="card-tag">360° Pro</span>
                     <div class="card-overlay"><div class="card-title">Buscando a la futura vedette</div></div>
                 </div>
-                <div class="card" onclick="openPreview('Océanos Profundos 360', '🌊', 'Sumérgete junto a la fauna marina en las profundidades del océano.', 'ms3media/vedette360_web.mp4')"><div class="card-bg">🌊</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Océanos Profundos 360</div></div></div>
+                <div class="card" onclick="openPreview('Océanos Profundos 360', '🌊', 'Sumérgete junto a la fauna marina.', 'ms3media/vedette360_web.mp4')"><div class="card-bg">🌊</div><span class="card-tag">Naturaleza</span><div class="card-overlay"><div class="card-title">Océanos Profundos 360</div></div></div>
             </div>
         </div>
 
@@ -705,7 +696,7 @@
         <div class="content-section" id="tabDirectos">
             <div class="section-title">Transmisiones en Vivo 360°</div>
             <div class="cards-grid">
-                <div class="card" onclick="openPreview('Estudio Principal Live', '🔴', 'Transmisión en directo desde el set principal con interacción en tiempo real.', 'ms3media/vedette360_web.mp4')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Estudio Principal Live</div></div></div>
+                <div class="card" onclick="openPreview('Estudio Principal Live', '🔴', 'Transmisión en directo desde el set principal.', 'ms3media/vedette360_web.mp4')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Estudio Principal Live</div></div></div>
             </div>
         </div>
 
@@ -719,7 +710,7 @@
         <div class="content-section" id="tabBusqueda">
             <div class="section-title">Resultados Populares</div>
             <div class="cards-grid">
-                <div class="card" onclick="openPreview('Global 360 News', '🌍', 'Noticias internacionales cubiertas en formato inmersivo de 360 grados.', 'ms3media/vedette360_web.mp4')">
+                <div class="card" onclick="openPreview('Global 360 News', '🌍', 'Noticias internacionales cubiertas en formato inmersivo.', 'ms3media/vedette360_web.mp4')">
                     <div class="card-bg">🌍</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Global 360 News</div></div>
                 </div>
             </div>
@@ -736,7 +727,7 @@
             </div>
             <div class="preview-body">
                 <div class="preview-title" id="modalTitle">Título del Programa</div>
-                <div class="preview-desc" id="modalDesc">Descripción detallada del contenido audiovisual inmersivo...</div>
+                <div class="preview-desc" id="modalDesc">Descripción detallada del contenido...</div>
                 <div class="preview-actions">
                     <button class="btn btn-primary" id="modalPlayBtn">▶ Reproducir</button>
                     <button class="btn btn-secondary" id="modalAddListBtn">+ Agregar a mi lista</button>
@@ -745,22 +736,17 @@
         </div>
     </div>
 
-    <!-- Visor Esférico Propio 360° (Nativo sin interfaz de YouTube) -->
+    <!-- Reproductor Nativo de Video HTML5 -->
     <div class="player-fullscreen-container" id="playerContainer">
-        <div id="panorama"></div>
-        <div class="player-controls" id="playerControls">
-            <div class="control-top">
-                <button class="close-btn" id="closePlayerBtn">✕</button>
-            </div>
-            <div class="control-bottom">
-                <button class="control-btn" id="gyroBtn">Activar Giroscopio</button>
-            </div>
+        <div class="player-top-bar">
+            <button class="close-btn" id="closePlayerBtn">✕</button>
         </div>
+        <video id="nativeVideoPlayer" controls playsinline></video>
     </div>
 
     <script>
         let myList = [
-            { title: 'Buscando a la futura vedette', icon: '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', desc: 'Experiencia 360° propia grabada con Gear 360. Arrastra con el mouse o mueve tu celular con total libertad de movimiento.', url: 'ms3media/vedette360_web.mp4' },
+            { title: 'Buscando a la futura vedette', icon: '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', desc: 'Experiencia 360° propia grabada con Gear 360.', url: 'ms3media/vedette360_web.mp4' },
             { title: 'Favorito Estelar', icon: '⭐', desc: 'Producciones de culto marcadas por tu perfil.', url: 'ms3media/vedette360_web.mp4' },
             { title: 'Documental Pendiente', icon: '📌', desc: 'Investigaciones especiales listas para tu tiempo libre.', url: 'ms3media/vedette360_web.mp4' }
         ];
@@ -868,70 +854,29 @@
             closePreview();
         });
 
-        // Visor Propio 360° / VR nativo con Pannellum (soporte para videos locales y giroscopio)
+        // Reproductor Nativo HTML5 (Sin librerías externas)
         const playerContainer = document.getElementById('playerContainer');
         const closePlayerBtn = document.getElementById('closePlayerBtn');
-        const playerControls = document.getElementById('playerControls');
-        const gyroBtn = document.getElementById('gyroBtn');
-        let viewerInstance = null;
+        const nativeVideoPlayer = document.getElementById('nativeVideoPlayer');
 
         function openPlayer(videoSource) {
+            const finalSource = videoSource || 'ms3media/vedette360_web.mp4';
+            nativeVideoPlayer.src = finalSource;
             playerContainer.classList.add('active');
+            nativeVideoPlayer.play().catch(() => {});
+
             if (playerContainer.requestFullscreen) {
                 playerContainer.requestFullscreen().catch(() => {});
             }
-
-            setTimeout(() => {
-                if (viewerInstance) {
-                    viewerInstance.destroy();
-                }
-                
-                const finalSource = videoSource || 'ms3media/vedette360_web.mp4';
-
-                // Configuración de Pannellum para reproducir video esférico 360°
-                viewerInstance = pannellum.viewer('panorama', {
-                    "type": "video",
-                    "sources": [finalSource],
-                    "autoLoad": true,
-                    "autoplay": true,
-                    "loop": true,
-                    "compass": true,
-                    "hfov": 100
-                });
-            }, 200);
         }
 
         closePlayerBtn.addEventListener('click', () => {
-            if (viewerInstance) {
-                viewerInstance.destroy();
-                viewerInstance = null;
-            }
+            nativeVideoPlayer.pause();
+            nativeVideoPlayer.src = "";
             playerContainer.classList.remove('active');
-            document.getElementById('panorama').innerHTML = '';
             if (document.exitFullscreen) {
                 document.exitFullscreen().catch(() => {});
             }
-        });
-
-        gyroBtn.addEventListener('click', () => {
-            if (viewerInstance) {
-                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    DeviceOrientationEvent.requestPermission().then(response => {
-                        if (response === 'granted') {
-                            viewerInstance.startOrientation();
-                            gyroBtn.textContent = "Giroscopio Activo";
-                        }
-                    }).catch(() => {});
-                } else {
-                    viewerInstance.startOrientation();
-                    gyroBtn.textContent = "Giroscopio Activo";
-                }
-            }
-        });
-
-        playerContainer.addEventListener('click', (e) => {
-            if (e.target.tagName === 'BUTTON' || e.target.closest('#panorama')) return;
-            playerControls.classList.toggle('hidden');
         });
     </script>
 </body>
