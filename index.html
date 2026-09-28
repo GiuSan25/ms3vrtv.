@@ -574,7 +574,7 @@
             gap: 8px;
         }
 
-        /* Reproductor Propio 360° VR nativo con archivo local */
+        /* Reproductor Propio 360° VR nativo */
         .player-fullscreen-container {
             position: fixed;
             top: 0;
@@ -676,7 +676,7 @@
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Tendencias Ahora</div></div>
                 <div class="cards-slider">
-                    <!-- Tarjeta "Buscando a la futura vedette" con vedettehorizontal.png y reproductor local 360 -->
+                    <!-- Tarjeta "Buscando a la futura vedette" con archivo local 360 -->
                     <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° propia grabada con Gear 360. Arrastra con el mouse o mueve tu celular con total libertad de movimiento.', 'ms3media/vedette360_web.mp4')">
                         <div class="card-bg" style="background-image: url('ms3media/vedettehorizontal.png');"></div>
                         <span class="card-tag">360° Pro</span>
@@ -745,7 +745,7 @@
         </div>
     </div>
 
-    <!-- Visor Esférico Propio 360° (Nativo sin interfaz de YouTube) -->
+    <!-- Visor Esférico Propio 360° / VR nativo -->
     <div class="player-fullscreen-container" id="playerContainer">
         <div id="panorama"></div>
         <div class="player-controls" id="playerControls">
@@ -868,7 +868,7 @@
             closePreview();
         });
 
-        // Visor Propio 360° / VR nativo configurado con tu archivo local (.mp4)
+        // Visor Propio 360° / VR nativo con soporte optimizado para .mp4 local y autoplay seguro
         const playerContainer = document.getElementById('playerContainer');
         const closePlayerBtn = document.getElementById('closePlayerBtn');
         const playerControls = document.getElementById('playerControls');
@@ -886,7 +886,6 @@
                     viewerInstance.destroy();
                 }
                 
-                // Si es un enlace de YouTube usa tipo iframe/embed, si es archivo local usa tipo video esférico equirectangular
                 let isLocalVideo = videoUrl && videoUrl.includes('.mp4');
 
                 if (isLocalVideo) {
@@ -896,11 +895,11 @@
                         "autoLoad": true,
                         "autoplay": true,
                         "loop": true,
+                        "muted": true, // Soluciona bloqueos de reproducción automática en navegadores
                         "compass": true,
                         "hfov": 100
                     });
                 } else {
-                    // Fallback para enlaces web externos
                     document.getElementById('panorama').innerHTML = `<iframe src="${videoUrl}" style="width:100%; height:100%; border:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
                 }
             }, 200);
