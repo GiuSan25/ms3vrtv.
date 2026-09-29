@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -38,13 +38,13 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), filter 1.2s ease;
+            transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1), transform 1.4s cubic-bezier(0.16, 1, 0.3, 1), filter 1.4s ease;
         }
 
         .welcome-screen.fade-out-elegant {
             opacity: 0;
-            transform: scale(1.15);
-            filter: blur(10px);
+            transform: scale(1.1);
+            filter: blur(12px);
             pointer-events: none;
         }
 
@@ -151,16 +151,22 @@
             text-shadow: none;
         }
 
-        /* Contenedor Principal */
+        /* Contenedor Principal con Animación de Fluidez y Aparición */
         .app-container {
             display: none;
             opacity: 0;
-            transition: opacity 1s ease;
+            transform: translateY(25px) scale(0.98);
+            filter: blur(6px);
+            transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                        transform 1.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                        filter 1.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .app-container.active {
             display: block;
             opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0px);
         }
 
         /* Barra Superior */
@@ -234,6 +240,11 @@
             border: none;
             font-size: 0.9rem;
             position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item:hover {
+            color: #fff;
         }
 
         .nav-item.active {
@@ -251,9 +262,12 @@
             border-radius: 2px;
         }
 
-        /* Vistas de Contenido Dinámicas */
+        /* Vistas de Contenido Dinámicas con Transición Suave */
         .content-section {
             display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
             padding: 20px;
             padding-bottom: 50px;
             background-color: #0b0614;
@@ -262,6 +276,8 @@
 
         .content-section.active {
             display: block;
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .section-title {
@@ -341,10 +357,10 @@
             font-weight: bold;
             cursor: pointer;
             border: none;
-            transition: opacity 0.2s;
+            transition: all 0.25s ease;
         }
 
-        .btn:hover { opacity: 0.85; }
+        .btn:hover { opacity: 0.85; transform: translateY(-2px); }
         .btn-primary { background-color: #fff; color: #000; }
         .btn-secondary {
             background-color: rgba(255, 255, 255, 0.15);
@@ -396,7 +412,7 @@
             background-color: #1a1528;
             border: 1px solid rgba(255,255,255,0.08);
             cursor: pointer;
-            transition: transform 0.2s, border-color 0.2s;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .cards-grid .card {
@@ -405,8 +421,9 @@
         }
 
         .card:hover {
-            transform: scale(1.03);
-            border-color: rgba(255, 42, 109, 0.5);
+            transform: translateY(-4px) scale(1.03);
+            border-color: rgba(255, 42, 109, 0.6);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
 
         .card-bg {
@@ -485,14 +502,18 @@
             background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(8px);
             z-index: 9999;
-            display: none;
+            display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
         }
 
         .preview-modal.active {
-            display: flex;
+            opacity: 1;
+            pointer-events: auto;
         }
 
         .preview-content {
@@ -504,12 +525,12 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 20px 40px rgba(0,0,0,0.8);
             position: relative;
-            animation: modalPop 0.3s ease;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        @keyframes modalPop {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+        .preview-modal.active .preview-content {
+            transform: scale(1) translateY(0);
         }
 
         .preview-header-img {
@@ -540,7 +561,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background 0.2s;
         }
+        .preview-close:hover { background: #ff2a6d; }
 
         .preview-body {
             padding: 20px;
@@ -583,11 +606,17 @@
             height: 100vh;
             background-color: #000;
             z-index: 99999;
-            display: none;
+            display: flex;
             justify-content: center;
             align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
         }
-        .player-fullscreen-container.active { display: flex; }
+        .player-fullscreen-container.active { 
+            opacity: 1;
+            pointer-events: auto;
+        }
         
         #panorama {
             width: 100%;
@@ -604,7 +633,9 @@
             background: rgba(0, 0, 0, 0.6); color: white; border: 2px solid white;
             font-size: 1.2rem; width: 40px; height: 40px; border-radius: 50%;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
         }
+        .close-btn:hover { background: #ff2a6d; border-color: #ff2a6d; }
         .control-bottom {
             position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
             display: flex; gap: 10px; pointer-events: auto; background: rgba(0, 0, 0, 0.6);
@@ -688,15 +719,12 @@
                     <div class="card" onclick="openPreview('AGR COMPETICION', '<img src=&quot;ms3media/agrcompeticion.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Adrenalina total en pista y boxes con AGR Competición en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/agrcompeticion.png')">
                         <div class="card-bg" style="background-image: url('ms3media/agrcompeticion.png');"></div><span class="card-tag">Motor</span><div class="card-overlay"><div class="card-title">AGR COMPETICION</div></div>
                     </div>
-                    <!-- Actualizado a BROTHER THE SKATE BOAR -->
                     <div class="card" onclick="openPreview('BROTHER THE SKATE BOAR', '<img src=&quot;ms3media/skatehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Acción extrema de skate y saltos urbanos en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/skatehorizontal.png')">
                         <div class="card-bg" style="background-image: url('ms3media/skatehorizontal.png');"></div><span class="card-tag">Skate</span><div class="card-overlay"><div class="card-title">BROTHER THE SKATE BOAR</div></div>
                     </div>
-                    <!-- Actualizado a VR MODA -->
                     <div class="card" onclick="openPreview('VR MODA', '<img src=&quot;ms3media/vrmodahorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Glamour, desfiles y alta costura inmersiva en pasarelas exclusivas.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/vrmodahorizontal.png')">
                         <div class="card-bg" style="background-image: url('ms3media/vrmodahorizontal.png');"></div><span class="card-tag">Moda</span><div class="card-overlay"><div class="card-title">VR MODA</div></div>
                     </div>
-                    <!-- Actualizado a VR MUSIC -->
                     <div class="card" onclick="openPreview('VR MUSIC', '<img src=&quot;ms3media/vrmusichorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Conciertos en vivo y experiencias musicales inmersivas en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/vrmusichorizontal.png')">
                         <div class="card-bg" style="background-image: url('ms3media/vrmusichorizontal.png');"></div><span class="card-tag">Música</span><div class="card-overlay"><div class="card-title">VR MUSIC</div></div>
                     </div>
@@ -708,7 +736,7 @@
                     <div class="card" onclick="openPreview('Estudio Principal Live', '🔴', 'Transmisión en directo.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🔴</div><span class="card-tag">Live</span><div class="card-overlay"><div class="card-title">Estudio Principal Live</div></div></div>
                     <div class="card" onclick="openPreview('Global 360 News', '🌍', 'Noticias internacionales.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🌍</div><span class="card-tag">News</span><div class="card-overlay"><div class="card-title">Global 360 News</div></div></div>
                     <div class="card" onclick="openPreview('Neon Beats Festival', '🎧', 'Música electrónica 360.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🎧</div><span class="card-tag">Musica</span><div class="card-overlay"><div class="card-title">Neon Beats Festival</div></div></div>
-                    <div class="card" onclick="openPreview('Fórmula VR Experiencia', '🏎️', 'Velocidad pura.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🏎️</div><span class="card-tag">Motor</span><div class="card-overlay"><div class="card-title">Fórmula VR Experiencia</div></div></div>
+                    <div class="card" onclick="openPreview('Fórmula VR Experiencia', '🏎️️', 'Velocidad pura.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🏎️️</div><span class="card-tag">Motor</span><div class="card-overlay"><div class="card-title">Fórmula VR Experiencia</div></div></div>
                 </div>
             </div>
 
@@ -721,19 +749,13 @@
                     <div class="card" onclick="openPreview('Viaje Cósmico 3D', '🌌', 'Exploración galáctica.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🌌</div><span class="card-tag">Espacio</span><div class="card-overlay"><div class="card-title">Viaje Cósmico 3D</div></div></div>
                     <div class="card" onclick="openPreview('Teatro Colon 360', '🎭', 'Acústica y arte escénico.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🎭</div><span class="card-tag">Teatro</span><div class="card-overlay"><div class="card-title">Teatro Colon 360</div></div></div>
                     <div class="card" onclick="openPreview('Safari Salvaje VR', '🦁', 'Fauna en libertad.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🦁</div><span class="card-tag">Safari</span><div class="card-overlay"><div class="card-title">Safari Salvaje VR</div></div></div>
-                    <div class="card" onclick="openPreview('BROTHER THE SKATE BOAR', '<img src=&quot;ms3media/skatehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Acción extrema de skate y saltos urbanos en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/skatehorizontal.png')">
-                        <div class="card-bg" style="background-image: url('ms3media/skatehorizontal.png');"></div><span class="card-tag">Skate</span><div class="card-overlay"><div class="card-title">BROTHER THE SKATE BOAR</div></div>
-                    </div>
+                    <div class="card" onclick="openPreview('BROTHER THE SKATE BOAR', '<img src=&quot;ms3media/skatehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Acción extrema de skate y saltos urbanos en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/skatehorizontal.png')"><div class="card-bg" style="background-image: url('ms3media/skatehorizontal.png');"></div><span class="card-tag">Skate</span><div class="card-overlay"><div class="card-title">BROTHER THE SKATE BOAR</div></div></div>
                     <div class="card" onclick="openPreview('Chef Estelar 360', '🍳', 'Gastronomía inmersiva.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🍳</div><span class="card-tag">Food</span><div class="card-overlay"><div class="card-title">Chef Estelar 360</div></div></div>
                     <div class="card" onclick="openPreview('Zen Meditación VR', '🧘', 'Relax absoluto en 360.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🧘</div><span class="card-tag">Zen</span><div class="card-overlay"><div class="card-title">Zen Meditación VR</div></div></div>
                     <div class="card" onclick="openPreview('Rally Dakar Inmersivo', '🚙', 'Dunas y velocidad.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🚙</div><span class="card-tag">Rally</span><div class="card-overlay"><div class="card-title">Rally Dakar Inmersivo</div></div></div>
                     <div class="card" onclick="openPreview('Magia e Ilusionismo', '🪄', 'Trucos rodeando tu visión.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🪄</div><span class="card-tag">Magia</span><div class="card-overlay"><div class="card-title">Magia e Ilusionismo</div></div></div>
-                    <div class="card" onclick="openPreview('VR MODA', '<img src=&quot;ms3media/vrmodahorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Glamour, desfiles y alta costura inmersiva en pasarelas exclusivas.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/vrmodahorizontal.png')">
-                        <div class="card-bg" style="background-image: url('ms3media/vrmodahorizontal.png');"></div><span class="card-tag">Moda</span><div class="card-overlay"><div class="card-title">VR MODA</div></div>
-                    </div>
-                    <div class="card" onclick="openPreview('VR MUSIC', '<img src=&quot;ms3media/vrmusichorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Conciertos en vivo y experiencias musicales inmersivas en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/vrmusichorizontal.png')">
-                        <div class="card-bg" style="background-image: url('ms3media/vrmusichorizontal.png');"></div><span class="card-tag">Música</span><div class="card-overlay"><div class="card-title">VR MUSIC</div></div>
-                    </div>
+                    <div class="card" onclick="openPreview('VR MODA', '<img src=&quot;ms3media/vrmodahorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Glamour, desfiles y alta costura inmersiva en pasarelas exclusivas.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/vrmodahorizontal.png')"><div class="card-bg" style="background-image: url('ms3media/vrmodahorizontal.png');"></div><span class="card-tag">Moda</span><div class="card-overlay"><div class="card-title">VR MODA</div></div></div>
+                    <div class="card" onclick="openPreview('VR MUSIC', '<img src=&quot;ms3media/vrmusichorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Conciertos en vivo y experiencias musicales inmersivas en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/vrmusichorizontal.png')"><div class="card-bg" style="background-image: url('ms3media/vrmusichorizontal.png');"></div><span class="card-tag">Música</span><div class="card-overlay"><div class="card-title">VR MUSIC</div></div></div>
                     <div class="card" onclick="openPreview('Invasión Neón 360', '💡', 'Luces y efectos visuales.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">💡</div><span class="card-tag">Efectos</span><div class="card-overlay"><div class="card-title">Invasión Neón 360</div></div></div>
                     <div class="card" onclick="openPreview('Buceo con Tiburones', '🦈', 'Experiencia submarina.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🦈</div><span class="card-tag">Buceo</span><div class="card-overlay"><div class="card-title">Buceo con Tiburones</div></div></div>
                     <div class="card" onclick="openPreview('Casas Embrujadas VR', '👻', 'Terror interactivo 360.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">👻</div><span class="card-tag">Terror</span><div class="card-overlay"><div class="card-title">Casas Embrujadas VR</div></div></div>
@@ -750,7 +772,7 @@
                     <div class="card" onclick="openPreview('Secretos de la Ópera', '🎭', 'Detrás del telón.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🎭</div><span class="card-tag">Cultura</span><div class="card-overlay"><div class="card-title">Secretos de la Ópera</div></div></div>
                     <div class="card" onclick="openPreview('Arquitectura Futura', '🏙️', 'Megaciudades 3D.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🏙️</div><span class="card-tag">Diseño</span><div class="card-overlay"><div class="card-title">Arquitectura Futura</div></div></div>
                     <div class="card" onclick="openPreview('Misterios del Abismo', '⚓', 'Naufragios históricos.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">⚓</div><span class="card-tag">Misterio</span><div class="card-overlay"><div class="card-title">Misterios del Abismo</div></div></div>
-                    <div class="card" onclick="openPreview('Cultura Pop 360', '🕹️', 'Videojuegos y retro.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🕹️</div><span class="card-tag">Retro</span><div class="card-overlay"><div class="card-title">Cultura Pop 360</div></div></div>
+                    <div class="card" onclick="openPreview('Cultura Pop 360', '🕹️️', 'Videojuegos y retro.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🕹️</div><span class="card-tag">Retro</span><div class="card-overlay"><div class="card-title">Cultura Pop 360</div></div></div>
                     <div class="card" onclick="openPreview('Volcanes Activos', '🌋', 'Erupciones en primer plano.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🌋</div><span class="card-tag">Planeta</span><div class="card-overlay"><div class="card-title">Volcanes Activos</div></div></div>
                     <div class="card" onclick="openPreview('Tribus del Mundo', '🛖', 'Antropología inmersiva.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🛖</div><span class="card-tag">Global</span><div class="card-overlay"><div class="card-title">Tribus del Mundo</div></div></div>
                     <div class="card" onclick="openPreview('Orígenes del Rock', '🎸', 'Conciertos legendarios.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🎸</div><span class="card-tag">Rock</span><div class="card-overlay"><div class="card-title">Orígenes del Rock</div></div></div>
@@ -897,7 +919,7 @@
             appContainer.classList.add('active');
             setTimeout(() => {
                 welcomeScreen.style.display = 'none';
-            }, 1200);
+            }, 1400);
         });
 
         // Pestañas
