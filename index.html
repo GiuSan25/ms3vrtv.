@@ -997,26 +997,10 @@
         const playerControls = document.getElementById('playerControls');
         const gyroBtn = document.getElementById('gyroBtn');
         let viewerInstance = null;
-
-        function openPlayer(title, panoImg) {
+function openPlayer(title, panoImg) {
             playerContainer.classList.add('active');
             if (playerContainer.requestFullscreen) {
                 playerContainer.requestFullscreen().catch(() => {});
-            }
-
-            let bgSource = panoImg || 'ms3media/vedettehorizontal.png';
-            if (title === 'MEDICINA VR') {
-                bgSource = 'ms3media/medicinahorizontal.png';
-            } else if (title === 'LA MASA') {
-                bgSource = 'ms3media/lamasahorizontal.png';
-            } else if (title === 'AGR COMPETICION') {
-                bgSource = 'ms3media/agrcompeticionhorizontal.png';
-            } else if (title === 'BROTHER THE SKATE BOAR') {
-                bgSource = 'ms3media/skatehorizontal.png';
-            } else if (title === 'VR MODA') {
-                bgSource = 'ms3media/vrmodahorizontal.png';
-            } else if (title === 'VR MUSIC') {
-                bgSource = 'ms3media/vrmusichorizontal.png';
             }
 
             setTimeout(() => {
@@ -1024,13 +1008,42 @@
                     viewerInstance.destroy();
                 }
                 
-                viewerInstance = pannellum.viewer('panorama', {
-                    "type": "equirectangular",
-                    "panorama": bgSource,
-                    "autoLoad": true,
-                    "compass": true,
-                    "hfov": 100
-                });
+                // Verificamos si es el video específico de la vedette para cargarlo como video 360
+                if (title === 'Buscando a la futura vedette') {
+                    viewerInstance = pannellum.viewer('panorama', {
+                        "type": "video",
+                        "sources": ["ms3media/vedette360_web.mp4"],
+                        "autoLoad": true,
+                        "autoplay": true,
+                        "loop": true,
+                        "compass": true,
+                        "hfov": 100
+                    });
+                } else {
+                    // Para el resto de los programas que usan imágenes estáticas de respaldo
+                    let bgSource = panoImg || 'ms3media/vedettehorizontal.png';
+                    if (title === 'MEDICINA VR') {
+                        bgSource = 'ms3media/medicinahorizontal.png';
+                    } else if (title === 'LA MASA') {
+                        bgSource = 'ms3media/lamasahorizontal.png';
+                    } else if (title === 'AGR COMPETICION') {
+                        bgSource = 'ms3media/agrcompeticionhorizontal.png';
+                    } else if (title === 'BROTHER THE SKATE BOAR') {
+                        bgSource = 'ms3media/skatehorizontal.png';
+                    } else if (title === 'VR MODA') {
+                        bgSource = 'ms3media/vrmodahorizontal.png';
+                    } else if (title === 'VR MUSIC') {
+                        bgSource = 'ms3media/vrmusichorizontal.png';
+                    }
+
+                    viewerInstance = pannellum.viewer('panorama', {
+                        "type": "equirectangular",
+                        "panorama": bgSource,
+                        "autoLoad": true,
+                        "compass": true,
+                        "hfov": 100
+                    });
+                }
             }, 200);
         }
 
