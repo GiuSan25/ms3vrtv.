@@ -13,6 +13,7 @@
             overflow: hidden;
             background-color: #000;
             font-family: sans-serif;
+            user-select: none;
         }
         #webgl-container {
             width: 100%;
@@ -20,6 +21,8 @@
             position: absolute;
             top: 0;
             left: 0;
+            /* Asegura que el contenedor capture los eventos del mouse y táctiles */
+            touch-action: none; 
         }
         /* Interfaz de controles flotantes */
         .vr-ui {
@@ -33,7 +36,7 @@
             padding: 10px 20px;
             border-radius: 30px;
             backdrop-filter: blur(5px);
-            z-index: 10;
+            z-index: 100; /* Prioridad alta pero sin bloquear el canvas de fondo */
         }
         .vr-btn {
             background: #ff0055;
@@ -59,7 +62,7 @@
             border-radius: 4px;
             font-size: 14px;
             pointer-events: none;
-            z-index: 10;
+            z-index: 100;
         }
     </style>
 </head>
@@ -76,9 +79,8 @@
 
     <!-- Video oculto que sirve de textura para la esfera -->
     <video id="videoSource" loop crossorigin="anonymous" playsinline style="display:none;">
-        <!-- Reemplaza la URL con tu video en formato equirectangular 360 -->
         <source src="https://threejs.org/examples/textures/pano.webm" type="video/webm">
-        Tu navegador không soporta video HTML5.
+        Tu navegador no soporta video HTML5.
     </video>
 
     <!-- Importación de Three.js y OrbitControls mediante ES Modules -->
@@ -95,8 +97,7 @@
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-        let camera, scene, renderer, video, texture, sphere;
-        let isUserInteracting = false;
+        let camera, scene, renderer, video, texture, sphere, controls;
 
         init();
         animate();
@@ -116,7 +117,7 @@
             texture = new THREE.VideoTexture(video);
             texture.colorSpace = THREE.SRGBColorSpace;
 
-            // 4. Crear la Esfera Geométrica e invertir las normales (-1 en escala X) para verla por dentro
+            // 4. Crear la Esfera Geométrica e invertir las normales (-1 en escala X)
             const geometry = new THREE.SphereGeometry(500, 60, 40);
             geometry.scale(-1, 1, 1); 
 
@@ -130,11 +131,11 @@
             renderer.setPixelRatio(window.devicePixelRatio);
             container.appendChild(renderer.domElement);
 
-            // 6. Controles orbitales para mover la vista con el mouse o táctil
-            const controls = new OrbitControls(camera, renderer.domElement);
-            controls.enableZoom = false; // Evitar zoom para mantener la inmersión fija en el centro
+            // 6. Controles orbitales configurados explícitamente sobre el DOM element
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableZoom = false;
             controls.enablePan = false;
-            controls.rotateSpeed = -0.5; // Invertir para naturalidad de giro interno
+            controls.rotateSpeed = -0.5; // Invertir para una rotación interna natural
 
             // Eventos de la Interfaz
             const playBtn = document.getElementById('playBtn');
@@ -170,6 +171,7 @@
 
         function animate() {
             requestAnimationFrame(animate);
+            controls.update(); // Necesario para que el movimiento del mouse/tactil responda de forma fluida
             renderer.render(scene, camera);
         }
     </script>
