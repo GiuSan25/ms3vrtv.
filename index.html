@@ -998,56 +998,31 @@
         const gyroBtn = document.getElementById('gyroBtn');
         let viewerInstance = null;
 
-       function openPlayer(title, panoImg) {
-        playerContainer.classList.add('active');
-        if (playerContainer.requestFullscreen) {
-            playerContainer.requestFullscreen().catch(() => {});
-        }
-
-        // Si es "Buscando a la futura vedette", mostramos el reproductor de video local
-        if (title === 'Buscando a la futura vedette') {
-            if (viewerInstance) {
-                viewerInstance.destroy();
-                viewerInstance = null;
+        function openPlayer(title, panoImg) {
+            playerContainer.classList.add('active');
+            if (playerContainer.requestFullscreen) {
+                playerContainer.requestFullscreen().catch(() => {});
             }
-            document.getElementById('panorama').innerHTML = `
-                <video controls autoplay style="width: 100%; height: 100%; object-fit: contain; background: black;">
-                    <source src="ms3media/videovedette.mp4" type="video/mp4">
-                    Tu navegador no soporta la reproducción de video.
-                </video>
-            `;
-            return;
-        }
 
-        let bgSource = panoImg || 'ms3media/vedettehorizontal.png';
-        if (title === 'MEDICINA VR') {
-            bgSource = 'ms3media/medicinahorizontal.png';
-        } else if (title === 'LA MASA') {
-            bgSource = 'ms3media/lamasahorizontal.png';
-        } else if (title === 'AGR COMPETICION') {
-            bgSource = 'ms3media/agrcompeticionhorizontal.png';
-        } else if (title === 'BROTHER THE SKATE BOAR') {
-            bgSource = 'ms3media/skatehorizontal.png';
-        } else if (title === 'VR MODA') {
-            bgSource = 'ms3media/vrmodahorizontal.png';
-        } else if (title === 'VR MUSIC') {
-            bgSource = 'ms3media/vrmusichorizontal.png';
-        }
-
-        setTimeout(() => {
-            if (viewerInstance) {
-                viewerInstance.destroy();
+            let bgSource = panoImg || 'ms3media/vedettehorizontal.png';
+            if (title === 'MEDICINA VR') {
+                bgSource = 'ms3media/medicinahorizontal.png';
+            } else if (title === 'LA MASA') {
+                bgSource = 'ms3media/lamasahorizontal.png';
+            } else if (title === 'AGR COMPETICION') {
+                bgSource = 'ms3media/agrcompeticionhorizontal.png';
+            } else if (title === 'BROTHER THE SKATE BOAR') {
+                bgSource = 'ms3media/skatehorizontal.png';
+            } else if (title === 'VR MODA') {
+                bgSource = 'ms3media/vrmodahorizontal.png';
+            } else if (title === 'VR MUSIC') {
+                bgSource = 'ms3media/vrmusichorizontal.png';
             }
-            
-            viewerInstance = pannellum.viewer('panorama', {
-                "type": "equirectangular",
-                "panorama": bgSource,
-                "autoLoad": true,
-                "compass": true,
-                "hfov": 100
-            });
-        }, 200);
-    }
+
+            setTimeout(() => {
+                if (viewerInstance) {
+                    viewerInstance.destroy();
+                }
                 
                 viewerInstance = pannellum.viewer('panorama', {
                     "type": "equirectangular",
