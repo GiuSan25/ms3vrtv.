@@ -597,7 +597,7 @@
             gap: 8px;
         }
 
-        /* Reproductor Propio 360° y Video Nativo */
+        /* Reproductor Propio 360° VR nativo sin marcas de YouTube */
         .player-fullscreen-container {
             position: fixed;
             top: 0;
@@ -623,21 +623,9 @@
             height: 100%;
         }
 
-        #nativeVideoPlayer {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: none;
-            background: #000;
-            z-index: 10;
-        }
-
         .player-controls {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 100001; pointer-events: none; transition: opacity 0.3s ease;
+            z-index: 100000; pointer-events: none; transition: opacity 0.3s ease;
         }
         .player-controls.hidden { opacity: 0; pointer-events: none; }
         .control-top { position: absolute; top: 20px; right: 20px; pointer-events: auto; }
@@ -687,7 +675,7 @@
             <div class="logo" id="logoHomeBtn">MS3</div>
             <div class="top-icons">
                 <div class="profile-icon" id="profileBtn" title="Mi Cuenta">GV</div>
-                <div id="settingsBtn" title="Ajustes">⚙</div>
+                <div id="settingsBtn" title="Ajustes">⚙️</div>
             </div>
         </div>
 
@@ -879,10 +867,9 @@
         </div>
     </div>
 
-    <!-- Visor Propio 360° / VR nativo y Video Nativo -->
+    <!-- Visor Propio 360° / VR nativo con Pannellum -->
     <div class="player-fullscreen-container" id="playerContainer">
         <div id="panorama"></div>
-        <video id="nativeVideoPlayer" controls playsinline></video>
         <div class="player-controls" id="playerControls">
             <div class="control-top">
                 <button class="close-btn" id="closePlayerBtn">✕</button>
@@ -1004,12 +991,11 @@
             closePreview();
         });
 
-        // Visor de Video y 360°
+        // Visor Propio 360° / VR nativo con Pannellum
         const playerContainer = document.getElementById('playerContainer');
         const closePlayerBtn = document.getElementById('closePlayerBtn');
         const playerControls = document.getElementById('playerControls');
         const gyroBtn = document.getElementById('gyroBtn');
-        const nativeVideoPlayer = document.getElementById('nativeVideoPlayer');
         let viewerInstance = null;
 
         function openPlayer(title, panoImg) {
@@ -1018,58 +1004,37 @@
                 playerContainer.requestFullscreen().catch(() => {});
             }
 
-            // Si es la vedette, reproducimos el archivo mp4 directamente
-            if (title === 'Buscando a la futura vedette') {
-                document.getElementById('panorama').style.display = 'none';
-                gyroBtn.style.display = 'none';
-                
-                nativeVideoPlayer.style.display = 'block';
-                nativeVideoPlayer.src = 'ms3media/videovedette.mp4';
-                nativeVideoPlayer.play().catch(err => console.log("Autoplay restringido:", err));
-            } else {
-                nativeVideoPlayer.style.display = 'none';
-                nativeVideoPlayer.pause();
-                nativeVideoPlayer.src = '';
-
-                document.getElementById('panorama').style.display = 'block';
-                gyroBtn.style.display = 'inline-block';
-
-                let bgSource = panoImg || 'ms3media/vedettehorizontal.png';
-                if (title === 'MEDICINA VR') {
-                    bgSource = 'ms3media/medicinahorizontal.png';
-                } else if (title === 'LA MASA') {
-                    bgSource = 'ms3media/lamasahorizontal.png';
-                } else if (title === 'AGR COMPETICION') {
-                    bgSource = 'ms3media/agrcompeticionhorizontal.png';
-                } else if (title === 'BROTHER THE SKATE BOAR') {
-                    bgSource = 'ms3media/skatehorizontal.png';
-                } else if (title === 'VR MODA') {
-                    bgSource = 'ms3media/vrmodahorizontal.png';
-                } else if (title === 'VR MUSIC') {
-                    bgSource = 'ms3media/vrmusichorizontal.png';
-                }
-
-                setTimeout(() => {
-                    if (viewerInstance) {
-                        viewerInstance.destroy();
-                    }
-                    
-                    viewerInstance = pannellum.viewer('panorama', {
-                        "type": "equirectangular",
-                        "panorama": bgSource,
-                        "autoLoad": true,
-                        "compass": true,
-                        "hfov": 100
-                    });
-                }, 200);
+            let bgSource = panoImg || 'ms3media/vedettehorizontal.png';
+            if (title === 'MEDICINA VR') {
+                bgSource = 'ms3media/medicinahorizontal.png';
+            } else if (title === 'LA MASA') {
+                bgSource = 'ms3media/lamasahorizontal.png';
+            } else if (title === 'AGR COMPETICION') {
+                bgSource = 'ms3media/agrcompeticionhorizontal.png';
+            } else if (title === 'BROTHER THE SKATE BOAR') {
+                bgSource = 'ms3media/skatehorizontal.png';
+            } else if (title === 'VR MODA') {
+                bgSource = 'ms3media/vrmodahorizontal.png';
+            } else if (title === 'VR MUSIC') {
+                bgSource = 'ms3media/vrmusichorizontal.png';
             }
+
+            setTimeout(() => {
+                if (viewerInstance) {
+                    viewerInstance.destroy();
+                }
+                
+                viewerInstance = pannellum.viewer('panorama', {
+                    "type": "equirectangular",
+                    "panorama": bgSource,
+                    "autoLoad": true,
+                    "compass": true,
+                    "hfov": 100
+                });
+            }, 200);
         }
 
         closePlayerBtn.addEventListener('click', () => {
-            nativeVideoPlayer.pause();
-            nativeVideoPlayer.currentTime = 0;
-            nativeVideoPlayer.style.display = 'none';
-
             if (viewerInstance) {
                 viewerInstance.destroy();
                 viewerInstance = null;
@@ -1098,7 +1063,7 @@
         });
 
         playerContainer.addEventListener('click', (e) => {
-            if (e.target.tagName === 'BUTTON' || e.target.closest('#panorama') || e.target.tagName === 'VIDEO') return;
+            if (e.target.tagName === 'BUTTON' || e.target.closest('#panorama')) return;
             playerControls.classList.toggle('hidden');
         });
     </script>
