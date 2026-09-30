@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS3 - La Nueva Televisión Inmersiva</title>
+    <!-- Librerías para Video 360° Inmersivo (Panolens y Three.js) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/panolens@0.12.1/dist/panolens.min.js"></script>
+    
     <style>
         * {
             box-sizing: border-box;
@@ -415,7 +419,7 @@
         .preview-actions { display: flex; gap: 12px; }
         .preview-actions .btn { flex: 1; padding: 12px; text-align: center; justify-content: center; display: flex; align-items: center; gap: 8px; }
 
-        /* REPRODUCTOR PROPIO DE REALIDAD VIRTUAL / 360 (LIMPIO) */
+        /* CONTENEDOR DE REPRODUCTOR 360 INMERSIVO (PANOLENS) */
         .player-fullscreen-container {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: #000; z-index: 99999; display: flex; justify-content: center; align-items: center;
@@ -423,24 +427,33 @@
         }
         .player-fullscreen-container.active { opacity: 1; pointer-events: auto; }
         
-        .vr-screen-wrapper {
-            width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden;
-        }
-        .vr-video-element {
-            width: 100%; height: 100%; object-fit: cover; background: #000;
+        #vr-viewer-container {
+            width: 100%; height: 100%; position: absolute; top: 0; left: 0;
         }
 
         .player-top-bar {
             position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100000;
+            pointer-events: none;
         }
-        .player-title-display { font-size: 1.1rem; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.8); background: rgba(0,0,0,0.5); padding: 6px 14px; border-radius: 20px; backdrop-filter: blur(5px); }
-        .close-player-btn {
-            background: rgba(0, 0, 0, 0.6); color: white; border: 2px solid white;
-            font-size: 1.1rem; width: 40px; height: 40px; border-radius: 50%;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: background 0.2s;
+        .player-top-bar > * { pointer-events: auto; }
+        
+        .player-title-display { font-size: 1.1rem; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.8); background: rgba(0,0,0,0.6); padding: 6px 14px; border-radius: 20px; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.1); }
+        
+        .player-controls-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
-        .close-player-btn:hover { background: #ff2a6d; border-color: #ff2a6d; }
+
+        .vr-mode-btn, .close-player-btn {
+            background: rgba(0, 0, 0, 0.6); color: white; border: 2px solid rgba(255,255,255,0.3);
+            font-size: 0.9rem; padding: 0 14px; height: 40px; border-radius: 20px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+            backdrop-filter: blur(5px);
+            transition: all 0.2s;
+        }
+        .vr-mode-btn:hover, .close-player-btn:hover { background: #ff2a6d; border-color: #ff2a6d; }
+        .close-player-btn { width: 40px; padding: 0; border-radius: 50%; font-size: 1.1rem; }
     </style>
 </head>
 <body>
@@ -569,18 +582,16 @@
         </div>
     </div>
 
-    <!-- REPRODUCTOR PROPIO DE REALIDAD VIRTUAL -->
+    <!-- REPRODUCTOR 360 INMERSIVO (PANOLENS) -->
     <div class="player-fullscreen-container" id="playerContainer">
         <div class="player-top-bar">
             <div class="player-title-display" id="playerTitleDisplay">Reproduciendo VR</div>
-            <button class="close-player-btn" id="closePlayerBtn">✕</button>
+            <div class="player-controls-right">
+                <button class="vr-mode-btn" id="vrCardboardBtn" title="Modo Gafas VR / Cardboard">🥽 Cardboard</button>
+                <button class="close-player-btn" id="closePlayerBtn">✕</button>
+            </div>
         </div>
-        <div class="vr-screen-wrapper">
-            <video class="vr-video-element" id="vrVideoPlayer" controls autoplay playsinline>
-                <source id="vrVideoSource" src="ms3media/ms3logo.mp4.mp4" type="video/mp4">
-                Tu navegador no soporta video HTML5.
-            </video>
-        </div>
+        <div id="vr-viewer-container"></div>
     </div>
 
     <script>
@@ -692,29 +703,68 @@
             closePreview();
         });
 
-        // Reproductor Propio RV
+        // REPRODUCTOR 360 CON PANOLENS
+        let vrViewer = null;
+        let currentVideoPanorama = null;
         const playerContainer = document.getElementById('playerContainer');
         const closePlayerBtn = document.getElementById('closePlayerBtn');
         const playerTitleDisplay = document.getElementById('playerTitleDisplay');
-        const vrVideoPlayer = document.getElementById('vrVideoPlayer');
-        const vrVideoSource = document.getElementById('vrVideoSource');
+        const vrCardboardBtn = document.getElementById('vrCardboardBtn');
+        const viewerContainer = document.getElementById('vr-viewer-container');
 
         function openPlayer(title, videoUrl) {
             playerTitleDisplay.textContent = title;
-            
-            // Si tiene un video específico, lo asignamos; si no, mantiene el predeterminado
-            if (videoUrl && videoUrl.trim() !== '') {
-                vrVideoSource.src = videoUrl;
-                vrVideoPlayer.load();
-            }
-
             playerContainer.classList.add('active');
             if (playerContainer.requestFullscreen) { playerContainer.requestFullscreen().catch(() => {}); }
-            vrVideoPlayer.play().catch(() => {});
+
+            // URL por defecto si no trae una específica
+            const targetVideo = (videoUrl && videoUrl.trim() !== '') ? videoUrl : 'https://ia600905.us.archive.org/5/items/buscando-h-265-injected_202609/BUSCANDO%20H265_injected.mp4';
+
+            // Limpiar visor anterior si existe
+            if (vrViewer) {
+                vrViewer.dispose();
+                viewerContainer.innerHTML = '';
+            }
+
+            // Crear panorama de video con Panolens
+            currentVideoPanorama = new PANOLENS.VideoPanorama(targetVideo, {
+                autoplay: true,
+                loop: true,
+                muted: false
+            });
+
+            // Inicializar el visor en el contenedor
+            vrViewer = new PANOLENS.Viewer({
+                container: viewerContainer,
+                controlBar: true,
+                autoHideControlBar: true,
+                cameraFov: 80
+            });
+
+            vrViewer.add(currentVideoPanorama);
         }
 
+        // Botón modo Cardboard / Gafas VR estereoscópicas
+        vrCardboardBtn.addEventListener('click', () => {
+            if (vrViewer) {
+                if (vrViewer.controller.stereo) {
+                    vrViewer.setStereo(!vrViewer.controller.stereoEnabled());
+                } else if (typeof vrViewer.enableControl === 'function') {
+                    // Alternativa según versión de Panolens
+                    try { vrViewer.toggleStereo(); } catch(e) {}
+                }
+            }
+        });
+
         closePlayerBtn.addEventListener('click', () => {
-            vrVideoPlayer.pause();
+            if (currentVideoPanorama && currentVideoPanorama.player) {
+                currentVideoPanorama.player.pause();
+            }
+            if (vrViewer) {
+                vrViewer.dispose();
+                vrViewer = null;
+            }
+            viewerContainer.innerHTML = '';
             playerContainer.classList.remove('active');
             if (document.exitFullscreen) { document.exitFullscreen().catch(() => {}); }
         });
