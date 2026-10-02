@@ -274,7 +274,7 @@
             transform: translateY(10px);
             transition: opacity 0.5s ease, transform 0.5s ease;
             padding: 20px;
-            padding-top: 140px; /* Espacio para que no lo tape la barra fija superior */
+            padding-top: 140px;
             padding-bottom: 50px;
             background-color: #0b0614;
             min-height: 100vh;
@@ -373,12 +373,6 @@
             color: #fff;
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255,255,255,0.2);
-        }
-        .btn-danger {
-            background-color: rgba(255, 42, 109, 0.2);
-            color: #ff2a6d;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 42, 109, 0.4);
         }
 
         /* Carruseles y Cuadrículas */
@@ -645,7 +639,6 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 100000; pointer-events: none; transition: opacity 0.3s ease;
         }
-        .player-controls.hidden { opacity: 0; pointer-events: none; }
         .control-top { position: absolute; top: 20px; right: 20px; pointer-events: auto; }
         .close-btn {
             background: rgba(0, 0, 0, 0.6); color: white; border: 2px solid white;
@@ -740,7 +733,7 @@
                 </div>
             </div>
 
-            <!-- Carrusel 2: Programas en Vivo (Con cronicatv que reproduce directo en pantalla completa al hacer clic) -->
+            <!-- Carrusel 2: Programas en Vivo (Con cronicatv interactivo optimizado para móviles) -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Programas en Vivo</div></div>
                 <div class="cards-slider">
@@ -932,16 +925,21 @@
         const youtubeIframe = document.getElementById('youtubeIframe');
         const panoramaDiv = document.getElementById('panorama');
 
-        // Función directa para reproducir en pantalla completa de manera automática y horizontal al hacer clic en la miniatura
+        // Función optimizada para abrir automáticamente en pantalla completa y rotación horizontal (Landscape) tanto en PC como en móviles
         function openPlayer(title, url, bgImg) {
             playerContainer.classList.add('active');
             
-            if (playerContainer.requestFullscreen) {
-                playerContainer.requestFullscreen().catch(() => {});
-            } else if (playerContainer.webkitRequestFullscreen) {
-                playerContainer.webkitRequestFullscreen();
+            // Forzar pantalla completa compatible con móviles y navegadores web
+            const elem = playerContainer;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(() => {});
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
             }
 
+            // Forzar orientación horizontal (Landscape) en móviles compatibles
             if (screen.orientation && screen.orientation.lock) {
                 screen.orientation.lock('landscape').catch(() => {});
             }
@@ -990,6 +988,8 @@
                 document.exitFullscreen().catch(() => {});
             } else if (document.webkitExitFullscreen) {
                 document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
             }
 
             if (screen.orientation && screen.orientation.unlock) {
