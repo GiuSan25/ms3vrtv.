@@ -18,7 +18,7 @@
             background-color: #000000;
             color: #fff;
             overflow-x: hidden;
-            overflow-y: auto; /* Scroll libre y fluido habilitado */
+            overflow-y: auto;
         }
 
         /* Pantalla de Bienvenida - Fondo Neón con Pantallas 3D Flotantes */
@@ -425,7 +425,7 @@
         .preview-actions { display: flex; gap: 12px; }
         .preview-actions .btn { flex: 1; padding: 12px; text-align: center; justify-content: center; display: flex; align-items: center; gap: 8px; }
 
-        /* Reproductor Pantalla Completa YouTube 360° */
+        /* Reproductor Pantalla Completa YouTube 360° nativo */
         .player-fullscreen-container {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: #000; z-index: 99999; display: none; justify-content: center; align-items: center;
@@ -503,11 +503,11 @@
                 </div>
             </div>
 
-            <!-- Carrusel 1: TENDENCIAS AHORA -->
+            <!-- Carrusel 1: TENDENCIAS AHORA (Buscando a la futura vedette con enlace RV oficial 360) -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Tendencias Ahora</div></div>
                 <div class="cards-slider">
-                    <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° en realidad virtual para sumergirte por completo.', 'https://youtu.be/y3qO1OL5nRg?si=_-jENRWRLTTkCJI6')">
+                    <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° en realidad virtual oficial de YouTube con soporte completo de giroscopio y controles inmersivos.', 'https://youtu.be/y3qO1OL5nRg?si=_-jENRWRLTTkCJI6')">
                         <div class="card-bg" style="background-image: url('ms3media/vedettehorizontal.png');"></div>
                         <span class="card-tag">360° Pro</span>
                         <div class="card-overlay"><div class="card-title">Buscando a la futura vedette</div></div>
@@ -556,7 +556,7 @@
         <div class="content-section" id="tabProgramas">
             <div class="section-title">Catálogo Completo de Programas VR</div>
             <div class="cards-grid">
-                <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° en realidad virtual para sumergirte por completo.', 'https://youtu.be/y3qO1OL5nRg?si=_-jENRWRLTTkCJI6')">
+                <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° en realidad virtual oficial de YouTube con soporte completo de giroscopio y controles inmersivos.', 'https://youtu.be/y3qO1OL5nRg?si=_-jENRWRLTTkCJI6')">
                     <div class="card-bg" style="background-image: url('ms3media/vedettehorizontal.png');"></div>
                     <span class="card-tag">360° Pro</span>
                     <div class="card-overlay"><div class="card-title">Buscando a la futura vedette</div></div>
@@ -620,12 +620,12 @@
         </div>
     </div>
 
-    <!-- Reproductor Pantalla Completa YouTube 360° -->
+    <!-- Reproductor Pantalla Completa YouTube 360° nativo -->
     <div class="player-fullscreen-container" id="playerContainer">
         <div class="control-top">
             <button class="close-btn" id="closePlayerBtn">✕</button>
         </div>
-        <iframe id="youtubeIframe" class="youtube-player-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        <iframe id="youtubeIframe" class="youtube-player-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; xr-spatial-tracking" allowfullscreen></iframe>
     </div>
 
     <script>
@@ -740,10 +740,12 @@
             let embedUrl = url;
             if (url.includes('youtu.be/')) {
                 const videoId = url.split('youtu.be/')[1].split('?')[0];
-                embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1`;
+                embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&playsinline=1&controls=1`;
             } else if (url.includes('watch?v=')) {
                 const videoId = url.split('watch?v=')[1].split('&')[0];
-                embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1`;
+                embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&playsinline=1&controls=1`;
+            } else if (url.includes('/embed/')) {
+                embedUrl = url + (url.includes('?') ? '&' : '?') + 'autoplay=1&enablejsapi=1&playsinline=1';
             }
             
             youtubeIframe.src = embedUrl;
