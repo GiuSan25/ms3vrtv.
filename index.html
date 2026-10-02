@@ -425,7 +425,7 @@
         .preview-actions { display: flex; gap: 12px; }
         .preview-actions .btn { flex: 1; padding: 12px; text-align: center; justify-content: center; display: flex; align-items: center; gap: 8px; }
 
-        /* Reproductor Pantalla Completa YouTube 360° nativo */
+        /* Reproductor Pantalla Completa YouTube nativo */
         .player-fullscreen-container {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: #000; z-index: 99999; display: none; justify-content: center; align-items: center;
@@ -503,7 +503,7 @@
                 </div>
             </div>
 
-            <!-- Carrusel 1: TENDENCIAS AHORA (Buscando a la futura vedette con enlace RV oficial 360) -->
+            <!-- Carrusel 1: TENDENCIAS AHORA -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Tendencias Ahora</div></div>
                 <div class="cards-slider">
@@ -524,10 +524,11 @@
                 </div>
             </div>
 
-            <!-- Carrusel 2: Programas en Vivo (cronicatv) -->
+            <!-- Carrusel 2: Programas en Vivo (Crónica, A24, TN) -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Programas en Vivo</div></div>
                 <div class="cards-slider">
+                    <!-- Crónica TV -->
                     <div class="card" onclick="openPlayer('cronicatv', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1')">
                         <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                             <iframe src="https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=1&controls=0&loop=1&playlist=hw4uHyct4vg" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
@@ -535,8 +536,25 @@
                         <span class="card-tag">EN VIVO</span>
                         <div class="card-overlay"><div class="card-title">cronicatv</div></div>
                     </div>
-                    <div class="card" onclick="openPreview('VR Cinema Masterclass', '🎬', 'Cine de próxima generación.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🎬</div><span class="card-tag">Cine</span><div class="card-overlay"><div class="card-title">VR Cinema Masterclass</div></div></div>
-                    <div class="card" onclick="openPreview('Viaje Cósmico 3D', '🌌', 'Exploración galáctica.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🌌</div><span class="card-tag">Espacio</span><div class="card-overlay"><div class="card-title">Viaje Cósmico 3D</div></div></div>
+
+                    <!-- A24 -->
+                    <div class="card" onclick="openPlayer('A24', 'https://www.youtube.com/embed/ArKbAx1K-2U?autoplay=1&mute=0&enablejsapi=1')">
+                        <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
+                            <iframe src="https://www.youtube.com/embed/ArKbAx1K-2U?autoplay=1&mute=1&controls=0&loop=1&playlist=ArKbAx1K-2U" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
+                        </div>
+                        <span class="card-tag">EN VIVO</span>
+                        <div class="card-overlay"><div class="card-title">A24</div></div>
+                    </div>
+
+                    <!-- TN -->
+                    <div class="card" onclick="openPlayer('TN', 'https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=0&enablejsapi=1')">
+                        <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
+                            <iframe src="https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=1&controls=0&loop=1&playlist=cb12KmMMDJA" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
+                        </div>
+                        <span class="card-tag">EN VIVO</span>
+                        <div class="card-overlay"><div class="card-title">TN</div></div>
+                    </div>
+
                     <div class="card" onclick="openPreview('Teatro Colon 360', '🎭', 'Acústica y arte escénico.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🎭</div><span class="card-tag">Teatro</span><div class="card-overlay"><div class="card-title">Teatro Colon 360</div></div></div>
                 </div>
             </div>
@@ -576,7 +594,20 @@
                     <span class="card-tag">EN VIVO</span>
                     <div class="card-overlay"><div class="card-title">cronicatv</div></div>
                 </div>
-                <div class="card" onclick="openPreview('Estudio Principal Live', '🔴', 'Set principal en directo.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Estudio Principal Live</div></div></div>
+                <div class="card" onclick="openPlayer('A24', 'https://www.youtube.com/embed/ArKbAx1K-2U?autoplay=1&mute=0&enablejsapi=1')">
+                    <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
+                        <iframe src="https://www.youtube.com/embed/ArKbAx1K-2U?autoplay=1&mute=1&controls=0&loop=1&playlist=ArKbAx1K-2U" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
+                    </div>
+                    <span class="card-tag">EN VIVO</span>
+                    <div class="card-overlay"><div class="card-title">A24</div></div>
+                </div>
+                <div class="card" onclick="openPlayer('TN', 'https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=0&enablejsapi=1')">
+                    <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
+                        <iframe src="https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=1&controls=0&loop=1&playlist=cb12KmMMDJA" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
+                    </div>
+                    <span class="card-tag">EN VIVO</span>
+                    <div class="card-overlay"><div class="card-title">TN</div></div>
+                </div>
             </div>
         </div>
 
@@ -620,7 +651,7 @@
         </div>
     </div>
 
-    <!-- Reproductor Pantalla Completa YouTube 360° nativo -->
+    <!-- Reproductor Pantalla Completa YouTube nativo -->
     <div class="player-fullscreen-container" id="playerContainer">
         <div class="control-top">
             <button class="close-btn" id="closePlayerBtn">✕</button>
