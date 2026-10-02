@@ -733,11 +733,11 @@
                 </div>
             </div>
 
-            <!-- Carrusel 2: Programas en Vivo (Con cronicatv interactivo optimizado para móviles) -->
+            <!-- Carrusel 2: Programas en Vivo (Con cronicatv interactivo de ejecución directa móvil) -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Programas en Vivo</div></div>
                 <div class="cards-slider">
-                    <div class="card" onclick="openPlayer('cronicatv', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1', 'ms3media/medicinahorizontal.png')">
+                    <div class="card" onclick="openPlayer('cronicatv', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1', 'ms3media/medicinahorizontal.png')">
                         <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                             <iframe src="https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=1&controls=0&loop=1&playlist=hw4uHyct4vg" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                         </div>
@@ -774,7 +774,7 @@
         <div class="content-section" id="tabDirectos">
             <div class="section-title">Transmisiones en Vivo 360°</div>
             <div class="cards-grid">
-                <div class="card" onclick="openPlayer('cronicatv', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1', 'ms3media/medicinahorizontal.png')">
+                <div class="card" onclick="openPlayer('cronicatv', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1', 'ms3media/medicinahorizontal.png')">
                     <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                         <iframe src="https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=1&controls=0&loop=1&playlist=hw4uHyct4vg" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                     </div>
@@ -795,7 +795,7 @@
         <div class="content-section" id="tabBusqueda">
             <div class="section-title">Resultados Populares</div>
             <div class="cards-grid">
-                <div class="card" onclick="openPlayer('cronicatv', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1', 'ms3media/medicinahorizontal.png')">
+                <div class="card" onclick="openPlayer('cronicatv', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1', 'ms3media/medicinahorizontal.png')">
                     <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                         <iframe src="https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=1&controls=0&loop=1&playlist=hw4uHyct4vg" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                     </div>
@@ -841,7 +841,7 @@
 
     <script>
         let myList = [
-            { title: 'cronicatv', icon: '<img src=&quot;ms3media/medicinahorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', desc: 'Transmisión en directo de Crónica TV.', url: 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1', bgImg: 'ms3media/medicinahorizontal.png' }
+            { title: 'cronicatv', icon: '<img src=&quot;ms3media/medicinahorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', desc: 'Transmisión en directo de Crónica TV.', url: 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1', bgImg: 'ms3media/medicinahorizontal.png' }
         ];
 
         let currentViewer = null;
@@ -925,11 +925,10 @@
         const youtubeIframe = document.getElementById('youtubeIframe');
         const panoramaDiv = document.getElementById('panorama');
 
-        // Función optimizada para abrir automáticamente en pantalla completa y rotación horizontal (Landscape) tanto en PC como en móviles
+        // Función optimizada para ejecución inmediata y rotación en celulares
         function openPlayer(title, url, bgImg) {
             playerContainer.classList.add('active');
             
-            // Forzar pantalla completa compatible con móviles y navegadores web
             const elem = playerContainer;
             if (elem.requestFullscreen) {
                 elem.requestFullscreen().catch(() => {});
@@ -939,7 +938,6 @@
                 elem.msRequestFullscreen();
             }
 
-            // Forzar orientación horizontal (Landscape) en móviles compatibles
             if (screen.orientation && screen.orientation.lock) {
                 screen.orientation.lock('landscape').catch(() => {});
             }
@@ -951,10 +949,10 @@
                 }
                 if (url.includes('youtu.be/')) {
                     const videoId = url.split('youtu.be/')[1].split('?')[0];
-                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1`;
                 } else if (url.includes('watch?v=')) {
                     const videoId = url.split('watch?v=')[1].split('&')[0];
-                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1`;
                 }
                 
                 panoramaDiv.style.display = 'none';
