@@ -9,6 +9,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
         body, html {
             width: 100%;
@@ -17,6 +18,7 @@
             background-color: #000000;
             color: #fff;
             overflow-x: hidden;
+            overflow-y: auto; /* Scroll libre y fluido habilitado */
         }
 
         /* Pantalla de Bienvenida - Fondo Neón con Pantallas 3D Flotantes */
@@ -148,6 +150,8 @@
             transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1), 
                         transform 1.4s cubic-bezier(0.16, 1, 0.3, 1), 
                         filter 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+            min-height: 100vh;
+            position: relative;
         }
 
         .app-container.active {
@@ -170,6 +174,7 @@
             width: 100%;
             z-index: 1000;
             border-bottom: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
         }
 
         .logo {
@@ -212,11 +217,12 @@
             top: 65px;
             left: 0;
             width: 100%;
-            background-color: #0b0614;
+            background-color: rgba(11, 6, 20, 0.95);
             border-bottom: 1px solid rgba(255,255,255,0.08);
             font-size: 0.9rem;
             z-index: 999;
             overflow-x: auto;
+            backdrop-filter: blur(10px);
         }
 
         .nav-item {
@@ -253,10 +259,10 @@
             display: none;
             opacity: 0;
             transform: translateY(10px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            transition: opacity 0.4s ease, transform 0.4s ease;
             padding: 20px;
             padding-top: 140px;
-            padding-bottom: 50px;
+            padding-bottom: 60px;
             background-color: #0b0614;
             min-height: 100vh;
         }
@@ -320,15 +326,16 @@
         .hero-buttons { display: flex; gap: 10px; }
 
         .btn {
-            padding: 8px 22px;
+            padding: 10px 24px;
             border-radius: 8px;
             font-size: 0.9rem;
             font-weight: bold;
             cursor: pointer;
             border: none;
-            transition: all 0.25s ease;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
         }
-        .btn:hover { opacity: 0.85; transform: translateY(-2px); }
+        .btn:active { transform: scale(0.96); }
         .btn-primary { background-color: #fff; color: #000; }
         .btn-secondary {
             background-color: rgba(255, 255, 255, 0.15);
@@ -340,7 +347,7 @@
         /* Carruseles y Cuadrículas */
         .row-section { margin-top: 30px; }
         .row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .cards-slider { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+        .cards-slider { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
         .cards-slider::-webkit-scrollbar { display: none; }
         .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
 
@@ -353,14 +360,11 @@
             background-color: #1a1528;
             border: 1px solid rgba(255,255,255,0.08);
             cursor: pointer;
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.25s ease, border-color 0.25s ease;
+            touch-action: manipulation;
         }
         .cards-grid .card { width: 100%; height: 120px; }
-        .card:hover {
-            transform: translateY(-4px) scale(1.03);
-            border-color: rgba(255, 42, 109, 0.6);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        }
+        .card:active { transform: scale(0.97); }
 
         .card-bg {
             width: 100%; height: 100%;
@@ -373,6 +377,7 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.85) 100%);
             display: flex; flex-direction: column; justify-content: flex-end; padding: 8px;
+            pointer-events: none;
         }
         .card-title { font-size: 0.8rem; font-weight: bold; line-height: 1.1; }
         .card-tag {
@@ -383,10 +388,10 @@
         .card-remove-btn {
             position: absolute; top: 6px; right: 6px; background: rgba(0, 0, 0, 0.7);
             color: #ff2a6d; border: 1px solid rgba(255, 42, 109, 0.4); border-radius: 50%;
-            width: 22px; height: 22px; font-size: 0.7rem; cursor: pointer; display: flex;
-            align-items: center; justify-content: center; z-index: 3; transition: background 0.2s, transform 0.2s;
+            width: 24px; height: 24px; font-size: 0.7rem; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; z-index: 3; touch-action: manipulation;
         }
-        .card-remove-btn:hover { background: #ff2a6d; color: #fff; transform: scale(1.1); }
+        .card-remove-btn:active { transform: scale(1.1); }
 
         /* MODAL DE PREVISIÓN */
         .preview-modal {
@@ -400,9 +405,9 @@
             background: #151022; width: 100%; max-width: 550px; border-radius: 16px;
             overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 20px 40px rgba(0,0,0,0.8); position: relative;
-            transform: scale(0.9) translateY(20px); transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: scale(0.95); transition: transform 0.3s ease;
         }
-        .preview-modal.active .preview-content { transform: scale(1) translateY(0); }
+        .preview-modal.active .preview-content { transform: scale(1); }
         .preview-header-img {
             width: 100%; height: 240px; background: linear-gradient(135deg, #2b1055, #a855f7);
             display: flex; align-items: center; justify-content: center; font-size: 4rem;
@@ -410,10 +415,10 @@
         }
         .preview-close {
             position: absolute; top: 15px; right: 15px; background: rgba(0, 0, 0, 0.6);
-            color: white; border: none; width: 35px; height: 35px; border-radius: 50%;
+            color: white; border: none; width: 36px; height: 36px; border-radius: 50%;
             font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            touch-action: manipulation;
         }
-        .preview-close:hover { background: #ff2a6d; }
         .preview-body { padding: 20px; }
         .preview-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 10px; }
         .preview-desc { font-size: 0.9rem; color: #b8b2cb; line-height: 1.5; margin-bottom: 25px; }
@@ -423,20 +428,20 @@
         /* Reproductor Pantalla Completa YouTube 360° */
         .player-fullscreen-container {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: #000; z-index: 99999; display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+            background-color: #000; z-index: 99999; display: none; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s ease;
         }
-        .player-fullscreen-container.active { opacity: 1; pointer-events: auto; }
+        .player-fullscreen-container.active { display: flex; opacity: 1; }
         .youtube-player-iframe {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 9999; display: block;
         }
         .control-top { position: absolute; top: 20px; right: 20px; z-index: 100000; }
         .close-btn {
             background: rgba(0, 0, 0, 0.6); color: white; border: 2px solid white;
-            font-size: 1.2rem; width: 40px; height: 40px; border-radius: 50%;
+            font-size: 1.2rem; width: 44px; height: 44px; border-radius: 50%;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
+            touch-action: manipulation;
         }
-        .close-btn:hover { background: #ff2a6d; border-color: #ff2a6d; }
     </style>
 </head>
 <body>
@@ -502,7 +507,6 @@
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Tendencias Ahora</div></div>
                 <div class="cards-slider">
-                    <!-- Tarjeta de Buscando a la futura vedette conectada al modal de previsualización -->
                     <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° en realidad virtual para sumergirte por completo.', 'https://youtu.be/y3qO1OL5nRg?si=_-jENRWRLTTkCJI6')">
                         <div class="card-bg" style="background-image: url('ms3media/vedettehorizontal.png');"></div>
                         <span class="card-tag">360° Pro</span>
@@ -680,7 +684,6 @@
             modalDesc.innerText = desc;
             modalImg.innerHTML = iconHTML + '<button class="preview-close" onclick="closePreview()">✕</button>';
             
-            // Comprobar si ya está en mi lista para mostrar la tilde
             updateAddListButtonState(title);
 
             modalPlayBtn.onclick = function() {
@@ -723,7 +726,6 @@
         const closePlayerBtn = document.getElementById('closePlayerBtn');
         const youtubeIframe = document.getElementById('youtubeIframe');
 
-        // Reproductor universal YouTube 360° / RV compatible Android e iOS
         function openPlayer(title, url) {
             playerContainer.classList.add('active');
             
@@ -741,9 +743,6 @@
                 embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1`;
             } else if (url.includes('watch?v=')) {
                 const videoId = url.split('watch?v=')[1].split('&')[0];
-                embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1`;
-            } else if (url.includes('youtu.be/')) {
-                const videoId = url.split('youtu.be/')[1].split('?')[0];
                 embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1`;
             }
             
