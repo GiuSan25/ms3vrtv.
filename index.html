@@ -151,7 +151,7 @@
             text-shadow: none;
         }
 
-        /* Contenedor Principal con Animación de Fluidez y Aparición */
+        /* Contenedor Principal */
         .app-container {
             display: none;
             opacity: 0;
@@ -169,18 +169,19 @@
             filter: blur(0px);
         }
 
-        /* Barra Superior */
+        /* Barra Superior Fija */
         .top-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 24px;
-            background: linear-gradient(180deg, rgba(11,6,20,0.95) 0%, rgba(11,6,20,0) 100%);
+            padding: 15px 24px;
+            background: rgba(11,6,20,0.95);
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
         .logo {
@@ -214,15 +215,19 @@
             font-size: 0.9rem;
         }
 
-        /* Menú de Pestañas Superior */
+        /* Menú de Pestañas Superior debajo del Top Nav */
         .sub-nav {
             display: flex;
             justify-content: space-around;
-            padding: 10px 20px;
-            margin-top: 70px;
+            padding: 12px 20px;
+            position: fixed;
+            top: 65px;
+            left: 0;
+            width: 100%;
             background-color: #0b0614;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
             font-size: 0.9rem;
+            z-index: 999;
             overflow-x: auto;
         }
 
@@ -255,23 +260,24 @@
         .nav-item.active::after {
             content: '';
             position: absolute;
-            bottom: -10px;
-            width: 20px;
+            bottom: -12px;
+            width: 25px;
             height: 3px;
             background-color: #ff2a6d;
             border-radius: 2px;
         }
 
-        /* Vistas de Contenido Dinámicas con Transición Suave */
+        /* Vistas de Contenido Dinámicas */
         .content-section {
             display: none;
             opacity: 0;
             transform: translateY(10px);
             transition: opacity 0.5s ease, transform 0.5s ease;
             padding: 20px;
+            padding-top: 140px; /* Espacio para que no lo tape la barra fija superior */
             padding-bottom: 50px;
             background-color: #0b0614;
-            min-height: calc(100vh - 130px);
+            min-height: 100vh;
         }
 
         .content-section.active {
@@ -598,7 +604,7 @@
             gap: 8px;
         }
 
-        /* Reproductor Propio 360° / Reproductor YouTube Fullscreen */
+        /* Reproductor Pantalla Completa */
         .player-fullscreen-container {
             position: fixed;
             top: 0;
@@ -734,7 +740,7 @@
                 </div>
             </div>
 
-            <!-- Carrusel 2: Programas en Vivo (Con cronicatv en miniatura reproduciéndose automáticamente sin sonido) -->
+            <!-- Carrusel 2: Programas en Vivo (Con cronicatv que reproduce directo en pantalla completa al hacer clic) -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Programas en Vivo</div></div>
                 <div class="cards-slider">
@@ -826,7 +832,7 @@
         </div>
     </div>
 
-    <!-- Visor Propio 360° / Reproductor YouTube Fullscreen -->
+    <!-- Reproductor Pantalla Completa -->
     <div class="player-fullscreen-container" id="playerContainer">
         <div id="panorama"></div>
         <iframe id="youtubeIframe" class="youtube-player-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
@@ -926,23 +932,25 @@
         const youtubeIframe = document.getElementById('youtubeIframe');
         const panoramaDiv = document.getElementById('panorama');
 
+        // Función directa para reproducir en pantalla completa de manera automática y horizontal al hacer clic en la miniatura
         function openPlayer(title, url, bgImg) {
             playerContainer.classList.add('active');
             
-            // Activar pantalla completa nativa
             if (playerContainer.requestFullscreen) {
                 playerContainer.requestFullscreen().catch(() => {});
             } else if (playerContainer.webkitRequestFullscreen) {
                 playerContainer.webkitRequestFullscreen();
             }
 
-            // Forzar rotación automática a horizontal en dispositivos móviles compatibles
             if (screen.orientation && screen.orientation.lock) {
                 screen.orientation.lock('landscape').catch(() => {});
             }
 
             if (url.includes('youtube.com/embed') || url.includes('youtu.be') || url.includes('youtube.com')) {
                 let embedUrl = url;
+                if (!embedUrl.includes('autoplay=1')) {
+                    embedUrl += (embedUrl.includes('?') ? '&' : '?') + 'autoplay=1';
+                }
                 if (url.includes('youtu.be/')) {
                     const videoId = url.split('youtu.be/')[1].split('?')[0];
                     embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
@@ -984,7 +992,6 @@
                 document.webkitExitFullscreen();
             }
 
-            // Liberar bloqueo de orientación al cerrar
             if (screen.orientation && screen.orientation.unlock) {
                 try { screen.orientation.unlock(); } catch (e) {}
             }
