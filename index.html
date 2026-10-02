@@ -466,6 +466,7 @@
             padding: 2px 6px;
             border-radius: 4px;
             color: #d8b4fe;
+            z-index: 2;
         }
 
         .card-remove-btn {
@@ -714,7 +715,7 @@
                 </div>
             </div>
 
-            <!-- Carrusel 1: PROGRAMAS VR -->
+            <!-- Carrusel 1: TENDENCIAS AHORA -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Tendencias Ahora</div></div>
                 <div class="cards-slider">
@@ -730,29 +731,24 @@
                     <div class="card" onclick="openPreview('AGR COMPETICION', '<img src=&quot;ms3media/agrcompeticionhorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Adrenalina total en pista y boxes con AGR Competición en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/agrcompeticionhorizontal.png')">
                         <div class="card-bg" style="background-image: url('ms3media/agrcompeticionhorizontal.png');"></div><span class="card-tag">Motor</span><div class="card-overlay"><div class="card-title">AGR COMPETICION</div></div>
                     </div>
-                    <div class="card" onclick="openPreview('BROTHER THE SKATE BOAR', '<img src=&quot;ms3media/skatehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Acción extrema de skate y saltos urbanos en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/skatehorizontal.png')">
-                        <div class="card-bg" style="background-image: url('ms3media/skatehorizontal.png');"></div><span class="card-tag">Skate</span><div class="card-overlay"><div class="card-title">BROTHER THE SKATE BOAR</div></div></div>
-                    <div class="card" onclick="openPreview('VR MODA', '<img src=&quot;ms3media/vrmodahorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Glamour, desfiles y alta costura inmersiva en pasarelas exclusivas.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/vrmodahorizontal.png')">
-                        <div class="card-bg" style="background-image: url('ms3media/vrmodahorizontal.png');"></div><span class="card-tag">Moda</span><div class="card-overlay"><div class="card-title">VR MODA</div></div></div>
-                    <div class="card" onclick="openPreview('VR MUSIC', '<img src=&quot;ms3media/vrmusichorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Conciertos en vivo y experiencias musicales inmersivas en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/vrmusichorizontal.png')">
-                        <div class="card-bg" style="background-image: url('ms3media/vrmusichorizontal.png');"></div><span class="card-tag">Música</span><div class="card-overlay"><div class="card-title">VR MUSIC</div></div></div>
                 </div>
             </div>
 
-            <!-- Carrusel 2: Programas en Vivo -->
+            <!-- Carrusel 2: Programas en Vivo (Con Lanzamiento Alpha en miniatura interactiva de video) -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">Programas en Vivo</div></div>
                 <div class="cards-slider">
-                    <!-- Lanzamiento Alpha con miniatura interactiva y botón de reproducción que abre en pantalla completa -->
+                    <!-- Tarjeta con reproducción automática y sin sonido en la miniatura -->
                     <div class="card" onclick="openPlayer('Lanzamiento Alpha', 'https://www.youtube.com/embed/nndzeKDSjuc?autoplay=1', 'ms3media/medicinahorizontal.png')">
-                        <div class="card-bg" style="background-image: url('ms3media/medicinahorizontal.png');"></div>
+                        <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
+                            <iframe src="https://www.youtube.com/embed/nndzeKDSjuc?autoplay=1&mute=1&controls=0&loop=1&playlist=nndzeKDSjuc" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
+                        </div>
                         <span class="card-tag">EN VIVO</span>
                         <div class="card-overlay"><div class="card-title">Lanzamiento Alpha</div></div>
                     </div>
                     <div class="card" onclick="openPreview('VR Cinema Masterclass', '🎬', 'Cine de próxima generación.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/lamasahorizontal.png')"><div class="card-bg">🎬</div><span class="card-tag">Cine</span><div class="card-overlay"><div class="card-title">VR Cinema Masterclass</div></div></div>
                     <div class="card" onclick="openPreview('Viaje Cósmico 3D', '🌌', 'Exploración galáctica.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/vedettehorizontal.png')"><div class="card-bg">🌌</div><span class="card-tag">Espacio</span><div class="card-overlay"><div class="card-title">Viaje Cósmico 3D</div></div></div>
                     <div class="card" onclick="openPreview('Teatro Colon 360', '🎭', 'Acústica y arte escénico.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/sanderdocumentalnuevo.jpeg')"><div class="card-bg">🎭</div><span class="card-tag">Teatro</span><div class="card-overlay"><div class="card-title">Teatro Colon 360</div></div></div>
-                    <div class="card" onclick="openPreview('Safari Salvaje VR', '🦁', 'Fauna en libertad.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/lamasahorizontal.png')"><div class="card-bg">🦁</div><span class="card-tag">Safari</span><div class="card-overlay"><div class="card-title">Safari Salvaje VR</div></div></div>
                 </div>
             </div>
 
@@ -763,7 +759,6 @@
                     <div class="card" onclick="openPreview('Historia de los Motores', '🔧', 'Evolución mecánica.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/agrcompeticionhorizontal.png')"><div class="card-bg">🔧</div><span class="card-tag">Historia</span><div class="card-overlay"><div class="card-title">Historia de los Motores</div></div></div>
                     <div class="card" onclick="openPreview('Pioneros del Espacio', '🛰️', 'La carrera espacial.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/vedettehorizontal.png')"><div class="card-bg">🛰️</div><span class="card-tag">Ciencia</span><div class="card-overlay"><div class="card-title">Pioneros del Espacio</div></div></div>
                     <div class="card" onclick="openPreview('Secretos de la Ópera', '🎭', 'Detrás del telón.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/sanderdocumentalnuevo.jpeg')"><div class="card-bg">🎭</div><span class="card-tag">Cultura</span><div class="card-overlay"><div class="card-title">Secretos de la Ópera</div></div></div>
-                    <div class="card" onclick="openPreview('Arquitectura Futura', '🏙️', 'Megaciudades 3D.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/lamasahorizontal.png')"><div class="card-bg">🏙️️</div><span class="card-tag">Diseño</span><div class="card-overlay"><div class="card-title">Arquitectura Futura</div></div></div>
                 </div>
             </div>
         </div>
@@ -774,8 +769,6 @@
             <div class="cards-grid">
                 <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° en realidad virtual.', 'https://youtu.be/y3qO1OL5nRg?si=ba7IAytpCXHOnFrM', 'ms3media/vedettehorizontal.png')"><div class="card-bg" style="background-image: url('ms3media/vedettehorizontal.png');"></div><span class="card-tag">360° Pro</span><div class="card-overlay"><div class="card-title">Buscando a la futura vedette</div></div></div>
                 <div class="card" onclick="openPreview('MEDICINA VR', '<img src=&quot;ms3media/medicinahorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Avances médicos inmersivos.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/medicinahorizontal.png')"><div class="card-bg" style="background-image: url('ms3media/medicinahorizontal.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">MEDICINA VR</div></div></div>
-                <div class="card" onclick="openPreview('LA MASA', '<img src=&quot;ms3media/lamasahorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Detrás de escena.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/lamasahorizontal.png')"><div class="card-bg" style="background-image: url('ms3media/lamasahorizontal.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">LA MASA</div></div></div>
-                <div class="card" onclick="openPreview('AGR COMPETICION', '<img src=&quot;ms3media/agrcompeticionhorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Adrenalina total en pista y boxes con AGR Competición en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/agrcompeticionhorizontal.png')"><div class="card-bg" style="background-image: url('ms3media/agrcompeticionhorizontal.png');"></div><span class="card-tag">Motor</span><div class="card-overlay"><div class="card-title">AGR COMPETICION</div></div></div>
             </div>
         </div>
 
@@ -783,10 +776,14 @@
         <div class="content-section" id="tabDirectos">
             <div class="section-title">Transmisiones en Vivo 360°</div>
             <div class="cards-grid">
-                <div class="card" onclick="openPlayer('Lanzamiento Alpha', 'https://www.youtube.com/embed/nndzeKDSjuc?autoplay=1', 'ms3media/medicinahorizontal.png')"><div class="card-bg" style="background-image: url('ms3media/medicinahorizontal.png');"></div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Lanzamiento Alpha</div></div></div>
+                <div class="card" onclick="openPlayer('Lanzamiento Alpha', 'https://www.youtube.com/embed/nndzeKDSjuc?autoplay=1', 'ms3media/medicinahorizontal.png')">
+                    <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
+                        <iframe src="https://www.youtube.com/embed/nndzeKDSjuc?autoplay=1&mute=1&controls=0&loop=1&playlist=nndzeKDSjuc" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
+                    </div>
+                    <span class="card-tag">EN VIVO</span>
+                    <div class="card-overlay"><div class="card-title">Lanzamiento Alpha</div></div>
+                </div>
                 <div class="card" onclick="openPreview('Estudio Principal Live', '🔴', 'Set principal en directo.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/sanderdocumentalnuevo.jpeg')"><div class="card-bg">🔴</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Estudio Principal Live</div></div></div>
-                <div class="card" onclick="openPreview('Boxes AGR Competición Live', '🏎️', 'Transmisión exclusiva en vivo desde el equipo AGR.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/agrcompeticionhorizontal.png')"><div class="card-bg">🏎️</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Boxes AGR Competición Live</div></div></div>
-                <div class="card" onclick="openPreview('Backstage Show Live', '✨', 'Previa en directo del show.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/vrmodahorizontal.png')"><div class="card-bg">✨</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Backstage Show Live</div></div></div>
             </div>
         </div>
 
@@ -801,7 +798,6 @@
             <div class="section-title">Resultados Populares</div>
             <div class="cards-grid">
                 <div class="card" onclick="openPlayer('Lanzamiento Alpha', 'https://www.youtube.com/embed/nndzeKDSjuc?autoplay=1', 'ms3media/medicinahorizontal.png')"><div class="card-bg" style="background-image: url('ms3media/medicinahorizontal.png');"></div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Lanzamiento Alpha</div></div></div>
-                <div class="card" onclick="openPreview('Global 360 News', '🌍', 'Noticias internacionales en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', 'ms3media/vedettehorizontal.png')"><div class="card-bg">🌍</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Global 360 News</div></div></div>
             </div>
         </div>
 
