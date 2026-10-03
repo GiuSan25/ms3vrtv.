@@ -417,8 +417,11 @@
             z-index: 999999; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.9);
         }
         .vertical-mini-player.active { display: block; }
+        .vertical-mini-player video {
+            width: 100%; height: 100%; object-fit: cover; border: none; display: none;
+        }
         .vertical-mini-player iframe {
-            width: 100%; height: 100%; border: none; object-fit: cover;
+            width: 100%; height: 100%; border: none; display: none;
         }
         .mini-close-btn {
             position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: #ff2a6d;
@@ -508,7 +511,7 @@
             <div class="logo" id="logoHomeBtn">MS3</div>
             <div class="top-icons">
                 <div class="profile-icon" id="profileBtn" title="Mi Cuenta">GV</div>
-                <div id="settingsBtn" title="Ajustes">⚙️</div>
+                <div id="settingsBtn" title="Ajustes">⚙</div>
             </div>
         </div>
 
@@ -536,7 +539,7 @@
                 </div>
             </div>
 
-            <!-- Carrusel 1: PROGRAMAS EN REALIDAD VIRTUAL (10+ pantallas) -->
+            <!-- Carrusel 1: PROGRAMAS EN REALIDAD VIRTUAL -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">PROGRAMAS EN REALIDAD VIRTUAL</div></div>
                 <div class="cards-slider">
@@ -554,7 +557,7 @@
                     </div>
                     <div class="card" onclick="openPreview('VR Círculo Polar', '❄️', 'Exploración glacial en 360°.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">❄️</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Círculo Polar VR</div></div></div>
                     <div class="card" onclick="openPreview('VR Aventura Submarina', '🌊', 'Fosa de las Marianas en realidad virtual.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🌊</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Aventura Submarina</div></div></div>
-                    <div class="card" onclick="openPreview('VR Estación Espacial', '🛰️', 'Paseo por la ISS en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🛰️</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Estación Espacial VR</div></div></div>
+                    <div class="card" onclick="openPreview('VR Estación Espacial', '🛰', 'Paseo por la ISS en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🛰️</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Estación Espacial VR</div></div></div>
                     <div class="card" onclick="openPreview('VR Safari Africano', '🦁', 'Fauna salvaje en alta definición 360°.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🦁</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Safari Africano</div></div></div>
                     <div class="card" onclick="openPreview('VR Concierto Sinfónico', '🎻', 'En el centro de la orquesta.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🎻</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Concierto Sinfónico</div></div></div>
                     <div class="card" onclick="openPreview('VR Rascacielos', '🏙️', 'Vértigo y arquitectura en las alturas.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🏙️</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Rascacielos VR</div></div></div>
@@ -563,7 +566,7 @@
                 </div>
             </div>
 
-            <!-- Carrusel 2: NOTICIAS EN VIVO (10+ pantallas) -->
+            <!-- Carrusel 2: NOTICIAS EN VIVO -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">NOTICIAS EN VIVO</div></div>
                 <div class="cards-slider">
@@ -602,8 +605,20 @@
                         </div>
                         <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">LN+</div></div>
                     </div>
-                    <div class="card" onclick="openPlayer('Canal 26', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1')"><div class="card-bg">📺</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Canal 26</div></div></div>
-                    <div class="card" onclick="openPlayer('IP Noticias', 'https://www.youtube.com/embed/ArKbAx1K-2U?autoplay=1&mute=0&enablejsapi=1')"><div class="card-bg">📰</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">IP Noticias</div></div></div>
+                    <!-- ARGENTINA|12 -->
+                    <div class="card" onclick="openPlayer('ARGENTINA|12', 'https://www.youtube.com/embed/21UP3XoRIBU?autoplay=1&mute=0&enablejsapi=1')">
+                        <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
+                            <iframe src="https://www.youtube.com/embed/21UP3XoRIBU?autoplay=1&mute=1&controls=0&loop=1&playlist=21UP3XoRIBU" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
+                        </div>
+                        <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">ARGENTINA|12</div></div>
+                    </div>
+                    <!-- CADENA 3 -->
+                    <div class="card" onclick="openPlayer('CADENA 3', 'https://www.youtube.com/embed/Bk471uQ26-4?autoplay=1&mute=0&enablejsapi=1')">
+                        <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
+                            <iframe src="https://www.youtube.com/embed/Bk471uQ26-4?autoplay=1&mute=1&controls=0&loop=1&playlist=Bk471uQ26-4" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
+                        </div>
+                        <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">CADENA 3</div></div>
+                    </div>
                     <div class="card" onclick="openPlayer('Telefe Noticias', 'https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=0&enablejsapi=1')"><div class="card-bg">📡</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Telefe Noticias</div></div></div>
                     <div class="card" onclick="openPlayer('El Trece Live', 'https://www.youtube.com/embed/j6oh4Kqz3UM?autoplay=1&mute=0&enablejsapi=1')"><div class="card-bg">📺</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">El Trece Live</div></div></div>
                     <div class="card" onclick="openPlayer('TV Pública', 'https://www.youtube.com/embed/FEWZjXJ7M0c?autoplay=1&mute=0&enablejsapi=1')"><div class="card-bg">🇦🇷</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">TV Pública</div></div></div>
@@ -611,7 +626,7 @@
                 </div>
             </div>
 
-            <!-- Carrusel 3: STREAMING (10+ pantallas) -->
+            <!-- Carrusel 3: STREAMING -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">STREAMING</div></div>
                 <div class="cards-slider">
@@ -633,29 +648,21 @@
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">FAMOSOS DE MS3</div></div>
                 <div class="famosos-slider">
-                    <div class="famoso-item" onclick="openVerticalMiniPlayer('Sander Maurin', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1')">
-                        <div class="famoso-circle" style="background-image: url('ms3media/sanderdocumentalnuevo.jpeg');"></div>
-                        <div class="famoso-name">Sander Maurin</div>
+                    <div class="famoso-item" onclick="openVerticalMiniPlayer('Guillermo Francella', 'https://www.youtube.com/embed/m3UE2RQ9bJE?autoplay=1&enablejsapi=1', true)">
+                        <div class="famoso-circle" style="background-image: url('ms3media/guillermofranchellafoto.jpeg');"></div>
+                        <div class="famoso-name">Guillermo Francella</div>
                     </div>
-                    <div class="famoso-item" onclick="openVerticalMiniPlayer('Giuliana Valenzuela', 'https://www.youtube.com/embed/y3qO1OL5nRg?autoplay=1&mute=0&enablejsapi=1')">
-                        <div class="famoso-circle" style="background-image: url('ms3media/vedettehorizontal.png');"></div>
-                        <div class="famoso-name">Giuliana V.</div>
+                    <div class="famoso-item" onclick="openVerticalMiniPlayer('Valeria Lynch', 'ms3media/valerialynch.mp4', false)">
+                        <div class="famoso-circle" style="background-image: url('ms3media/valerialynchfoto.jpeg');"></div>
+                        <div class="famoso-name">Valeria Lynch</div>
                     </div>
-                    <div class="famoso-item" onclick="openVerticalMiniPlayer('Invitado Especial 1', 'https://www.youtube.com/embed/ArKbAx1K-2U?autoplay=1&mute=0&enablejsapi=1')">
-                        <div class="famoso-circle" style="background-image: url('ms3media/medicinahorizontal.png');"></div>
-                        <div class="famoso-name">Dr. Mágico</div>
+                    <div class="famoso-item" onclick="openVerticalMiniPlayer('Anibal Pachano', 'ms3media/anibalpachanovideo.mp4', false)">
+                        <div class="famoso-circle" style="background-image: url('ms3media/anibalpachanofoto.jpeg');"></div>
+                        <div class="famoso-name">Anibal Pachano</div>
                     </div>
-                    <div class="famoso-item" onclick="openVerticalMiniPlayer('Estrella VR', 'https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=0&enablejsapi=1')">
-                        <div class="famoso-circle" style="background-image: url('ms3media/lamasahorizontal.png');"></div>
-                        <div class="famoso-name">La Masa Star</div>
-                    </div>
-                    <div class="famoso-item" onclick="openVerticalMiniPlayer('Piloto MS3', 'https://www.youtube.com/embed/j6oh4Kqz3UM?autoplay=1&mute=0&enablejsapi=1')">
-                        <div class="famoso-circle" style="background-image: url('ms3media/agrcompeticionhorizontal.png');"></div>
-                        <div class="famoso-name">AGR Driver</div>
-                    </div>
-                    <div class="famoso-item" onclick="openVerticalMiniPlayer('Creador Genial', 'https://www.youtube.com/embed/FEWZjXJ7M0c?autoplay=1&mute=0&enablejsapi=1')">
-                        <div class="famoso-circle" style="background-image: url('ms3media/sanderdocumentalnuevo.jpeg');"></div>
-                        <div class="famoso-name">Neo Maker</div>
+                    <div class="famoso-item" onclick="openVerticalMiniPlayer('Lucia Galan', 'ms3media/luciagalanvideo.mp4', false)">
+                        <div class="famoso-circle" style="background-image: url('ms3media/luciagalanfoto.jpeg');"></div>
+                        <div class="famoso-name">Lucia Galan</div>
                     </div>
                 </div>
             </div>
@@ -708,6 +715,18 @@
                     </div>
                     <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">LN+</div></div>
                 </div>
+                <div class="card" onclick="openPlayer('ARGENTINA|12', 'https://www.youtube.com/embed/21UP3XoRIBU?autoplay=1&mute=0&enablejsapi=1')">
+                    <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
+                        <iframe src="https://www.youtube.com/embed/21UP3XoRIBU?autoplay=1&mute=1&controls=0&loop=1&playlist=21UP3XoRIBU" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
+                    </div>
+                    <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">ARGENTINA|12</div></div>
+                </div>
+                <div class="card" onclick="openPlayer('CADENA 3', 'https://www.youtube.com/embed/Bk471uQ26-4?autoplay=1&mute=0&enablejsapi=1')">
+                    <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
+                        <iframe src="https://www.youtube.com/embed/Bk471uQ26-4?autoplay=1&mute=1&controls=0&loop=1&playlist=Bk471uQ26-4" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
+                    </div>
+                    <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">CADENA 3</div></div>
+                </div>
             </div>
         </div>
 
@@ -735,7 +754,8 @@
     <!-- REPRODUCTOR VERTICAL MINI FLOTANTE (FAMOSOS MS3) -->
     <div class="vertical-mini-player" id="verticalMiniPlayer">
         <button class="mini-close-btn" onclick="closeVerticalMiniPlayer()">✕</button>
-        <iframe id="verticalMiniIframe" src="" allow="autoplay; encrypted-media"></iframe>
+        <video id="verticalMiniVideo" src="" autoplay playsinline></video>
+        <iframe id="verticalMiniIframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
     </div>
 
     <!-- MODAL DE PREVISUALIZACIÓN -->
@@ -805,26 +825,39 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // Reproductor Mini Vertical para Famosos MS3
+        // Reproductor Mini Vertical Mixto (Soporta Videos Locales o YouTube Shorts)
         const verticalMiniPlayer = document.getElementById('verticalMiniPlayer');
+        const verticalMiniVideo = document.getElementById('verticalMiniVideo');
         const verticalMiniIframe = document.getElementById('verticalMiniIframe');
-        let miniPlayerTimer = null;
 
-        function openVerticalMiniPlayer(name, url) {
-            verticalMiniIframe.src = url;
+        function openVerticalMiniPlayer(name, source, isYouTube) {
             verticalMiniPlayer.classList.add('active');
 
-            // Simulación de cierre automático al finalizar el video breve o transcurridos 15 segundos
-            if(miniPlayerTimer) clearTimeout(miniPlayerTimer);
-            miniPlayerTimer = setTimeout(() => {
-                closeVerticalMiniPlayer();
-            }, 15000);
+            if (isYouTube) {
+                verticalMiniVideo.style.display = 'none';
+                verticalMiniVideo.pause();
+                verticalMiniVideo.src = '';
+                
+                verticalMiniIframe.style.display = 'block';
+                verticalMiniIframe.src = source;
+            } else {
+                verticalMiniIframe.style.display = 'none';
+                verticalMiniIframe.src = '';
+
+                verticalMiniVideo.style.display = 'block';
+                verticalMiniVideo.src = source;
+                verticalMiniVideo.play().catch(() => {});
+                verticalMiniVideo.onended = function() {
+                    closeVerticalMiniPlayer();
+                };
+            }
         }
 
         function closeVerticalMiniPlayer() {
             verticalMiniPlayer.classList.remove('active');
+            verticalMiniVideo.pause();
+            verticalMiniVideo.src = '';
             verticalMiniIframe.src = '';
-            if(miniPlayerTimer) clearTimeout(miniPlayerTimer);
         }
 
         const previewModal = document.getElementById('previewModal');
