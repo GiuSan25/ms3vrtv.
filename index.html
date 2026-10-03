@@ -412,19 +412,19 @@
         .famoso-circle:active { transform: scale(0.95); box-shadow: 0 0 20px #00f3ff; }
         .famoso-name { font-size: 0.75rem; text-align: center; font-weight: bold; color: #d8b4fe; white-space: nowrap; }
 
-        /* Reproductor Vertical Flotante Mini para Famosos */
+        /* Reproductor Vertical Flotante Mini para Famosos (Corregido y Adaptado) */
         .vertical-mini-player {
-            position: fixed; bottom: 30px; right: 20px; width: 140px; height: 240px;
+            position: fixed; bottom: 30px; right: 20px; width: 160px; height: 280px;
             background: #000; border: 2px solid #00f3ff; border-radius: 12px; overflow: hidden;
             z-index: 999999; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.9);
         }
-        .vertical-mini-player.active { display: block; }
-        .vertical-mini-player iframe {
-            width: 100%; height: 100%; border: none; pointer-events: none;
+        .vertical-mini-player.active { display: flex; flex-direction: column; }
+        .vertical-mini-player iframe, .vertical-mini-player video {
+            width: 100%; height: 100%; border: none; object-fit: cover; background: #000;
         }
         .mini-close-btn {
-            position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: #ff2a6d;
-            border: 1px solid #ff2a6d; border-radius: 50%; width: 22px; height: 22px; font-size: 0.7rem;
+            position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.8); color: #ff2a6d;
+            border: 1px solid #ff2a6d; border-radius: 50%; width: 24px; height: 24px; font-size: 0.75rem;
             cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 1000000;
         }
 
@@ -554,7 +554,7 @@
                     <div class="card" onclick="openPreview('AGR COMPETICION', '<img src=&quot;ms3media/agrcompeticionhorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Adrenalina total en pista y boxes.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')">
                         <div class="card-bg" style="background-image: url('ms3media/agrcompeticionhorizontal.png');"></div><span class="card-tag">Motor</span><div class="card-overlay"><div class="card-title">AGR COMPETICION</div></div>
                     </div>
-                    <div class="card" onclick="openPreview('VR Círculo Polar', '❄️', 'Exploración glacial en 360°.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">❄️</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Círculo Polar VR</div></div></div>
+                    <div class="card" onclick="openPreview('VR Círculo Polar', '❄️', 'Exploración glacial en 360°.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">❄️️</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Círculo Polar VR</div></div></div>
                     <div class="card" onclick="openPreview('VR Aventura Submarina', '🌊', 'Fosa de las Marianas en realidad virtual.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🌊</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Aventura Submarina</div></div></div>
                     <div class="card" onclick="openPreview('VR Estación Espacial', '🛰', 'Paseo por la ISS en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🛰️</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Estación Espacial VR</div></div></div>
                     <div class="card" onclick="openPreview('VR Safari Africano', '🦁', 'Fauna salvaje en alta definición 360°.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🦁</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Safari Africano</div></div></div>
@@ -647,7 +647,7 @@
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">FAMOSOS DE MS3</div></div>
                 <div class="famosos-slider">
-                    <div class="famoso-item" onclick="openVerticalMiniPlayer('Guillermo Francella', 'https://drive.google.com/file/d/1_8wvluTjIZJA04noqIp7kl9Vvcy153qN/preview')">
+                    <div class="famoso-item" onclick="openVerticalMiniPlayer('Guillermo Francella', 'https://docs.google.com/uc?export=download&id=1_8wvluTjIZJA04noqIp7kl9Vvcy153qN')">
                         <div class="famoso-circle" style="background-image: url('ms3media/guillermofranchellafoto.jpeg');"></div>
                         <div class="famoso-name">Guillermo Francella</div>
                     </div>
@@ -753,7 +753,7 @@
     <!-- REPRODUCTOR VERTICAL MINI FLOTANTE (FAMOSOS MS3) -->
     <div class="vertical-mini-player" id="verticalMiniPlayer">
         <button class="mini-close-btn" onclick="closeVerticalMiniPlayer()">✕</button>
-        <iframe id="verticalMiniIframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+        <div id="verticalPlayerWrapper" style="width:100%; height:100%; position:relative;"></div>
     </div>
 
     <!-- MODAL DE PREVISUALIZACIÓN -->
@@ -823,23 +823,37 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // Reproductor Mini Vertical Automático para Famosos MS3
+        // Reproductor Mini Vertical Adaptado para Google Drive y YouTube
         const verticalMiniPlayer = document.getElementById('verticalMiniPlayer');
-        const verticalMiniIframe = document.getElementById('verticalMiniIframe');
+        const verticalPlayerWrapper = document.getElementById('verticalPlayerWrapper');
 
-        function openVerticalMiniPlayer(name, embedUrl) {
-            // Asegura que Google Drive reproduzca automáticamente agregando autoplay=1
-            let finalUrl = embedUrl;
-            if (finalUrl.includes('drive.google.com') && !finalUrl.includes('autoplay=1')) {
-                finalUrl += (finalUrl.includes('?') ? '&' : '?') + 'autoplay=1';
+        function openVerticalMiniPlayer(name, url) {
+            verticalPlayerWrapper.innerHTML = '';
+            if (url.includes('google.com')) {
+                const videoEl = document.createElement('video');
+                videoEl.src = url;
+                videoEl.autoplay = true;
+                videoEl.controls = true;
+                videoEl.playsInline = true;
+                videoEl.style.width = '100%';
+                videoEl.style.height = '100%';
+                videoEl.style.objectFit = 'cover';
+                verticalPlayerWrapper.appendChild(videoEl);
+            } else {
+                const iframeEl = document.createElement('iframe');
+                iframeEl.src = url;
+                iframeEl.style.width = '100%';
+                iframeEl.style.height = '100%';
+                iframeEl.style.border = 'none';
+                iframeEl.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+                verticalPlayerWrapper.appendChild(iframeEl);
             }
-            verticalMiniIframe.src = finalUrl;
             verticalMiniPlayer.classList.add('active');
         }
 
         function closeVerticalMiniPlayer() {
             verticalMiniPlayer.classList.remove('active');
-            verticalMiniIframe.src = '';
+            verticalPlayerWrapper.innerHTML = '';
         }
 
         const previewModal = document.getElementById('previewModal');
