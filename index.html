@@ -213,7 +213,7 @@
         /* Menú de Pestañas Superior */
         .sub-nav {
             display: flex;
-            justify-style: space-around;
+            justify-content: space-around;
             padding: 12px 20px;
             position: fixed;
             top: 65px;
@@ -395,7 +395,7 @@
         }
         .card-remove-btn:active { transform: scale(1.1); }
 
-        /* Estilo Carrusel Famosos MS3 (Circular / Redondo con Borde Neón Futurista) */
+        /* Estilo Carrusel Famosos MS3 */
         .famosos-slider {
             display: flex; gap: 16px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
         }
@@ -414,7 +414,7 @@
         .famoso-circle:active { transform: scale(0.95); box-shadow: 0 0 20px #00f3ff; }
         .famoso-name { font-size: 0.75rem; text-align: center; font-weight: bold; color: #d8b4fe; white-space: nowrap; }
 
-        /* Reproductor Vertical Flotante Mini para Famosos (Corregido y Adaptado) */
+        /* Reproductor Vertical Flotante Mini para Famosos */
         .vertical-mini-player {
             position: fixed; bottom: 30px; right: 20px; width: 160px; height: 280px;
             background: #000; border: 2px solid #00f3ff; border-radius: 12px; overflow: hidden;
@@ -539,8 +539,8 @@
                 <div class="hero-details">
                     <h2>SANDER MAURIN : creador y director de MS3</h2>
                     <div class="hero-buttons">
-                        <button class="btn btn-primary" onclick="openPlayer('Sander maurin creador y director de ms3', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')">▶ REPRODUCIR</button>
-                        <button class="btn btn-secondary" onclick="openPreview('Sander maurin creador y director de ms3', '<img src=&quot;ms3media/sanderdocumentalnuevo.jpeg&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Disfruta de este contenido exclusivo inmersivo directed por Sander Maurin...', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')">INFO</button>
+                        <button class="btn btn-primary" onclick="openPlayer('Sander maurin creador y director de ms3', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">▶ REPRODUCIR</button>
+                        <button class="btn btn-secondary" onclick="openPreview('Sander maurin creador y director de ms3', '<img src=&quot;ms3media/sanderdocumentalnuevo.jpeg&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Disfruta de este contenido exclusivo inmersivo dirigido por Sander Maurin...', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">INFO</button>
                     </div>
                 </div>
             </div>
@@ -549,7 +549,7 @@
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">PROGRAMAS EN REALIDAD VIRTUAL</div></div>
                 <div class="cards-slider">
-                    <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° en realidad virtual oficial de YouTube.', 'https://youtu.be/y3qO1OL5nRg?si=_-jENRWRLTTkCJI6', true)">
+                    <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° en realidad virtual con giroscopio.', 'https://youtu.be/y3qO1OL5nRg?si=_-jENRWRLTTkCJI6', true)">
                         <div class="card-bg" style="background-image: url('ms3media/vedettehorizontal.png');"></div><span class="card-tag">360° Pro</span><div class="card-overlay"><div class="card-title">Buscando a la futura vedette</div></div>
                     </div>
                     <div class="card" onclick="openPreview('MEDICINA VR 1', '<img src=&quot;ms3media/medicinahorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Avances médicos inmersivos parte 1.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
@@ -577,58 +577,58 @@
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">NOTICIAS EN VIVO</div></div>
                 <div class="cards-slider">
                     <!-- CRONICA -->
-                    <div class="card" onclick="openPlayer('CRONICA', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1')">
+                    <div class="card" onclick="openPlayer('CRONICA', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1', false)">
                         <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                             <iframe src="https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=1&controls=0&loop=1&playlist=hw4uHyct4vg" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                         </div>
                         <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">CRONICA</div></div>
                     </div>
                     <!-- A24 -->
-                    <div class="card" onclick="openPlayer('A24', 'https://www.youtube.com/embed/ArKbAx1K-2U?autoplay=1&mute=0&enablejsapi=1')">
+                    <div class="card" onclick="openPlayer('A24', 'https://www.youtube.com/embed/ArKbAx1K-2U?autoplay=1&mute=0&enablejsapi=1', false)">
                         <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                             <iframe src="https://www.youtube.com/embed/ArKbAx1K-2U?autoplay=1&mute=1&controls=0&loop=1&playlist=ArKbAx1K-2U" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                         </div>
                         <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">A24</div></div>
                     </div>
                     <!-- TN -->
-                    <div class="card" onclick="openPlayer('TN', 'https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=0&enablejsapi=1')">
+                    <div class="card" onclick="openPlayer('TN', 'https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=0&enablejsapi=1', false)">
                         <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                             <iframe src="https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=1&controls=0&loop=1&playlist=cb12KmMMDJA" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                         </div>
                         <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">TN</div></div>
                     </div>
                     <!-- C5N -->
-                    <div class="card" onclick="openPlayer('C5N', 'https://www.youtube.com/embed/j6oh4Kqz3UM?autoplay=1&mute=0&enablejsapi=1')">
+                    <div class="card" onclick="openPlayer('C5N', 'https://www.youtube.com/embed/j6oh4Kqz3UM?autoplay=1&mute=0&enablejsapi=1', false)">
                         <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                             <iframe src="https://www.youtube.com/embed/j6oh4Kqz3UM?autoplay=1&mute=1&controls=0&loop=1&playlist=j6oh4Kqz3UM" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                         </div>
                         <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">C5N</div></div>
                     </div>
                     <!-- LN+ -->
-                    <div class="card" onclick="openPlayer('LN+', 'https://www.youtube.com/embed/FEWZjXJ7M0c?autoplay=1&mute=0&enablejsapi=1')">
+                    <div class="card" onclick="openPlayer('LN+', 'https://www.youtube.com/embed/FEWZjXJ7M0c?autoplay=1&mute=0&enablejsapi=1', false)">
                         <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                             <iframe src="https://www.youtube.com/embed/FEWZjXJ7M0c?autoplay=1&mute=1&controls=0&loop=1&playlist=FEWZjXJ7M0c" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                         </div>
                         <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">LN+</div></div>
                     </div>
                     <!-- ARGENTINA|12 -->
-                    <div class="card" onclick="openPlayer('ARGENTINA|12', 'https://www.youtube.com/embed/21UP3XoRIBU?autoplay=1&mute=0&enablejsapi=1')">
+                    <div class="card" onclick="openPlayer('ARGENTINA|12', 'https://www.youtube.com/embed/21UP3XoRIBU?autoplay=1&mute=0&enablejsapi=1', false)">
                         <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                             <iframe src="https://www.youtube.com/embed/21UP3XoRIBU?autoplay=1&mute=1&controls=0&loop=1&playlist=21UP3XoRIBU" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                         </div>
                         <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">ARGENTINA|12</div></div>
                     </div>
                     <!-- CADENA 3 -->
-                    <div class="card" onclick="openPlayer('CADENA 3', 'https://www.youtube.com/embed/Bk471uQ26-4?autoplay=1&mute=0&enablejsapi=1')">
+                    <div class="card" onclick="openPlayer('CADENA 3', 'https://www.youtube.com/embed/Bk471uQ26-4?autoplay=1&mute=0&enablejsapi=1', false)">
                         <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                             <iframe src="https://www.youtube.com/embed/Bk471uQ26-4?autoplay=1&mute=1&controls=0&loop=1&playlist=Bk471uQ26-4" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                         </div>
                         <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">CADENA 3</div></div>
                     </div>
-                    <div class="card" onclick="openPlayer('Telefe Noticias', 'https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=0&enablejsapi=1')"><div class="card-bg">📡</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Telefe Noticias</div></div></div>
-                    <div class="card" onclick="openPlayer('El Trece Live', 'https://www.youtube.com/embed/j6oh4Kqz3UM?autoplay=1&mute=0&enablejsapi=1')"><div class="card-bg">📺</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">El Trece Live</div></div></div>
-                    <div class="card" onclick="openPlayer('TV Pública', 'https://www.youtube.com/embed/FEWZjXJ7M0c?autoplay=1&mute=0&enablejsapi=1')"><div class="card-bg">🇦🇷</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">TV Pública</div></div></div>
-                    <div class="card" onclick="openPlayer('Net TV', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1')"><div class="card-bg">🌐</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Net TV</div></div></div>
+                    <div class="card" onclick="openPlayer('Telefe Noticias', 'https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=0&enablejsapi=1', false)"><div class="card-bg">📡</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Telefe Noticias</div></div></div>
+                    <div class="card" onclick="openPlayer('El Trece Live', 'https://www.youtube.com/embed/j6oh4Kqz3UM?autoplay=1&mute=0&enablejsapi=1', false)"><div class="card-bg">📺</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">El Trece Live</div></div></div>
+                    <div class="card" onclick="openPlayer('TV Pública', 'https://www.youtube.com/embed/FEWZjXJ7M0c?autoplay=1&mute=0&enablejsapi=1', false)"><div class="card-bg">🇦🇷</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">TV Pública</div></div></div>
+                    <div class="card" onclick="openPlayer('Net TV', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1', false)"><div class="card-bg">🌐</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Net TV</div></div></div>
                 </div>
             </div>
 
@@ -636,21 +636,21 @@
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">STREAMING</div></div>
                 <div class="cards-slider">
-                    <div class="card" onclick="openPreview('Luzu TV', '🔥', 'Stream en vivo de Luzu TV.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🔥</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Luzu TV</div></div></div>
-                    <div class="card" onclick="openPreview('Olga Stream', '🎙️', 'Programación exclusiva de Olga.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🎙️</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Olga Stream</div></div></div>
-                    <div class="card" onclick="openPreview('República Z', '⚡', 'Debates y streaming joven.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">⚡</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">República Z</div></div></div>
-                    <div class="card" onclick="openPreview('Blender', '🎧', 'Cultura pop y entretenimiento.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🎧</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Blender</div></div></div>
-                    <div class="card" onclick="openPreview('Gelatina', '🚀', 'Política y actualidad en streaming.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🚀</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Gelatina</div></div></div>
-                    <div class="card" onclick="openPreview('Vorterix Stream', '🎸', 'Rock y entrevistas en vivo.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🎸</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Vorterix Stream</div></div></div>
-                    <div class="card" onclick="openPreview('Urbana Play', '📻', 'Radio y streaming visual.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">📻</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Urbana Play</div></div></div>
-                    <div class="card" onclick="openPreview('Kuarzo Digital', '💎', 'Entretenimiento y magazine.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">💎</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Kuarzo Digital</div></div></div>
-                    <div class="card" onclick="openPreview('Loft Stream', '✨', 'Estilo de vida y tendencias.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">✨</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Loft Stream</div></div></div>
-                    <div class="card" onclick="openPreview('Azul Stream', '🌊', 'Contenido libre y entrevistas.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🌊</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Azul Stream</div></div></div>
-                    <div class="card" onclick="openPreview('Furia Digital', '🔥', 'Gaming y streaming de creadores.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🔥</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Furia Digital</div></div></div>
+                    <div class="card" onclick="openPreview('Luzu TV', '🔥', 'Stream en vivo de Luzu TV.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">🔥</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Luzu TV</div></div></div>
+                    <div class="card" onclick="openPreview('Olga Stream', '🎙️', 'Programación exclusiva de Olga.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">🎙️</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Olga Stream</div></div></div>
+                    <div class="card" onclick="openPreview('República Z', '⚡', 'Debates y streaming joven.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">⚡</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">República Z</div></div></div>
+                    <div class="card" onclick="openPreview('Blender', '🎧', 'Cultura pop y entretenimiento.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">🎧</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Blender</div></div></div>
+                    <div class="card" onclick="openPreview('Gelatina', '🚀', 'Política y actualidad en streaming.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">🚀</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Gelatina</div></div></div>
+                    <div class="card" onclick="openPreview('Vorterix Stream', '🎸', 'Rock y entrevistas en vivo.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">🎸</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Vorterix Stream</div></div></div>
+                    <div class="card" onclick="openPreview('Urbana Play', '📻', 'Radio y streaming visual.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">📻</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Urbana Play</div></div></div>
+                    <div class="card" onclick="openPreview('Kuarzo Digital', '💎', 'Entretenimiento y magazine.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">💎</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Kuarzo Digital</div></div></div>
+                    <div class="card" onclick="openPreview('Loft Stream', '✨', 'Estilo de vida y tendencias.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">✨</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Loft Stream</div></div></div>
+                    <div class="card" onclick="openPreview('Azul Stream', '🌊', 'Contenido libre y entrevistas.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">🌊</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Azul Stream</div></div></div>
+                    <div class="card" onclick="openPreview('Furia Digital', '🔥', 'Gaming y streaming de creadores.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">🔥</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Furia Digital</div></div></div>
                 </div>
             </div>
 
-            <!-- Carrusel 4: FAMOSOS DE MS3 (Formato Redondo / Circular con borde neón futurista) -->
+            <!-- Carrusel 4: FAMOSOS DE MS3 -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">FAMOSOS DE MS3</div></div>
                 <div class="famosos-slider">
@@ -691,43 +691,43 @@
         <div class="content-section" id="tabDirectos">
             <div class="section-title">Transmisiones en Vivo y Noticias</div>
             <div class="cards-grid">
-                <div class="card" onclick="openPlayer('CRONICA', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1')">
+                <div class="card" onclick="openPlayer('CRONICA', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1', false)">
                     <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                         <iframe src="https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=1&controls=0&loop=1&playlist=hw4uHyct4vg" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                     </div>
                     <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">CRONICA</div></div>
                 </div>
-                <div class="card" onclick="openPlayer('A24', 'https://www.youtube.com/embed/ArKbAx1K-2U?autoplay=1&mute=0&enablejsapi=1')">
+                <div class="card" onclick="openPlayer('A24', 'https://www.youtube.com/embed/ArKbAx1K-2U?autoplay=1&mute=0&enablejsapi=1', false)">
                     <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                         <iframe src="https://www.youtube.com/embed/ArKbAx1K-2U?autoplay=1&mute=1&controls=0&loop=1&playlist=ArKbAx1K-2U" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                     </div>
                     <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">A24</div></div>
                 </div>
-                <div class="card" onclick="openPlayer('TN', 'https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=0&enablejsapi=1')">
+                <div class="card" onclick="openPlayer('TN', 'https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=0&enablejsapi=1', false)">
                     <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                         <iframe src="https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=1&controls=0&loop=1&playlist=cb12KmMMDJA" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                     </div>
                     <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">TN</div></div>
                 </div>
-                <div class="card" onclick="openPlayer('C5N', 'https://www.youtube.com/embed/j6oh4Kqz3UM?autoplay=1&mute=0&enablejsapi=1')">
+                <div class="card" onclick="openPlayer('C5N', 'https://www.youtube.com/embed/j6oh4Kqz3UM?autoplay=1&mute=0&enablejsapi=1', false)">
                     <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                         <iframe src="https://www.youtube.com/embed/j6oh4Kqz3UM?autoplay=1&mute=1&controls=0&loop=1&playlist=j6oh4Kqz3UM" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                     </div>
                     <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">C5N</div></div>
                 </div>
-                <div class="card" onclick="openPlayer('LN+', 'https://www.youtube.com/embed/FEWZjXJ7M0c?autoplay=1&mute=0&enablejsapi=1')">
+                <div class="card" onclick="openPlayer('LN+', 'https://www.youtube.com/embed/FEWZjXJ7M0c?autoplay=1&mute=0&enablejsapi=1', false)">
                     <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                         <iframe src="https://www.youtube.com/embed/FEWZjXJ7M0c?autoplay=1&mute=1&controls=0&loop=1&playlist=FEWZjXJ7M0c" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                     </div>
                     <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">LN+</div></div>
                 </div>
-                <div class="card" onclick="openPlayer('ARGENTINA|12', 'https://www.youtube.com/embed/21UP3XoRIBU?autoplay=1&mute=0&enablejsapi=1')">
+                <div class="card" onclick="openPlayer('ARGENTINA|12', 'https://www.youtube.com/embed/21UP3XoRIBU?autoplay=1&mute=0&enablejsapi=1', false)">
                     <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                         <iframe src="https://www.youtube.com/embed/21UP3XoRIBU?autoplay=1&mute=1&controls=0&loop=1&playlist=21UP3XoRIBU" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                     </div>
                     <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">ARGENTINA|12</div></div>
                 </div>
-                <div class="card" onclick="openPlayer('CADENA 3', 'https://www.youtube.com/embed/Bk471uQ26-4?autoplay=1&mute=0&enablejsapi=1')">
+                <div class="card" onclick="openPlayer('CADENA 3', 'https://www.youtube.com/embed/Bk471uQ26-4?autoplay=1&mute=0&enablejsapi=1', false)">
                     <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                         <iframe src="https://www.youtube.com/embed/Bk471uQ26-4?autoplay=1&mute=1&controls=0&loop=1&playlist=Bk471uQ26-4" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                     </div>
@@ -746,7 +746,7 @@
         <div class="content-section" id="tabBusqueda">
             <div class="section-title">Resultados Populares</div>
             <div class="cards-grid">
-                <div class="card" onclick="openPlayer('CRONICA', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1')">
+                <div class="card" onclick="openPlayer('CRONICA', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1', false)">
                     <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                         <iframe src="https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=1&controls=0&loop=1&playlist=hw4uHyct4vg" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                     </div>
@@ -912,7 +912,7 @@
         const vrCanvasContainer = document.getElementById('vrCanvasContainer');
         const gyroToggleBtn = document.getElementById('gyroToggleBtn');
 
-        // Variables Three.js para Modo 360 (Videos Locales / MP4 / WebGL)
+        // Variables Three.js para Modo 360
         let scene, camera, renderer, sphereMesh, videoElement, videoTexture;
         let isMouseDown = false, onPointerDownPointerX = 0, onPointerDownPointerY = 0;
         let lon = 0, onPointerDownLon = 0, lat = 0, onPointerDownLat = 0;
@@ -931,7 +931,7 @@
                 screen.orientation.lock('landscape').catch(() => {});
             }
 
-            // Si es archivo mp4 directo se usa Three.js con Girosocpio/Mouse
+            // Si se marca como video 360° en MP4 directa, utiliza Three.js con Giroscopio
             if (is360 && url.endsWith('.mp4')) {
                 youtubeIframe.style.display = 'none';
                 youtubeIframe.src = '';
@@ -939,23 +939,26 @@
                 gyroToggleBtn.style.display = 'flex';
                 initCustom360Player(url);
             } else {
-                // Modo YouTube (Soporta interactividad 360 integrada por defecto en YouTube con giroscopio y mouse)
+                // Modo YouTube (Soporta interactividad 360 nativa embebida)
                 vrCanvasContainer.style.display = 'none';
                 gyroToggleBtn.style.display = 'none';
                 youtubeIframe.style.display = 'block';
 
-                let embedUrl = url;
+                let videoId = '';
                 if (url.includes('youtu.be/')) {
-                    const videoId = url.split('youtu.be/')[1].split('?')[0];
-                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&playsinline=1&controls=1`;
+                    videoId = url.split('youtu.be/')[1].split('?')[0];
                 } else if (url.includes('watch?v=')) {
-                    const videoId = url.split('watch?v=')[1].split('&')[0];
-                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&playsinline=1&controls=1`;
+                    videoId = url.split('watch?v=')[1].split('&')[0];
                 } else if (url.includes('/embed/')) {
-                    embedUrl = url + (url.includes('?') ? '&' : '?') + 'autoplay=1&enablejsapi=1&playsinline=1';
+                    videoId = url.split('/embed/')[1].split('?')[0];
                 }
-                
-                youtubeIframe.src = embedUrl;
+
+                if (videoId) {
+                    // Configuración optimizada de YouTube Embed para giroscopio y 360 nativo
+                    youtubeIframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&playsinline=1&controls=1&rel=0`;
+                } else {
+                    youtubeIframe.src = url;
+                }
             }
         }
 
@@ -995,7 +998,7 @@
 
             window.addEventListener('resize', onWindowResize);
 
-            // Iniciar Giroscopio si está disponible
+            // Iniciar Giroscopio
             enableGyroscope();
             animate360();
         }
