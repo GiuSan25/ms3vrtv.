@@ -23,7 +23,7 @@
             overflow-y: auto;
         }
 
-        /* Pantalla de Bienvenida - Fondo Neón con Pantallas 3D Flotantes */
+        /* Pantalla de Bienvenida */
         .welcome-screen {
             position: fixed;
             top: 0;
@@ -163,7 +163,7 @@
             filter: blur(0px);
         }
 
-        /* Barra Superior Fija */
+        /* Barra Superior */
         .top-nav {
             display: flex;
             justify-content: space-between;
@@ -213,7 +213,7 @@
         /* Menú de Pestañas Superior */
         .sub-nav {
             display: flex;
-            justify-style: space-around;
+            justify-content: space-around;
             padding: 12px 20px;
             position: fixed;
             top: 65px;
@@ -395,7 +395,7 @@
         }
         .card-remove-btn:active { transform: scale(1.1); }
 
-        /* Estilo Carrusel Famosos MS3 (Circular / Redondo con Borde Neón Futurista) */
+        /* Estilo Carrusel Famosos MS3 */
         .famosos-slider {
             display: flex; gap: 16px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
         }
@@ -484,6 +484,14 @@
         }
         .close-btn { width: 44px; padding: 0; border-radius: 50%; }
         .gyro-btn.active { border-color: #00f3ff; color: #00f3ff; box-shadow: 0 0 10px #00f3ff; }
+
+        /* Botón de reproducción manual (Overlay para desbloqueo de audio/video) */
+        .vr-play-overlay {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 100001; background: rgba(0, 243, 255, 0.85); color: #000;
+            border: none; padding: 16px 32px; border-radius: 30px; font-weight: bold;
+            font-size: 1.1rem; cursor: pointer; box-shadow: 0 0 25px #00f3ff; display: none;
+        }
     </style>
 </head>
 <body>
@@ -784,6 +792,7 @@
             <button class="gyro-btn" id="gyroToggleBtn" style="display:none;" onclick="toggleGyroscope()">📱 Giroscopio ON</button>
             <button class="close-btn" id="closePlayerBtn">✕</button>
         </div>
+        <button class="vr-play-overlay" id="vrPlayOverlay">▶ Tocar para Reproducir</button>
         <iframe id="youtubeIframe" class="youtube-player-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; xr-spatial-tracking" allowfullscreen></iframe>
         <div id="vrCanvasContainer" class="vr-canvas-container"></div>
     </div>
@@ -829,7 +838,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // Reproductor Mini Vertical Adaptado para Famosos MS3
+        // Reproductor Mini Vertical
         const verticalMiniPlayer = document.getElementById('verticalMiniPlayer');
         const verticalPlayerWrapper = document.getElementById('verticalPlayerWrapper');
 
@@ -908,8 +917,9 @@
         const youtubeIframe = document.getElementById('youtubeIframe');
         const vrCanvasContainer = document.getElementById('vrCanvasContainer');
         const gyroToggleBtn = document.getElementById('gyroToggleBtn');
+        const vrPlayOverlay = document.getElementById('vrPlayOverlay');
 
-        // Variables Three.js para Modo 360 (Videos Locales / MP4 / WebGL)
+        // Motor Three.js 360
         let scene, camera, renderer, sphereMesh, videoElement, videoTexture;
         let isMouseDown = false, onPointerDownPointerX = 0, onPointerDownPointerY = 0;
         let lon = 0, onPointerDownLon = 0, lat = 0, onPointerDownLat = 0;
@@ -928,17 +938,16 @@
                 screen.orientation.lock('landscape').catch(() => {});
             }
 
-            // Si es un video en formato MP4 o enlace directo se procesa con Three.js en Realidad Virtual / Giroscopio
-            if (is360 || url.endsWith('.mp4')) {
+            if (is360 || url.includes('.mp4')) {
                 youtubeIframe.style.display = 'none';
                 youtubeIframe.src = '';
                 vrCanvasContainer.style.display = 'block';
                 gyroToggleBtn.style.display = 'flex';
                 initCustom360Player(url);
             } else {
-                // Modo YouTube estándar
                 vrCanvasContainer.style.display = 'none';
                 gyroToggleBtn.style.display = 'none';
+                vrPlayOverlay.style.display = 'none';
                 youtubeIframe.style.display = 'block';
 
                 let embedUrl = url;
@@ -956,9 +965,9 @@
             }
         }
 
-        // --- MOTOR DE REPRODUCCIÓN 360 (Three.js + Mouse + Giroscopio) ---
         function initCustom360Player(videoUrl) {
             vrCanvasContainer.innerHTML = '';
+            vrPlayOverlay.style.display = 'none';
 
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
@@ -970,30 +979,48 @@
             videoElement = document.createElement('video');
             videoElement.crossOrigin = 'anonymous';
             videoElement.playsInline = true;
-            videoElement.src = videoUrl;
-            videoElement.autoplay = true;
             videoElement.loop = true;
-            videoElement.muted = false; // Permitir audio activo
-            videoElement.play().catch(e => console.log("Autoplay con sonido bloqueado, interactúe con la pantalla:", e));
+            videoElement.muted = true; // Iniciar en mute para prevenir bloqueos de autoplay
+            videoElement.src = videoUrl;
 
             videoTexture = new THREE.VideoTexture(videoElement);
+            videoTexture.minFilter = THREE.LinearFilter;
+            videoTexture.magFilter = THREE.LinearFilter;
+            videoTexture.format = THREE.RGBAFormat;
+
             const material = new THREE.MeshBasicMaterial({ map: videoTexture });
             sphereMesh = new THREE.Mesh(geometry, material);
             scene.add(sphereMesh);
 
-            renderer = new THREE.WebGLRenderer();
+            renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setPixelRatio(window.devicePixelRatio);
             renderer.setSize(window.innerWidth, window.innerHeight);
             vrCanvasContainer.appendChild(renderer.domElement);
 
-            // Eventos Mouse y Touch para Computadora y Celular
+            // Intentar autoplay
+            let playPromise = videoElement.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    // Intento exitoso, intentar desmutear si es posible
+                    setTimeout(() => { videoElement.muted = false; }, 500);
+                }).catch(error => {
+                    console.log("Autoplay bloqueado por el navegador, mostrando botón:", error);
+                    vrPlayOverlay.style.display = 'block';
+                });
+            }
+
+            vrPlayOverlay.onclick = function() {
+                videoElement.muted = false;
+                videoElement.play();
+                vrPlayOverlay.style.display = 'none';
+            };
+
             vrCanvasContainer.addEventListener('pointerdown', onPointerDown);
             document.addEventListener('pointermove', onPointerMove);
             document.addEventListener('pointerup', onPointerUp);
 
             window.addEventListener('resize', onWindowResize);
 
-            // Iniciar Giroscopio si está disponible
             enableGyroscope();
             animate360();
         }
@@ -1091,6 +1118,7 @@
                 orientationHandler = null;
             }
             vrCanvasContainer.style.display = 'none';
+            vrPlayOverlay.style.display = 'none';
 
             if (document.exitFullscreen) { document.exitFullscreen().catch(() => {}); }
             else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
