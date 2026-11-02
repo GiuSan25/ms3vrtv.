@@ -922,41 +922,44 @@
 
         function openPlayer(title, url, is360 = false) {
             playerContainer.classList.add('active');
-            
-            const elem = playerContainer;
-            if (elem.requestFullscreen) { elem.requestFullscreen().catch(() => {}); }
-            else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
+            youtubeIframe.src = ''; // Limpia el estado anterior para evitar pantalla negra
 
-            if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('landscape').catch(() => {});
-            }
+            setTimeout(() => {
+                const elem = playerContainer;
+                if (elem.requestFullscreen) { elem.requestFullscreen().catch(() => {}); }
+                else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
 
-            // Si es archivo mp4 directo se usa Three.js con Girosocpio/Mouse
-            if (is360 && url.endsWith('.mp4')) {
-                youtubeIframe.style.display = 'none';
-                youtubeIframe.src = '';
-                vrCanvasContainer.style.display = 'block';
-                gyroToggleBtn.style.display = 'flex';
-                initCustom360Player(url);
-            } else {
-                // Modo YouTube (Soporta interactividad 360 integrada por defecto en YouTube con giroscopio y mouse)
-                vrCanvasContainer.style.display = 'none';
-                gyroToggleBtn.style.display = 'none';
-                youtubeIframe.style.display = 'block';
-
-                let embedUrl = url;
-                if (url.includes('youtu.be/')) {
-                    const videoId = url.split('youtu.be/')[1].split('?')[0];
-                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&playsinline=1&controls=1`;
-                } else if (url.includes('watch?v=')) {
-                    const videoId = url.split('watch?v=')[1].split('&')[0];
-                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&playsinline=1&controls=1`;
-                } else if (url.includes('/embed/')) {
-                    embedUrl = url + (url.includes('?') ? '&' : '?') + 'autoplay=1&enablejsapi=1&playsinline=1';
+                if (screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock('landscape').catch(() => {});
                 }
-                
-                youtubeIframe.src = embedUrl;
-            }
+
+                // Si es archivo mp4 directo se usa Three.js con Giroscopio/Mouse
+                if (is360 && url.endsWith('.mp4')) {
+                    youtubeIframe.style.display = 'none';
+                    youtubeIframe.src = '';
+                    vrCanvasContainer.style.display = 'block';
+                    gyroToggleBtn.style.display = 'flex';
+                    initCustom360Player(url);
+                } else {
+                    // Modo YouTube (Soporta interactividad 360 integrada por defecto en YouTube con giroscopio y mouse)
+                    vrCanvasContainer.style.display = 'none';
+                    gyroToggleBtn.style.display = 'none';
+                    youtubeIframe.style.display = 'block';
+
+                    let embedUrl = url;
+                    if (url.includes('youtu.be/')) {
+                        const videoId = url.split('youtu.be/')[1].split('?')[0];
+                        embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&playsinline=1&controls=1`;
+                    } else if (url.includes('watch?v=')) {
+                        const videoId = url.split('watch?v=')[1].split('&')[0];
+                        embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&playsinline=1&controls=1`;
+                    } else if (url.includes('/embed/')) {
+                        embedUrl = url + (url.includes('?') ? '&' : '?') + 'autoplay=1&enablejsapi=1&playsinline=1';
+                    }
+                    
+                    youtubeIframe.src = embedUrl;
+                }
+            }, 80);
         }
 
         // --- MOTOR DE REPRODUCCIÓN 360 (Three.js + Mouse + Giroscopio) ---
