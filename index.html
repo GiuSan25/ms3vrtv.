@@ -2,1131 +2,1494 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MS3 - La Nueva Televisión Inmersiva</title>
-    <!-- Three.js Library -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>CYBERFLIX VR PRO - Multiverso Cinematográfico 3D</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js (Motor 3D) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@300;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        * {
-            box-sizing: border-box;
+        body {
             margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
-        body, html {
-            width: 100%;
-            height: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #000000;
-            color: #fff;
-            overflow-x: hidden;
-            overflow-y: auto;
-        }
-
-        /* Pantalla de Bienvenida - Fondo Neón con Pantallas 3D Flotantes */
-        .welcome-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #000000;
-            perspective: 1400px;
             overflow: hidden;
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1), transform 1.4s cubic-bezier(0.16, 1, 0.3, 1), filter 1.4s ease;
+            font-family: 'Rajdhani', sans-serif;
+            background-color: #020208;
+            color: #fff;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        .welcome-screen.fade-out-elegant {
-            opacity: 0;
-            transform: scale(1.1);
-            filter: blur(12px);
-            pointer-events: none;
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+
+        /* Modern Glassmorphism UI - Extra Rounded & Soft */
+        .glass-panel {
+            background: rgba(8, 14, 28, 0.78);
+            backdrop-filter: blur(28px);
+            border: 1px solid rgba(0, 240, 255, 0.35);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 240, 255, 0.2), inset 0 0 25px rgba(0, 240, 255, 0.08);
+            border-radius: 2rem;
         }
 
-        .welcome-logo-container {
+        .glass-btn {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(255, 0, 128, 0.25));
+            border: 1px solid rgba(0, 240, 255, 0.7);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.35);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 9999px;
+        }
+
+        .glass-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.65), rgba(255, 0, 128, 0.65));
+            border-color: #00f0ff;
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.9), 0 0 20px #ff007f;
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        .neon-glow-cyan {
+            text-shadow: 0 0 16px rgba(0, 240, 255, 0.9), 0 0 32px rgba(0, 240, 255, 0.5);
+        }
+
+        .glass-btn {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(255, 0, 128, 0.25));
+            border: 1px solid rgba(0, 240, 255, 0.7);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.6), rgba(255, 0, 128, 0.6));
+            border-color: #00f0ff;
+            box-shadow: 0 0 35px rgba(0, 240, 255, 0.9), 0 0 15px #ff007f;
+            transform: scale(1.05);
+        }
+
+        .neon-glow-cyan {
+            text-shadow: 0 0 12px rgba(0, 240, 255, 0.9), 0 0 24px rgba(0, 240, 255, 0.5);
+        }
+
+        /* Puntero de Mirada VR (Gaze Cursor) */
+        #gaze-cursor-container {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -54%);
-            text-align: center;
-            width: 550px;
-            max-width: 90vw;
-            z-index: 1;
+            transform: translate(-50%, -50%);
             pointer-events: none;
-        }
-
-        .welcome-logo-video {
-            width: 100%;
-            height: auto;
-            object-fit: contain;
-            border: none !important;
-            outline: none !important;
-            background: transparent !important;
-            box-shadow: none !important;
-        }
-
-        .geometric-bg-3d {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 2;
-            transform-style: preserve-3d;
-        }
-
-        .tv-screen-3d {
-            position: absolute;
-            background: rgba(10, 5, 20, 0.45);
-            border: 2px solid rgba(0, 243, 255, 0.4);
-            box-shadow: 0 0 25px rgba(0, 243, 255, 0.25), inset 0 0 15px rgba(255, 42, 109, 0.2);
-            backdrop-filter: blur(2px);
-            border-radius: 8px;
-            animation: floatScreens 16s infinite linear;
-        }
-
-        .tv-screen-3d::after {
-            content: '';
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            width: 30%;
-            height: 3px;
-            background: rgba(255, 42, 109, 0.6);
-            border-radius: 2px;
-            box-shadow: 0 0 8px rgba(255, 42, 109, 0.8);
-        }
-
-        .screen-1 { width: 140px; height: 90px; top: 15%; left: 8%; animation-duration: 18s; }
-        .screen-2 { width: 160px; height: 100px; top: 62%; left: 10%; animation-duration: 22s; animation-direction: reverse; }
-        .screen-3 { width: 130px; height: 85px; top: 18%; right: 10%; animation-duration: 15s; }
-        .screen-4 { width: 170px; height: 110px; bottom: 12%; right: 12%; animation-duration: 24s; }
-        .screen-5 { width: 120px; height: 75px; top: 42%; left: 3%; animation-duration: 20s; }
-        .screen-6 { width: 150px; height: 95px; top: 32%; right: 5%; animation-duration: 19s; animation-direction: reverse; }
-
-        @keyframes floatScreens {
-            0% { transform: translateZ(-300px) rotateX(0deg) rotateY(0deg) translateY(0px); opacity: 0.25; }
-            50% { transform: translateZ(280px) rotateX(180deg) rotateY(180deg) translateY(-35px); opacity: 0.8; }
-            100% { transform: translateZ(-300px) rotateX(360deg) rotateY(360deg) translateY(0px); opacity: 0.25; }
-        }
-
-        .neon-enter-btn {
-            position: absolute;
-            bottom: 12vh;
-            z-index: 10;
-            background: transparent;
-            color: #00f3ff;
-            border: 2px solid #00f3ff;
-            padding: 16px 40px;
-            border-radius: 30px;
-            font-size: 1.1rem;
-            font-weight: 900;
-            letter-spacing: 2px;
-            cursor: pointer;
-            text-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4), inset 0 0 15px rgba(0, 243, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .neon-enter-btn:hover {
-            background: #00f3ff;
-            color: #000000;
-            box-shadow: 0 0 35px #00f3ff, 0 0 70px rgba(255, 42, 109, 0.6);
-            transform: scale(1.08);
-            text-shadow: none;
-        }
-
-        /* Contenedor Principal */
-        .app-container {
+            z-index: 50;
             display: none;
-            opacity: 0;
-            transform: translateY(25px) scale(0.98);
-            filter: blur(6px);
-            transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1), 
-                        transform 1.4s cubic-bezier(0.16, 1, 0.3, 1), 
-                        filter 1.4s cubic-bezier(0.16, 1, 0.3, 1);
-            min-height: 100vh;
-            position: relative;
         }
 
-        .app-container.active {
-            display: block;
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            filter: blur(0px);
-        }
-
-        /* Barra Superior Fija */
-        .top-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 24px;
-            background: rgba(11,6,20,0.95);
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 900;
-            letter-spacing: 1px;
-            background: linear-gradient(90deg, #fff, #b19fff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            cursor: pointer;
-        }
-
-        .top-icons {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            color: #b19fff;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-
-        .profile-icon {
-            width: 32px;
-            height: 32px;
+        .gaze-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #00f0ff;
             border-radius: 50%;
-            background: linear-gradient(135deg, #a855f7, #6366f1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.9rem;
-        }
-
-        /* Menú de Pestañas Superior */
-        .sub-nav {
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 20px;
-            position: fixed;
-            top: 65px;
-            left: 0;
-            width: 100%;
-            background-color: rgba(11, 6, 20, 0.95);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            font-size: 0.9rem;
-            z-index: 999;
-            overflow-x: auto;
-            backdrop-filter: blur(10px);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #8a859b;
-            cursor: pointer;
-            text-decoration: none;
-            gap: 4px;
-            white-space: nowrap;
-            padding: 0 10px;
-            background: none;
-            border: none;
-            font-size: 0.9rem;
-            position: relative;
-            transition: color 0.3s ease;
-        }
-
-        .nav-item:hover { color: #fff; }
-        .nav-item.active { color: #fff; font-weight: bold; }
-        .nav-item.active::after {
-            content: '';
+            box-shadow: 0 0 12px #00f0ff, 0 0 24px #00f0ff;
             position: absolute;
-            bottom: -12px;
-            width: 25px;
-            height: 3px;
-            background-color: #ff2a6d;
-            border-radius: 2px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
-        /* Vistas de Contenido Dinámicas */
-        .content-section {
-            display: none;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.4s ease, transform 0.4s ease;
-            padding: 20px;
-            padding-top: 140px;
-            padding-bottom: 60px;
-            background-color: #0b0614;
-            min-height: 100vh;
+        @media (max-width: 768px) {
+            .gaze-ring, .gaze-progress {
+                width: 38px;
+                height: 38px;
+            }
+            .gaze-dot {
+                width: 8px;
+                height: 8px;
+            }
         }
 
-        .content-section.active {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .section-title {
-            font-size: 0.85rem;
-            letter-spacing: 1.5px;
-            color: #8a859b;
-            margin-bottom: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        /* Banner Destacado */
-        .hero-banner {
-            position: relative;
-            width: 100%;
-            height: 430px;
-            border-radius: 16px;
-            overflow: hidden;
-            background: linear-gradient(135deg, rgba(43, 17, 85, 0.5), rgba(117, 89, 125, 0.5)), url('ms3media/sanderdocumentalnuevo.jpeg');
-            background-size: cover;
-            background-position: center;
-            border: 1px solid rgba(255, 42, 109, 0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            margin-bottom: 25px;
-        }
-
-        .hero-overlay {
+        .gaze-ring {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(0, 240, 255, 0.3);
+            border-radius: 50%;
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(180deg, rgba(0,0,0,0.1) 30%, rgba(11,6,20,0.95) 100%);
-            z-index: 1;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
-        .hero-badge {
+        .gaze-progress {
+            width: 48px;
+            height: 48px;
+            border: 3px solid transparent;
+            border-top-color: #ff007f;
+            border-right-color: #ff007f;
+            border-radius: 50%;
             position: absolute;
-            top: 15px; right: 15px;
-            background: rgba(120, 50, 255, 0.6);
-            backdrop-filter: blur(5px);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            z-index: 2;
-            border: 1px solid rgba(255,255,255,0.2);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(0deg);
         }
 
-        .hero-details { position: relative; z-index: 2; }
-        .hero-details h2 { font-size: 1.4rem; margin-bottom: 15px; line-height: 1.2; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-        .hero-buttons { display: flex; gap: 10px; }
-
-        .btn {
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s ease;
-            touch-action: manipulation;
-        }
-        .btn:active { transform: scale(0.96); }
-        .btn-primary { background-color: #fff; color: #000; }
-        .btn-secondary {
-            background-color: rgba(255, 255, 255, 0.15);
-            color: #fff;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        /* Carruseles y Cuadrículas */
-        .row-section { margin-top: 30px; }
-        .row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .cards-slider { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-        .cards-slider::-webkit-scrollbar { display: none; }
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
-
-        .card {
-            flex: 0 0 180px;
-            height: 110px;
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-            background-color: #1a1528;
-            border: 1px solid rgba(255,255,255,0.08);
-            cursor: pointer;
-            transition: transform 0.25s ease, border-color 0.25s ease;
-            touch-action: manipulation;
-        }
-        .cards-grid .card { width: 100%; height: 120px; }
-        .card:active { transform: scale(0.97); }
-
-        .card-bg {
-            width: 100%; height: 100%;
-            background: linear-gradient(135deg, #151025, #3c2a6d);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; background-size: cover; background-position: center;
-        }
-
-        .card-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.85) 100%);
-            display: flex; flex-direction: column; justify-content: flex-end; padding: 8px;
+        /* Ambient scanlines subtle touch on background */
+        .scanlines {
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
             pointer-events: none;
         }
-        .card-title { font-size: 0.8rem; font-weight: bold; line-height: 1.1; }
-        .card-tag {
-            position: absolute; top: 6px; left: 6px; font-size: 0.6rem;
-            background: rgba(11, 6, 20, 0.7); padding: 2px 6px; border-radius: 4px; color: #d8b4fe; z-index: 2;
-        }
 
-        .card-remove-btn {
-            position: absolute; top: 6px; right: 6px; background: rgba(0, 0, 0, 0.7);
-            color: #ff2a6d; border: 1px solid rgba(255, 42, 109, 0.4); border-radius: 50%;
-            width: 24px; height: 24px; font-size: 0.7rem; cursor: pointer; display: flex;
-            align-items: center; justify-content: center; z-index: 3; touch-action: manipulation;
-        }
-        .card-remove-btn:active { transform: scale(1.1); }
-
-        /* Estilo Carrusel Famosos MS3 */
-        .famosos-slider {
-            display: flex; gap: 16px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
-        }
-        .famosos-slider::-webkit-scrollbar { display: none; }
-        .famoso-item {
-            flex: 0 0 95px;
-            display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; touch-action: manipulation;
-        }
-        .famoso-circle {
-            width: 90px; height: 90px; border-radius: 50%; 
-            border: 2px solid #00f3ff;
-            box-shadow: 0 0 12px rgba(0, 243, 255, 0.6), inset 0 0 8px rgba(0, 243, 255, 0.3);
-            background-size: cover; background-position: center; 
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .famoso-circle:active { transform: scale(0.95); box-shadow: 0 0 20px #00f3ff; }
-        .famoso-name { font-size: 0.75rem; text-align: center; font-weight: bold; color: #d8b4fe; white-space: nowrap; }
-
-        /* Reproductor Vertical Flotante Mini para Famosos */
-        .vertical-mini-player {
-            position: fixed; bottom: 30px; right: 20px; width: 160px; height: 280px;
-            background: #000; border: 2px solid #00f3ff; border-radius: 12px; overflow: hidden;
-            z-index: 999999; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.9);
-        }
-        .vertical-mini-player.active { display: flex; flex-direction: column; }
-        .vertical-mini-player iframe, .vertical-mini-player video {
-            width: 100%; height: 100%; border: none; object-fit: cover; background: #000;
-        }
-        .mini-close-btn {
-            position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.8); color: #ff2a6d;
-            border: 1px solid #ff2a6d; border-radius: 50%; width: 24px; height: 24px; font-size: 0.75rem;
-            cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 1000000;
-        }
-
-        /* MODAL DE PREVISIÓN */
-        .preview-modal {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 9999;
-            display: flex; justify-content: center; align-items: center; padding: 20px;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-        }
-        .preview-modal.active { opacity: 1; pointer-events: auto; }
-        .preview-content {
-            background: #151022; width: 100%; max-width: 550px; border-radius: 16px;
-            overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8); position: relative;
-            transform: scale(0.95); transition: transform 0.3s ease;
-        }
-        .preview-modal.active .preview-content { transform: scale(1); }
-        .preview-header-img {
-            width: 100%; height: 240px; background: linear-gradient(135deg, #2b1055, #a855f7);
-            display: flex; align-items: center; justify-content: center; font-size: 4rem;
-            position: relative; background-size: cover; background-position: center;
-        }
-        .preview-close {
-            position: absolute; top: 15px; right: 15px; background: rgba(0, 0, 0, 0.6);
-            color: white; border: none; width: 36px; height: 36px; border-radius: 50%;
-            font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            touch-action: manipulation;
-        }
-        .preview-body { padding: 20px; }
-        .preview-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 10px; }
-        .preview-desc { font-size: 0.9rem; color: #b8b2cb; line-height: 1.5; margin-bottom: 25px; }
-        .preview-actions { display: flex; gap: 12px; }
-        .preview-actions .btn { flex: 1; padding: 12px; text-align: center; justify-content: center; display: flex; align-items: center; gap: 8px; }
-
-        /* Reproductor Pantalla Completa YouTube 360° nativo y Canvas 360 Custom */
-        .player-fullscreen-container {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: #000; z-index: 99999; display: none; justify-content: center; align-items: center;
-            opacity: 0; transition: opacity 0.3s ease;
-        }
-        .player-fullscreen-container.active { display: flex; opacity: 1; }
-        .youtube-player-iframe {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 9999; display: block;
-        }
-        .vr-canvas-container {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9998; display: none;
-        }
-        .control-top { position: absolute; top: 20px; right: 20px; z-index: 100000; display: flex; gap: 10px; }
-        .close-btn, .gyro-btn {
-            background: rgba(0, 0, 0, 0.6); color: white; border: 2px solid white;
-            font-size: 1.2rem; padding: 0 15px; height: 44px; border-radius: 22px;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            touch-action: manipulation; font-weight: bold; backdrop-filter: blur(5px);
-        }
-        .close-btn { width: 44px; padding: 0; border-radius: 50%; }
-        .gyro-btn.active { border-color: #00f3ff; color: #00f3ff; box-shadow: 0 0 10px #00f3ff; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.4); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 240, 255, 0.5); border-radius: 3px; }
     </style>
 </head>
-<body>
+<body class="bg-black text-white overflow-hidden">
 
-    <!-- Pantalla de Bienvenida -->
-    <div class="welcome-screen" id="welcomeScreen">
-        <div class="welcome-logo-container">
-            <video class="welcome-logo-video" autoplay muted loop playsinline>
-                <source src="ms3media/ms3logo.mp4.mp4" type="video/mp4">
-                Tu navegador no soporta videos.
-            </video>
+    <!-- Scanline Overlay Futurista -->
+    <div class="scanlines fixed inset-0 z-30 opacity-40"></div>
+
+    <!-- 1. PANTALLA DE BIENVENIDA FUTURISTA -->
+    <div id="welcome-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black transition-opacity duration-1000">
+        <div class="relative z-10 flex flex-col items-center text-center px-4 max-w-2xl w-full">
+            <!-- Logo VR Animated Hologram -->
+            <div class="relative mb-8 group cursor-pointer -mt-4">
+                <div class="absolute -inset-3 rounded-full bg-gradient-to-r from-cyan-500 via-pink-500 to-purple-600 blur-2xl opacity-75 group-hover:opacity-100 transition duration-1000 animate-pulse"></div>
+                <div class="relative w-20 h-20 md:w-24 md:h-24 rounded-full bg-slate-950/90 border-2 border-cyan-400 flex items-center justify-center shadow-[0_0_40px_rgba(0,240,255,0.6)] group-hover:scale-110 transition duration-500">
+                    <i class="fa-solid fa-vr-cardboard text-cyan-400 text-3xl md:text-4xl filter drop-shadow-[0_0_12px_#00f0ff] group-hover:text-pink-500 transition duration-300"></i>
+                </div>
+            </div>
+
+            <!-- Video Holográfico en Bucle Autoplay Sin Controles -->
+            <div class="relative w-full max-w-lg aspect-video mb-8 rounded-3xl overflow-hidden bg-black/80 border border-cyan-500/30 shadow-[0_0_50px_rgba(0,240,255,0.2)] pointer-events-none">
+                <video src="media/ms3logo.mp4" 
+                       autoplay 
+                       loop 
+                       muted 
+                       playsinline 
+                       class="w-full h-full object-cover">
+                </video>
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/30"></div>
+            </div>
+
+            <!-- Botón 3D "INGRESAR AL UNIVERSO" -->
+            <button id="enter-btn" class="glass-btn font-orbitron text-cyan-200 font-bold text-lg md:text-xl px-12 py-5 tracking-widest flex items-center gap-4 cursor-pointer border-2 border-cyan-400/80 group">
+                <span>INGRESAR AL UNIVERSO</span>
+                <i class="fa-solid fa-atom text-pink-500 group-hover:rotate-180 transition-transform duration-700 text-2xl"></i>
+            </button>
         </div>
 
-        <div class="geometric-bg-3d">
-            <div class="tv-screen-3d screen-1"></div>
-            <div class="tv-screen-3d screen-2"></div>
-            <div class="tv-screen-3d screen-3"></div>
-            <div class="tv-screen-3d screen-4"></div>
-            <div class="tv-screen-3d screen-5"></div>
-            <div class="tv-screen-3d screen-6"></div>
+        <div class="absolute bottom-6 text-xs text-cyan-400/60 font-mono tracking-widest flex items-center gap-4">
+            <span><i class="fa-solid fa-microchip text-pink-500"></i> THREE.JS VR ENGINE v3.5</span>
+            <span>|</span>
+            <span><i class="fa-solid fa-wifi text-cyan-400"></i> STREAMING HOLOGRÁFICO ACTIVO</span>
         </div>
-
-        <button class="neon-enter-btn" id="enterBtn">INGRESAR</button>
     </div>
 
-    <!-- Contenedor Principal (App) -->
-    <div class="app-container" id="appContainer">
-        
-        <!-- Barra Superior -->
-        <div class="top-nav">
-            <div class="logo" id="logoHomeBtn">MS3</div>
-            <div class="top-icons">
-                <div class="profile-icon" id="profileBtn" title="Mi Cuenta">GV</div>
-                <div id="settingsBtn" title="Ajustes">⚙</div>
-            </div>
-        </div>
+    <!-- 2. CANVAS THREE.JS (UNIVERSO VR 3D) -->
+    <div id="webgl-container" class="w-full h-full absolute inset-0 z-0"></div>
 
-        <!-- Pestañas de Navegación -->
-        <div class="sub-nav">
-            <button class="nav-item active" data-target="tabInicio">Inicio</button>
-            <button class="nav-item" data-target="tabProgramas">Programas VR</button>
-            <button class="nav-item" data-target="tabDirectos">Noticias</button>
-            <button class="nav-item" data-target="tabMiLista">Mi Lista</button>
-            <button class="nav-item" data-target="tabBusqueda">Búsqueda</button>
-        </div>
-
-        <!-- VISTA 1: INICIO -->
-        <div class="content-section active" id="tabInicio">
-            <div class="section-title">Destacado</div>
-            <div class="hero-banner" style="background-image: url('ms3media/sanderdocumentalnuevo.jpeg'); background-size: cover; background-position: center;">
-                <div class="hero-overlay"></div>
-                <div class="hero-badge">MS3 EXCLUSIVO</div>
-                <div class="hero-details">
-                    <h2>SANDER MAURIN : creador y director de MS3</h2>
-                    <div class="hero-buttons">
-                        <button class="btn btn-primary" onclick="openPlayer('Sander maurin creador y director de ms3', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1')">▶ REPRODUCIR</button>
-                        <button class="btn btn-secondary" onclick="openPreview('Sander maurin creador y director de ms3', '<img src=&quot;ms3media/sanderdocumentalnuevo.jpeg&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Disfruta de este contenido exclusivo inmersivo directed por Sander Maurin...', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1')">INFO</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Carrusel 1: PROGRAMAS EN REALIDAD VIRTUAL -->
-            <div class="row-section">
-                <div class="row-header"><div class="section-title" style="margin-bottom:0;">PROGRAMAS EN REALIDAD VIRTUAL</div></div>
-                <div class="cards-slider">
-                    <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° en realidad virtual oficial de YouTube.', 'https://www.youtube.com/embed/y3qO1OL5nRg?autoplay=1&mute=0&enablejsapi=1&playsinline=1', true)">
-                        <div class="card-bg" style="background-image: url('ms3media/vedettehorizontal.png');"></div><span class="card-tag">360° Pro</span><div class="card-overlay"><div class="card-title">Buscando a la futura vedette</div></div>
-                    </div>
-                    <div class="card" onclick="openPreview('MEDICINA VR 1', '<img src=&quot;ms3media/medicinahorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Avances médicos inmersivos parte 1.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1', true)">
-                        <div class="card-bg" style="background-image: url('ms3media/medicinahorizontal.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">MEDICINA VR 1</div></div>
-                    </div>
-                    <div class="card" onclick="openPreview('LA MASA VR', '<img src=&quot;ms3media/lamasahorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Detrás de escena inmersivo de LA MASA.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1', true)">
-                        <div class="card-bg" style="background-image: url('ms3media/lamasahorizontal.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">LA MASA VR</div></div>
-                    </div>
-                    <div class="card" onclick="openPreview('AGR COMPETICION', '<img src=&quot;ms3media/agrcompeticionhorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Adrenalina total en pista y boxes.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1', true)">
-                        <div class="card-bg" style="background-image: url('ms3media/agrcompeticionhorizontal.png');"></div><span class="card-tag">Motor</span><div class="card-overlay"><div class="card-title">AGR COMPETICION</div></div>
-                    </div>
-                    <div class="card" onclick="openPreview('VR Círculo Polar', '❄️', 'Exploración glacial en 360°.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1', true)"><div class="card-bg">❄️</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Círculo Polar VR</div></div></div>
-                    <div class="card" onclick="openPreview('VR Aventura Submarina', '🌊', 'Fosa de las Marianas en realidad virtual.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1', true)"><div class="card-bg">🌊</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Aventura Submarina</div></div></div>
-                    <div class="card" onclick="openPreview('VR Estación Espacial', '🛰', 'Paseo por la ISS en 360 grados.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1', true)"><div class="card-bg">🛰️</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Estación Espacial VR</div></div></div>
-                    <div class="card" onclick="openPreview('VR Safari Africano', '🦁', 'Fauna salvaje en alta definición 360°.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1', true)"><div class="card-bg">🦁</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Safari Africano</div></div></div>
-                    <div class="card" onclick="openPreview('VR Concierto Sinfónico', '🎻', 'En el centro de la orquesta.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1', true)"><div class="card-bg">🎻</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Concierto Sinfónico</div></div></div>
-                    <div class="card" onclick="openPreview('VR Rascacielos', '🏙️', 'Vértigo y arquitectura en las alturas.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1', true)"><div class="card-bg">🏙️</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Rascacielos VR</div></div></div>
-                    <div class="card" onclick="openPreview('VR Volcanes Activos', '🌋', 'Fuego y lava en primera persona.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1', true)"><div class="card-bg">🌋</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Volcanes Activos</div></div></div>
-                    <div class="card" onclick="openPreview('VR Museo Louvre', '🖼️', 'Recorrido privado por las galerías.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1', true)"><div class="card-bg">🖼️</div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">Museo Louvre VR</div></div></div>
-                </div>
-            </div>
-
-            <!-- Carrusel 2: NOTICIAS EN VIVO -->
-            <div class="row-section">
-                <div class="row-header"><div class="section-title" style="margin-bottom:0;">NOTICIAS EN VIVO</div></div>
-                <div class="cards-slider">
-                    <!-- CRONICA -->
-                    <div class="card" onclick="openPlayer('CRONICA', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1')">
-                        <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
-                            <iframe src="https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=1&controls=0&loop=1&playlist=hw4uHyct4vg" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
-                        </div>
-                        <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">CRONICA</div></div>
-                    </div>
-                    <!-- A24 -->
-                    <div class="card" onclick="openPlayer('A24', 'https://www.youtube.com/embed/ArKbAx1K-2U?autoplay=1&mute=0&enablejsapi=1')">
-                        <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
-                            <iframe src="https://www.youtube.com/embed/ArKbAx1K-2U?autoplay=1&mute=1&controls=0&loop=1&playlist=ArKbAx1K-2U" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
-                        </div>
-                        <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">A24</div></div>
-                    </div>
-                    <!-- TN -->
-                    <div class="card" onclick="openPlayer('TN', 'https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=0&enablejsapi=1')">
-                        <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
-                            <iframe src="https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=1&controls=0&loop=1&playlist=cb12KmMMDJA" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
-                        </div>
-                        <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">TN</div></div>
-                    </div>
-                    <!-- C5N -->
-                    <div class="card" onclick="openPlayer('C5N', 'https://www.youtube.com/embed/j6oh4Kqz3UM?autoplay=1&mute=0&enablejsapi=1')">
-                        <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
-                            <iframe src="https://www.youtube.com/embed/j6oh4Kqz3UM?autoplay=1&mute=1&controls=0&loop=1&playlist=j6oh4Kqz3UM" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
-                        </div>
-                        <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">C5N</div></div>
-                    </div>
-                    <!-- LN+ -->
-                    <div class="card" onclick="openPlayer('LN+', 'https://www.youtube.com/embed/FEWZjXJ7M0c?autoplay=1&mute=0&enablejsapi=1')">
-                        <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
-                            <iframe src="https://www.youtube.com/embed/FEWZjXJ7M0c?autoplay=1&mute=1&controls=0&loop=1&playlist=FEWZjXJ7M0c" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
-                        </div>
-                        <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">LN+</div></div>
-                    </div>
-                    <!-- ARGENTINA|12 -->
-                    <div class="card" onclick="openPlayer('ARGENTINA|12', 'https://www.youtube.com/embed/21UP3XoRIBU?autoplay=1&mute=0&enablejsapi=1')">
-                        <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
-                            <iframe src="https://www.youtube.com/embed/21UP3XoRIBU?autoplay=1&mute=1&controls=0&loop=1&playlist=21UP3XoRIBU" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
-                        </div>
-                        <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">ARGENTINA|12</div></div>
-                    </div>
-                    <!-- CADENA 3 -->
-                    <div class="card" onclick="openPlayer('CADENA 3', 'https://www.youtube.com/embed/Bk471uQ26-4?autoplay=1&mute=0&enablejsapi=1')">
-                        <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
-                            <iframe src="https://www.youtube.com/embed/Bk471uQ26-4?autoplay=1&mute=1&controls=0&loop=1&playlist=Bk471uQ26-4" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
-                        </div>
-                        <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">CADENA 3</div></div>
-                    </div>
-                    <div class="card" onclick="openPlayer('Telefe Noticias', 'https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=0&enablejsapi=1')"><div class="card-bg">📡</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Telefe Noticias</div></div></div>
-                    <div class="card" onclick="openPlayer('El Trece Live', 'https://www.youtube.com/embed/j6oh4Kqz3UM?autoplay=1&mute=0&enablejsapi=1')"><div class="card-bg">📺</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">El Trece Live</div></div></div>
-                    <div class="card" onclick="openPlayer('TV Pública', 'https://www.youtube.com/embed/FEWZjXJ7M0c?autoplay=1&mute=0&enablejsapi=1')"><div class="card-bg">🇦🇷</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">TV Pública</div></div></div>
-                    <div class="card" onclick="openPlayer('Net TV', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1')"><div class="card-bg">🌐</div><span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">Net TV</div></div></div>
-                </div>
-            </div>
-
-            <!-- Carrusel 3: STREAMING -->
-            <div class="row-section">
-                <div class="row-header"><div class="section-title" style="margin-bottom:0;">STREAMING</div></div>
-                <div class="cards-slider">
-                    <div class="card" onclick="openPreview('Luzu TV', '🔥', 'Stream en vivo de Luzu TV.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1')"><div class="card-bg">🔥</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Luzu TV</div></div></div>
-                    <div class="card" onclick="openPreview('Olga Stream', '🎙️', 'Programación exclusiva de Olga.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1')"><div class="card-bg">🎙️</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Olga Stream</div></div></div>
-                    <div class="card" onclick="openPreview('República Z', '⚡', 'Debates y streaming joven.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1')"><div class="card-bg">⚡</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">República Z</div></div></div>
-                    <div class="card" onclick="openPreview('Blender', '🎧', 'Cultura pop y entretenimiento.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1')"><div class="card-bg">🎧</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Blender</div></div></div>
-                    <div class="card" onclick="openPreview('Gelatina', '🚀', 'Política y actualidad en streaming.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1')"><div class="card-bg">🚀</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Gelatina</div></div></div>
-                    <div class="card" onclick="openPreview('Vorterix Stream', '🎸', 'Rock y entrevistas en vivo.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1')"><div class="card-bg">🎸</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Vorterix Stream</div></div></div>
-                    <div class="card" onclick="openPreview('Urbana Play', '📻', 'Radio y streaming visual.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1')"><div class="card-bg">📻</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Urbana Play</div></div></div>
-                    <div class="card" onclick="openPreview('Kuarzo Digital', '💎', 'Entretenimiento y magazine.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1')"><div class="card-bg">💎</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Kuarzo Digital</div></div></div>
-                    <div class="card" onclick="openPreview('Loft Stream', '✨', 'Estilo de vida y tendencias.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1')"><div class="card-bg">✨</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Loft Stream</div></div></div>
-                    <div class="card" onclick="openPreview('Azul Stream', '🌊', 'Contenido libre y entrevistas.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1')"><div class="card-bg">🌊</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Azul Stream</div></div></div>
-                    <div class="card" onclick="openPreview('Furia Digital', '🔥', 'Gaming y streaming de creadores.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1')"><div class="card-bg">🔥</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Furia Digital</div></div></div>
-                </div>
-            </div>
-
-            <!-- Carrusel 4: FAMOSOS DE MS3 -->
-            <div class="row-section">
-                <div class="row-header"><div class="section-title" style="margin-bottom:0;">FAMOSOS DE MS3</div></div>
-                <div class="famosos-slider">
-                    <div class="famoso-item" onclick="openVerticalMiniPlayer('Guillermo Francella', 'https://www.youtube.com/embed/m3UE2RQ9bJE?autoplay=1&controls=0&mute=0&loop=1&playlist=m3UE2RQ9bJE')">
-                        <div class="famoso-circle" style="background-image: url('ms3media/guillermofranchellafoto.jpeg');"></div>
-                        <div class="famoso-name">Guillermo Francella</div>
-                    </div>
-                    <div class="famoso-item" onclick="openVerticalMiniPlayer('Valeria Lynch', 'https://www.youtube.com/embed/chu-fsb3pOA?autoplay=1&controls=0&mute=0&loop=1&playlist=chu-fsb3pOA')">
-                        <div class="famoso-circle" style="background-image: url('ms3media/valerialynchfoto.jpeg');"></div>
-                        <div class="famoso-name">Valeria Lynch</div>
-                    </div>
-                    <div class="famoso-item" onclick="openVerticalMiniPlayer('Anibal Pachano', 'https://www.youtube.com/embed/EI4rURxtBcA?autoplay=1&controls=0&mute=0&loop=1&playlist=EI4rURxtBcA')">
-                        <div class="famoso-circle" style="background-image: url('ms3media/anibalpachanofoto.jpeg');"></div>
-                        <div class="famoso-name">Anibal Pachano</div>
-                    </div>
-                    <div class="famoso-item" onclick="openVerticalMiniPlayer('Lucia Galan', 'https://www.youtube.com/embed/Z6574MiZEA8?autoplay=1&controls=0&mute=0&loop=1&playlist=Z6574MiZEA8')">
-                        <div class="famoso-circle" style="background-image: url('ms3media/luciagalanfoto.jpeg');"></div>
-                        <div class="famoso-name">Lucia Galan</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VISTA 2: PROGRAMAS VR -->
-        <div class="content-section" id="tabProgramas">
-            <div class="section-title">Catálogo Completo de Programas VR</div>
-            <div class="cards-grid">
-                <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° en realidad virtual.', 'https://www.youtube.com/embed/y3qO1OL5nRg?autoplay=1&mute=0&enablejsapi=1&playsinline=1', true)">
-                    <div class="card-bg" style="background-image: url('ms3media/vedettehorizontal.png');"></div><span class="card-tag">360° Pro</span><div class="card-overlay"><div class="card-title">Buscando a la futura vedette</div></div>
-                </div>
-                <div class="card" onclick="openPreview('MEDICINA VR', '<img src=&quot;ms3media/medicinahorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Avances médicos inmersivos.', 'https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=0&enablejsapi=1&playsinline=1', true)">
-                    <div class="card-bg" style="background-image: url('ms3media/medicinahorizontal.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">MEDICINA VR</div></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VISTA 3: NOTICIAS -->
-        <div class="content-section" id="tabDirectos">
-            <div class="section-title">Transmisiones en Vivo y Noticias</div>
-            <div class="cards-grid">
-                <div class="card" onclick="openPlayer('CRONICA', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1')">
-                    <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
-                        <iframe src="https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=1&controls=0&loop=1&playlist=hw4uHyct4vg" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
-                    </div>
-                    <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">CRONICA</div></div>
-                </div>
-                <div class="card" onclick="openPlayer('A24', 'https://www.youtube.com/embed/ArKbAx1K-2U?autoplay=1&mute=0&enablejsapi=1')">
-                    <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
-                        <iframe src="https://www.youtube.com/embed/ArKbAx1K-2U?autoplay=1&mute=1&controls=0&loop=1&playlist=ArKbAx1K-2U" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
-                    </div>
-                    <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">A24</div></div>
-                </div>
-                <div class="card" onclick="openPlayer('TN', 'https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=0&enablejsapi=1')">
-                    <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
-                        <iframe src="https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=1&controls=0&loop=1&playlist=cb12KmMMDJA" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
-                    </div>
-                    <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">TN</div></div>
-                </div>
-                <div class="card" onclick="openPlayer('C5N', 'https://www.youtube.com/embed/j6oh4Kqz3UM?autoplay=1&mute=0&enablejsapi=1')">
-                    <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
-                        <iframe src="https://www.youtube.com/embed/j6oh4Kqz3UM?autoplay=1&mute=1&controls=0&loop=1&playlist=j6oh4Kqz3UM" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
-                    </div>
-                    <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">C5N</div></div>
-                </div>
-                <div class="card" onclick="openPlayer('LN+', 'https://www.youtube.com/embed/FEWZjXJ7M0c?autoplay=1&mute=0&enablejsapi=1')">
-                    <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
-                        <iframe src="https://www.youtube.com/embed/FEWZjXJ7M0c?autoplay=1&mute=1&controls=0&loop=1&playlist=FEWZjXJ7M0c" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
-                    </div>
-                    <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">LN+</div></div>
-                </div>
-                <div class="card" onclick="openPlayer('ARGENTINA|12', 'https://www.youtube.com/embed/21UP3XoRIBU?autoplay=1&mute=0&enablejsapi=1')">
-                    <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
-                        <iframe src="https://www.youtube.com/embed/21UP3XoRIBU?autoplay=1&mute=1&controls=0&loop=1&playlist=21UP3XoRIBU" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
-                    </div>
-                    <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">ARGENTINA|12</div></div>
-                </div>
-                <div class="card" onclick="openPlayer('CADENA 3', 'https://www.youtube.com/embed/Bk471uQ26-4?autoplay=1&mute=0&enablejsapi=1')">
-                    <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
-                        <iframe src="https://www.youtube.com/embed/Bk471uQ26-4?autoplay=1&mute=1&controls=0&loop=1&playlist=Bk471uQ26-4" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
-                    </div>
-                    <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">CADENA 3</div></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VISTA 4: MI LISTA -->
-        <div class="content-section" id="tabMiLista">
-            <div class="section-title">Tus Videos Guardados en el Perfil</div>
-            <div class="cards-grid" id="gridMyList"></div>
-        </div>
-
-        <!-- VISTA 5: BÚSQUEDA -->
-        <div class="content-section" id="tabBusqueda">
-            <div class="section-title">Resultados Populares</div>
-            <div class="cards-grid">
-                <div class="card" onclick="openPlayer('CRONICA', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1')">
-                    <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
-                        <iframe src="https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=1&controls=0&loop=1&playlist=hw4uHyct4vg" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
-                    </div>
-                    <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">CRONICA</div></div>
-                </div>
-            </div>
-        </div>
-
+    <!-- 3. PUNTERO DE MIRADA VR (GAZE CURSOR 3S) -->
+    <div id="gaze-cursor-container">
+        <div class="gaze-ring"></div>
+        <div id="gaze-progress" class="gaze-progress"></div>
+        <div class="gaze-dot"></div>
     </div>
 
-    <!-- REPRODUCTOR VERTICAL MINI FLOTANTE (FAMOSOS MS3) -->
-    <div class="vertical-mini-player" id="verticalMiniPlayer">
-        <button class="mini-close-btn" onclick="closeVerticalMiniPlayer()">✕</button>
-        <div id="verticalPlayerWrapper" style="width:100%; height:100%; position:relative;"></div>
+    <!-- 4. UI HUD / BOTÓN MENÚ -->
+    <div id="ui-hud" class="fixed top-6 left-6 z-40 hidden">
+        <button id="toggle-menu-btn" class="glass-btn w-14 h-14 rounded-full flex items-center justify-center text-cyan-300 text-2xl shadow-2xl hover:text-white">
+            <i class="fa-solid fa-bars-staggered"></i>
+        </button>
     </div>
 
-    <!-- MODAL DE PREVISUALIZACIÓN -->
-    <div class="preview-modal" id="previewModal">
-        <div class="preview-content">
-            <div class="preview-header-img" id="modalImg">
-                🚀
-                <button class="preview-close" onclick="closePreview()">✕</button>
-            </div>
-            <div class="preview-body">
-                <div class="preview-title" id="modalTitle">Título del Programa</div>
-                <div class="preview-desc" id="modalDesc">Descripción detallada...</div>
-                <div class="preview-actions">
-                    <button class="btn btn-primary" id="modalPlayBtn">▶ Reproducir</button>
-                    <button class="btn btn-secondary" id="modalAddListBtn">+ Agregar a mi lista</button>
+    <!-- 5. MENÚ DESPLEGABLE LATERAL -->
+    <div id="side-menu" class="fixed top-4 left-4 h-[calc(100vh-2rem)] w-84 glass-panel z-40 transform -translate-x-[115%] transition-transform duration-500 ease-in-out p-6 flex flex-col justify-between border border-cyan-500/40 shadow-[0_0_50px_rgba(0,240,255,0.25)]">
+        <div>
+            <!-- Header -->
+            <div class="flex items-center justify-between pb-5 border-b border-cyan-500/30 mb-6">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-sliders text-cyan-400 text-xl"></i>
+                    <span class="font-orbitron text-base font-bold text-cyan-300 tracking-wider">PANEL DE CONTROL VR</span>
                 </div>
+                <button id="close-menu-btn" class="w-9 h-9 rounded-full bg-slate-900/80 border border-cyan-500/40 text-cyan-400 hover:text-pink-500 flex items-center justify-center text-lg transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-5">
+                <!-- Modo Navegación -->
+                <div class="bg-slate-900/80 p-4 rounded-2xl border border-cyan-900/60">
+                    <label class="font-orbitron text-xs text-cyan-400 tracking-wider block mb-3 uppercase flex items-center gap-2">
+                        <i class="fa-solid fa-gamepad"></i> Modo de Control
+                    </label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="mode-mouse-btn" class="px-3 py-2.5 text-xs font-bold rounded-xl border border-cyan-500 bg-cyan-500/30 text-cyan-200 flex items-center justify-center gap-2 transition">
+                            <i class="fa-solid fa-mouse"></i> Touch / Mouse
+                        </button>
+                        <button id="mode-gyro-btn" class="px-3 py-2.5 text-xs font-bold rounded-xl border border-gray-700 bg-gray-800/40 text-gray-400 hover:border-cyan-500/50 flex items-center justify-center gap-2 transition">
+                            <i class="fa-solid fa-mobile-screen"></i> Giroscopio
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VR Split Screen Toggle -->
+                <div class="bg-slate-900/80 p-4 rounded-2xl border border-cyan-900/60 flex items-center justify-between">
+                    <div>
+                        <div class="font-orbitron text-sm text-cyan-300 font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-glasses text-pink-500"></i> Ver en Gafas VR
+                        </div>
+                        <div class="text-xs text-slate-400">Pantalla Dividida 3D</div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="vr-split-toggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-cyan-500 peer-checked:to-pink-500"></div>
+                    </label>
+                </div>
+
+                <!-- Control por Mirada Toggle -->
+                <div class="bg-slate-900/80 p-4 rounded-2xl border border-cyan-900/60 flex items-center justify-between">
+                    <div>
+                        <div class="font-orbitron text-sm text-cyan-300 font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-eye text-cyan-400"></i> Puntero por Mirada
+                        </div>
+                        <div class="text-xs text-slate-400">Autocarga en 3s</div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="gaze-pointer-toggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-cyan-500 peer-checked:to-pink-500"></div>
+                    </label>
+                </div>
+
+                <!-- Reset Camera Button -->
+                <button id="reset-cam-btn" class="w-full glass-btn py-3 rounded-full font-orbitron text-xs font-bold text-cyan-300 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-arrows-to-dot"></i> RECENTRAR CÁMARA
+                </button>
+            </div>
+        </div>
+
+        <div class="pt-4 border-t border-cyan-500/20 text-center">
+            <div class="text-xs font-mono text-cyan-400/60">CYBERFLIX VR MATRIX ENGINE</div>
+            <div class="text-[10px] text-slate-400 mt-1">Exploración holográfica 360° fluida</div>
+        </div>
+    </div>
+
+    <!-- 6. CONTROLES DEL REPRODUCTOR CINE VR 360 -->
+    <div id="cinema-controls" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-40 hidden w-full max-w-xl px-4">
+        <div class="glass-panel px-6 py-4 rounded-3xl flex flex-col gap-3 border border-pink-500/60 shadow-[0_0_40px_rgba(255,0,127,0.3)]">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="w-3 h-3 rounded-full bg-red-500 animate-ping"></span>
+                    <span id="now-playing-title" class="font-orbitron text-sm text-cyan-300 font-bold tracking-wider truncate max-w-xs">
+                        REPRODUCIENDO...
+                    </span>
+                </div>
+                <button id="exit-cinema-btn" class="text-pink-400 hover:text-white font-orbitron text-xs font-bold flex items-center gap-2 px-5 py-2.5 rounded-full border border-pink-500/50 bg-pink-500/20 hover:bg-pink-600 transition">
+                    <i class="fa-solid fa-arrow-left"></i> SALIR DEL CINE VR
+                </button>
+            </div>
+            
+            <div class="w-full bg-slate-900/90 rounded-full h-2.5 overflow-hidden border border-cyan-500/30">
+                <div id="video-progress-bar" class="bg-gradient-to-r from-cyan-400 to-pink-500 h-full w-1/3 rounded-full"></div>
             </div>
         </div>
     </div>
 
-    <!-- Reproductor Pantalla Completa YouTube 360° nativo y Canvas 360 Custom -->
-    <div class="player-fullscreen-container" id="playerContainer">
-        <div class="control-top">
-            <button class="gyro-btn" id="gyroToggleBtn" style="display:none;" onclick="toggleGyroscope()">📱 Giroscopio ON</button>
-            <button class="close-btn" id="closePlayerBtn">✕</button>
+    <!-- MODAL HOLOGRÁFICO DE DETALLES Y CAPÍTULOS CON DISEÑO REDONDEADO -->
+    <div id="program-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md hidden p-4 transition-all duration-300 overflow-y-auto">
+        <div class="relative w-full max-w-2xl glass-panel p-6 rounded-[2.5rem] border-2 border-cyan-400 shadow-[0_0_60px_rgba(0,240,255,0.35)] my-8">
+            <!-- Botón Cerrar -->
+            <button id="close-program-modal" class="absolute top-5 right-5 w-10 h-10 bg-slate-900/90 hover:bg-pink-600 text-cyan-300 hover:text-white rounded-full flex items-center justify-center text-lg border border-cyan-500/40 transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Vista Previa de Trailer / Miniatura Video -->
+            <div class="relative w-full aspect-video bg-black rounded-3xl overflow-hidden border border-cyan-500/40 mb-5 group shadow-inner">
+                <video id="modal-trailer-video" class="w-full h-full object-cover" autoplay loop muted playsinline src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"></video>
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+                <div class="absolute top-4 left-4 bg-cyan-950/90 border border-cyan-400/60 px-4 py-1.5 rounded-full text-[11px] font-mono text-cyan-300 backdrop-blur-md shadow-lg">
+                    <i class="fa-solid fa-play text-pink-500 mr-1.5"></i> TRAILER 360°
+                </div>
+            </div>
+
+            <!-- Información del Programa -->
+            <div class="mb-5 px-1">
+                <span id="modal-program-category" class="text-xs font-mono text-pink-400 tracking-widest uppercase block mb-1">PROGRAMA PRINCIPAL</span>
+                <h2 id="modal-program-title" class="font-orbitron text-2xl md:text-3xl font-bold text-white mb-2 neon-glow-cyan">MEDICINA VR</h2>
+                <p id="modal-program-desc" class="text-slate-300 text-sm md:text-base leading-relaxed">Con la conducción de Norberto Furman. Explora cirugías holográficas en tiempo real y avances biomédicos en 360°.</p>
+            </div>
+
+            <!-- Botones Principales Redondeados -->
+            <div class="flex flex-wrap items-center gap-4 mb-6">
+                <button id="modal-play-btn" class="glass-btn flex-1 py-4 px-6 rounded-full font-orbitron font-bold text-sm text-cyan-200 flex items-center justify-center gap-3 border-cyan-400">
+                    <i class="fa-solid fa-play text-pink-500 text-lg"></i> REPRODUCE EN CINE VR
+                </button>
+                <button id="modal-see-more-btn" class="flex-1 py-4 px-6 rounded-full font-orbitron font-bold text-sm text-cyan-300 bg-slate-900/90 border border-cyan-500/50 hover:border-cyan-300 hover:bg-slate-800 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-border-all text-cyan-400"></i> VER MÁS PROGRAMAS
+                </button>
+            </div>
+
+            <!-- Desplegable de Capítulos -->
+            <div class="border-t border-cyan-500/30 pt-4">
+                <button id="accordion-episodes-btn" class="w-full flex items-center justify-between py-3.5 px-5 rounded-2xl bg-slate-900/70 border border-cyan-500/40 text-cyan-300 font-orbitron text-sm font-bold hover:bg-slate-800 transition">
+                    <span class="flex items-center gap-3">
+                        <i class="fa-solid fa-list-ul text-pink-500"></i> CAPÍTULOS DISPONIBLES
+                    </span>
+                    <i id="accordion-arrow" class="fa-solid fa-chevron-down text-cyan-400 transition-transform"></i>
+                </button>
+
+                <div id="episodes-list" class="hidden mt-3 space-y-2.5 max-h-48 overflow-y-auto pr-1">
+                    <div class="episode-item bg-slate-950/80 p-3.5 rounded-2xl border border-cyan-900/60 hover:border-cyan-400 flex items-center justify-between cursor-pointer transition group" data-ep-title="Capítulo 1: Trauma y Recuperación Spine">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-cyan-950 border border-cyan-500/50 flex items-center justify-center font-orbitron text-xs text-cyan-300 group-hover:bg-pink-600 group-hover:text-white transition">01</div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white group-hover:text-cyan-300">Capítulo 1: Avances Biomecánicos</h4>
+                                <span class="text-[10px] text-slate-400 font-mono">Duración: 42 min • Con Dr. Furman</span>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-circle-play text-cyan-400 text-lg group-hover:text-pink-500 transition"></i>
+                    </div>
+
+                    <div class="episode-item bg-slate-950/80 p-3.5 rounded-2xl border border-cyan-900/60 hover:border-cyan-400 flex items-center justify-between cursor-pointer transition group" data-ep-title="Capítulo 2: Holografía en Kinesiología">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-cyan-950 border border-cyan-500/50 flex items-center justify-center font-orbitron text-xs text-cyan-300 group-hover:bg-pink-600 group-hover:text-white transition">02</div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white group-hover:text-cyan-300">Capítulo 2: Kinesiología Virtual 3D</h4>
+                                <span class="text-[10px] text-slate-400 font-mono">Duración: 38 min • Con Dr. Furman</span>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-circle-play text-cyan-400 text-lg group-hover:text-pink-500 transition"></i>
+                    </div>
+
+                    <div class="episode-item bg-slate-950/80 p-3.5 rounded-2xl border border-cyan-900/60 hover:border-cyan-400 flex items-center justify-between cursor-pointer transition group" data-ep-title="Capítulo 3: Neuro-Rehabilitación 360°">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-cyan-950 border border-cyan-500/50 flex items-center justify-center font-orbitron text-xs text-cyan-300 group-hover:bg-pink-600 group-hover:text-white transition">03</div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white group-hover:text-cyan-300">Capítulo 3: Neuro-Rehabilitación 360°</h4>
+                                <span class="text-[10px] text-slate-400 font-mono">Duración: 50 min • Con Dr. Furman</span>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-circle-play text-cyan-400 text-lg group-hover:text-pink-500 transition"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rejilla de Programas al hacer clic en VER MÁS -->
+            <div id="see-more-grid-container" class="hidden border-t border-cyan-500/30 pt-4 mt-4">
+                <h4 class="font-orbitron text-xs font-bold text-pink-400 tracking-wider mb-3 uppercase">TODOS LOS PROGRAMAS DE ESTA SECCIÓN</h4>
+                <div id="see-more-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-56 overflow-y-auto pr-1"></div>
+            </div>
         </div>
-        <iframe id="youtubeIframe" class="youtube-player-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; xr-spatial-tracking" allowfullscreen></iframe>
-        <div id="vrCanvasContainer" class="vr-canvas-container"></div>
+    </div>
+
+    <!-- 7. REPRODUCTOR DE VIDEO MINIATURA / CELEBRIDADES MS3 OVERLAY -->
+    <div id="celebrity-video-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden transition-all duration-300">
+        <div class="relative w-80 sm:w-96 glass-panel p-5 rounded-[40px] border-2 border-cyan-400 shadow-2xl flex flex-col gap-3">
+            <button id="close-celebrity-modal" class="absolute -top-3 -right-3 w-10 h-10 bg-pink-600 hover:bg-pink-500 text-white rounded-full flex items-center justify-center text-lg shadow-lg border-2 border-white transition transform hover:scale-110 z-50">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="w-24 h-4 bg-slate-900 border border-cyan-500/40 rounded-full mx-auto -mt-2 flex items-center justify-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                <span class="w-6 h-1 rounded-full bg-slate-700"></span>
+            </div>
+
+            <div class="flex items-center justify-between border-b border-cyan-500/30 pb-2">
+                <div class="flex items-center gap-2.5">
+                    <img id="celeb-avatar-img" src="" class="w-9 h-9 rounded-full border border-cyan-400 object-cover" alt="Celeb">
+                    <div>
+                        <h3 id="celeb-name-title" class="font-orbitron text-cyan-300 font-bold text-sm truncate max-w-[140px]">FAMOSO MS3</h3>
+                        <span id="celeb-role-badge" class="text-[10px] text-pink-400 font-mono uppercase block">TRANSMISIÓN EXCLUSIVA</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5 text-[10px] font-mono text-cyan-400 bg-cyan-950/80 px-2.5 py-1 rounded-full border border-cyan-500/40">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span> LIVE
+                </div>
+            </div>
+
+            <div class="relative w-full aspect-[9/16] max-h-[60vh] bg-black rounded-3xl overflow-hidden border border-cyan-500/40 flex items-center justify-center shadow-inner">
+                <video id="celeb-active-video" class="w-full h-full object-cover" autoplay playsinline></video>
+                <div id="celeb-video-overlay-msg" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 gap-3 text-cyan-300 hidden">
+                    <i class="fa-solid fa-spinner animate-spin text-3xl text-pink-500"></i>
+                    <span class="font-orbitron text-xs">CARGANDO REEL...</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-1.5 pt-1">
+                <div class="flex items-center gap-2">
+                    <span id="celeb-video-time" class="text-[10px] font-mono text-cyan-300">00:00 / 00:00</span>
+                    <input type="range" id="celeb-video-seekbar" min="0" max="100" value="0" class="w-full accent-cyan-400 h-1 bg-slate-800 rounded-lg cursor-pointer">
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <button id="celeb-play-pause-btn" class="text-cyan-300 hover:text-white text-base">
+                            <i class="fa-solid fa-pause"></i>
+                        </button>
+                        <button id="celeb-mute-btn" class="text-cyan-300 hover:text-white text-base">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+                    <div class="text-[10px] font-mono text-slate-400">
+                        Cierre automático
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        let myList = [
-            { title: 'CRONICA', icon: '<img src=&quot;ms3media/medicinahorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', desc: 'Transmisión en directo de Crónica TV.', url: 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1', is360: false }
-        ];
-
-        const welcomeScreen = document.getElementById('welcomeScreen');
-        const appContainer = document.getElementById('appContainer');
-        const enterBtn = document.getElementById('enterBtn');
-
-        enterBtn.addEventListener('click', () => {
-            welcomeScreen.classList.add('fade-out-elegant');
-            setTimeout(() => {
-                welcomeScreen.style.display = 'none';
-                appContainer.classList.add('active');
-            }, 800);
-        });
-
-        const navItems = document.querySelectorAll('.sub-nav .nav-item');
-        const contentSections = document.querySelectorAll('.content-section');
-
-        navItems.forEach(item => {
-            item.addEventListener('click', () => {
-                navItems.forEach(nav => nav.classList.remove('active'));
-                contentSections.forEach(sec => sec.classList.remove('active'));
-
-                item.classList.add('active');
-                const targetId = item.getAttribute('data-target');
-                document.getElementById(targetId).classList.add('active');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                if(targetId === 'tabMiLista') { renderMyList(); }
-            });
-        });
-
-        document.getElementById('logoHomeBtn').addEventListener('click', () => {
-            navItems.forEach(nav => nav.classList.remove('active'));
-            contentSections.forEach(sec => sec.classList.remove('active'));
-            navItems[0].classList.add('active');
-            document.getElementById('tabInicio').classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
-        // Reproductor Mini Vertical Adaptado para Famosos MS3
-        const verticalMiniPlayer = document.getElementById('verticalMiniPlayer');
-        const verticalPlayerWrapper = document.getElementById('verticalPlayerWrapper');
-
-        function openVerticalMiniPlayer(name, url) {
-            verticalPlayerWrapper.innerHTML = '';
-            const iframeEl = document.createElement('iframe');
-            iframeEl.src = url;
-            iframeEl.style.width = '100%';
-            iframeEl.style.height = '100%';
-            iframeEl.style.border = 'none';
-            iframeEl.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-            verticalPlayerWrapper.appendChild(iframeEl);
-            verticalMiniPlayer.classList.add('active');
-        }
-
-        function closeVerticalMiniPlayer() {
-            verticalMiniPlayer.classList.remove('active');
-            verticalPlayerWrapper.innerHTML = '';
-        }
-
-        const previewModal = document.getElementById('previewModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalDesc = document.getElementById('modalDesc');
-        const modalImg = document.getElementById('modalImg');
-        const modalPlayBtn = document.getElementById('modalPlayBtn');
-        const modalAddListBtn = document.getElementById('modalAddListBtn');
-
-        let currentModalData = {};
-
-        function openPreview(title, iconHTML, desc, url, is360 = false) {
-            currentModalData = { title, icon: iconHTML, desc, url, is360 };
-            modalTitle.innerText = title;
-            modalDesc.innerText = desc;
-            modalImg.innerHTML = iconHTML + '<button class="preview-close" onclick="closePreview()">✕</button>';
-            
-            updateAddListButtonState(title);
-
-            modalPlayBtn.onclick = function() {
-                closePreview();
-                openPlayer(title, url, is360);
-            };
-
-            modalAddListBtn.onclick = function() {
-                if(!myList.some(item => item.title === title)) {
-                    myList.push(currentModalData);
-                    updateAddListButtonState(title);
-                } else {
-                    let index = myList.findIndex(item => item.title === title);
-                    myList.splice(index, 1);
-                    updateAddListButtonState(title);
-                }
-            };
-
-            previewModal.classList.add('active');
-        }
-
-        function updateAddListButtonState(title) {
-            let exists = myList.some(item => item.title === title);
-            if(exists) {
-                modalAddListBtn.innerHTML = '✓ Agregado';
-                modalAddListBtn.style.background = 'rgba(0, 243, 255, 0.2)';
-                modalAddListBtn.style.color = '#00f3ff';
-                modalAddListBtn.style.borderColor = '#00f3ff';
-            } else {
-                modalAddListBtn.innerHTML = '+ Agregar a mi lista';
-                modalAddListBtn.style.background = 'rgba(255, 255, 255, 0.15)';
-                modalAddListBtn.style.color = '#fff';
-                modalAddListBtn.style.borderColor = 'rgba(255,255,255,0.2)';
-            }
-        }
-
-        function closePreview() { previewModal.classList.remove('active'); }
-
-        const playerContainer = document.getElementById('playerContainer');
-        const closePlayerBtn = document.getElementById('closePlayerBtn');
-        const youtubeIframe = document.getElementById('youtubeIframe');
-        const vrCanvasContainer = document.getElementById('vrCanvasContainer');
-        const gyroToggleBtn = document.getElementById('gyroToggleBtn');
-
-        // Variables Three.js para Modo 360 (Videos Locales / MP4 / WebGL)
-        let scene, camera, renderer, sphereMesh, videoElement, videoTexture;
-        let isMouseDown = false, onPointerDownPointerX = 0, onPointerDownPointerY = 0;
-        let lon = 0, onPointerDownLon = 0, lat = 0, onPointerDownLat = 0;
-        let phi = 0, theta = 0;
-        let useGyro = false;
-        let orientationHandler = null;
-
-        function openPlayer(title, url, is360 = false) {
-            playerContainer.classList.add('active');
-            youtubeIframe.src = ''; // Limpia el estado anterior para evitar pantalla negra
-
-            setTimeout(() => {
-                const elem = playerContainer;
-                if (elem.requestFullscreen) { elem.requestFullscreen().catch(() => {}); }
-                else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
-
-                if (screen.orientation && screen.orientation.lock) {
-                    screen.orientation.lock('landscape').catch(() => {});
-                }
-
-                // Si es archivo mp4 directo se usa Three.js con Giroscopio/Mouse
-                if (is360 && url.endsWith('.mp4')) {
-                    youtubeIframe.style.display = 'none';
-                    youtubeIframe.src = '';
-                    vrCanvasContainer.style.display = 'block';
-                    gyroToggleBtn.style.display = 'flex';
-                    initCustom360Player(url);
-                } else {
-                    // Modo YouTube (Soporta interactividad 360 integrada por defecto en YouTube con giroscopio y mouse)
-                    vrCanvasContainer.style.display = 'none';
-                    gyroToggleBtn.style.display = 'none';
-                    youtubeIframe.style.display = 'block';
-
-                    let embedUrl = url;
-                    if (url.includes('youtu.be/')) {
-                        const videoId = url.split('youtu.be/')[1].split('?')[0];
-                        embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&playsinline=1&controls=1`;
-                    } else if (url.includes('watch?v=')) {
-                        const videoId = url.split('watch?v=')[1].split('&')[0];
-                        embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&playsinline=1&controls=1`;
-                    } else if (url.includes('/embed/')) {
-                        embedUrl = url + (url.includes('?') ? '&' : '?') + 'autoplay=1&enablejsapi=1&playsinline=1';
+        // --- BASE DE DATOS ESTRUCTURADA ---
+        const CATEGORIES_DATA = {
+            'PROGRAMAS VR': {
+                hero: {
+                    title: 'MEDICINA VR',
+                    desc: 'Con la conducción de Norberto Furman',
+                    category: 'SALUD & CIENCIA 360°',
+                    image: 'media/furman.png',
+                    color: '#00f0ff',
+                    bg: '#041d33'
+                },
+                rows: [
+                    {
+                        items: [
+                            {
+                                title: 'BUSCANDO A LA FUTURA VEDETTE',
+                                desc: 'Con la conducción de Carmen Barbieri',
+                                category: 'ENTRETENIMIENTO',
+                                image: 'media/buscandoalafuturavedette.png',
+                                color: '#ff007f',
+                                bg: '#2b0018'
+                            },
+                            {
+                                title: 'LA MASA VR',
+                                desc: 'Acción y Combate Inmersivo 3D',
+                                category: 'DEPORTES & ACCIÓN',
+                                image: 'media/lamasa.png',
+                                color: '#00ff88',
+                                bg: '#002615'
+                            },
+                            {
+                                title: 'BRITHER THE SKATEBOARD',
+                                desc: 'Con la conducción de Eric Angulo',
+                                category: 'URBANO & DEPORTES',
+                                image: 'media/skate.png',
+                                color: '#ffaa00',
+                                bg: '#2b1b00'
+                            },
+                            {
+                                title: 'VR MODA',
+                                desc: 'Con la conducción de Jana Grinfeld',
+                                category: 'MODA & ESTILO',
+                                image: 'media/moda.png',
+                                color: '#aa00ff',
+                                bg: '#1c002b'
+                            }
+                        ]
                     }
-                    
-                    youtubeIframe.src = embedUrl;
-                }
-            }, 80);
-        }
+                ]
+            },
+            'MS3 FAMOSOS': {
+                isCircleSection: true,
+                celebrities: [
+                    { name: 'Carmen Barbieri', role: 'Conductora & Vedette', avatarColor: '#ff007f', videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4' },
+                    { name: 'Norberto Furman', role: 'Medicina VR', avatarColor: '#00f0ff', videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4' },
+                    { name: 'Eric Angulo', role: 'Brither Skateboard', avatarColor: '#ffaa00', videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4' },
+                    { name: 'Jana Grinfeld', role: 'VR Moda', avatarColor: '#aa00ff', videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoylikes.mp4' },
+                    { name: 'La Masa', role: 'Lucha & Acción', avatarColor: '#00ff88', videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4' }
+                ]
+            }
+        };
 
-        // --- MOTOR DE REPRODUCCIÓN 360 (Three.js + Mouse + Giroscopio) ---
-        function initCustom360Player(videoUrl) {
-            vrCanvasContainer.innerHTML = '';
+        // Variables Globales del Motor Three.js
+        let scene, camera, renderer;
+        let starField, nebulaParticles;
+        let raycaster, mouse;
+        let screenMeshes = [];
+        let categoryButtonsMeshes = [];
+        let heroScreenMesh = null;
+        let activeCategory = 'PROGRAMAS VR';
+
+        // Estado de Control y Giroscopio
+        let isUniverseActive = false;
+        let isCinematicMode = false;
+        let activeMediaMesh = null;
+        let activeSelectedMediaData = null;
+        let originalMeshTransform = {};
+        let isMouseDown = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let touchVelocity = { x: 0, y: 0 };
+        let lastTouchTime = 0;
+        let targetRotation = { x: 0, y: 0 };
+        let currentRotation = { x: 0, y: 0 };
+        let useGyro = false;
+        let isStereoVR = false;
+
+        // Estado Puntero por Mirada (Gaze Cursor)
+        let gazeEnabled = false;
+        let gazeHoveredMesh = null;
+        let gazeStartTime = 0;
+        const GAZE_DURATION = 3000;
+
+        // --- INICIALIZACIÓN DEL MOTOR 3D ---
+        function initEngine() {
+            const container = document.getElementById('webgl-container');
 
             scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
-            camera.target = new THREE.Vector3(0, 0, 0);
+            scene.fog = new THREE.FogExp2(0x020208, 0.025);
 
-            const geometry = new THREE.SphereGeometry(500, 60, 40);
-            geometry.scale(-1, 1, 1);
+            camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 0, 0.1);
 
-            videoElement = document.createElement('video');
-            videoElement.crossOrigin = 'anonymous';
-            videoElement.playsInline = true;
-            videoElement.src = videoUrl;
-            videoElement.autoplay = true;
-            videoElement.loop = true;
-            videoElement.play();
-
-            videoTexture = new THREE.VideoTexture(videoElement);
-            const material = new THREE.MeshBasicMaterial({ map: videoTexture });
-            sphereMesh = new THREE.Mesh(geometry, material);
-            scene.add(sphereMesh);
-
-            renderer = new THREE.WebGLRenderer();
-            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.setSize(window.innerWidth, window.innerHeight);
-            vrCanvasContainer.appendChild(renderer.domElement);
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            container.appendChild(renderer.domElement);
 
-            // Eventos Mouse y Touch para Computadora y Celular
-            vrCanvasContainer.addEventListener('pointerdown', onPointerDown);
-            document.addEventListener('pointermove', onPointerMove);
-            document.addEventListener('pointerup', onPointerUp);
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2(-999, -999);
+
+            buildCosmosBackground();
+            buildVRInterface();
+            setupInteractions();
 
             window.addEventListener('resize', onWindowResize);
-
-            // Iniciar Giroscopio si está disponible
-            enableGyroscope();
-            animate360();
         }
 
-        function onPointerDown(event) {
-            isMouseDown = true;
-            onPointerDownPointerX = event.clientX;
-            onPointerDownPointerY = event.clientY;
-            onPointerDownLon = lon;
-            onPointerDownLat = lat;
+        function buildCosmosBackground() {
+            // Fondo Estelar de Partículas
+            const starsGeo = new THREE.BufferGeometry();
+            const count = 3000;
+            const positions = new Float32Array(count * 3);
+
+            for (let i = 0; i < count * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 300;
+                positions[i + 1] = (Math.random() - 0.5) * 300;
+                positions[i + 2] = (Math.random() - 0.5) * 300;
+            }
+
+            starsGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const starsMat = new THREE.PointsMaterial({
+                color: 0x00f0ff,
+                size: 0.6,
+                transparent: true,
+                opacity: 0.7
+            });
+
+            starField = new THREE.Points(starsGeo, starsMat);
+            scene.add(starField);
+
+            // Nébula Neón Secundaria
+            const nebGeo = new THREE.BufferGeometry();
+            const nebCount = 800;
+            const nebPos = new Float32Array(nebCount * 3);
+
+            for (let i = 0; i < nebCount * 3; i += 3) {
+                nebPos[i] = (Math.random() - 0.5) * 200;
+                nebPos[i + 1] = (Math.random() - 0.5) * 200;
+                nebPos[i + 2] = (Math.random() - 0.5) * 200;
+            }
+
+            nebGeo.setAttribute('position', new THREE.BufferAttribute(nebPos, 3));
+            const nebMat = new THREE.PointsMaterial({
+                color: 0xff007f,
+                size: 1.2,
+                transparent: true,
+                opacity: 0.45
+            });
+
+            nebulaParticles = new THREE.Points(nebGeo, nebMat);
+            scene.add(nebulaParticles);
         }
 
-        function onPointerMove(event) {
-            if (!isMouseDown) return;
-            lon = (onPointerDownPointerX - event.clientX) * 0.1 + onPointerDownLon;
-            lat = (event.clientY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
+        // --- FUNCIÓN AUXILIAR PARA GENERAR MALLAS CON BORDES REDONDEADOS SUAVES EN THREE.JS ---
+        function createRoundedPlaneGeometry(width, height, radius, smoothness = 12) {
+            const shape = new THREE.Shape();
+            const x = -width / 2;
+            const y = -height / 2;
+
+            shape.moveTo(x + radius, y);
+            shape.lineTo(x + width - radius, y);
+            shape.quadraticCurveTo(x + width, y, x + width, y + radius);
+            shape.lineTo(x + width, y + height - radius);
+            shape.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            shape.lineTo(x + radius, y + height);
+            shape.quadraticCurveTo(x, y + height, x, y + height - radius);
+            shape.lineTo(x, y + radius);
+            shape.quadraticCurveTo(x, y, x + radius, y);
+
+            return new THREE.ShapeGeometry(shape, smoothness);
         }
 
-        function onPointerUp() { isMouseDown = false; }
+        // --- CREAR MESH DE BOTÓN DE CATEGORÍA CON DISEÑO OVALADO PULL-SHAPED ---
+        function createCategoryButtonMesh(catName, isSelected) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 160;
+            const ctx = canvas.getContext('2d');
 
-        function enableGyroscope() {
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission().then(permissionState => {
-                    if (permissionState === 'granted') {
-                        attachGyroListener();
-                    }
-                }).catch(console.error);
+            // Dibujar botón con bordes redondeados orgánicos
+            const r = 40;
+            ctx.beginPath();
+            ctx.moveTo(r, 0);
+            ctx.lineTo(canvas.width - r, 0);
+            ctx.quadraticCurveTo(canvas.width, 0, canvas.width, r);
+            ctx.lineTo(canvas.width, canvas.height - r);
+            ctx.quadraticCurveTo(canvas.width, canvas.height, canvas.width - r, canvas.height);
+            ctx.lineTo(r, canvas.height);
+            ctx.quadraticCurveTo(0, canvas.height, 0, canvas.height - r);
+            ctx.lineTo(0, r);
+            ctx.quadraticCurveTo(0, 0, r, 0);
+            ctx.closePath();
+
+            ctx.fillStyle = isSelected ? 'rgba(255, 0, 127, 0.85)' : 'rgba(8, 24, 45, 0.85)';
+            ctx.fill();
+
+            ctx.strokeStyle = isSelected ? '#ffffff' : '#00f0ff';
+            ctx.lineWidth = 10;
+            ctx.stroke();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 36px Orbitron';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(catName, canvas.width / 2, canvas.height / 2);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.generateMipmaps = false;
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+
+            const geometry = createRoundedPlaneGeometry(3.2, 0.9, 0.3);
+            const material = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+                side: THREE.DoubleSide
+            });
+
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.userData = {
+                type: 'category_btn',
+                category: catName,
+                initialRot: new THREE.Euler()
+            };
+
+            return mesh;
+        }
+
+        // --- CREA LA MALLA MESH 3D REDONDEADA PARA CADA PORTADA ---
+        function createScreenMesh(item, width, height, isHero) {
+            const cornerRadius = isHero ? 0.8 : 0.45;
+            const geometry = createRoundedPlaneGeometry(width, height, cornerRadius);
+
+            const material = new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                side: THREE.DoubleSide,
+                transparent: false
+            });
+
+            if (item.image) {
+                const textureLoader = new THREE.TextureLoader();
+                textureLoader.load(item.image, (texture) => {
+                    texture.generateMipmaps = false;
+                    texture.minFilter = THREE.LinearFilter;
+                    texture.magFilter = THREE.LinearFilter;
+                    texture.needsUpdate = true;
+                    material.map = texture;
+                    material.needsUpdate = true;
+                }, undefined, () => {
+                    material.map = generateFallbackTexture(item, isHero);
+                    material.needsUpdate = true;
+                });
             } else {
-                attachGyroListener();
+                material.map = generateFallbackTexture(item, isHero);
             }
+
+            const mesh = new THREE.Mesh(geometry, material);
+
+            // Borde resplandeciente redondeado
+            const frameGeo = createRoundedPlaneGeometry(width + 0.18, height + 0.18, cornerRadius + 0.08);
+            const frameMat = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(item.color || '#00f0ff'),
+                side: THREE.BackSide,
+                transparent: true,
+                opacity: 0.85
+            });
+            const frameMesh = new THREE.Mesh(frameGeo, frameMat);
+            frameMesh.position.z = -0.02;
+            mesh.add(frameMesh);
+            mesh.userData.frameMesh = frameMesh;
+
+            // Título flotante elegante ubicado debajo de la portada
+            const labelMesh = createTitleLabelMesh(item, width);
+            labelMesh.position.y = - (height / 2 + (isHero ? 0.85 : 0.48));
+            labelMesh.position.z = 0.05;
+            mesh.add(labelMesh);
+
+            mesh.userData = {
+                type: 'screen',
+                media: item,
+                isHero: isHero,
+                isHovered: false,
+                initialScale: new THREE.Vector3(1, 1, 1),
+                initialRot: new THREE.Euler()
+            };
+
+            return mesh;
         }
 
-        function attachGyroListener() {
-            useGyro = true;
-            gyroToggleBtn.classList.add('active');
-            gyroToggleBtn.innerText = '📱 Giroscopio ON';
+        // --- TEXTURA FALLBACK EN CASO DE QUE LA IMAGEN NO EXISTA ---
+        function generateFallbackTexture(item, isHero) {
+            const canvas = document.createElement('canvas');
+            canvas.width = isHero ? 1024 : 512;
+            canvas.height = isHero ? 512 : 288;
+            const ctx = canvas.getContext('2d');
 
-            if (!orientationHandler) {
-                orientationHandler = function(event) {
-                    if (!useGyro || isMouseDown) return;
-                    if (event.alpha !== null && event.beta !== null && event.gamma !== null) {
-                        lon = event.alpha;
-                        lat = (event.beta - 90) * 0.5;
+            ctx.fillStyle = item.bg || '#041d33';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = item.color || '#00f0ff';
+            ctx.font = 'bold 36px Orbitron';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(item.title || 'VR SHOW', canvas.width / 2, canvas.height / 2);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.generateMipmaps = false;
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+            return texture;
+        }
+
+        // --- MESH DE TÍTULO DEBAJO DE LA PORTADA ---
+        function createTitleLabelMesh(item, screenWidth) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 200;
+            const ctx = canvas.getContext('2d');
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Título Principal
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 42px Orbitron';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            ctx.fillText(item.title, canvas.width / 2, 10, canvas.width - 40);
+
+            // Subtítulo / Conducción
+            if (item.category || item.desc) {
+                const subtext = item.desc || item.category;
+                ctx.fillStyle = item.color || '#00f0ff';
+                ctx.font = '600 28px Rajdhani';
+                ctx.fillText(subtext, canvas.width / 2, 70, canvas.width - 40);
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.generateMipmaps = false;
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+
+            const labelHeight = screenWidth * (200 / 1024);
+            const geometry = new THREE.PlaneGeometry(screenWidth, labelHeight);
+            const material = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+                side: THREE.DoubleSide
+            });
+
+            return new THREE.Mesh(geometry, material);
+        }
+
+        // --- CONSTRUCCIÓN DE PANTALLAS Y BOTONES EN EL ESPACIO 3D ---
+        function buildVRInterface() {
+            screenMeshes.forEach(mesh => scene.remove(mesh));
+            categoryButtonsMeshes.forEach(mesh => scene.remove(mesh));
+            screenMeshes = [];
+            categoryButtonsMeshes = [];
+
+            const isMobile = window.innerWidth <= 768;
+            const radius = isMobile ? 10 : 12;
+            const catData = CATEGORIES_DATA[activeCategory] || CATEGORIES_DATA['PROGRAMAS VR'];
+
+            // SECCIÓN FAMOSOS DE MS3
+            if (catData.isCircleSection) {
+                const celebs = catData.celebrities;
+                
+                celebs.forEach((celeb, idx) => {
+                    const isTopRow = idx < 5;
+                    const posInRow = isTopRow ? idx : idx - 5;
+                    
+                    const angleStep = isMobile ? 0.38 : 0.45; 
+                    const startAngle = -((5 - 1) * angleStep) / 2;
+                    const angle = startAngle + posInRow * angleStep;
+                    const yPos = isTopRow ? (isMobile ? 2.2 : 2.8) : (isMobile ? -0.8 : -1.2); 
+
+                    const circleMesh = createCelebrityCircleMesh(celeb);
+                    if (isMobile) {
+                        circleMesh.scale.set(0.82, 0.82, 0.82);
                     }
-                };
-                window.addEventListener('deviceorientation', orientationHandler);
-            }
-        }
+                    circleMesh.position.x = radius * Math.sin(angle);
+                    circleMesh.position.y = yPos;
+                    circleMesh.position.z = -radius * Math.cos(angle);
+                    circleMesh.lookAt(0, yPos, 0);
+                    circleMesh.userData.initialRot.copy(circleMesh.rotation);
 
-        function toggleGyroscope() {
-            useGyro = !useGyro;
-            if (useGyro) {
-                gyroToggleBtn.classList.add('active');
-                gyroToggleBtn.innerText = '📱 Giroscopio ON';
+                    scene.add(circleMesh);
+                    screenMeshes.push(circleMesh);
+                });
             } else {
-                gyroToggleBtn.classList.remove('active');
-                gyroToggleBtn.innerText = '📱 Giroscopio OFF';
+                // 1. GRAN PORTADA PRINCIPAL CENTRAL
+                const heroData = catData.hero;
+                const heroW = isMobile ? 16.0 : 24.0;
+                const heroH = isMobile ? 6.5 : 9.2;
+                const heroMesh = createScreenMesh(heroData, heroW, heroH, true);
+                
+                const heroRadius = isMobile ? 12.0 : 15.0;
+                const heroAngle = 0;
+                heroMesh.position.x = heroRadius * Math.sin(heroAngle);
+                heroMesh.position.y = isMobile ? 6.5 : 8.5;
+                heroMesh.position.z = -heroRadius * Math.cos(heroAngle);
+                
+                heroMesh.rotation.set(0, 0, 0);
+                heroMesh.userData.initialRot.copy(heroMesh.rotation);
+
+                scene.add(heroMesh);
+                screenMeshes.push(heroMesh);
+                heroScreenMesh = heroMesh;
+
+                // 2. FILAS DE PORTADAS SECUNDARIAS CATEGORIZADAS
+                catData.rows.forEach((row, rowIndex) => {
+                    const yPos = rowIndex === 0 ? (isMobile ? 0.5 : 0.2) : (isMobile ? -2.8 : -3.6);
+                    const itemCount = row.items.length;
+                    const angleStep = isMobile ? 0.36 : 0.42;
+                    const startAngle = -((itemCount - 1) * angleStep) / 2;
+
+                    row.items.forEach((item, itemIndex) => {
+                        const angle = startAngle + itemIndex * angleStep;
+                        const w = isMobile ? 3.0 : 3.8;
+                        const h = isMobile ? 1.8 : 2.2;
+                        const mesh = createScreenMesh(item, w, h, false);
+
+                        mesh.position.x = radius * Math.sin(angle);
+                        mesh.position.y = yPos;
+                        mesh.position.z = -radius * Math.cos(angle);
+                        mesh.lookAt(0, yPos, 0);
+                        mesh.userData.initialRot.copy(mesh.rotation);
+
+                        scene.add(mesh);
+                        screenMeshes.push(mesh);
+                    });
+                });
             }
+
+            // 3. BOTONES HORIZONTALES NEÓN DE CATEGORÍAS
+            const categories = Object.keys(CATEGORIES_DATA);
+            const btnCount = categories.length;
+            const btnAngleStep = isMobile ? 0.28 : 0.34;
+            const btnStartAngle = -((btnCount - 1) * btnAngleStep) / 2;
+            const btnYPos = isMobile ? -5.2 : -6.2;
+
+            categories.forEach((catName, index) => {
+                const angle = btnStartAngle + index * btnAngleStep;
+                const isSelected = catName === activeCategory;
+                
+                const btnMesh = createCategoryButtonMesh(catName, isSelected);
+                if (isMobile) {
+                    btnMesh.scale.set(0.85, 0.85, 0.85);
+                }
+                btnMesh.position.x = (radius - 0.5) * Math.sin(angle);
+                btnMesh.position.y = btnYPos;
+                btnMesh.position.z = -(radius - 0.5) * Math.cos(angle);
+                btnMesh.lookAt(0, btnYPos, 0);
+
+                scene.add(btnMesh);
+                categoryButtonsMeshes.push(btnMesh);
+                screenMeshes.push(btnMesh);
+            });
         }
 
-        function animate360() {
-            if (!vrCanvasContainer.style.display || vrCanvasContainer.style.display === 'none') return;
-            requestAnimationFrame(animate360);
+        // --- CREAR MESH CIRCULAR PARA CELEBRIDADES DE MS3 ---
+        function createCelebrityCircleMesh(celeb) {
+            const radiusSize = 1.3;
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
 
-            lat = Math.max(-85, Math.min(85, lat));
-            phi = THREE.MathUtils.degToRad(90 - lat);
-            theta = THREE.MathUtils.degToRad(lon);
+            const grad = ctx.createRadialGradient(256, 256, 10, 256, 256, 256);
+            grad.addColorStop(0, celeb.avatarColor || '#00f0ff');
+            grad.addColorStop(0.7, '#08001a');
+            grad.addColorStop(1, '#000000');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(256, 256, 240, 0, Math.PI * 2);
+            ctx.fill();
 
-            camera.target.x = 500 * Math.sin(phi) * Math.cos(theta);
-            camera.target.y = 500 * Math.cos(phi);
-            camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
+            ctx.strokeStyle = celeb.avatarColor || '#00f0ff';
+            ctx.lineWidth = 14;
+            ctx.stroke();
 
-            camera.lookAt(camera.target);
-            renderer.render(scene, camera);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 120px Orbitron';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(celeb.name.charAt(0), 256, 210);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 36px Orbitron';
+            ctx.fillText(celeb.name, 256, 350);
+
+            ctx.fillStyle = celeb.avatarColor || '#00f0ff';
+            ctx.font = 'bold 24px Rajdhani';
+            ctx.fillText(celeb.role, 256, 395);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.generateMipmaps = false;
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+
+            const geometry = new THREE.CircleGeometry(radiusSize, 64);
+            const material = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+                side: THREE.DoubleSide
+            });
+
+            const mesh = new THREE.Mesh(geometry, material);
+
+            const ringGeo = new THREE.RingGeometry(radiusSize + 0.05, radiusSize + 0.15, 64);
+            const ringMat = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(celeb.avatarColor),
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.8
+            });
+            const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+            ringMesh.position.z = -0.01;
+            mesh.add(ringMesh);
+
+            mesh.userData = {
+                type: 'celebrity_circle',
+                celebrity: celeb,
+                initialRot: new THREE.Euler()
+            };
+
+            return mesh;
         }
 
-        function onWindowResize() {
-            if (camera && renderer) {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
+        // --- INTERACCIONES, MOUSE Y RAYCASTER ---
+        function setupInteractions() {
+            const container = document.getElementById('webgl-container');
+
+            document.getElementById('enter-btn').addEventListener('click', enterUniverse);
+
+            container.addEventListener('mousedown', (e) => {
+                isMouseDown = true;
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+                touchVelocity = { x: 0, y: 0 };
+                lastTouchTime = performance.now();
+            });
+
+            container.addEventListener('mousemove', (e) => {
+                mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+                if (isMouseDown && !useGyro) {
+                    const now = performance.now();
+                    const dt = Math.max((now - lastTouchTime) / 1000, 0.001);
+
+                    const deltaX = e.clientX - previousMousePosition.x;
+                    const deltaY = e.clientY - previousMousePosition.y;
+
+                    const sensitivity = 0.006;
+                    targetRotation.y += deltaX * sensitivity;
+                    targetRotation.x += deltaY * sensitivity;
+
+                    touchVelocity.y = (deltaX * sensitivity) / dt;
+                    touchVelocity.x = (deltaY * sensitivity) / dt;
+
+                    targetRotation.x = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, targetRotation.x));
+
+                    previousMousePosition = { x: e.clientX, y: e.clientY };
+                    lastTouchTime = now;
+                }
+            });
+
+            container.addEventListener('mouseup', () => { isMouseDown = false; });
+            container.addEventListener('click', handleVRClick);
+
+            container.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    isMouseDown = true;
+                    previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                    touchVelocity = { x: 0, y: 0 };
+                    lastTouchTime = performance.now();
+                }
+            });
+
+            container.addEventListener('touchmove', (e) => {
+                if (isMouseDown && !useGyro && e.touches.length === 1) {
+                    const now = performance.now();
+                    const dt = Math.max((now - lastTouchTime) / 1000, 0.001);
+
+                    const deltaX = e.touches[0].clientX - previousMousePosition.x;
+                    const deltaY = e.touches[0].clientY - previousMousePosition.y;
+
+                    const touchSensitivity = 0.014;
+                    targetRotation.y += deltaX * touchSensitivity;
+                    targetRotation.x += deltaY * touchSensitivity;
+
+                    touchVelocity.y = (deltaX * touchSensitivity) / dt;
+                    touchVelocity.x = (deltaY * touchSensitivity) / dt;
+
+                    targetRotation.x = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, targetRotation.x));
+
+                    previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                    lastTouchTime = now;
+                }
+            });
+
+            container.addEventListener('touchend', () => { isMouseDown = false; });
+
+            document.getElementById('toggle-menu-btn').addEventListener('click', () => {
+                document.getElementById('side-menu').classList.remove('-translate-x-full');
+            });
+
+            document.getElementById('close-menu-btn').addEventListener('click', () => {
+                document.getElementById('side-menu').classList.add('-translate-x-full');
+            });
+
+            document.getElementById('mode-mouse-btn').addEventListener('click', () => {
+                useGyro = false;
+                document.getElementById('mode-mouse-btn').className = "px-3 py-2.5 text-xs font-bold rounded-lg border border-cyan-500 bg-cyan-500/30 text-cyan-200 flex items-center justify-center gap-2";
+                document.getElementById('mode-gyro-btn').className = "px-3 py-2.5 text-xs font-bold rounded-lg border border-gray-700 bg-gray-800/40 text-gray-400 hover:border-cyan-500/50 flex items-center justify-center gap-2";
+            });
+
+            document.getElementById('mode-gyro-btn').addEventListener('click', () => {
+                if (window.DeviceOrientationEvent) {
+                    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                        DeviceOrientationEvent.requestPermission().then(state => {
+                            if (state === 'granted') enableGyro();
+                        });
+                    } else {
+                        enableGyro();
+                    }
+                }
+            });
+
+            document.getElementById('gaze-pointer-toggle').addEventListener('change', (e) => {
+                gazeEnabled = e.target.checked;
+                document.getElementById('gaze-cursor-container').style.display = gazeEnabled ? 'block' : 'none';
+            });
+
+            const vrToggle = document.getElementById('vr-split-toggle');
+            if (vrToggle) {
+                vrToggle.addEventListener('change', (e) => {
+                    isStereoVR = e.target.checked;
+                });
             }
+
+            document.getElementById('reset-cam-btn').addEventListener('click', () => {
+                targetRotation = { x: 0, y: 0 };
+            });
+
+            document.getElementById('exit-cinema-btn').addEventListener('click', exitCinematicMode);
+
+            setupProgramModalEvents();
+            setupCelebrityVideoPlayerControls();
         }
 
-        closePlayerBtn.addEventListener('click', () => {
-            playerContainer.classList.remove('active');
-            youtubeIframe.src = '';
+        // --- MANEJO DEL MODAL DE DETALLES Y CAPÍTULOS ---
+        function setupProgramModalEvents() {
+            const modal = document.getElementById('program-modal');
+            const closeBtn = document.getElementById('close-program-modal');
+            const playBtn = document.getElementById('modal-play-btn');
+            const seeMoreBtn = document.getElementById('modal-see-more-btn');
+            const accordionBtn = document.getElementById('accordion-episodes-btn');
+            const episodesList = document.getElementById('episodes-list');
+            const accordionArrow = document.getElementById('accordion-arrow');
+
+            closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+
+            accordionBtn.addEventListener('click', () => {
+                const isHidden = episodesList.classList.contains('hidden');
+                if (isHidden) {
+                    episodesList.classList.remove('hidden');
+                    accordionArrow.classList.add('rotate-180');
+                } else {
+                    episodesList.classList.add('hidden');
+                    accordionArrow.classList.remove('rotate-180');
+                }
+            });
+
+            playBtn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                if (activeMediaMesh) {
+                    openCinematicMode(activeMediaMesh);
+                }
+            });
+
+            seeMoreBtn.addEventListener('click', () => {
+                const seeMoreContainer = document.getElementById('see-more-grid-container');
+                const isHidden = seeMoreContainer.classList.contains('hidden');
+                if (isHidden) {
+                    populateSeeMoreGrid();
+                    seeMoreContainer.classList.remove('hidden');
+                } else {
+                    seeMoreContainer.classList.add('hidden');
+                }
+            });
+
+            document.querySelectorAll('.episode-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const epTitle = item.getAttribute('data-ep-title');
+                    modal.classList.add('hidden');
+                    if (activeMediaMesh) {
+                        document.getElementById('now-playing-title').innerText = epTitle;
+                        openCinematicMode(activeMediaMesh);
+                    }
+                });
+            });
+        }
+
+        function openProgramModal(mesh) {
+            const item = mesh.userData.media;
+            activeSelectedMediaData = item;
             
-            if (videoElement) {
-                videoElement.pause();
-                videoElement.src = '';
-            }
-            if (orientationHandler) {
-                window.removeEventListener('deviceorientation', orientationHandler);
-                orientationHandler = null;
-            }
-            vrCanvasContainer.style.display = 'none';
+            document.getElementById('modal-program-title').innerText = item.title;
+            document.getElementById('modal-program-category').innerText = item.category || 'PROGRAMA VR';
+            document.getElementById('modal-program-desc').innerText = item.desc || `Disfruta de ${item.title} en formato inmersivo holográfico 360°.`;
 
-            if (document.exitFullscreen) { document.exitFullscreen().catch(() => {}); }
-            else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
-            if (screen.orientation && screen.orientation.unlock) { try { screen.orientation.unlock(); } catch (e) {} }
-        });
+            document.getElementById('see-more-grid-container').classList.add('hidden');
+            document.getElementById('episodes-list').classList.add('hidden');
+            document.getElementById('accordion-arrow').classList.remove('rotate-180');
 
-        function renderMyList() {
-            const grid = document.getElementById('gridMyList');
+            document.getElementById('program-modal').classList.remove('hidden');
+        }
+
+        function populateSeeMoreGrid() {
+            const grid = document.getElementById('see-more-grid');
             grid.innerHTML = '';
-            if(myList.length === 0) {
-                grid.innerHTML = '<p style="color: #8a859b; grid-column: 1/-1;">No tienes videos guardados en tu lista todavía.</p>';
-                return;
+
+            const catData = CATEGORIES_DATA[activeCategory] || CATEGORIES_DATA['PROGRAMAS VR'];
+            let allItems = [];
+
+            if (catData.hero) allItems.push(catData.hero);
+            if (catData.rows) {
+                catData.rows.forEach(r => {
+                    allItems = allItems.concat(r.items);
+                });
             }
-            myList.forEach((item, index) => {
+
+            allItems.forEach(item => {
                 const card = document.createElement('div');
-                card.className = 'card';
+                card.className = "bg-slate-900/90 border border-cyan-500/40 rounded-2xl p-2.5 cursor-pointer hover:border-pink-500 transition text-center shadow-lg";
                 card.innerHTML = `
-                    <div class="card-bg">${item.icon || '🎬'}</div>
-                    <span class="card-tag">Guardado</span>
-                    <button class="card-remove-btn" title="Eliminar" onclick="event.stopPropagation(); removeFromList(${index})">✕</button>
-                    <div class="card-overlay"><div class="card-title">${item.title}</div></div>
+                    <div class="w-full aspect-video rounded-xl bg-cyan-950 overflow-hidden mb-1.5 flex items-center justify-center">
+                        ${item.image ? `<img src="${item.image}" class="w-full h-full object-cover">` : `<i class="fa-solid fa-tv text-cyan-400 text-lg"></i>`}
+                    </div>
+                    <div class="font-orbitron text-[10px] text-white truncate font-bold">${item.title}</div>
                 `;
-                card.onclick = () => openPreview(item.title, item.icon, item.desc, item.url, item.is360);
+
+                card.addEventListener('click', () => {
+                    document.getElementById('modal-program-title').innerText = item.title;
+                    document.getElementById('modal-program-category').innerText = item.category || 'PROGRAMA VR';
+                    document.getElementById('modal-program-desc').innerText = item.desc || `Experiencia inmersiva ${item.title}`;
+                    document.getElementById('see-more-grid-container').classList.add('hidden');
+                });
+
                 grid.appendChild(card);
             });
         }
 
-        function removeFromList(index) {
-            myList.splice(index, 1);
-            renderMyList();
+        function enableGyro() {
+            useGyro = true;
+            document.getElementById('mode-gyro-btn').className = "px-3 py-2.5 text-xs font-bold rounded-lg border border-cyan-500 bg-cyan-500/30 text-cyan-200 flex items-center justify-center gap-2";
+            document.getElementById('mode-mouse-btn').className = "px-3 py-2.5 text-xs font-bold rounded-lg border border-gray-700 bg-gray-800/40 text-gray-400 hover:border-cyan-500/50 flex items-center justify-center gap-2";
+
+            window.addEventListener('deviceorientation', (e) => {
+                if (!useGyro) return;
+                if (e.gamma !== null && e.beta !== null) {
+                    const gyroGain = 3.5;
+                    targetRotation.y = (e.gamma * Math.PI / 180) * gyroGain;
+                    targetRotation.x = (((e.beta - 45) * Math.PI) / 180) * gyroGain;
+
+                    targetRotation.x = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, targetRotation.x));
+                }
+            });
         }
+
+        function setupCelebrityVideoPlayerControls() {
+            const modal = document.getElementById('celebrity-video-modal');
+            const closeBtn = document.getElementById('close-celebrity-modal');
+            const video = document.getElementById('celeb-active-video');
+            const playPauseBtn = document.getElementById('celeb-play-pause-btn');
+            const muteBtn = document.getElementById('celeb-mute-btn');
+            const seekbar = document.getElementById('celeb-video-seekbar');
+            const timeLabel = document.getElementById('celeb-video-time');
+
+            closeBtn.addEventListener('click', closeCelebrityVideo);
+
+            playPauseBtn.addEventListener('click', () => {
+                if (video.paused) {
+                    video.play();
+                    playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                } else {
+                    video.pause();
+                    playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+                }
+            });
+
+            muteBtn.addEventListener('click', () => {
+                video.muted = !video.muted;
+                muteBtn.innerHTML = video.muted ? 
+                    '<i class="fa-solid fa-volume-xmark text-pink-500"></i>' : 
+                    '<i class="fa-solid fa-volume-high"></i>';
+            });
+
+            seekbar.addEventListener('input', () => {
+                if (video.duration) {
+                    const seekTo = (seekbar.value / 100) * video.duration;
+                    video.currentTime = seekTo;
+                }
+            });
+
+            video.addEventListener('timeupdate', () => {
+                if (video.duration) {
+                    const pct = (video.currentTime / video.duration) * 100;
+                    seekbar.value = pct;
+
+                    const curMins = Math.floor(video.currentTime / 60);
+                    const curSecs = Math.floor(video.currentTime % 60).toString().padStart(2, '0');
+                    const durMins = Math.floor(video.duration / 60);
+                    const durSecs = Math.floor(video.duration % 60).toString().padStart(2, '0');
+                    timeLabel.innerText = `${curMins}:${curSecs} / ${durMins}:${durSecs}`;
+                }
+            });
+
+            video.addEventListener('ended', closeCelebrityVideo);
+        }
+
+        function openCelebrityVideo(celeb) {
+            const modal = document.getElementById('celebrity-video-modal');
+            const video = document.getElementById('celeb-active-video');
+            const nameTitle = document.getElementById('celeb-name-title');
+            const roleBadge = document.getElementById('celeb-role-badge');
+            const avatarImg = document.getElementById('celeb-avatar-img');
+
+            nameTitle.innerText = celeb.name;
+            roleBadge.innerText = celeb.role;
+            avatarImg.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${celeb.name}`;
+
+            video.src = celeb.videoUrl;
+            video.muted = false;
+
+            modal.classList.remove('hidden');
+
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    video.muted = true;
+                    video.play();
+                });
+            }
+        }
+
+        function closeCelebrityVideo() {
+            const modal = document.getElementById('celebrity-video-modal');
+            const video = document.getElementById('celeb-active-video');
+
+            video.pause();
+            video.src = '';
+            modal.classList.add('hidden');
+        }
+
+        function handleVRClick() {
+            if (!isUniverseActive) return;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(screenMeshes, true);
+
+            if (intersects.length > 0) {
+                let hitMesh = intersects[0].object;
+                while (hitMesh.parent && hitMesh.parent !== scene) {
+                    if (hitMesh.userData && hitMesh.userData.type) break;
+                    hitMesh = hitMesh.parent;
+                }
+
+                if (hitMesh.userData.type === 'category_btn') {
+                    activeCategory = hitMesh.userData.category;
+                    buildVRInterface();
+                } else if (hitMesh.userData.type === 'celebrity_circle') {
+                    openCelebrityVideo(hitMesh.userData.celebrity);
+                } else if (hitMesh.userData.type === 'screen' && !isCinematicMode) {
+                    activeMediaMesh = hitMesh;
+                    openProgramModal(hitMesh);
+                }
+            }
+        }
+
+        function enterUniverse() {
+            document.getElementById('welcome-screen').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('welcome-screen').classList.add('hidden');
+                document.getElementById('ui-hud').classList.remove('hidden');
+                isUniverseActive = true;
+            }, 1000);
+        }
+
+        function openCinematicMode(mesh) {
+            isCinematicMode = true;
+            activeMediaMesh = mesh;
+            originalMeshTransform = {
+                position: mesh.position.clone(),
+                rotation: mesh.rotation.clone(),
+                scale: mesh.scale.clone()
+            };
+
+            mesh.position.set(0, 0, -3.2);
+            mesh.rotation.set(0, 0, 0);
+            mesh.scale.set(1.8, 1.8, 1.8);
+
+            document.getElementById('now-playing-title').innerText = mesh.userData.media.title;
+            document.getElementById('cinema-controls').classList.remove('hidden');
+        }
+
+        function exitCinematicMode() {
+            if (!isCinematicMode || !activeMediaMesh) return;
+
+            activeMediaMesh.position.copy(originalMeshTransform.position);
+            activeMediaMesh.rotation.copy(originalMeshTransform.rotation);
+            activeMediaMesh.scale.copy(originalMeshTransform.scale);
+
+            document.getElementById('cinema-controls').classList.add('hidden');
+            isCinematicMode = false;
+            activeMediaMesh = null;
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            buildVRInterface();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (starField) starField.rotation.y += 0.0003;
+            if (nebulaParticles) nebulaParticles.rotation.y -= 0.0002;
+
+            if (!isMouseDown && !useGyro) {
+                targetRotation.y += touchVelocity.y * 0.016;
+                targetRotation.x += touchVelocity.x * 0.016;
+
+                touchVelocity.x *= 0.92;
+                touchVelocity.y *= 0.92;
+
+                targetRotation.x = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, targetRotation.x));
+            }
+
+            const lerpSpeed = useGyro ? 0.12 : 0.08;
+            currentRotation.x += (targetRotation.x - currentRotation.x) * lerpSpeed;
+            currentRotation.y += (targetRotation.y - currentRotation.y) * lerpSpeed;
+
+            camera.rotation.x = currentRotation.x;
+            camera.rotation.y = currentRotation.y;
+
+            if (isUniverseActive && !isCinematicMode) {
+                raycaster.setFromCamera(gazeEnabled ? new THREE.Vector2(0,0) : mouse, camera);
+                const intersects = raycaster.intersectObjects(screenMeshes, true);
+
+                let hoveredObj = null;
+                if (intersects.length > 0) {
+                    let topMesh = intersects[0].object;
+                    while (topMesh.parent && topMesh.parent !== scene) {
+                        if (topMesh.userData && topMesh.userData.type) break;
+                        topMesh = topMesh.parent;
+                    }
+                    if (topMesh.userData && (topMesh.userData.type === 'screen' || topMesh.userData.type === 'celebrity_circle' || topMesh.userData.type === 'category_btn')) {
+                        hoveredObj = topMesh;
+                    }
+                }
+
+                screenMeshes.forEach(mesh => {
+                    const isHovered = (mesh === hoveredObj);
+                    const targetScale = isHovered ? 1.08 : 1.0;
+                    
+                    mesh.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.15);
+
+                    if (mesh.userData.frameMesh) {
+                        mesh.userData.frameMesh.material.opacity = THREE.MathUtils.lerp(
+                            mesh.userData.frameMesh.material.opacity,
+                            isHovered ? 1.0 : 0.7,
+                            0.15
+                        );
+                    }
+                });
+            }
+
+            if (gazeEnabled && isUniverseActive && !isCinematicMode) {
+                raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+                const intersects = raycaster.intersectObjects(screenMeshes, true);
+
+                if (intersects.length > 0) {
+                    let target = intersects[0].object;
+                    while (target.parent && target.parent !== scene) {
+                        if (target.userData && target.userData.type) break;
+                        target = target.parent;
+                    }
+
+                    if (gazeHoveredMesh !== target) {
+                        gazeHoveredMesh = target;
+                        gazeStartTime = Date.now();
+                    } else {
+                        const elapsed = Date.now() - gazeStartTime;
+                        const progress = Math.min(elapsed / GAZE_DURATION, 1);
+                        document.getElementById('gaze-progress').style.transform = `translate(-50%, -50%) rotate(${progress * 360}deg)`;
+
+                        if (progress >= 1) {
+                            handleVRClick();
+                            gazeStartTime = Date.now();
+                        }
+                    }
+                } else {
+                    gazeHoveredMesh = null;
+                    document.getElementById('gaze-progress').style.transform = 'translate(-50%, -50%) rotate(0deg)';
+                }
+            }
+
+            if (isStereoVR) {
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                const halfWidth = width / 2;
+                const eyeSeparation = 0.08;
+
+                renderer.setScissorTest(true);
+
+                camera.position.x = -eyeSeparation;
+                renderer.setViewport(0, 0, halfWidth, height);
+                renderer.setScissor(0, 0, halfWidth, height);
+                renderer.render(scene, camera);
+
+                camera.position.x = eyeSeparation;
+                renderer.setViewport(halfWidth, 0, halfWidth, height);
+                renderer.setScissor(halfWidth, 0, halfWidth, height);
+                renderer.render(scene, camera);
+
+                camera.position.x = 0;
+                renderer.setScissorTest(false);
+            } else {
+                renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+                renderer.render(scene, camera);
+            }
+        }
+
+        window.onload = () => {
+            initEngine();
+            animate();
+        };
     </script>
 </body>
 </html>
