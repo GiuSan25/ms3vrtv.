@@ -452,7 +452,7 @@
         }
         .preview-modal.active { opacity: 1; pointer-events: auto; }
         .preview-content {
-            background: #151022; width: 100%; max-width: 550px; border-radius: 16px;
+            background: #151022; width: 100%; max-width: 600px; border-radius: 16px;
             overflow-y: auto; max-height: 90vh; border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 20px 40px rgba(0,0,0,0.8); position: relative;
             transform: scale(0.95); transition: transform 0.3s ease;
@@ -488,15 +488,15 @@
             gap: 6px;
         }
 
-        /* Panel Desplegable dentro del Modal (Ver más programas VR / Ver capítulos Furman) */
+        /* Panel Desplegable General */
         .dropdown-drawer {
             display: none;
             margin-top: 16px;
-            background: rgba(11, 6, 20, 0.85);
+            background: rgba(11, 6, 20, 0.92);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
-            padding: 12px;
-            max-height: 240px;
+            padding: 14px;
+            max-height: 320px;
             overflow-y: auto;
         }
         .dropdown-drawer.open {
@@ -508,15 +508,75 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .dropdown-drawer-header {
-            font-size: 0.75rem;
+            font-size: 0.78rem;
             font-weight: bold;
             letter-spacing: 1px;
             text-transform: uppercase;
             color: #00f3ff;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             padding-bottom: 6px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
+
+        /* Cuadrícula vertical para los Programas VR en "Ver más" */
+        .vr-vertical-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        @media (min-width: 480px) {
+            .vr-vertical-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        .vr-vertical-card {
+            background: #1a1528;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .vr-vertical-card:hover {
+            border-color: #00f3ff;
+            transform: translateY(-2px);
+        }
+        .vr-vertical-thumb {
+            width: 100%;
+            height: 95px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            background-color: #0f0a1d;
+        }
+        .vr-vertical-info {
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-grow: 1;
+        }
+        .vr-vertical-title {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #fff;
+            line-height: 1.15;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .vr-vertical-badge {
+            font-size: 0.6rem;
+            color: #d8b4fe;
+            background: rgba(11, 6, 20, 0.8);
+            padding: 2px 6px;
+            border-radius: 4px;
+            align-self: flex-start;
+        }
+
+        /* Lista horizontal para Capítulos de Medicina VR */
         .dropdown-item {
             display: flex;
             align-items: center;
@@ -545,7 +605,7 @@
             background: #231b38;
         }
         .dropdown-item-title {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 600;
             color: #fff;
             white-space: nowrap;
@@ -886,10 +946,10 @@
                     <button class="btn btn-accent" id="modalVerCapitulosBtn" style="display:none;">📂 Ver capítulos</button>
                 </div>
 
-                <!-- Menú Desplegable: Todos los Programas VR -->
+                <!-- Menú Desplegable: Todos los Programas VR (Cuadrícula vertical uno al lado del otro) -->
                 <div class="dropdown-drawer" id="verMasDrawer">
                     <div class="dropdown-drawer-header">Programación de Realidad Virtual (VR)</div>
-                    <div id="verMasListContainer"></div>
+                    <div class="vr-vertical-grid" id="verMasListContainer"></div>
                 </div>
 
                 <!-- Menú Desplegable: Capítulos de Medicina VR (Dr. Furman) -->
@@ -1116,7 +1176,6 @@
 
         let currentModalData = {};
 
-        // Abre la vista previa específica de un programa VR con botón "Ver más" (y "Ver capítulos" si es Medicina VR)
         function openVRProgram(programTitle) {
             const prog = vrProgramsCatalog.find(p => p.title === programTitle) || vrProgramsCatalog[0];
             const objPos = prog.fitTop ? 'object-position: center 20%; background:#0f0a1d;' : 'object-position: center;';
@@ -1134,7 +1193,6 @@
             modalDesc.innerText = desc;
             modalImg.innerHTML = iconHTML + '<button class="preview-close" onclick="closePreview()">✕</button>';
             
-            // Reiniciar desplegables
             verMasDrawer.classList.remove('open');
             verCapitulosDrawer.classList.remove('open');
 
@@ -1156,11 +1214,10 @@
                 }
             };
 
-            // Configurar botón "Ver más" (Programación VR)
             if (options.showVerMas) {
                 modalVerMasBtn.style.display = 'flex';
                 modalVerMasBtn.innerHTML = '▼ Ver más';
-                populateVerMasList(title);
+                populateVerMasGrid(title);
                 modalVerMasBtn.onclick = function() {
                     verCapitulosDrawer.classList.remove('open');
                     const isOpen = verMasDrawer.classList.toggle('open');
@@ -1170,7 +1227,6 @@
                 modalVerMasBtn.style.display = 'none';
             }
 
-            // Configurar botón "Ver capítulos" (Solo Medicina VR - Dr. Furman)
             if (options.showCapitulos) {
                 modalVerCapitulosBtn.style.display = 'flex';
                 modalVerCapitulosBtn.innerHTML = '📂 Ver capítulos';
@@ -1188,23 +1244,21 @@
             previewModal.classList.add('active');
         }
 
-        function populateVerMasList(activeTitle) {
+        // Poblar la cuadrícula vertical en "Ver más"
+        function populateVerMasGrid(activeTitle) {
             verMasListContainer.innerHTML = '';
             vrProgramsCatalog.forEach(prog => {
-                const row = document.createElement('div');
-                row.className = 'dropdown-item';
-                row.onclick = () => openVRProgram(prog.title);
-                row.innerHTML = `
-                    <div class="dropdown-item-left">
-                        <img class="dropdown-thumb" src="${prog.img}" style="${prog.fitTop ? 'object-position: center 20%;' : ''}" alt="${prog.title}">
-                        <div>
-                            <div class="dropdown-item-title">${prog.title} ${prog.title === activeTitle ? '• Actual' : ''}</div>
-                            <div class="dropdown-item-sub">${prog.tag} • Realidad Virtual</div>
-                        </div>
+                const card = document.createElement('div');
+                card.className = 'vr-vertical-card';
+                card.onclick = () => openVRProgram(prog.title);
+                card.innerHTML = `
+                    <div class="vr-vertical-thumb ${prog.fitTop ? 'vrmusic-fit' : ''}" style="background-image: url('${prog.img}');"></div>
+                    <div class="vr-vertical-info">
+                        <div class="vr-vertical-title">${prog.title} ${prog.title === activeTitle ? '• (Actual)' : ''}</div>
+                        <span class="vr-vertical-badge">${prog.tag}</span>
                     </div>
-                    <span class="dropdown-play-pill">Ver</span>
                 `;
-                verMasListContainer.appendChild(row);
+                verMasListContainer.appendChild(card);
             });
         }
 
@@ -1258,7 +1312,6 @@
         const vrCanvasContainer = document.getElementById('vrCanvasContainer');
         const gyroToggleBtn = document.getElementById('gyroToggleBtn');
 
-        // Variables Three.js para Modo 360
         let scene, camera, renderer, sphereMesh, videoElement, videoTexture;
         let isMouseDown = false, onPointerDownPointerX = 0, onPointerDownPointerY = 0;
         let lon = 0, onPointerDownLon = 0, lat = 0, onPointerDownLat = 0;
