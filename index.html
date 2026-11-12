@@ -327,6 +327,111 @@
         .hero-details h2 { font-size: 1.4rem; margin-bottom: 15px; line-height: 1.2; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         .hero-buttons { display: flex; gap: 10px; }
 
+        /* Banner de Descarga de App + Video Miniatura */
+        .app-promo-banner {
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.12), rgba(168, 85, 247, 0.18));
+            border: 1px solid rgba(0, 243, 255, 0.35);
+            border-radius: 16px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 243, 255, 0.12);
+            flex-wrap: wrap;
+        }
+
+        .app-promo-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .app-promo-title {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+
+        .app-promo-subtitle {
+            font-size: 0.82rem;
+            color: #d8b4fe;
+            line-height: 1.35;
+        }
+
+        .app-promo-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Botón con enlace directo */
+        .btn-download-app {
+            background: linear-gradient(135deg, #00f3ff, #7c3aed);
+            color: #000;
+            font-weight: 900;
+            padding: 12px 22px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .btn-download-app:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px #00f3ff, 0 0 15px rgba(124, 58, 237, 0.8);
+            color: #fff;
+        }
+        .btn-download-app:active { transform: scale(0.97); }
+
+        /* Video Miniatura Explicativo al lado */
+        .app-mini-tutorial {
+            width: 130px;
+            height: 75px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #00f3ff;
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.4);
+            position: relative;
+            cursor: pointer;
+            background: #000;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+        .app-mini-tutorial:hover {
+            transform: scale(1.05);
+        }
+        .app-mini-tutorial iframe, .app-mini-tutorial video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+        }
+        .tutorial-overlay-badge {
+            position: absolute;
+            bottom: 4px;
+            left: 4px;
+            background: rgba(0, 0, 0, 0.75);
+            color: #00f3ff;
+            font-size: 0.55rem;
+            font-weight: bold;
+            padding: 2px 5px;
+            border-radius: 4px;
+            backdrop-filter: blur(2px);
+        }
+
         .btn {
             padding: 10px 24px;
             border-radius: 8px;
@@ -706,6 +811,23 @@
                     <div class="hero-buttons">
                         <button class="btn btn-primary" onclick="openPlayer('Sander maurin creador y director de ms3', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')">▶ REPRODUCIR</button>
                         <button class="btn btn-secondary" onclick="openPreview('Sander maurin creador y director de ms3', '<img src=&quot;ms3media/sanderdocumentalnuevo.jpeg&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Disfruta de este contenido exclusivo inmersivo dirigido por Sander Maurin...', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)">INFO</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: Botón Descarga la App (con enlace funcional) + Video Miniatura Explicativo -->
+            <div class="app-promo-banner">
+                <div class="app-promo-info">
+                    <div class="app-promo-title">📱 LLEVÁ MS3 A TODOS LADOS</div>
+                    <div class="app-promo-subtitle">Disfruta la televisión inmersiva en tu dispositivo móvil con máxima calidad y soporte VR.</div>
+                </div>
+                <div class="app-promo-actions">
+                    <a href="https://giusan25.github.io/ms3app/" target="_blank" rel="noopener noreferrer" class="btn-download-app">
+                        📥 DESCARGA LA APP
+                    </a>
+                    <div class="app-mini-tutorial" onclick="openPlayer('Tutorial MS3: ¿Cómo usar la app?', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')">
+                        <iframe src="https://www.youtube.com/embed/cQeUF8H2PR0?autoplay=1&mute=1&controls=0&loop=1&playlist=cQeUF8H2PR0" frameborder="0"></iframe>
+                        <span class="tutorial-overlay-badge">▶ ¿Cómo usar?</span>
                     </div>
                 </div>
             </div>
@@ -1244,7 +1366,6 @@
             previewModal.classList.add('active');
         }
 
-        // Poblar la cuadrícula vertical en "Ver más"
         function populateVerMasGrid(activeTitle) {
             verMasListContainer.innerHTML = '';
             vrProgramsCatalog.forEach(prog => {
