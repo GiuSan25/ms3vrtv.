@@ -213,7 +213,7 @@
         /* Menú de Pestañas Superior */
         .sub-nav {
             display: flex;
-            justify-style: space-around;
+            justify-content: space-around;
             padding: 12px 20px;
             position: fixed;
             top: 65px;
@@ -345,6 +345,11 @@
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255,255,255,0.2);
         }
+        .btn-accent {
+            background: rgba(0, 243, 255, 0.15);
+            color: #00f3ff;
+            border: 1px solid rgba(0, 243, 255, 0.45);
+        }
 
         /* Carruseles y Cuadrículas */
         .row-section { margin-top: 30px; }
@@ -375,6 +380,14 @@
             font-size: 1.5rem; background-size: cover; background-position: center;
         }
 
+        /* Ajuste específico de encuadre para VR Music */
+        .vrmusic-fit {
+            background-size: 100% auto !important;
+            background-position: center 22% !important;
+            background-repeat: no-repeat !important;
+            background-color: #0f0a1d !important;
+        }
+
         .card-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.85) 100%);
@@ -395,7 +408,7 @@
         }
         .card-remove-btn:active { transform: scale(1.1); }
 
-        /* Estilo Carrusel Famosos MS3 (Circular / Redondo con Borde Neón Futurista) */
+        /* Estilo Carrusel Famosos MS3 */
         .famosos-slider {
             display: flex; gap: 16px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
         }
@@ -414,7 +427,7 @@
         .famoso-circle:active { transform: scale(0.95); box-shadow: 0 0 20px #00f3ff; }
         .famoso-name { font-size: 0.75rem; text-align: center; font-weight: bold; color: #d8b4fe; white-space: nowrap; }
 
-        /* Reproductor Vertical Flotante Mini para Famosos (Corregido y Adaptado) */
+        /* Reproductor Vertical Flotante Mini */
         .vertical-mini-player {
             position: fixed; bottom: 30px; right: 20px; width: 160px; height: 280px;
             background: #000; border: 2px solid #00f3ff; border-radius: 12px; overflow: hidden;
@@ -440,13 +453,13 @@
         .preview-modal.active { opacity: 1; pointer-events: auto; }
         .preview-content {
             background: #151022; width: 100%; max-width: 550px; border-radius: 16px;
-            overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto; max-height: 90vh; border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 20px 40px rgba(0,0,0,0.8); position: relative;
             transform: scale(0.95); transition: transform 0.3s ease;
         }
         .preview-modal.active .preview-content { transform: scale(1); }
         .preview-header-img {
-            width: 100%; height: 240px; background: linear-gradient(135deg, #2b1055, #a855f7);
+            width: 100%; height: 230px; background: linear-gradient(135deg, #2b1055, #a855f7);
             display: flex; align-items: center; justify-content: center; font-size: 4rem;
             position: relative; background-size: cover; background-position: center;
         }
@@ -457,12 +470,104 @@
             touch-action: manipulation;
         }
         .preview-body { padding: 20px; }
-        .preview-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 10px; }
-        .preview-desc { font-size: 0.9rem; color: #b8b2cb; line-height: 1.5; margin-bottom: 25px; }
-        .preview-actions { display: flex; gap: 12px; }
-        .preview-actions .btn { flex: 1; padding: 12px; text-align: center; justify-content: center; display: flex; align-items: center; gap: 8px; }
+        .preview-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 8px; }
+        .preview-desc { font-size: 0.9rem; color: #b8b2cb; line-height: 1.5; margin-bottom: 18px; }
+        .preview-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .preview-actions .btn {
+            flex: 1 1 calc(50% - 10px);
+            padding: 11px 12px;
+            font-size: 0.85rem;
+            text-align: center;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
 
-        /* Reproductor Pantalla Completa YouTube 360° nativo y Canvas 360 Custom */
+        /* Panel Desplegable dentro del Modal (Ver más programas VR / Ver capítulos Furman) */
+        .dropdown-drawer {
+            display: none;
+            margin-top: 16px;
+            background: rgba(11, 6, 20, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 12px;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+        .dropdown-drawer.open {
+            display: block;
+            animation: fadeSlideDown 0.25s ease;
+        }
+        @keyframes fadeSlideDown {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .dropdown-drawer-header {
+            font-size: 0.75rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #00f3ff;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .dropdown-item:last-child { border-bottom: none; }
+        .dropdown-item:hover { background: rgba(255, 255, 255, 0.08); }
+        .dropdown-item-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+        .dropdown-thumb {
+            width: 52px;
+            height: 34px;
+            border-radius: 6px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: #231b38;
+        }
+        .dropdown-item-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .dropdown-item-sub {
+            font-size: 0.72rem;
+            color: #9e96b8;
+        }
+        .dropdown-play-pill {
+            font-size: 0.72rem;
+            font-weight: bold;
+            background: rgba(255, 42, 109, 0.2);
+            color: #ff2a6d;
+            border: 1px solid rgba(255, 42, 109, 0.45);
+            padding: 4px 10px;
+            border-radius: 20px;
+            flex-shrink: 0;
+        }
+
+        /* Reproductor Pantalla Completa */
         .player-fullscreen-container {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: #000; z-index: 99999; display: none; justify-content: center; align-items: center;
@@ -540,7 +645,7 @@
                     <h2>SANDER MAURIN : creador y director de MS3</h2>
                     <div class="hero-buttons">
                         <button class="btn btn-primary" onclick="openPlayer('Sander maurin creador y director de ms3', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')">▶ REPRODUCIR</button>
-                        <button class="btn btn-secondary" onclick="openPreview('Sander maurin creador y director de ms3', '<img src=&quot;ms3media/sanderdocumentalnuevo.jpeg&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Disfruta de este contenido exclusivo inmersivo directed por Sander Maurin...', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')">INFO</button>
+                        <button class="btn btn-secondary" onclick="openPreview('Sander maurin creador y director de ms3', '<img src=&quot;ms3media/sanderdocumentalnuevo.jpeg&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Disfruta de este contenido exclusivo inmersivo dirigido por Sander Maurin...', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)">INFO</button>
                     </div>
                 </div>
             </div>
@@ -549,37 +654,37 @@
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">PROGRAMAS EN REALIDAD VIRTUAL</div></div>
                 <div class="cards-slider">
-                    <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° en realidad virtual oficial de YouTube.', 'https://youtu.be/y3qO1OL5nRg?si=_-jENRWRLTTkCJI6', true)">
+                    <div class="card" onclick="openVRProgram('Buscando a la futura vedette')">
                         <div class="card-bg" style="background-image: url('ms3media/vedettehorizontal.png');"></div><span class="card-tag">360° Pro</span><div class="card-overlay"><div class="card-title">Buscando a la futura vedette</div></div>
                     </div>
-                    <div class="card" onclick="openPreview('MEDICINA VR 1', '<img src=&quot;ms3media/medicinahorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Avances médicos inmersivos parte 1.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
-                        <div class="card-bg" style="background-image: url('ms3media/medicinahorizontal.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">MEDICINA VR 1</div></div>
+                    <div class="card" onclick="openVRProgram('MEDICINA VR')">
+                        <div class="card-bg" style="background-image: url('ms3media/medicinahorizontal.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">MEDICINA VR</div></div>
                     </div>
-                    <div class="card" onclick="openPreview('LA MASA VR', '<img src=&quot;ms3media/lamasahorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Detrás de escena inmersivo de LA MASA.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
+                    <div class="card" onclick="openVRProgram('LA MASA VR')">
                         <div class="card-bg" style="background-image: url('ms3media/lamasahorizontal.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">LA MASA VR</div></div>
                     </div>
-                    <div class="card" onclick="openPreview('AGR COMPETICION', '<img src=&quot;ms3media/agrcompeticionhorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Adrenalina total en pista y boxes.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
+                    <div class="card" onclick="openVRProgram('AGR COMPETICION')">
                         <div class="card-bg" style="background-image: url('ms3media/agrcompeticionhorizontal.png');"></div><span class="card-tag">Motor</span><div class="card-overlay"><div class="card-title">AGR COMPETICION</div></div>
                     </div>
-                    <div class="card" onclick="openPreview('COCINA VR', '<img src=&quot;ms3media/cocina.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia culinaria inmersiva en realidad virtual.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
+                    <div class="card" onclick="openVRProgram('COCINA VR')">
                         <div class="card-bg" style="background-image: url('ms3media/cocina.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">COCINA VR</div></div>
                     </div>
-                    <div class="card" onclick="openPreview('DOCUMENTALES VR', '<img src=&quot;ms3media/documentales.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Documentales inmersivos en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
+                    <div class="card" onclick="openVRProgram('DOCUMENTALES VR')">
                         <div class="card-bg" style="background-image: url('ms3media/documentales.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">DOCUMENTALES VR</div></div>
                     </div>
-                    <div class="card" onclick="openPreview('PASEO VIRTUAL', '<img src=&quot;ms3media/paseo.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Paseo inmersivo virtual.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
+                    <div class="card" onclick="openVRProgram('PASEO VIRTUAL')">
                         <div class="card-bg" style="background-image: url('ms3media/paseo.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">PASEO VIRTUAL</div></div>
                     </div>
-                    <div class="card" onclick="openPreview('VR MUSIC', '<img src=&quot;ms3media/vrmusic.jpg.jpeg&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Música y conciertos en realidad virtual.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
-                        <div class="card-bg" style="background-image: url('ms3media/vrmusic.jpg.jpeg');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">VR MUSIC</div></div>
+                    <div class="card" onclick="openVRProgram('VR MUSIC')">
+                        <div class="card-bg vrmusic-fit" style="background-image: url('ms3media/vrmusic.jpg.jpeg');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">VR MUSIC</div></div>
                     </div>
-                    <div class="card" onclick="openPreview('ZONA INMERSIVA VR', '<img src=&quot;ms3media/zona.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Explora la zona inmersiva en las alturas.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
+                    <div class="card" onclick="openVRProgram('ZONA INMERSIVA VR')">
                         <div class="card-bg" style="background-image: url('ms3media/zona.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">ZONA INMERSIVA VR</div></div>
                     </div>
-                    <div class="card" onclick="openPreview('VR MODA', '<img src=&quot;ms3media/moda.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Pasarelas y moda en primera persona.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
+                    <div class="card" onclick="openVRProgram('VR MODA')">
                         <div class="card-bg" style="background-image: url('ms3media/moda.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">VR MODA</div></div>
                     </div>
-                    <div class="card" onclick="openPreview('BROTHER THE SKATE BOARD VR', '<img src=&quot;ms3media/skatehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Skateboarding inmersivo en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
+                    <div class="card" onclick="openVRProgram('BROTHER THE SKATE BOARD VR')">
                         <div class="card-bg" style="background-image: url('ms3media/skatehorizontal.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">BROTHER THE SKATE BOARD VR</div></div>
                     </div>
                 </div>
@@ -589,49 +694,42 @@
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">NOTICIAS EN VIVO</div></div>
                 <div class="cards-slider">
-                    <!-- CRONICA -->
                     <div class="card" onclick="openPlayer('CRONICA', 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1')">
                         <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                             <iframe src="https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=1&controls=0&loop=1&playlist=hw4uHyct4vg" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                         </div>
                         <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">CRONICA</div></div>
                     </div>
-                    <!-- A24 -->
                     <div class="card" onclick="openPlayer('A24', 'https://www.youtube.com/embed/ArKbAx1K-2U?autoplay=1&mute=0&enablejsapi=1')">
                         <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                             <iframe src="https://www.youtube.com/embed/ArKbAx1K-2U?autoplay=1&mute=1&controls=0&loop=1&playlist=ArKbAx1K-2U" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                         </div>
                         <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">A24</div></div>
                     </div>
-                    <!-- TN -->
                     <div class="card" onclick="openPlayer('TN', 'https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=0&enablejsapi=1')">
                         <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                             <iframe src="https://www.youtube.com/embed/cb12KmMMDJA?autoplay=1&mute=1&controls=0&loop=1&playlist=cb12KmMMDJA" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                         </div>
                         <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">TN</div></div>
                     </div>
-                    <!-- C5N -->
                     <div class="card" onclick="openPlayer('C5N', 'https://www.youtube.com/embed/j6oh4Kqz3UM?autoplay=1&mute=0&enablejsapi=1')">
                         <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                             <iframe src="https://www.youtube.com/embed/j6oh4Kqz3UM?autoplay=1&mute=1&controls=0&loop=1&playlist=j6oh4Kqz3UM" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                         </div>
                         <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">C5N</div></div>
                     </div>
-                    <!-- LN+ -->
                     <div class="card" onclick="openPlayer('LN+', 'https://www.youtube.com/embed/FEWZjXJ7M0c?autoplay=1&mute=0&enablejsapi=1')">
                         <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                             <iframe src="https://www.youtube.com/embed/FEWZjXJ7M0c?autoplay=1&mute=1&controls=0&loop=1&playlist=FEWZjXJ7M0c" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                         </div>
                         <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">LN+</div></div>
                     </div>
-                    <!-- ARGENTINA|12 -->
                     <div class="card" onclick="openPlayer('ARGENTINA|12', 'https://www.youtube.com/embed/21UP3XoRIBU?autoplay=1&mute=0&enablejsapi=1')">
                         <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                             <iframe src="https://www.youtube.com/embed/21UP3XoRIBU?autoplay=1&mute=1&controls=0&loop=1&playlist=21UP3XoRIBU" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
                         </div>
                         <span class="card-tag">EN VIVO</span><div class="card-overlay"><div class="card-title">ARGENTINA|12</div></div>
                     </div>
-                    <!-- CADENA 3 -->
                     <div class="card" onclick="openPlayer('CADENA 3', 'https://www.youtube.com/embed/Bk471uQ26-4?autoplay=1&mute=0&enablejsapi=1')">
                         <div class="card-bg" style="position: relative; overflow: hidden; background: #000;">
                             <iframe src="https://www.youtube.com/embed/Bk471uQ26-4?autoplay=1&mute=1&controls=0&loop=1&playlist=Bk471uQ26-4" style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%); pointer-events: none;" frameborder="0"></iframe>
@@ -649,21 +747,21 @@
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">STREAMING</div></div>
                 <div class="cards-slider">
-                    <div class="card" onclick="openPreview('Luzu TV', '🔥', 'Stream en vivo de Luzu TV.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🔥</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Luzu TV</div></div></div>
-                    <div class="card" onclick="openPreview('Olga Stream', '🎙️', 'Programación exclusiva de Olga.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🎙️</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Olga Stream</div></div></div>
-                    <div class="card" onclick="openPreview('República Z', '⚡', 'Debates y streaming joven.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">⚡</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">República Z</div></div></div>
-                    <div class="card" onclick="openPreview('Blender', '🎧', 'Cultura pop y entretenimiento.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🎧</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Blender</div></div></div>
-                    <div class="card" onclick="openPreview('Gelatina', '🚀', 'Política y actualidad en streaming.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🚀</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Gelatina</div></div></div>
-                    <div class="card" onclick="openPreview('Vorterix Stream', '🎸', 'Rock y entrevistas en vivo.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🎸</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Vorterix Stream</div></div></div>
-                    <div class="card" onclick="openPreview('Urbana Play', '📻', 'Radio y streaming visual.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">📻</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Urbana Play</div></div></div>
-                    <div class="card" onclick="openPreview('Kuarzo Digital', '💎', 'Entretenimiento y magazine.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">💎</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Kuarzo Digital</div></div></div>
-                    <div class="card" onclick="openPreview('Loft Stream', '✨', 'Estilo de vida y tendencias.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">✨</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Loft Stream</div></div></div>
-                    <div class="card" onclick="openPreview('Azul Stream', '🌊', 'Contenido libre y entrevistas.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🌊</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Azul Stream</div></div></div>
-                    <div class="card" onclick="openPreview('Furia Digital', '🔥', 'Gaming y streaming de creadores.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs')"><div class="card-bg">🔥</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Furia Digital</div></div></div>
+                    <div class="card" onclick="openPreview('Luzu TV', '🔥', 'Stream en vivo de Luzu TV.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">🔥</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Luzu TV</div></div></div>
+                    <div class="card" onclick="openPreview('Olga Stream', '🎙️', 'Programación exclusiva de Olga.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">🎙️</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Olga Stream</div></div></div>
+                    <div class="card" onclick="openPreview('República Z', '⚡', 'Debates y streaming joven.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">⚡</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">República Z</div></div></div>
+                    <div class="card" onclick="openPreview('Blender', '🎧', 'Cultura pop y entretenimiento.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">🎧</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Blender</div></div></div>
+                    <div class="card" onclick="openPreview('Gelatina', '🚀', 'Política y actualidad en streaming.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">🚀</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Gelatina</div></div></div>
+                    <div class="card" onclick="openPreview('Vorterix Stream', '🎸', 'Rock y entrevistas en vivo.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">🎸</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Vorterix Stream</div></div></div>
+                    <div class="card" onclick="openPreview('Urbana Play', '📻', 'Radio y streaming visual.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">📻</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Urbana Play</div></div></div>
+                    <div class="card" onclick="openPreview('Kuarzo Digital', '💎', 'Entretenimiento y magazine.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">💎</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Kuarzo Digital</div></div></div>
+                    <div class="card" onclick="openPreview('Loft Stream', '✨', 'Estilo de vida y tendencias.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">✨</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Loft Stream</div></div></div>
+                    <div class="card" onclick="openPreview('Azul Stream', '🌊', 'Contenido libre y entrevistas.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">🌊</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Azul Stream</div></div></div>
+                    <div class="card" onclick="openPreview('Furia Digital', '🔥', 'Gaming y streaming de creadores.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', false)"><div class="card-bg">🔥</div><span class="card-tag">Stream</span><div class="card-overlay"><div class="card-title">Furia Digital</div></div></div>
                 </div>
             </div>
 
-            <!-- Carrusel 4: FAMOSOS DE MS3 (Formato Redondo / Circular con borde neón futurista) -->
+            <!-- Carrusel 4: FAMOSOS DE MS3 -->
             <div class="row-section">
                 <div class="row-header"><div class="section-title" style="margin-bottom:0;">FAMOSOS DE MS3</div></div>
                 <div class="famosos-slider">
@@ -690,35 +788,7 @@
         <!-- VISTA 2: PROGRAMAS VR -->
         <div class="content-section" id="tabProgramas">
             <div class="section-title">Catálogo Completo de Programas VR</div>
-            <div class="cards-grid">
-                <div class="card" onclick="openPreview('Buscando a la futura vedette', '<img src=&quot;ms3media/vedettehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia 360° en realidad virtual.', 'https://youtu.be/y3qO1OL5nRg?si=_-jENRWRLTTkCJI6', true)">
-                    <div class="card-bg" style="background-image: url('ms3media/vedettehorizontal.png');"></div><span class="card-tag">360° Pro</span><div class="card-overlay"><div class="card-title">Buscando a la futura vedette</div></div>
-                </div>
-                <div class="card" onclick="openPreview('MEDICINA VR', '<img src=&quot;ms3media/medicinahorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Avances médicos inmersivos.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
-                    <div class="card-bg" style="background-image: url('ms3media/medicinahorizontal.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">MEDICINA VR</div></div>
-                </div>
-                <div class="card" onclick="openPreview('COCINA VR', '<img src=&quot;ms3media/cocina.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Experiencia culinaria inmersiva en realidad virtual.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
-                    <div class="card-bg" style="background-image: url('ms3media/cocina.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">COCINA VR</div></div>
-                </div>
-                <div class="card" onclick="openPreview('DOCUMENTALES VR', '<img src=&quot;ms3media/documentales.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Documentales inmersivos en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
-                    <div class="card-bg" style="background-image: url('ms3media/documentales.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">DOCUMENTALES VR</div></div>
-                </div>
-                <div class="card" onclick="openPreview('PASEO VIRTUAL', '<img src=&quot;ms3media/paseo.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Paseo inmersivo virtual.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
-                    <div class="card-bg" style="background-image: url('ms3media/paseo.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">PASEO VIRTUAL</div></div>
-                </div>
-                <div class="card" onclick="openPreview('VR MUSIC', '<img src=&quot;ms3media/vrmusic.jpg.jpeg&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Música y conciertos en realidad virtual.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
-                    <div class="card-bg" style="background-image: url('ms3media/vrmusic.jpg.jpeg');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">VR MUSIC</div></div>
-                </div>
-                <div class="card" onclick="openPreview('ZONA INMERSIVA VR', '<img src=&quot;ms3media/zona.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Explora la zona inmersiva en las alturas.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
-                    <div class="card-bg" style="background-image: url('ms3media/zona.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">ZONA INMERSIVA VR</div></div>
-                </div>
-                <div class="card" onclick="openPreview('VR MODA', '<img src=&quot;ms3media/moda.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Pasarelas y moda en primera persona.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
-                    <div class="card-bg" style="background-image: url('ms3media/moda.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">VR MODA</div></div>
-                </div>
-                <div class="card" onclick="openPreview('BROTHER THE SKATE BOARD VR', '<img src=&quot;ms3media/skatehorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', 'Skateboarding inmersivo en 360 grados.', 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs', true)">
-                    <div class="card-bg" style="background-image: url('ms3media/skatehorizontal.png');"></div><span class="card-tag">360°</span><div class="card-overlay"><div class="card-title">BROTHER THE SKATE BOARD VR</div></div>
-                </div>
-            </div>
+            <div class="cards-grid" id="gridProgramasVR"></div>
         </div>
 
         <!-- VISTA 3: NOTICIAS -->
@@ -807,9 +877,25 @@
             <div class="preview-body">
                 <div class="preview-title" id="modalTitle">Título del Programa</div>
                 <div class="preview-desc" id="modalDesc">Descripción detallada...</div>
-                <div class="preview-actions">
+                
+                <!-- Botones de Acción -->
+                <div class="preview-actions" id="modalActionsContainer">
                     <button class="btn btn-primary" id="modalPlayBtn">▶ Reproducir</button>
                     <button class="btn btn-secondary" id="modalAddListBtn">+ Agregar a mi lista</button>
+                    <button class="btn btn-secondary" id="modalVerMasBtn" style="display:none;">▼ Ver más</button>
+                    <button class="btn btn-accent" id="modalVerCapitulosBtn" style="display:none;">📂 Ver capítulos</button>
+                </div>
+
+                <!-- Menú Desplegable: Todos los Programas VR -->
+                <div class="dropdown-drawer" id="verMasDrawer">
+                    <div class="dropdown-drawer-header">Programación de Realidad Virtual (VR)</div>
+                    <div id="verMasListContainer"></div>
+                </div>
+
+                <!-- Menú Desplegable: Capítulos de Medicina VR (Dr. Furman) -->
+                <div class="dropdown-drawer" id="verCapitulosDrawer">
+                    <div class="dropdown-drawer-header">Medicina VR — Capítulos Dr. Furman</div>
+                    <div id="verCapitulosListContainer"></div>
                 </div>
             </div>
         </div>
@@ -826,8 +912,136 @@
     </div>
 
     <script>
+        // Catálogo oficial de Programas VR
+        const vrProgramsCatalog = [
+            {
+                title: 'Buscando a la futura vedette',
+                img: 'ms3media/vedettehorizontal.png',
+                tag: '360° Pro',
+                desc: 'Experiencia 360° en realidad virtual oficial de YouTube.',
+                url: 'https://youtu.be/y3qO1OL5nRg?si=_-jENRWRLTTkCJI6',
+                isMedicina: false
+            },
+            {
+                title: 'MEDICINA VR',
+                img: 'ms3media/medicinahorizontal.png',
+                tag: '360°',
+                desc: 'Avances médicos inmersivos junto al Dr. Norberto Furman.',
+                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
+                isMedicina: true
+            },
+            {
+                title: 'LA MASA VR',
+                img: 'ms3media/lamasahorizontal.png',
+                tag: '360°',
+                desc: 'Detrás de escena inmersivo de LA MASA.',
+                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
+                isMedicina: false
+            },
+            {
+                title: 'AGR COMPETICION',
+                img: 'ms3media/agrcompeticionhorizontal.png',
+                tag: 'Motor',
+                desc: 'Adrenalina total en pista y boxes.',
+                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
+                isMedicina: false
+            },
+            {
+                title: 'COCINA VR',
+                img: 'ms3media/cocina.png',
+                tag: '360°',
+                desc: 'Experiencia culinaria inmersiva en realidad virtual.',
+                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
+                isMedicina: false
+            },
+            {
+                title: 'DOCUMENTALES VR',
+                img: 'ms3media/documentales.png',
+                tag: '360°',
+                desc: 'Documentales inmersivos en 360 grados.',
+                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
+                isMedicina: false
+            },
+            {
+                title: 'PASEO VIRTUAL',
+                img: 'ms3media/paseo.png',
+                tag: '360°',
+                desc: 'Paseo inmersivo virtual.',
+                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
+                isMedicina: false
+            },
+            {
+                title: 'VR MUSIC',
+                img: 'ms3media/vrmusic.jpg.jpeg',
+                tag: '360°',
+                desc: 'Música y conciertos en realidad virtual.',
+                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
+                isMedicina: false,
+                fitTop: true
+            },
+            {
+                title: 'ZONA INMERSIVA VR',
+                img: 'ms3media/zona.png',
+                tag: '360°',
+                desc: 'Explora la zona inmersiva en las alturas.',
+                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
+                isMedicina: false
+            },
+            {
+                title: 'VR MODA',
+                img: 'ms3media/moda.png',
+                tag: '360°',
+                desc: 'Pasarelas y moda en primera persona.',
+                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
+                isMedicina: false
+            },
+            {
+                title: 'BROTHER THE SKATE BOARD VR',
+                img: 'ms3media/skatehorizontal.png',
+                tag: '360°',
+                desc: 'Skateboarding inmersivo en 360 grados.',
+                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
+                isMedicina: false
+            }
+        ];
+
+        // 12 Capítulos de Medicina VR (Dr. Furman)
+        const furmanChapters = [
+            { num: 1, title: 'Capítulo 1: Salud de la Columna Vertebral', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
+            { num: 2, title: 'Capítulo 2: Articulaciones y Movilidad', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
+            { num: 3, title: 'Capítulo 3: Prevención del Dolor Cervical', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
+            { num: 4, title: 'Capítulo 4: Rehabilitación Física en 360°', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
+            { num: 5, title: 'Capítulo 5: Cuidado de Rodillas y Caderas', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
+            { num: 6, title: 'Capítulo 6: Postura y Ergonomía Diaria', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
+            { num: 7, title: 'Capítulo 7: Medicina Deportiva Inmersiva', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
+            { num: 8, title: 'Capítulo 8: Tratamientos para Lumbalgia', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
+            { num: 9, title: 'Capítulo 9: Recuperación Muscular Avanzada', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
+            { num: 10, title: 'Capítulo 10: Bienestar Integral y Longevidad', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
+            { num: 11, title: 'Capítulo 11: Consultorio Abierto Dr. Furman', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
+            { num: 12, title: 'Capítulo 12: El Futuro de la Medicina VR', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' }
+        ];
+
+        // Poblar cuadrícula de la pestaña Programas VR
+        function renderVRGrid() {
+            const grid = document.getElementById('gridProgramasVR');
+            if (!grid) return;
+            grid.innerHTML = '';
+            vrProgramsCatalog.forEach(prog => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => openVRProgram(prog.title);
+                card.innerHTML = `
+                    <div class="card-bg ${prog.fitTop ? 'vrmusic-fit' : ''}" style="background-image: url('${prog.img}');"></div>
+                    <span class="card-tag">${prog.tag}</span>
+                    <div class="card-overlay"><div class="card-title">${prog.title}</div></div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+        renderVRGrid();
+
         let myList = [
-            { title: 'CRONICA', icon: '<img src=&quot;ms3media/medicinahorizontal.png&quot; style=&quot;width:100%; height:100%; object-fit:cover;&quot;>', desc: 'Transmisión en directo de Crónica TV.', url: 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1', is360: false }
+            { title: 'CRONICA', icon: '<img src="ms3media/medicinahorizontal.png" style="width:100%; height:100%; object-fit:cover;">', desc: 'Transmisión en directo de Crónica TV.', url: 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1', is360: false }
         ];
 
         const welcomeScreen = document.getElementById('welcomeScreen');
@@ -893,15 +1107,37 @@
         const modalImg = document.getElementById('modalImg');
         const modalPlayBtn = document.getElementById('modalPlayBtn');
         const modalAddListBtn = document.getElementById('modalAddListBtn');
+        const modalVerMasBtn = document.getElementById('modalVerMasBtn');
+        const modalVerCapitulosBtn = document.getElementById('modalVerCapitulosBtn');
+        const verMasDrawer = document.getElementById('verMasDrawer');
+        const verMasListContainer = document.getElementById('verMasListContainer');
+        const verCapitulosDrawer = document.getElementById('verCapitulosDrawer');
+        const verCapitulosListContainer = document.getElementById('verCapitulosListContainer');
 
         let currentModalData = {};
 
-        function openPreview(title, iconHTML, desc, url, is360 = false) {
+        // Abre la vista previa específica de un programa VR con botón "Ver más" (y "Ver capítulos" si es Medicina VR)
+        function openVRProgram(programTitle) {
+            const prog = vrProgramsCatalog.find(p => p.title === programTitle) || vrProgramsCatalog[0];
+            const objPos = prog.fitTop ? 'object-position: center 20%; background:#0f0a1d;' : 'object-position: center;';
+            const iconHTML = `<img src="${prog.img}" style="width:100%; height:100%; object-fit:cover; ${objPos}">`;
+
+            openPreview(prog.title, iconHTML, prog.desc, prog.url, true, {
+                showVerMas: true,
+                showCapitulos: prog.isMedicina === true
+            });
+        }
+
+        function openPreview(title, iconHTML, desc, url, is360 = false, options = {}) {
             currentModalData = { title, icon: iconHTML, desc, url, is360 };
             modalTitle.innerText = title;
             modalDesc.innerText = desc;
             modalImg.innerHTML = iconHTML + '<button class="preview-close" onclick="closePreview()">✕</button>';
             
+            // Reiniciar desplegables
+            verMasDrawer.classList.remove('open');
+            verCapitulosDrawer.classList.remove('open');
+
             updateAddListButtonState(title);
 
             modalPlayBtn.onclick = function() {
@@ -920,7 +1156,79 @@
                 }
             };
 
+            // Configurar botón "Ver más" (Programación VR)
+            if (options.showVerMas) {
+                modalVerMasBtn.style.display = 'flex';
+                modalVerMasBtn.innerHTML = '▼ Ver más';
+                populateVerMasList(title);
+                modalVerMasBtn.onclick = function() {
+                    verCapitulosDrawer.classList.remove('open');
+                    const isOpen = verMasDrawer.classList.toggle('open');
+                    modalVerMasBtn.innerHTML = isOpen ? '▲ Ocultar' : '▼ Ver más';
+                };
+            } else {
+                modalVerMasBtn.style.display = 'none';
+            }
+
+            // Configurar botón "Ver capítulos" (Solo Medicina VR - Dr. Furman)
+            if (options.showCapitulos) {
+                modalVerCapitulosBtn.style.display = 'flex';
+                modalVerCapitulosBtn.innerHTML = '📂 Ver capítulos';
+                populateFurmanChapters();
+                modalVerCapitulosBtn.onclick = function() {
+                    verMasDrawer.classList.remove('open');
+                    modalVerMasBtn.innerHTML = '▼ Ver más';
+                    const isOpen = verCapitulosDrawer.classList.toggle('open');
+                    modalVerCapitulosBtn.innerHTML = isOpen ? '📂 Ocultar capítulos' : '📂 Ver capítulos';
+                };
+            } else {
+                modalVerCapitulosBtn.style.display = 'none';
+            }
+
             previewModal.classList.add('active');
+        }
+
+        function populateVerMasList(activeTitle) {
+            verMasListContainer.innerHTML = '';
+            vrProgramsCatalog.forEach(prog => {
+                const row = document.createElement('div');
+                row.className = 'dropdown-item';
+                row.onclick = () => openVRProgram(prog.title);
+                row.innerHTML = `
+                    <div class="dropdown-item-left">
+                        <img class="dropdown-thumb" src="${prog.img}" style="${prog.fitTop ? 'object-position: center 20%;' : ''}" alt="${prog.title}">
+                        <div>
+                            <div class="dropdown-item-title">${prog.title} ${prog.title === activeTitle ? '• Actual' : ''}</div>
+                            <div class="dropdown-item-sub">${prog.tag} • Realidad Virtual</div>
+                        </div>
+                    </div>
+                    <span class="dropdown-play-pill">Ver</span>
+                `;
+                verMasListContainer.appendChild(row);
+            });
+        }
+
+        function populateFurmanChapters() {
+            verCapitulosListContainer.innerHTML = '';
+            furmanChapters.forEach(cap => {
+                const row = document.createElement('div');
+                row.className = 'dropdown-item';
+                row.onclick = () => {
+                    closePreview();
+                    openPlayer(`Medicina VR - ${cap.title}`, cap.url, true);
+                };
+                row.innerHTML = `
+                    <div class="dropdown-item-left">
+                        <img class="dropdown-thumb" src="ms3media/medicinahorizontal.png" alt="Cap ${cap.num}">
+                        <div>
+                            <div class="dropdown-item-title">${cap.title}</div>
+                            <div class="dropdown-item-sub">Dr. Norberto Furman • 360° VR</div>
+                        </div>
+                    </div>
+                    <span class="dropdown-play-pill">▶ Play</span>
+                `;
+                verCapitulosListContainer.appendChild(row);
+            });
         }
 
         function updateAddListButtonState(title) {
@@ -938,7 +1246,11 @@
             }
         }
 
-        function closePreview() { previewModal.classList.remove('active'); }
+        function closePreview() {
+            previewModal.classList.remove('active');
+            verMasDrawer.classList.remove('open');
+            verCapitulosDrawer.classList.remove('open');
+        }
 
         const playerContainer = document.getElementById('playerContainer');
         const closePlayerBtn = document.getElementById('closePlayerBtn');
@@ -946,7 +1258,7 @@
         const vrCanvasContainer = document.getElementById('vrCanvasContainer');
         const gyroToggleBtn = document.getElementById('gyroToggleBtn');
 
-        // Variables Three.js para Modo 360 (Videos Locales / MP4 / WebGL)
+        // Variables Three.js para Modo 360
         let scene, camera, renderer, sphereMesh, videoElement, videoTexture;
         let isMouseDown = false, onPointerDownPointerX = 0, onPointerDownPointerY = 0;
         let lon = 0, onPointerDownLon = 0, lat = 0, onPointerDownLat = 0;
@@ -965,7 +1277,6 @@
                 screen.orientation.lock('landscape').catch(() => {});
             }
 
-            // Si es archivo mp4 directo se usa Three.js con Girosocpio/Mouse
             if (is360 && url.endsWith('.mp4')) {
                 youtubeIframe.style.display = 'none';
                 youtubeIframe.src = '';
@@ -973,7 +1284,6 @@
                 gyroToggleBtn.style.display = 'flex';
                 initCustom360Player(url);
             } else {
-                // Modo YouTube (Soporta interactividad 360 integrada por defecto en YouTube con giroscopio y mouse)
                 vrCanvasContainer.style.display = 'none';
                 gyroToggleBtn.style.display = 'none';
                 youtubeIframe.style.display = 'block';
@@ -993,7 +1303,6 @@
             }
         }
 
-        // --- MOTOR DE REPRODUCCIÓN 360 (Three.js + Mouse + Giroscopio) ---
         function initCustom360Player(videoUrl) {
             vrCanvasContainer.innerHTML = '';
 
@@ -1022,14 +1331,12 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             vrCanvasContainer.appendChild(renderer.domElement);
 
-            // Eventos Mouse y Touch para Computadora y Celular
             vrCanvasContainer.addEventListener('pointerdown', onPointerDown);
             document.addEventListener('pointermove', onPointerMove);
             document.addEventListener('pointerup', onPointerUp);
 
             window.addEventListener('resize', onWindowResize);
 
-            // Iniciar Giroscopio si está disponible
             enableGyroscope();
             animate360();
         }
@@ -1149,7 +1456,14 @@
                     <button class="card-remove-btn" title="Eliminar" onclick="event.stopPropagation(); removeFromList(${index})">✕</button>
                     <div class="card-overlay"><div class="card-title">${item.title}</div></div>
                 `;
-                card.onclick = () => openPreview(item.title, item.icon, item.desc, item.url, item.is360);
+                card.onclick = () => {
+                    const isVR = vrProgramsCatalog.some(p => p.title === item.title);
+                    if (isVR) {
+                        openVRProgram(item.title);
+                    } else {
+                        openPreview(item.title, item.icon, item.desc, item.url, item.is360);
+                    }
+                };
                 grid.appendChild(card);
             });
         }
