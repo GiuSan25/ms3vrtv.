@@ -23,7 +23,7 @@
             overflow-y: auto;
         }
 
-        /* Pantalla de Bienvenida - Fondo Neón con Pantallas 3D Flotantes */
+        /* Pantalla de Bienvenida - Videos superior/inferior, Logo central y Botón */
         .welcome-screen {
             position: fixed;
             top: 0;
@@ -37,8 +37,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
+            justify-content: space-between;
+            padding: 0;
             transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1), transform 1.4s cubic-bezier(0.16, 1, 0.3, 1), filter 1.4s ease;
         }
 
@@ -49,16 +49,37 @@
             pointer-events: none;
         }
 
+        .welcome-banner-video {
+            width: 100vw;
+            height: 22vh;
+            object-fit: cover;
+            border: none !important;
+            outline: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            pointer-events: none !important;
+            flex-shrink: 0;
+        }
+
+        .welcome-center-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+            flex-grow: 1;
+            width: 100%;
+            padding: 10px 20px;
+        }
+
         .welcome-logo-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -54%);
             text-align: center;
             width: 550px;
             max-width: 90vw;
             z-index: 1;
             pointer-events: none;
+            margin-bottom: 20px;
         }
 
         .welcome-logo-video {
@@ -69,6 +90,7 @@
             outline: none !important;
             background: transparent !important;
             box-shadow: none !important;
+            pointer-events: none !important;
         }
 
         .geometric-bg-3d {
@@ -118,8 +140,7 @@
         }
 
         .neon-enter-btn {
-            position: absolute;
-            bottom: 12vh;
+            position: relative;
             z-index: 10;
             background: transparent;
             color: #00f3ff;
@@ -744,28 +765,82 @@
         }
         .vr-canvas-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9998; display: none;
+            cursor: grab;
         }
-        .control-top { position: absolute; top: 20px; right: 20px; z-index: 100000; display: flex; gap: 10px; }
+        .vr-canvas-container:active {
+            cursor: grabbing;
+        }
+        .control-top { position: absolute; top: 20px; right: 20px; z-index: 100000; display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
         .close-btn, .gyro-btn {
-            background: rgba(0, 0, 0, 0.6); color: white; border: 2px solid white;
-            font-size: 1.2rem; padding: 0 15px; height: 44px; border-radius: 22px;
+            background: rgba(0, 0, 0, 0.65); color: white; border: 2px solid white;
+            font-size: 0.9rem; padding: 0 14px; height: 42px; border-radius: 22px;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
             touch-action: manipulation; font-weight: bold; backdrop-filter: blur(5px);
         }
-        .close-btn { width: 44px; padding: 0; border-radius: 50%; }
-        .gyro-btn.active { border-color: #00f3ff; color: #00f3ff; box-shadow: 0 0 10px #00f3ff; }
+        .close-btn { width: 42px; padding: 0; border-radius: 50%; font-size: 1.1rem; }
+        .gyro-btn.active { border-color: #00f3ff; color: #00f3ff; box-shadow: 0 0 12px rgba(0, 243, 255, 0.6); }
+
+        /* Barra inferior de controles para el motor VR 360 propio */
+        .vr-bottom-controls {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100000;
+            display: none;
+            align-items: center;
+            gap: 14px;
+            background: rgba(11, 6, 20, 0.8);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            padding: 10px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(8px);
+        }
+        .vr-bottom-controls.active {
+            display: flex;
+        }
+        .vr-ctrl-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .vr-ctrl-btn:hover {
+            color: #00f3ff;
+        }
     </style>
 </head>
 <body>
 
     <!-- Pantalla de Bienvenida -->
     <div class="welcome-screen" id="welcomeScreen">
-        <div class="welcome-logo-container">
-            <video class="welcome-logo-video" autoplay muted loop playsinline>
-                <source src="ms3media/ms3logo.mp4.mp4" type="video/mp4">
-                Tu navegador no soporta videos.
-            </video>
+        <!-- Video superior horizontal de extremo a extremo -->
+        <video class="welcome-banner-video" autoplay muted loop playsinline disablepictureinpicture controlslist="nodownload nofullscreen noremoteplayback">
+            <source src="ms3media/bandabienvenida.mp4" type="video/mp4">
+            Tu navegador no soporta videos.
+        </video>
+
+        <!-- Contenedor central (Logo + Botón Ingresar justo debajo) -->
+        <div class="welcome-center-wrapper">
+            <div class="welcome-logo-container">
+                <video class="welcome-logo-video" autoplay muted loop playsinline disablepictureinpicture controlslist="nodownload nofullscreen noremoteplayback">
+                    <source src="ms3media/ms3logo.mp4.mp4" type="video/mp4">
+                    Tu navegador no soporta videos.
+                </video>
+            </div>
+            <button class="neon-enter-btn" id="enterBtn">INGRESAR</button>
         </div>
+
+        <!-- Video inferior horizontal de extremo a extremo -->
+        <video class="welcome-banner-video" autoplay muted loop playsinline disablepictureinpicture controlslist="nodownload nofullscreen noremoteplayback">
+            <source src="ms3media/bandabienvenida.mp4" type="video/mp4">
+            Tu navegador no soporta videos.
+        </video>
 
         <div class="geometric-bg-3d">
             <div class="tv-screen-3d screen-1"></div>
@@ -775,8 +850,6 @@
             <div class="tv-screen-3d screen-5"></div>
             <div class="tv-screen-3d screen-6"></div>
         </div>
-
-        <button class="neon-enter-btn" id="enterBtn">INGRESAR</button>
     </div>
 
     <!-- Contenedor Principal (App) -->
@@ -815,7 +888,7 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN: Botón Descarga la App (con enlace funcional) + Video Miniatura Explicativo -->
+            <!-- SECCIÓN: Botón Descarga la App + Video Miniatura Explicativo -->
             <div class="app-promo-banner">
                 <div class="app-promo-info">
                     <div class="app-promo-title">📱 LLEVÁ MS3 A TODOS LADOS</div>
@@ -1062,14 +1135,13 @@
                 
                 <!-- Botones de Acción -->
                 <div class="preview-actions" id="modalActionsContainer">
-                    <button class="btn btn-primary" id="modalPlayBtn">▶ Reproducir</button>
+                    <button class="btn btn-primary" id="modalPlayBtn">▶ Reproducir VR</button>
                     <button class="btn btn-secondary" id="modalAddListBtn">+ Agregar a mi lista</button>
-                    <button class="btn btn-accent" id="modalOpenVRAppBtn" style="display:none;">🥽 Ver en App VR</button>
                     <button class="btn btn-secondary" id="modalVerMasBtn" style="display:none;">▼ Ver más</button>
                     <button class="btn btn-accent" id="modalVerCapitulosBtn" style="display:none;">📂 Ver capítulos</button>
                 </div>
 
-                <!-- Menú Desplegable: Todos los Programas VR (Cuadrícula vertical uno al lado del otro) -->
+                <!-- Menú Desplegable: Todos los Programas VR -->
                 <div class="dropdown-drawer" id="verMasDrawer">
                     <div class="dropdown-drawer-header">Programación de Realidad Virtual (VR)</div>
                     <div class="vr-vertical-grid" id="verMasListContainer"></div>
@@ -1084,14 +1156,22 @@
         </div>
     </div>
 
-    <!-- Reproductor Pantalla Completa YouTube 360° nativo y Canvas 360 Custom -->
+    <!-- Reproductor Pantalla Completa Interno 360° VR y Embed -->
     <div class="player-fullscreen-container" id="playerContainer">
         <div class="control-top">
+            <button class="gyro-btn" id="vrSplitBtn" style="display:none;" onclick="toggleSplitVR()">🥽 Gafas VR: OFF</button>
             <button class="gyro-btn" id="gyroToggleBtn" style="display:none;" onclick="toggleGyroscope()">📱 Giroscopio ON</button>
             <button class="close-btn" id="closePlayerBtn">✕</button>
         </div>
         <iframe id="youtubeIframe" class="youtube-player-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; xr-spatial-tracking" allowfullscreen></iframe>
         <div id="vrCanvasContainer" class="vr-canvas-container"></div>
+        
+        <!-- Controles inferiores para el reproductor 360° propio -->
+        <div class="vr-bottom-controls" id="vrBottomControls">
+            <button class="vr-ctrl-btn" id="vrPlayPauseBtn" onclick="toggleVRPlayPause()">⏸ Pausar</button>
+            <button class="vr-ctrl-btn" id="vrMuteBtn" onclick="toggleVRMute()">🔊 Audio ON</button>
+            <button class="vr-ctrl-btn" onclick="recenterVR()">🎯 Centrar Vista</button>
+        </div>
     </div>
 
     <script>
@@ -1101,8 +1181,8 @@
                 title: 'Buscando a la futura vedette',
                 img: 'ms3media/vedettehorizontal.png',
                 tag: '360° Pro',
-                desc: 'Experiencia 360° en realidad virtual oficial de YouTube.',
-                url: 'https://youtu.be/y3qO1OL5nRg?si=h01sOlXW2wVQicMB',
+                desc: 'Experiencia inmersiva 360° en realidad virtual dentro de MS3.',
+                url: 'ms3media/vedette360.mp4',
                 isMedicina: false
             },
             {
@@ -1290,7 +1370,6 @@
         const modalImg = document.getElementById('modalImg');
         const modalPlayBtn = document.getElementById('modalPlayBtn');
         const modalAddListBtn = document.getElementById('modalAddListBtn');
-        const modalOpenVRAppBtn = document.getElementById('modalOpenVRAppBtn');
         const modalVerMasBtn = document.getElementById('modalVerMasBtn');
         const modalVerCapitulosBtn = document.getElementById('modalVerCapitulosBtn');
         const verMasDrawer = document.getElementById('verMasDrawer');
@@ -1337,16 +1416,6 @@
                     updateAddListButtonState(title);
                 }
             };
-
-            // Botón para abrir directamente en app nativa de YouTube VR / Cardboard si el navegador restringe las gafas
-            if (is360 && (url.includes('youtu.be') || url.includes('youtube.com'))) {
-                modalOpenVRAppBtn.style.display = 'flex';
-                modalOpenVRAppBtn.onclick = function() {
-                    window.open(url, '_blank', 'noopener,noreferrer');
-                };
-            } else {
-                modalOpenVRAppBtn.style.display = 'none';
-            }
 
             if (options.showVerMas) {
                 modalVerMasBtn.style.display = 'flex';
@@ -1439,21 +1508,29 @@
             verCapitulosDrawer.classList.remove('open');
         }
 
+        // ==========================================
+        // MOTOR DE REALIDAD VIRTUAL 360° PROPIO (THREE.JS)
+        // ==========================================
         const playerContainer = document.getElementById('playerContainer');
         const closePlayerBtn = document.getElementById('closePlayerBtn');
         const youtubeIframe = document.getElementById('youtubeIframe');
         const vrCanvasContainer = document.getElementById('vrCanvasContainer');
         const gyroToggleBtn = document.getElementById('gyroToggleBtn');
+        const vrSplitBtn = document.getElementById('vrSplitBtn');
+        const vrBottomControls = document.getElementById('vrBottomControls');
+        const vrPlayPauseBtn = document.getElementById('vrPlayPauseBtn');
+        const vrMuteBtn = document.getElementById('vrMuteBtn');
 
         let scene, camera, renderer, sphereMesh, videoElement, videoTexture;
         let isMouseDown = false, onPointerDownPointerX = 0, onPointerDownPointerY = 0;
-        let lon = 0, onPointerDownLon = 0, lat = 0, onPointerDownLat = 0;
+        let lon = 180, onPointerDownLon = 0, lat = 0, onPointerDownLat = 0;
         let phi = 0, theta = 0;
         let useGyro = false;
+        let isSplitVR = false;
         let orientationHandler = null;
+        let initialAlpha = null;
 
         function openPlayer(title, url, is360 = false) {
-            // Solicitar permiso de giroscopio en iOS inmediatamente tras el toque del usuario
             if (is360 && typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission().catch(() => {});
             }
@@ -1468,36 +1545,44 @@
                 screen.orientation.lock('landscape').catch(() => {});
             }
 
-            if (is360 && url.endsWith('.mp4')) {
+            if (is360 && (url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.m3u8'))) {
                 youtubeIframe.style.display = 'none';
                 youtubeIframe.src = '';
                 vrCanvasContainer.style.display = 'block';
                 gyroToggleBtn.style.display = 'flex';
+                vrSplitBtn.style.display = 'flex';
+                vrBottomControls.classList.add('active');
                 initCustom360Player(url);
             } else {
                 vrCanvasContainer.style.display = 'none';
                 gyroToggleBtn.style.display = 'none';
+                vrSplitBtn.style.display = 'none';
+                vrBottomControls.classList.remove('active');
                 youtubeIframe.style.display = 'block';
 
-                let videoId = '';
+                let embedUrl = url;
                 if (url.includes('youtu.be/')) {
-                    videoId = url.split('youtu.be/')[1].split('?')[0];
+                    const videoId = url.split('youtu.be/')[1].split('?')[0];
+                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&playsinline=1&controls=1`;
                 } else if (url.includes('watch?v=')) {
-                    videoId = url.split('watch?v=')[1].split('&')[0];
-                }
-
-                if (videoId) {
-                    youtubeIframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&playsinline=1&controls=1&rel=0&modestbranding=1`;
+                    const videoId = url.split('watch?v=')[1].split('&')[0];
+                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&playsinline=1&controls=1`;
                 } else if (url.includes('/embed/')) {
-                    youtubeIframe.src = url + (url.includes('?') ? '&' : '?') + 'autoplay=1&enablejsapi=1&playsinline=1';
-                } else {
-                    youtubeIframe.src = url;
+                    embedUrl = url + (url.includes('?') ? '&' : '?') + 'autoplay=1&enablejsapi=1&playsinline=1';
                 }
+                
+                youtubeIframe.src = embedUrl;
             }
         }
 
         function initCustom360Player(videoUrl) {
             vrCanvasContainer.innerHTML = '';
+            lon = 180;
+            lat = 0;
+            initialAlpha = null;
+            isSplitVR = false;
+            vrSplitBtn.classList.remove('active');
+            vrSplitBtn.innerText = '🥽 Gafas VR: OFF';
 
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
@@ -1509,17 +1594,35 @@
             videoElement = document.createElement('video');
             videoElement.crossOrigin = 'anonymous';
             videoElement.playsInline = true;
+            videoElement.setAttribute('webkit-playsinline', 'true');
             videoElement.src = videoUrl;
             videoElement.autoplay = true;
             videoElement.loop = true;
-            videoElement.play();
+            videoElement.muted = false;
+
+            const playPromise = videoElement.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    vrPlayPauseBtn.innerText = '⏸ Pausar';
+                    vrMuteBtn.innerText = '🔊 Audio ON';
+                }).catch(() => {
+                    videoElement.muted = true;
+                    videoElement.play();
+                    vrPlayPauseBtn.innerText = '⏸ Pausar';
+                    vrMuteBtn.innerText = '🔇 Activar Audio';
+                });
+            }
 
             videoTexture = new THREE.VideoTexture(videoElement);
+            videoTexture.minFilter = THREE.LinearFilter;
+            videoTexture.magFilter = THREE.LinearFilter;
+            videoTexture.format = THREE.RGBFormat;
+
             const material = new THREE.MeshBasicMaterial({ map: videoTexture });
             sphereMesh = new THREE.Mesh(geometry, material);
             scene.add(sphereMesh);
 
-            renderer = new THREE.WebGLRenderer();
+            renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setPixelRatio(window.devicePixelRatio);
             renderer.setSize(window.innerWidth, window.innerHeight);
             vrCanvasContainer.appendChild(renderer.domElement);
@@ -1527,7 +1630,6 @@
             vrCanvasContainer.addEventListener('pointerdown', onPointerDown);
             document.addEventListener('pointermove', onPointerMove);
             document.addEventListener('pointerup', onPointerUp);
-
             window.addEventListener('resize', onWindowResize);
 
             enableGyroscope();
@@ -1544,8 +1646,8 @@
 
         function onPointerMove(event) {
             if (!isMouseDown) return;
-            lon = (onPointerDownPointerX - event.clientX) * 0.1 + onPointerDownLon;
-            lat = (event.clientY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
+            lon = (onPointerDownPointerX - event.clientX) * 0.15 + onPointerDownLon;
+            lat = (event.clientY - onPointerDownPointerY) * 0.15 + onPointerDownLat;
         }
 
         function onPointerUp() { isMouseDown = false; }
@@ -1570,9 +1672,18 @@
             if (!orientationHandler) {
                 orientationHandler = function(event) {
                     if (!useGyro || isMouseDown) return;
-                    if (event.alpha !== null && event.beta !== null && event.gamma !== null) {
-                        lon = event.alpha;
-                        lat = (event.beta - 90) * 0.5;
+                    if (event.alpha !== null && event.beta !== null) {
+                        if (initialAlpha === null) initialAlpha = event.alpha;
+                        const deltaAlpha = event.alpha - initialAlpha;
+                        lon = 180 - deltaAlpha;
+
+                        const isLandscape = window.innerWidth > window.innerHeight;
+                        if (isLandscape && event.gamma !== null) {
+                            const tilt = event.gamma > 0 ? 90 - event.gamma : -90 - event.gamma;
+                            lat = Math.max(-85, Math.min(85, tilt));
+                        } else {
+                            lat = Math.max(-85, Math.min(85, (event.beta - 90) * 0.8));
+                        }
                     }
                 };
                 window.addEventListener('deviceorientation', orientationHandler);
@@ -1582,12 +1693,51 @@
         function toggleGyroscope() {
             useGyro = !useGyro;
             if (useGyro) {
+                initialAlpha = null;
                 gyroToggleBtn.classList.add('active');
                 gyroToggleBtn.innerText = '📱 Giroscopio ON';
             } else {
                 gyroToggleBtn.classList.remove('active');
                 gyroToggleBtn.innerText = '📱 Giroscopio OFF';
             }
+        }
+
+        function toggleSplitVR() {
+            isSplitVR = !isSplitVR;
+            if (isSplitVR) {
+                vrSplitBtn.classList.add('active');
+                vrSplitBtn.innerText = '🥽 Gafas VR: ON';
+            } else {
+                vrSplitBtn.classList.remove('active');
+                vrSplitBtn.innerText = '🥽 Gafas VR: OFF';
+                if (renderer) {
+                    renderer.setScissorTest(false);
+                    renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+                }
+            }
+        }
+
+        function toggleVRPlayPause() {
+            if (!videoElement) return;
+            if (videoElement.paused) {
+                videoElement.play();
+                vrPlayPauseBtn.innerText = '⏸ Pausar';
+            } else {
+                videoElement.pause();
+                vrPlayPauseBtn.innerText = '▶ Reproducir';
+            }
+        }
+
+        function toggleVRMute() {
+            if (!videoElement) return;
+            videoElement.muted = !videoElement.muted;
+            vrMuteBtn.innerText = videoElement.muted ? '🔇 Activar Audio' : '🔊 Audio ON';
+        }
+
+        function recenterVR() {
+            lon = 180;
+            lat = 0;
+            initialAlpha = null;
         }
 
         function animate360() {
@@ -1603,7 +1753,30 @@
             camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
 
             camera.lookAt(camera.target);
-            renderer.render(scene, camera);
+
+            if (isSplitVR) {
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                const halfWidth = width / 2;
+
+                renderer.setScissorTest(true);
+
+                camera.aspect = halfWidth / height;
+                camera.updateProjectionMatrix();
+                renderer.setScissor(0, 0, halfWidth, height);
+                renderer.setViewport(0, 0, halfWidth, height);
+                renderer.render(scene, camera);
+
+                renderer.setScissor(halfWidth, 0, halfWidth, height);
+                renderer.setViewport(halfWidth, 0, halfWidth, height);
+                renderer.render(scene, camera);
+            } else {
+                renderer.setScissorTest(false);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+                renderer.render(scene, camera);
+            }
         }
 
         function onWindowResize() {
@@ -1617,6 +1790,7 @@
         closePlayerBtn.addEventListener('click', () => {
             playerContainer.classList.remove('active');
             youtubeIframe.src = '';
+            vrBottomControls.classList.remove('active');
             
             if (videoElement) {
                 videoElement.pause();
@@ -1627,6 +1801,8 @@
                 orientationHandler = null;
             }
             vrCanvasContainer.style.display = 'none';
+            gyroToggleBtn.style.display = 'none';
+            vrSplitBtn.style.display = 'none';
 
             if (document.exitFullscreen) { document.exitFullscreen().catch(() => {}); }
             else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
