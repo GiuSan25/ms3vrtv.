@@ -748,7 +748,7 @@
             flex-shrink: 0;
         }
 
-        /* Reproductor Pantalla Completa Interno (Noticias y Destacado) */
+        /* Reproductor Pantalla Completa Interno (Para Noticias y Destacado) */
         .player-fullscreen-container {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: #000; z-index: 99999; display: none; justify-content: center; align-items: center;
@@ -1136,14 +1136,14 @@
             document.addEventListener('click', unlockIOSAutoplay, { once: true });
         });
 
-        // Catálogo oficial de Programas VR (Todos abren directo en YouTube VR)
+        // Catálogo oficial de Programas VR con sus enlaces exactos de YouTube
         const vrProgramsCatalog = [
             {
                 title: 'Buscando a la futura vedette',
                 img: 'ms3media/vedettehorizontal.png',
                 tag: '360° Pro',
                 desc: 'buscando a la futura vedette con la conduccion de carmen barbieri en donde la vedette vuelve a ser arte se buscara entre muchas participantes a la gran nueva vedette que cante, baile y actue la mas completa y talentosa un premio increible !!',
-                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                url: 'https://youtu.be/y3qO1OL5nRg',
                 openExternalYT: true,
                 isMedicina: false
             },
@@ -1152,7 +1152,7 @@
                 img: 'ms3media/medicinahorizontal.png',
                 tag: '360°',
                 desc: '¡Preparate para descubrir los secretos de tu propio cuerpo junto a Norberto Furman en un programa imperdible donde la ciencia, el humor y la salud se fusionan! Con la visita estelar de grandes figuras del arte como Guillermo Francella, cada emisión combina explicaciones fascinantes sobre anatomía y biología con charlas divertidas, enseñándote de manera única cómo funciona y se cuida la máquina perfecta que habitás todos los días.',
-                url: 'https://www.youtube.com/watch?v=pPQBj4EzKqA',
+                url: 'https://youtu.be/pPQBj4EzKqA',
                 openExternalYT: true,
                 isMedicina: true
             },
@@ -1161,7 +1161,7 @@
                 img: 'ms3media/lamasahorizontal.png',
                 tag: '360°',
                 desc: 'Detrás de escena inmersivo de LA MASA.',
-                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                url: 'https://youtu.be/YH5hZKFNkwk',
                 openExternalYT: true,
                 isMedicina: false
             },
@@ -1170,7 +1170,7 @@
                 img: 'ms3media/agrcompeticionhorizontal.png',
                 tag: 'Motor',
                 desc: 'Adrenalina total en pista y boxes.',
-                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                url: 'https://youtu.be/UAFsKGoaPa0',
                 openExternalYT: true,
                 isMedicina: false
             },
@@ -1179,7 +1179,7 @@
                 img: 'ms3media/cocina.png',
                 tag: '360°',
                 desc: 'Experiencia culinaria inmersiva en realidad virtual.',
-                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                url: 'https://youtu.be/myuDkGwuraU',
                 openExternalYT: true,
                 isMedicina: false
             },
@@ -1188,7 +1188,7 @@
                 img: 'ms3media/documentales.png',
                 tag: '360°',
                 desc: 'Documentales inmersivos en 360 grados.',
-                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                url: 'https://youtu.be/cQeUF8H2PR0',
                 openExternalYT: true,
                 isMedicina: false
             },
@@ -1197,7 +1197,7 @@
                 img: 'ms3media/paseo.png',
                 tag: '360°',
                 desc: 'Paseo inmersivo virtual.',
-                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                url: 'https://youtu.be/cQeUF8H2PR0',
                 openExternalYT: true,
                 isMedicina: false
             },
@@ -1206,7 +1206,7 @@
                 img: 'ms3media/vrmusic.jpg.jpeg',
                 tag: '360°',
                 desc: 'Música y conciertos en realidad virtual.',
-                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                url: 'https://youtu.be/cQeUF8H2PR0',
                 openExternalYT: true,
                 isMedicina: false,
                 fitTop: true
@@ -1216,7 +1216,7 @@
                 img: 'ms3media/zona.png',
                 tag: '360°',
                 desc: 'Explora la zona inmersiva en las alturas.',
-                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                url: 'https://youtu.be/lW5JOOgTpq4',
                 openExternalYT: true,
                 isMedicina: false
             },
@@ -1225,7 +1225,7 @@
                 img: 'ms3media/moda.png',
                 tag: '360°',
                 desc: 'Pasarelas y moda en primera persona.',
-                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                url: 'https://youtu.be/cQeUF8H2PR0',
                 openExternalYT: true,
                 isMedicina: false
             },
@@ -1234,7 +1234,7 @@
                 img: 'ms3media/skatehorizontal.png',
                 tag: '360°',
                 desc: 'Skateboarding inmersivo en 360 grados.',
-                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                url: 'https://youtu.be/X5ALhjomTqM',
                 openExternalYT: true,
                 isMedicina: false
             }
@@ -1242,18 +1242,18 @@
 
         // 12 Capítulos de Medicina VR (Dr. Furman - Directo a YouTube)
         const furmanChapters = [
-            { num: 1, title: 'Capítulo 1: Salud de la Columna Vertebral', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
-            { num: 2, title: 'Capítulo 2: Articulaciones y Movilidad', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
-            { num: 3, title: 'Capítulo 3: Prevención del Dolor Cervical', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
-            { num: 4, title: 'Capítulo 4: Rehabilitación Física en 360°', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
-            { num: 5, title: 'Capítulo 5: Cuidado de Rodillas y Caderas', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
-            { num: 6, title: 'Capítulo 6: Postura y Ergonomía Diaria', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
-            { num: 7, title: 'Capítulo 7: Medicina Deportiva Inmersiva', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
-            { num: 8, title: 'Capítulo 8: Tratamientos para Lumbalgia', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
-            { num: 9, title: 'Capítulo 9: Recuperación Muscular Avanzada', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
-            { num: 10, title: 'Capítulo 10: Bienestar Integral y Longevidad', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
-            { num: 11, title: 'Capítulo 11: Consultorio Abierto Dr. Furman', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
-            { num: 12, title: 'Capítulo 12: El Futuro de la Medicina VR', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' }
+            { num: 1, title: 'Capítulo 1: Salud de la Columna Vertebral', url: 'https://youtu.be/pPQBj4EzKqA' },
+            { num: 2, title: 'Capítulo 2: Articulaciones y Movilidad', url: 'https://youtu.be/pPQBj4EzKqA' },
+            { num: 3, title: 'Capítulo 3: Prevención del Dolor Cervical', url: 'https://youtu.be/pPQBj4EzKqA' },
+            { num: 4, title: 'Capítulo 4: Rehabilitación Física en 360°', url: 'https://youtu.be/pPQBj4EzKqA' },
+            { num: 5, title: 'Capítulo 5: Cuidado de Rodillas y Caderas', url: 'https://youtu.be/pPQBj4EzKqA' },
+            { num: 6, title: 'Capítulo 6: Postura y Ergonomía Diaria', url: 'https://youtu.be/pPQBj4EzKqA' },
+            { num: 7, title: 'Capítulo 7: Medicina Deportiva Inmersiva', url: 'https://youtu.be/pPQBj4EzKqA' },
+            { num: 8, title: 'Capítulo 8: Tratamientos para Lumbalgia', url: 'https://youtu.be/pPQBj4EzKqA' },
+            { num: 9, title: 'Capítulo 9: Recuperación Muscular Avanzada', url: 'https://youtu.be/pPQBj4EzKqA' },
+            { num: 10, title: 'Capítulo 10: Bienestar Integral y Longevidad', url: 'https://youtu.be/pPQBj4EzKqA' },
+            { num: 11, title: 'Capítulo 11: Consultorio Abierto Dr. Furman', url: 'https://youtu.be/pPQBj4EzKqA' },
+            { num: 12, title: 'Capítulo 12: El Futuro de la Medicina VR', url: 'https://youtu.be/pPQBj4EzKqA' }
         ];
 
         // Poblar cuadrícula de la pestaña Programas VR
@@ -1373,7 +1373,7 @@
 
             updateAddListButtonState(title);
 
-            modalPlayBtn.innerHTML = openExternalYT ? '▶ Abrir en YouTube VR' : '▶ Reproducir';
+            modalPlayBtn.innerHTML = openExternalYT ? '▶ Ver en YouTube VR' : '▶ Reproducir';
             modalPlayBtn.onclick = function() {
                 closePreview();
                 openPlayer(title, url, openExternalYT);
