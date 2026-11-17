@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MS3 - La Nueva Televisión Inmersiva</title>
-    <!-- Three.js Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -23,7 +21,7 @@
             overflow-y: auto;
         }
 
-        /* Pantalla de Bienvenida - Videos superior/inferior, Logo central y Botón */
+        /* Pantalla de Bienvenida */
         .welcome-screen {
             position: fixed;
             top: 0;
@@ -391,7 +389,6 @@
             flex-wrap: wrap;
         }
 
-        /* Botón con enlace directo */
         .btn-download-app {
             background: linear-gradient(135deg, #00f3ff, #7c3aed);
             color: #000;
@@ -417,7 +414,6 @@
         }
         .btn-download-app:active { transform: scale(0.97); }
 
-        /* Video Miniatura Explicativo al lado */
         .app-mini-tutorial {
             width: 130px;
             height: 75px;
@@ -506,7 +502,6 @@
             font-size: 1.5rem; background-size: cover; background-position: center;
         }
 
-        /* Ajuste específico de encuadre para VR Music */
         .vrmusic-fit {
             background-size: 100% auto !important;
             background-position: center 22% !important;
@@ -753,7 +748,7 @@
             flex-shrink: 0;
         }
 
-        /* Reproductor Pantalla Completa */
+        /* Reproductor Pantalla Completa Interno (Noticias y Destacado) */
         .player-fullscreen-container {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: #000; z-index: 99999; display: none; justify-content: center; align-items: center;
@@ -763,55 +758,12 @@
         .youtube-player-iframe {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 9999; display: block;
         }
-        .vr-canvas-container {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9998; display: none;
-            cursor: grab;
-        }
-        .vr-canvas-container:active {
-            cursor: grabbing;
-        }
-        .control-top { position: absolute; top: 20px; right: 20px; z-index: 100000; display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
-        .close-btn, .gyro-btn {
+        .control-top { position: absolute; top: 20px; right: 20px; z-index: 100000; display: flex; gap: 10px; }
+        .close-btn {
             background: rgba(0, 0, 0, 0.65); color: white; border: 2px solid white;
-            font-size: 0.9rem; padding: 0 14px; height: 42px; border-radius: 22px;
+            width: 42px; height: 42px; border-radius: 50%; font-size: 1.1rem;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
             touch-action: manipulation; font-weight: bold; backdrop-filter: blur(5px);
-        }
-        .close-btn { width: 42px; padding: 0; border-radius: 50%; font-size: 1.1rem; }
-        .gyro-btn.active { border-color: #00f3ff; color: #00f3ff; box-shadow: 0 0 12px rgba(0, 243, 255, 0.6); }
-
-        /* Barra inferior de controles para el motor VR 360 propio */
-        .vr-bottom-controls {
-            position: absolute;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100000;
-            display: none;
-            align-items: center;
-            gap: 14px;
-            background: rgba(11, 6, 20, 0.8);
-            border: 1px solid rgba(0, 243, 255, 0.4);
-            padding: 10px 20px;
-            border-radius: 30px;
-            backdrop-filter: blur(8px);
-        }
-        .vr-bottom-controls.active {
-            display: flex;
-        }
-        .vr-ctrl-btn {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .vr-ctrl-btn:hover {
-            color: #00f3ff;
         }
     </style>
 </head>
@@ -819,13 +771,11 @@
 
     <!-- Pantalla de Bienvenida -->
     <div class="welcome-screen" id="welcomeScreen">
-        <!-- Video superior horizontal de extremo a extremo con soporte estricto iOS -->
         <video class="welcome-banner-video" autoplay muted loop playsinline webkit-playsinline preload="auto">
             <source src="ms3media/bienvenidabanda.mp4" type="video/mp4">
             Tu navegador no soporta videos.
         </video>
 
-        <!-- Contenedor central (Logo + Botón Ingresar justo debajo) -->
         <div class="welcome-center-wrapper">
             <div class="welcome-logo-container">
                 <video class="welcome-logo-video" autoplay muted loop playsinline webkit-playsinline preload="auto">
@@ -836,7 +786,6 @@
             <button class="neon-enter-btn" id="enterBtn">INGRESAR</button>
         </div>
 
-        <!-- Video inferior horizontal de extremo a extremo con soporte estricto iOS -->
         <video class="welcome-banner-video" autoplay muted loop playsinline webkit-playsinline preload="auto">
             <source src="ms3media/bienvenidabanda.mp4" type="video/mp4">
             Tu navegador no soporta videos.
@@ -1135,7 +1084,7 @@
                 
                 <!-- Botones de Acción -->
                 <div class="preview-actions" id="modalActionsContainer">
-                    <button class="btn btn-primary" id="modalPlayBtn">▶ Reproducir VR</button>
+                    <button class="btn btn-primary" id="modalPlayBtn">▶ Ver en YouTube VR</button>
                     <button class="btn btn-secondary" id="modalAddListBtn">+ Agregar a mi lista</button>
                     <button class="btn btn-secondary" id="modalVerMasBtn" style="display:none;">▼ Ver más</button>
                     <button class="btn btn-accent" id="modalVerCapitulosBtn" style="display:none;">📂 Ver capítulos</button>
@@ -1156,22 +1105,12 @@
         </div>
     </div>
 
-    <!-- Reproductor Pantalla Completa Interno 360° VR y Embed -->
+    <!-- Reproductor Pantalla Completa Interno (Para Noticias y Destacado) -->
     <div class="player-fullscreen-container" id="playerContainer">
         <div class="control-top">
-            <button class="gyro-btn" id="vrSplitBtn" style="display:none;" onclick="toggleSplitVR()">🥽 Gafas VR: OFF</button>
-            <button class="gyro-btn" id="gyroToggleBtn" style="display:none;" onclick="toggleGyroscope()">📱 Giroscopio ON</button>
             <button class="close-btn" id="closePlayerBtn">✕</button>
         </div>
         <iframe id="youtubeIframe" class="youtube-player-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; xr-spatial-tracking" allowfullscreen></iframe>
-        <div id="vrCanvasContainer" class="vr-canvas-container"></div>
-        
-        <!-- Controles inferiores para el reproductor 360° propio -->
-        <div class="vr-bottom-controls" id="vrBottomControls">
-            <button class="vr-ctrl-btn" id="vrPlayPauseBtn" onclick="toggleVRPlayPause()">⏸ Pausar</button>
-            <button class="vr-ctrl-btn" id="vrMuteBtn" onclick="toggleVRMute()">🔊 Audio ON</button>
-            <button class="vr-ctrl-btn" onclick="recenterVR()">🎯 Centrar Vista</button>
-        </div>
     </div>
 
     <script>
@@ -1197,15 +1136,15 @@
             document.addEventListener('click', unlockIOSAutoplay, { once: true });
         });
 
-        // Catálogo oficial de Programas VR
+        // Catálogo oficial de Programas VR (Todos abren directo en YouTube VR)
         const vrProgramsCatalog = [
             {
                 title: 'Buscando a la futura vedette',
                 img: 'ms3media/vedettehorizontal.png',
                 tag: '360° Pro',
                 desc: 'buscando a la futura vedette con la conduccion de carmen barbieri en donde la vedette vuelve a ser arte se buscara entre muchas participantes a la gran nueva vedette que cante, baile y actue la mas completa y talentosa un premio increible !!',
-                url: 'ms3media/vedette360.mp4',
-                is360: true,
+                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                openExternalYT: true,
                 isMedicina: false
             },
             {
@@ -1213,8 +1152,8 @@
                 img: 'ms3media/medicinahorizontal.png',
                 tag: '360°',
                 desc: '¡Preparate para descubrir los secretos de tu propio cuerpo junto a Norberto Furman en un programa imperdible donde la ciencia, el humor y la salud se fusionan! Con la visita estelar de grandes figuras del arte como Guillermo Francella, cada emisión combina explicaciones fascinantes sobre anatomía y biología con charlas divertidas, enseñándote de manera única cómo funciona y se cuida la máquina perfecta que habitás todos los días.',
-                url: 'https://youtu.be/pPQBj4EzKqA?si=8SBYUD1YSTds-Lxk',
-                is360: false,
+                url: 'https://www.youtube.com/watch?v=pPQBj4EzKqA',
+                openExternalYT: true,
                 isMedicina: true
             },
             {
@@ -1222,8 +1161,8 @@
                 img: 'ms3media/lamasahorizontal.png',
                 tag: '360°',
                 desc: 'Detrás de escena inmersivo de LA MASA.',
-                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
-                is360: false,
+                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                openExternalYT: true,
                 isMedicina: false
             },
             {
@@ -1231,8 +1170,8 @@
                 img: 'ms3media/agrcompeticionhorizontal.png',
                 tag: 'Motor',
                 desc: 'Adrenalina total en pista y boxes.',
-                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
-                is360: false,
+                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                openExternalYT: true,
                 isMedicina: false
             },
             {
@@ -1240,8 +1179,8 @@
                 img: 'ms3media/cocina.png',
                 tag: '360°',
                 desc: 'Experiencia culinaria inmersiva en realidad virtual.',
-                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
-                is360: false,
+                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                openExternalYT: true,
                 isMedicina: false
             },
             {
@@ -1249,8 +1188,8 @@
                 img: 'ms3media/documentales.png',
                 tag: '360°',
                 desc: 'Documentales inmersivos en 360 grados.',
-                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
-                is360: false,
+                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                openExternalYT: true,
                 isMedicina: false
             },
             {
@@ -1258,8 +1197,8 @@
                 img: 'ms3media/paseo.png',
                 tag: '360°',
                 desc: 'Paseo inmersivo virtual.',
-                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
-                is360: false,
+                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                openExternalYT: true,
                 isMedicina: false
             },
             {
@@ -1267,8 +1206,8 @@
                 img: 'ms3media/vrmusic.jpg.jpeg',
                 tag: '360°',
                 desc: 'Música y conciertos en realidad virtual.',
-                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
-                is360: false,
+                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                openExternalYT: true,
                 isMedicina: false,
                 fitTop: true
             },
@@ -1277,8 +1216,8 @@
                 img: 'ms3media/zona.png',
                 tag: '360°',
                 desc: 'Explora la zona inmersiva en las alturas.',
-                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
-                is360: false,
+                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                openExternalYT: true,
                 isMedicina: false
             },
             {
@@ -1286,8 +1225,8 @@
                 img: 'ms3media/moda.png',
                 tag: '360°',
                 desc: 'Pasarelas y moda en primera persona.',
-                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
-                is360: false,
+                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                openExternalYT: true,
                 isMedicina: false
             },
             {
@@ -1295,26 +1234,26 @@
                 img: 'ms3media/skatehorizontal.png',
                 tag: '360°',
                 desc: 'Skateboarding inmersivo en 360 grados.',
-                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
-                is360: false,
+                url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0',
+                openExternalYT: true,
                 isMedicina: false
             }
         ];
 
-        // 12 Capítulos de Medicina VR (Dr. Furman)
+        // 12 Capítulos de Medicina VR (Dr. Furman - Directo a YouTube)
         const furmanChapters = [
-            { num: 1, title: 'Capítulo 1: Salud de la Columna Vertebral', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
-            { num: 2, title: 'Capítulo 2: Articulaciones y Movilidad', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
-            { num: 3, title: 'Capítulo 3: Prevención del Dolor Cervical', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
-            { num: 4, title: 'Capítulo 4: Rehabilitación Física en 360°', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
-            { num: 5, title: 'Capítulo 5: Cuidado de Rodillas y Caderas', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
-            { num: 6, title: 'Capítulo 6: Postura y Ergonomía Diaria', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
-            { num: 7, title: 'Capítulo 7: Medicina Deportiva Inmersiva', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
-            { num: 8, title: 'Capítulo 8: Tratamientos para Lumbalgia', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
-            { num: 9, title: 'Capítulo 9: Recuperación Muscular Avanzada', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
-            { num: 10, title: 'Capítulo 10: Bienestar Integral y Longevidad', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
-            { num: 11, title: 'Capítulo 11: Consultorio Abierto Dr. Furman', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' },
-            { num: 12, title: 'Capítulo 12: El Futuro de la Medicina VR', url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs' }
+            { num: 1, title: 'Capítulo 1: Salud de la Columna Vertebral', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
+            { num: 2, title: 'Capítulo 2: Articulaciones y Movilidad', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
+            { num: 3, title: 'Capítulo 3: Prevención del Dolor Cervical', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
+            { num: 4, title: 'Capítulo 4: Rehabilitación Física en 360°', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
+            { num: 5, title: 'Capítulo 5: Cuidado de Rodillas y Caderas', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
+            { num: 6, title: 'Capítulo 6: Postura y Ergonomía Diaria', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
+            { num: 7, title: 'Capítulo 7: Medicina Deportiva Inmersiva', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
+            { num: 8, title: 'Capítulo 8: Tratamientos para Lumbalgia', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
+            { num: 9, title: 'Capítulo 9: Recuperación Muscular Avanzada', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
+            { num: 10, title: 'Capítulo 10: Bienestar Integral y Longevidad', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
+            { num: 11, title: 'Capítulo 11: Consultorio Abierto Dr. Furman', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' },
+            { num: 12, title: 'Capítulo 12: El Futuro de la Medicina VR', url: 'https://www.youtube.com/watch?v=cQeUF8H2PR0' }
         ];
 
         // Poblar cuadrícula de la pestaña Programas VR
@@ -1337,7 +1276,7 @@
         renderVRGrid();
 
         let myList = [
-            { title: 'CRONICA', icon: '<img src="ms3media/medicinahorizontal.png" style="width:100%; height:100%; object-fit:cover;">', desc: 'Transmisión en directo de Crónica TV.', url: 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1', is360: false }
+            { title: 'CRONICA', icon: '<img src="ms3media/medicinahorizontal.png" style="width:100%; height:100%; object-fit:cover;">', desc: 'Transmisión en directo de Crónica TV.', url: 'https://www.youtube.com/embed/hw4uHyct4vg?autoplay=1&mute=0&enablejsapi=1', openExternalYT: false }
         ];
 
         const welcomeScreen = document.getElementById('welcomeScreen');
@@ -1417,14 +1356,14 @@
             const objPos = prog.fitTop ? 'object-position: center 20%; background:#0f0a1d;' : 'object-position: center;';
             const iconHTML = `<img src="${prog.img}" style="width:100%; height:100%; object-fit:cover; ${objPos}">`;
 
-            openPreview(prog.title, iconHTML, prog.desc, prog.url, prog.is360, {
+            openPreview(prog.title, iconHTML, prog.desc, prog.url, prog.openExternalYT, {
                 showVerMas: true,
                 showCapitulos: prog.isMedicina === true
             });
         }
 
-        function openPreview(title, iconHTML, desc, url, is360 = false, options = {}) {
-            currentModalData = { title, icon: iconHTML, desc, url, is360 };
+        function openPreview(title, iconHTML, desc, url, openExternalYT = false, options = {}) {
+            currentModalData = { title, icon: iconHTML, desc, url, openExternalYT };
             modalTitle.innerText = title;
             modalDesc.innerText = desc;
             modalImg.innerHTML = iconHTML + '<button class="preview-close" onclick="closePreview()">✕</button>';
@@ -1434,9 +1373,10 @@
 
             updateAddListButtonState(title);
 
+            modalPlayBtn.innerHTML = openExternalYT ? '▶ Abrir en YouTube VR' : '▶ Reproducir';
             modalPlayBtn.onclick = function() {
                 closePreview();
-                openPlayer(title, url, is360);
+                openPlayer(title, url, openExternalYT);
             };
 
             modalAddListBtn.onclick = function() {
@@ -1504,17 +1444,17 @@
                 row.className = 'dropdown-item';
                 row.onclick = () => {
                     closePreview();
-                    openPlayer(`Medicina VR - ${cap.title}`, cap.url, false);
+                    openPlayer(`Medicina VR - ${cap.title}`, cap.url, true);
                 };
                 row.innerHTML = `
                     <div class="dropdown-item-left">
                         <img class="dropdown-thumb" src="ms3media/medicinahorizontal.png" alt="Cap ${cap.num}">
                         <div>
                             <div class="dropdown-item-title">${cap.title}</div>
-                            <div class="dropdown-item-sub">Dr. Norberto Furman • YouTube VR</div>
+                            <div class="dropdown-item-sub">Dr. Norberto Furman • Abrir en YouTube VR</div>
                         </div>
                     </div>
-                    <span class="dropdown-play-pill">▶ Play</span>
+                    <span class="dropdown-play-pill">▶ YouTube</span>
                 `;
                 verCapitulosListContainer.appendChild(row);
             });
@@ -1542,32 +1482,36 @@
         }
 
         // ==========================================
-        // MOTOR DE REALIDAD VIRTUAL 360° Y YOUTUBE
+        // REPRODUCTOR: DIRECTO A YOUTUBE PARA VR / INTERNO PARA NOTICIAS
         // ==========================================
         const playerContainer = document.getElementById('playerContainer');
         const closePlayerBtn = document.getElementById('closePlayerBtn');
         const youtubeIframe = document.getElementById('youtubeIframe');
-        const vrCanvasContainer = document.getElementById('vrCanvasContainer');
-        const gyroToggleBtn = document.getElementById('gyroToggleBtn');
-        const vrSplitBtn = document.getElementById('vrSplitBtn');
-        const vrBottomControls = document.getElementById('vrBottomControls');
-        const vrPlayPauseBtn = document.getElementById('vrPlayPauseBtn');
-        const vrMuteBtn = document.getElementById('vrMuteBtn');
 
-        let scene, camera, renderer, sphereMesh, videoElement, videoTexture;
-        let isMouseDown = false, onPointerDownPointerX = 0, onPointerDownPointerY = 0;
-        let lon = 180, onPointerDownLon = 0, lat = 0, onPointerDownLat = 0;
-        let phi = 0, theta = 0;
-        let useGyro = false;
-        let isSplitVR = false;
-        let orientationHandler = null;
-        let initialAlpha = null;
+        function extractYouTubeId(url) {
+            if (!url) return null;
+            if (url.includes('youtu.be/')) {
+                return url.split('youtu.be/')[1].split('?')[0].split('&')[0];
+            }
+            if (url.includes('watch?v=')) {
+                return url.split('watch?v=')[1].split('&')[0];
+            }
+            if (url.includes('/embed/')) {
+                return url.split('/embed/')[1].split('?')[0].split('&')[0];
+            }
+            return null;
+        }
 
-        function openPlayer(title, url, is360 = false) {
-            if (is360 && typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission().catch(() => {});
+        function openPlayer(title, url, openExternalYT = false) {
+            // Si es un programa en Realidad Virtual, abrir directamente en YouTube (app nativa o web)
+            if (openExternalYT) {
+                const videoId = extractYouTubeId(url);
+                const directYoutubeUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : url;
+                window.open(directYoutubeUrl, '_blank', 'noopener,noreferrer');
+                return;
             }
 
+            // Para noticias en vivo, streaming o el documental destacado: reproducir dentro de la web
             playerContainer.classList.add('active');
             
             const elem = playerContainer;
@@ -1578,264 +1522,20 @@
                 screen.orientation.lock('landscape').catch(() => {});
             }
 
-            if (is360 && (url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.m3u8'))) {
-                youtubeIframe.style.display = 'none';
-                youtubeIframe.src = '';
-                vrCanvasContainer.style.display = 'block';
-                gyroToggleBtn.style.display = 'flex';
-                vrSplitBtn.style.display = 'flex';
-                vrBottomControls.classList.add('active');
-                initCustom360Player(url);
-            } else {
-                vrCanvasContainer.style.display = 'none';
-                gyroToggleBtn.style.display = 'none';
-                vrSplitBtn.style.display = 'none';
-                vrBottomControls.classList.remove('active');
-                youtubeIframe.style.display = 'block';
-
-                let embedUrl = url;
-                if (url.includes('youtu.be/')) {
-                    const videoId = url.split('youtu.be/')[1].split('?')[0];
-                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&playsinline=1&controls=1`;
-                } else if (url.includes('watch?v=')) {
-                    const videoId = url.split('watch?v=')[1].split('&')[0];
-                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&playsinline=1&controls=1`;
-                } else if (url.includes('/embed/')) {
-                    embedUrl = url + (url.includes('?') ? '&' : '?') + 'autoplay=1&enablejsapi=1&playsinline=1';
-                }
-                
-                youtubeIframe.src = embedUrl;
+            let embedUrl = url;
+            const videoId = extractYouTubeId(url);
+            if (videoId && !url.includes('/embed/')) {
+                embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&enablejsapi=1&playsinline=1&controls=1`;
+            } else if (url.includes('/embed/')) {
+                embedUrl = url + (url.includes('?') ? '&' : '?') + 'autoplay=1&enablejsapi=1&playsinline=1';
             }
-        }
-
-        function initCustom360Player(videoUrl) {
-            vrCanvasContainer.innerHTML = '';
-            lon = 180;
-            lat = 0;
-            initialAlpha = null;
-            isSplitVR = false;
-            vrSplitBtn.classList.remove('active');
-            vrSplitBtn.innerText = '🥽 Gafas VR: OFF';
-
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
-            camera.target = new THREE.Vector3(0, 0, 0);
-
-            const geometry = new THREE.SphereGeometry(500, 60, 40);
-            geometry.scale(-1, 1, 1);
-
-            videoElement = document.createElement('video');
-            videoElement.crossOrigin = 'anonymous';
-            videoElement.playsInline = true;
-            videoElement.setAttribute('webkit-playsinline', 'true');
-            videoElement.src = videoUrl;
-            videoElement.autoplay = true;
-            videoElement.loop = true;
-            videoElement.muted = false;
-
-            const playPromise = videoElement.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    vrPlayPauseBtn.innerText = '⏸ Pausar';
-                    vrMuteBtn.innerText = '🔊 Audio ON';
-                }).catch(() => {
-                    videoElement.muted = true;
-                    videoElement.play();
-                    vrPlayPauseBtn.innerText = '⏸ Pausar';
-                    vrMuteBtn.innerText = '🔇 Activar Audio';
-                });
-            }
-
-            videoTexture = new THREE.VideoTexture(videoElement);
-            videoTexture.minFilter = THREE.LinearFilter;
-            videoTexture.magFilter = THREE.LinearFilter;
-            videoTexture.format = THREE.RGBFormat;
-
-            const material = new THREE.MeshBasicMaterial({ map: videoTexture });
-            sphereMesh = new THREE.Mesh(geometry, material);
-            scene.add(sphereMesh);
-
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            vrCanvasContainer.appendChild(renderer.domElement);
-
-            vrCanvasContainer.addEventListener('pointerdown', onPointerDown);
-            document.addEventListener('pointermove', onPointerMove);
-            document.addEventListener('pointerup', onPointerUp);
-            window.addEventListener('resize', onWindowResize);
-
-            enableGyroscope();
-            animate360();
-        }
-
-        function onPointerDown(event) {
-            isMouseDown = true;
-            onPointerDownPointerX = event.clientX;
-            onPointerDownPointerY = event.clientY;
-            onPointerDownLon = lon;
-            onPointerDownLat = lat;
-        }
-
-        function onPointerMove(event) {
-            if (!isMouseDown) return;
-            lon = (onPointerDownPointerX - event.clientX) * 0.15 + onPointerDownLon;
-            lat = (event.clientY - onPointerDownPointerY) * 0.15 + onPointerDownLat;
-        }
-
-        function onPointerUp() { isMouseDown = false; }
-
-        function enableGyroscope() {
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission().then(permissionState => {
-                    if (permissionState === 'granted') {
-                        attachGyroListener();
-                    }
-                }).catch(console.error);
-            } else {
-                attachGyroListener();
-            }
-        }
-
-        function attachGyroListener() {
-            useGyro = true;
-            gyroToggleBtn.classList.add('active');
-            gyroToggleBtn.innerText = '📱 Giroscopio ON';
-
-            if (!orientationHandler) {
-                orientationHandler = function(event) {
-                    if (!useGyro || isMouseDown) return;
-                    if (event.alpha !== null && event.beta !== null) {
-                        if (initialAlpha === null) initialAlpha = event.alpha;
-                        const deltaAlpha = event.alpha - initialAlpha;
-                        lon = 180 - deltaAlpha;
-
-                        const isLandscape = window.innerWidth > window.innerHeight;
-                        if (isLandscape && event.gamma !== null) {
-                            const tilt = event.gamma > 0 ? 90 - event.gamma : -90 - event.gamma;
-                            lat = Math.max(-85, Math.min(85, tilt));
-                        } else {
-                            lat = Math.max(-85, Math.min(85, (event.beta - 90) * 0.8));
-                        }
-                    }
-                };
-                window.addEventListener('deviceorientation', orientationHandler);
-            }
-        }
-
-        function toggleGyroscope() {
-            useGyro = !useGyro;
-            if (useGyro) {
-                initialAlpha = null;
-                gyroToggleBtn.classList.add('active');
-                gyroToggleBtn.innerText = '📱 Giroscopio ON';
-            } else {
-                gyroToggleBtn.classList.remove('active');
-                gyroToggleBtn.innerText = '📱 Giroscopio OFF';
-            }
-        }
-
-        function toggleSplitVR() {
-            isSplitVR = !isSplitVR;
-            if (isSplitVR) {
-                vrSplitBtn.classList.add('active');
-                vrSplitBtn.innerText = '🥽 Gafas VR: ON';
-            } else {
-                vrSplitBtn.classList.remove('active');
-                vrSplitBtn.innerText = '🥽 Gafas VR: OFF';
-                if (renderer) {
-                    renderer.setScissorTest(false);
-                    renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-                }
-            }
-        }
-
-        function toggleVRPlayPause() {
-            if (!videoElement) return;
-            if (videoElement.paused) {
-                videoElement.play();
-                vrPlayPauseBtn.innerText = '⏸ Pausar';
-            } else {
-                videoElement.pause();
-                vrPlayPauseBtn.innerText = '▶ Reproducir';
-            }
-        }
-
-        function toggleVRMute() {
-            if (!videoElement) return;
-            videoElement.muted = !videoElement.muted;
-            vrMuteBtn.innerText = videoElement.muted ? '🔇 Activar Audio' : '🔊 Audio ON';
-        }
-
-        function recenterVR() {
-            lon = 180;
-            lat = 0;
-            initialAlpha = null;
-        }
-
-        function animate360() {
-            if (!vrCanvasContainer.style.display || vrCanvasContainer.style.display === 'none') return;
-            requestAnimationFrame(animate360);
-
-            lat = Math.max(-85, Math.min(85, lat));
-            phi = THREE.MathUtils.degToRad(90 - lat);
-            theta = THREE.MathUtils.degToRad(lon);
-
-            camera.target.x = 500 * Math.sin(phi) * Math.cos(theta);
-            camera.target.y = 500 * Math.cos(phi);
-            camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
-
-            camera.lookAt(camera.target);
-
-            if (isSplitVR) {
-                const width = window.innerWidth;
-                const height = window.innerHeight;
-                const halfWidth = width / 2;
-
-                renderer.setScissorTest(true);
-
-                camera.aspect = halfWidth / height;
-                camera.updateProjectionMatrix();
-                renderer.setScissor(0, 0, halfWidth, height);
-                renderer.setViewport(0, 0, halfWidth, height);
-                renderer.render(scene, camera);
-
-                renderer.setScissor(halfWidth, 0, halfWidth, height);
-                renderer.setViewport(halfWidth, 0, halfWidth, height);
-                renderer.render(scene, camera);
-            } else {
-                renderer.setScissorTest(false);
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-                renderer.render(scene, camera);
-            }
-        }
-
-        function onWindowResize() {
-            if (camera && renderer) {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            }
+            
+            youtubeIframe.src = embedUrl;
         }
 
         closePlayerBtn.addEventListener('click', () => {
             playerContainer.classList.remove('active');
             youtubeIframe.src = '';
-            vrBottomControls.classList.remove('active');
-            
-            if (videoElement) {
-                videoElement.pause();
-                videoElement.src = '';
-            }
-            if (orientationHandler) {
-                window.removeEventListener('deviceorientation', orientationHandler);
-                orientationHandler = null;
-            }
-            vrCanvasContainer.style.display = 'none';
-            gyroToggleBtn.style.display = 'none';
-            vrSplitBtn.style.display = 'none';
 
             if (document.exitFullscreen) { document.exitFullscreen().catch(() => {}); }
             else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
@@ -1863,7 +1563,7 @@
                     if (isVR) {
                         openVRProgram(item.title);
                     } else {
-                        openPreview(item.title, item.icon, item.desc, item.url, item.is360);
+                        openPreview(item.title, item.icon, item.desc, item.url, item.openExternalYT);
                     }
                 };
                 grid.appendChild(card);
