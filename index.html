@@ -1175,22 +1175,31 @@
     </div>
 
     <script>
+        // Asegurar autoplay fluido en bienvenida
+        document.addEventListener('DOMContentLoaded', () => {
+            const welcomeVideos = document.querySelectorAll('.welcome-screen video');
+            welcomeVideos.forEach(vid => {
+                vid.muted = true;
+                vid.play().catch(() => {});
+            });
+        });
+
         // Catálogo oficial de Programas VR
         const vrProgramsCatalog = [
             {
                 title: 'Buscando a la futura vedette',
                 img: 'ms3media/vedettehorizontal.png',
                 tag: '360° Pro',
-                desc: 'Experiencia inmersiva 360° en realidad virtual dentro de MS3.',
-                url: 'ms3media/vedette360.mp4',
+                desc: 'buscando a la futura vedette con la conduccion de carmen barbieri en donde la vedette vuelve a ser arte se buscara entre muchas participantes a la gran nueva vedette que cante, baile y actue la mas completa y talentosa un premio increible !!',
+                url: 'https://youtu.be/y3qO1OL5nRg?si=77AyJHUBxV-7P6QA',
                 isMedicina: false
             },
             {
                 title: 'MEDICINA VR',
                 img: 'ms3media/medicinahorizontal.png',
                 tag: '360°',
-                desc: 'Avances médicos inmersivos junto al Dr. Norberto Furman.',
-                url: 'https://youtu.be/cQeUF8H2PR0?si=T-jnZonZnGdbJ9bs',
+                desc: '¡Preparate para descubrir los secretos de tu propio cuerpo junto a Norberto Furman en un programa imperdible donde la ciencia, el humor y la salud se fusionan! Con la visita estelar de grandes figuras del arte como Guillermo Francella, cada emisión combina explicaciones fascinantes sobre anatomía y biología con charlas divertidas, enseñándote de manera única cómo funciona y se cuida la máquina perfecta que habitás todos los días.',
+                url: 'https://youtu.be/pPQBj4EzKqA?si=8SBYUD1YSTds-Lxk',
                 isMedicina: true
             },
             {
